@@ -15,7 +15,13 @@ BUNDLE = 'com.entrixy.ios'
 
 
 def run(*args, timeout=90, optional=False):
-    result = subprocess.run(args, text=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, timeout=timeout)
+    try:
+        result = subprocess.run(args, text=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, timeout=timeout)
+    except subprocess.TimeoutExpired:
+        if not optional:
+            raise
+        print("Optional simulator command timed out: " + " ".join(args[:4]), flush=True)
+        return ""
     print(result.stdout, end='', flush=True)
     if result.returncode and not optional:
         raise RuntimeError('Simulator command failed: ' + ' '.join(args[:4]))
@@ -48,7 +54,7 @@ def main():
             run('xcrun', 'simctl', 'bootstatus', device, '-b', timeout=240)
             run('xcrun', 'simctl', 'status_bar', device, 'override', '--time', '9:41',
                 '--dataNetwork', 'wifi', '--wifiMode', 'active', '--wifiBars', '3',
-                '--batteryState', 'charged', '--batteryLevel', '100')
+                '--batteryState', 'charged', '--batteryLevel', '100', timeout=20, optional=True)
             run('xcrun', 'simctl', 'install', device, str(APP))
             container = Path(run('xcrun', 'simctl', 'get_app_container', device, BUNDLE, 'data'))
             bootstrap = Path(os.environ.get('RUNNER_TEMP', '/tmp')) / 'preview-bootstrap.json'
