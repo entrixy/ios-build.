@@ -64,11 +64,17 @@ struct KeyImportScreen: View {
                     .buttonStyle(PrimaryActionStyle())
                     .disabled(invite == nil || model.busy || readingPhoto)
                     }
+                    Button("Отмена", role: .cancel) { dismiss() }
+                        .buttonStyle(.plain)
+                        .font(.body.weight(.medium))
+                        .foregroundStyle(Brand.ink)
+                        .frame(maxWidth: .infinity, minHeight: 48)
+                        .contentShape(Rectangle())
+                        .disabled(model.busy || readingPhoto)
                 }.padding(24)
             }
             .background(Color(uiColor: .systemGroupedBackground))
             .navigationTitle("Добавить ключ").navigationBarTitleDisplayMode(.inline)
-            .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Отмена") { dismiss() } } }
             .sheet(isPresented: $scanning) { QRScannerScreen { value in accept(value); scanning = false } }
             .onChange(of: photo) { value in
                 guard let value else { return }
@@ -85,6 +91,7 @@ struct KeyImportScreen: View {
                 }
             }
         }.tint(Brand.ink)
+            .interactiveDismissDisabled(model.busy || readingPhoto)
     }
 
     private func accept(_ value: String) {
