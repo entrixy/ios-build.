@@ -33,30 +33,36 @@ struct BackupScreen: View {
                 Section {
                     Text("Перенос не завершён").font(.headline)
                     Text("Осталось серверов: \(manager.remainingOwners), полученных ключей: \(manager.remainingGuests).")
-                    Button("Продолжить") { Task { await manager.restore() } }.disabled(manager.busy)
+                    Button("Продолжить перенос") { Task { await manager.restore() } }.buttonStyle(PrimaryActionStyle()).disabled(manager.busy)
                 } footer: { Text("Уже перенесённые доступы сохранены. План хранится на этом iPhone и не создаёт новую идентичность при повторе.") }
             } else {
                 Section {
-                    SecureField("Пароль копии", text: $password).textContentType(.newPassword).disabled(manager.busy)
-                    SecureField("Повторите пароль", text: $repeatedPassword).textContentType(.newPassword).disabled(manager.busy)
+                    AppField("Пароль копии") {
+                        SecureField("Пароль копии", text: $password).textContentType(.newPassword).disabled(manager.busy)
+                    }
+                    AppField("Повторите пароль") {
+                        SecureField("Повторите пароль", text: $repeatedPassword).textContentType(.newPassword).disabled(manager.busy)
+                    }
                     Button {
                         Task { do { _ = try await manager.export(password: password); fileSaved = false } catch { manager.report(error) } }
-                    } label: { if manager.busy { ProgressView() } else { Text("Создать зашифрованную копию") } }
-                        .disabled(manager.busy || password.count < 8 || password != repeatedPassword)
+                    } label: { ActionButtonLabel(title: manager.exportData == nil ? "Создать зашифрованную копию" : "Копия создана", busy: manager.busy) }
+                        .buttonStyle(PrimaryActionStyle()).disabled(manager.busy || manager.exportData != nil || password.count < 8 || password != repeatedPassword)
                     if manager.exportData != nil {
                         Text(fileSaved ? "Копия сохранена" : "Копия зашифрована и готова к сохранению").font(.subheadline).foregroundStyle(Brand.secondaryInk)
-                        Button("Сохранить в Файлы") { exporting = true }
+                        Button("Сохранить в Файлы") { exporting = true }.buttonStyle(PrimaryActionStyle())
                     }
                 } header: { Text("Сохранить доступы") }
                 footer: { Text("Пароль не сохраняется в приложении. Без него расшифровать файл невозможно. Копия содержит состояние на момент создания; повторяйте её после изменения доступов.") }
                 Section {
-                    Button("Выбрать файл копии") { importing = true }.disabled(manager.busy)
+                    Button("Выбрать файл копии") { importing = true }.buttonStyle(SecondaryActionStyle()).disabled(manager.busy)
                     if importedBytes != nil {
-                        SecureField("Пароль выбранного файла", text: $importPassword).disabled(manager.busy)
+                        AppField("Пароль выбранного файла") {
+                            SecureField("Пароль выбранного файла", text: $importPassword).disabled(manager.busy)
+                        }
                         Button("Проверить копию") {
                             guard let bytes = importedBytes else { return }
                             Task { do { try await manager.inspect(bytes, password: importPassword) } catch { manager.report(error) } }
-                        }.disabled(manager.busy || importPassword.isEmpty)
+                        }.buttonStyle(SecondaryActionStyle()).disabled(manager.busy || importPassword.isEmpty)
                     }
                 } header: { Text("Восстановить доступы") }
                 if let preview = manager.preview {
@@ -65,7 +71,7 @@ struct BackupScreen: View {
                         KeyValueRow(title: "Своих серверов", value: String(preview.owners.count))
                         KeyValueRow(title: "Полученных ключей", value: String(preview.guests.count))
                         ForEach(preview.owners) { Text($0.server).font(.subheadline).foregroundStyle(Brand.secondaryInk) }
-                        Button("Перенести доступы на этот iPhone") { confirming = true }.disabled(manager.busy)
+                        Button("Перенести доступы на этот iPhone") { confirming = true }.buttonStyle(PrimaryActionStyle()).disabled(manager.busy)
                     } header: { Text("Файл проверен") }
                     footer: { Text("Привязки переносятся через серверы. На прежнем телефоне перенесённые доступы прекратят работать. Локальный код и биометрия другого устройства не копируются.") }
                 }

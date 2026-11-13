@@ -14,7 +14,7 @@ struct OwnerServersScreen: View {
                             Text(model.ownerMessages[owner.server] ?? "Регистрация была отправлена, но её результат не подтверждён. Повторная регистрация не выполняется.")
                                 .font(.subheadline).foregroundStyle(Brand.secondaryInk)
                             if model.canSaveOwnerAccess(owner.server) {
-                                Button("Сохранить доступ") { Task { await model.retrySavingOwnerAccess(owner.server) } }
+                                Button("Сохранить доступ") { Task { await model.retrySavingOwnerAccess(owner.server) } }.buttonStyle(PrimaryActionStyle())
                                     .disabled(model.ownerBusy)
                             }
                         } else {
@@ -38,7 +38,7 @@ struct OwnerServersScreen: View {
             } header: { Text("Мои серверы") }
             footer: { Text("На каждом сервере сохраняется отдельный доступ владельца. Полученные от других людей ключи находятся в разделе «Полученные ключи».") }
         }
-        .navigationTitle("Мои серверы")
+        .navigationTitle("Мои серверы").navigationBarTitleDisplayMode(.inline)
         .refreshable { await model.refreshOwners() }
         .task { await model.refreshOwners() }
         .sheet(isPresented: $adding) { AddOwnerServerScreen() }
@@ -55,10 +55,14 @@ struct AddOwnerServerScreen: View {
         NavigationStack {
             Form {
                 Section {
-                    TextField("Адрес сервера", text: $server)
-                        .keyboardType(.URL).textInputAutocapitalization(.never).autocorrectionDisabled()
-                    SecureField("Код сервера, если нужен", text: $accessCode)
-                        .textInputAutocapitalization(.never).autocorrectionDisabled()
+                    AppField("Адрес сервера") {
+                        TextField("Адрес сервера", text: $server)
+                            .keyboardType(.URL).textInputAutocapitalization(.never).autocorrectionDisabled()
+                    }
+                    AppField("Код сервера, если нужен") {
+                        SecureField("Код сервера, если нужен", text: $accessCode)
+                            .textInputAutocapitalization(.never).autocorrectionDisabled()
+                    }
                 } header: { Text("Сервер Entrixy") }
                 footer: { Text("Добавление создаст доступ владельца на этом сервере и сохранит его в защищённом хранилище iPhone.") }
                 Section {
@@ -67,8 +71,7 @@ struct AddOwnerServerScreen: View {
                             if await model.addOwner(server: server, accessCode: accessCode) { dismiss() }
                         }
                     } label: {
-                        if model.ownerBusy { ProgressView().tint(Brand.secondaryInk) }
-                        else { Text("Добавить сервер") }
+                        ActionButtonLabel(title: "Добавить сервер", busy: model.ownerBusy)
                     }
                     .buttonStyle(PrimaryActionStyle())
                     .listRowInsets(EdgeInsets())
@@ -77,8 +80,8 @@ struct AddOwnerServerScreen: View {
                 }
             }
             .navigationTitle("Добавить сервер").navigationBarTitleDisplayMode(.inline)
-            .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Закрыть") { dismiss() }.disabled(model.ownerBusy) } }
-            .interactiveDismissDisabled(model.ownerBusy)
+            .sheetDismissFooter(disabled: model.ownerBusy) { dismiss() }
+
             .alert("Entrixy", isPresented: Binding(get: { model.errorMessage != nil }, set: { if !$0 { model.errorMessage = nil } })) {
                 Button("Понятно") { model.errorMessage = nil }
             } message: { Text(model.errorMessage ?? "") }
@@ -137,7 +140,7 @@ struct OwnerObjectsScreen: View {
                 }
             }
         }
-        .navigationTitle("Мои объекты")
+        .navigationTitle("Мои объекты").navigationBarTitleDisplayMode(.inline)
         .refreshable { await model.refreshOwners() }
         .sheet(isPresented: $adding) { AddOwnerObjectScreen(server: server) }
     }
@@ -161,20 +164,30 @@ struct AddOwnerObjectScreen: View {
         NavigationStack {
             Form {
                 Section {
-                    TextField("Название", text: $label)
+                    AppField("Название") {
+                        TextField("Название", text: $label)
+                    }
                     Picker("Тип объекта", selection: $kind) {
                         Text("Контроллер Entrixy").tag("device")
                         Text("Телефонный звонок").tag("call")
                         Text("HTTPS-запрос с сервера").tag("webhook")
                     }
                     if kind == "device" {
-                        TextField("Код с корпуса контроллера", text: $claimCode).textInputAutocapitalization(.characters).autocorrectionDisabled()
+                        AppField("Код с корпуса контроллера") {
+                            TextField("Код с корпуса контроллера", text: $claimCode).textInputAutocapitalization(.characters).autocorrectionDisabled()
+                        }
                     } else if kind == "call" {
-                        TextField("Номер телефона", text: $phone).keyboardType(.phonePad)
+                        AppField("Номер телефона") {
+                            TextField("Номер телефона", text: $phone).keyboardType(.phonePad)
+                        }
                         Text("iOS требует подтверждать телефонный звонок. Фоновый автодозвон недоступен.").font(.footnote).foregroundStyle(Brand.secondaryInk)
                     } else {
-                        TextField("https://…", text: $url).keyboardType(.URL).textInputAutocapitalization(.never).autocorrectionDisabled()
-                        SecureField("Секрет подписи запроса", text: $secret).textInputAutocapitalization(.never).autocorrectionDisabled()
+                        AppField("Адрес HTTPS-запроса") {
+                            TextField("https://…", text: $url).keyboardType(.URL).textInputAutocapitalization(.never).autocorrectionDisabled()
+                        }
+                        AppField("Секрет подписи запроса") {
+                            SecureField("Секрет подписи запроса", text: $secret).textInputAutocapitalization(.never).autocorrectionDisabled()
+                        }
                         Text("Сервер будет отправлять подписанные запросы. Адрес и секрет передаются этому серверу для выполнения команды.").font(.footnote).foregroundStyle(Brand.secondaryInk)
                     }
                 } header: { Text(server) }
@@ -188,15 +201,14 @@ struct AddOwnerObjectScreen: View {
                             if result || !after.subtracting(before).isEmpty { dismiss() }
                         }
                     } label: {
-                        if model.ownerBusy { ProgressView().tint(Brand.secondaryInk) }
-                        else { Text("Добавить объект") }
+                        ActionButtonLabel(title: "Добавить объект", busy: model.ownerBusy)
                     }.buttonStyle(PrimaryActionStyle()).listRowInsets(EdgeInsets()).listRowBackground(Color.clear)
                         .disabled(!complete || model.ownerBusy)
                 }
             }
             .navigationTitle("Добавить объект").navigationBarTitleDisplayMode(.inline)
-            .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Закрыть") { dismiss() }.disabled(model.ownerBusy) } }
-            .interactiveDismissDisabled(model.ownerBusy)
+            .sheetDismissFooter(disabled: model.ownerBusy) { dismiss() }
+
             .alert("Entrixy", isPresented: Binding(get: { model.errorMessage != nil }, set: { if !$0 { model.errorMessage = nil } })) {
                 Button("Понятно") { model.errorMessage = nil }
             } message: { Text(model.errorMessage ?? "") }
@@ -218,21 +230,23 @@ struct OwnerObjectEditor: View {
         Form {
             if let object {
                 Section {
-                    TextField("Название", text: $label).disabled(object.pending != nil || object.available == false)
+                    AppField("Название") {
+                        TextField("Название", text: $label).disabled(object.pending != nil || object.available == false)
+                    }
                     if object.available == false { Text("Объект недоступен. Обновите данные сервера, прежде чем изменять его.").foregroundStyle(Brand.secondaryInk) }
                     if let message = model.ownerObjectMessages[objectID] { Text(message).foregroundStyle(Brand.secondaryInk) }
                     if object.pending != nil {
                         Text(object.sent ? "Результат запроса не подтверждён. Обновление проверит его без повторной отправки." : "Изменение ещё не применено.").foregroundStyle(Brand.secondaryInk)
-                        Button("Проверить результат") { Task { await model.refreshOwners() } }.disabled(model.ownerBusy)
+                        Button("Проверить результат") { Task { await model.refreshOwners() } }.buttonStyle(SecondaryActionStyle()).disabled(model.ownerBusy)
                         if model.canSaveOwnerObjectResult(objectID) {
-                            Button("Сохранить результат") { Task { await model.retrySavingOwnerObjectResult(server: server, objectID: objectID) } }.disabled(model.ownerBusy)
+                            Button("Сохранить результат") { Task { await model.retrySavingOwnerObjectResult(server: server, objectID: objectID) } }.buttonStyle(PrimaryActionStyle()).disabled(model.ownerBusy)
                         } else if !object.sent && object.pending == .create && object.routing["device_id_ref"] != nil {
-                            Button("Повторить создание объекта") { Task { await model.retryPreparedOwnerObject(server: server, objectID: objectID) } }.disabled(model.ownerBusy)
+                            Button("Повторить создание объекта") { Task { await model.retryPreparedOwnerObject(server: server, objectID: objectID) } }.buttonStyle(PrimaryActionStyle()).disabled(model.ownerBusy)
                         } else if !object.sent {
                             Button("Отменить изменение", role: .destructive) {
                                 model.cancelOwnerObjectChange(server: server, objectID: objectID)
                                 if self.object == nil { dismiss() }
-                            }.disabled(model.ownerBusy)
+                            }.buttonStyle(SecondaryActionStyle()).disabled(model.ownerBusy)
                         }
                     } else if object.revision == nil {
                         Text("Для безопасного изменения сначала обновите данные. Сервер должен поддерживать проверку версии объекта.").font(.footnote).foregroundStyle(Brand.secondaryInk)
@@ -241,11 +255,11 @@ struct OwnerObjectEditor: View {
                 Section {
                     Button("Сохранить название") {
                         Task { if await model.renameOwnerObject(server: server, objectID: objectID, label: label) { dismiss() } }
-                    }.disabled(model.ownerBusy || object.available == false || object.pending != nil || object.revision == nil || label.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                    }.buttonStyle(PrimaryActionStyle()).disabled(model.ownerBusy || object.available == false || object.pending != nil || object.revision == nil || label.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
                     if let did = object.bleDeviceID {
                         NavigationLink("Bluetooth-доступ гостей") { BLEPermissionsScreen(server: server, deviceID: did) }
                     }
-                    Button("Удалить объект", role: .destructive) { deleting = true }.disabled(model.ownerBusy || object.available == false || object.pending != nil)
+                    Button("Удалить объект", role: .destructive) { deleting = true }.buttonStyle(SecondaryActionStyle()).disabled(model.ownerBusy || object.available == false || object.pending != nil)
                 }
             }
         }

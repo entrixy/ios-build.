@@ -41,7 +41,7 @@ struct OwnerGuestsScreen: View {
                         VStack(alignment: .leading, spacing: 8) {
                             Text("Сохранённые ключи Android: \(owner.androidKeys?.count ?? 0)").font(.headline)
                             Text("Секреты сохранены. Для восстановления нужно подтвердить связку и правила передачи; новые ключи автоматически не создаются.").font(.subheadline).foregroundStyle(Brand.secondaryInk)
-                            Button("Проверить данные сервера") { Task { await model.refreshOwners() } }.disabled(model.ownerBusy)
+                            Button("Проверить данные сервера") { Task { await model.refreshOwners() } }.buttonStyle(SecondaryActionStyle()).disabled(model.ownerBusy)
                         }.padding(.vertical, 5)
                     }
                     if (owner.issuedKeys ?? []).isEmpty && (owner.delegatedKeys ?? []).isEmpty && (owner.androidKeys ?? []).isEmpty { Text("Выданных ключей пока нет").foregroundStyle(Brand.secondaryInk) }
@@ -98,8 +98,12 @@ struct IssueOwnerKeyScreen: View {
             Form {
                 Section {
                     Picker("Сервер", selection: $server) { ForEach(owners) { Text($0.server).tag($0.server) } }.disabled(editingKeyID != nil || model.ownerBusy)
-                    TextField("Имя гостя", text: $label)
-                    TextField("Приветствие гостю", text: $welcome, axis: .vertical)
+                    AppField("Имя гостя") {
+                        TextField("Имя гостя", text: $label)
+                    }
+                    AppField("Приветствие гостю") {
+                        TextField("Приветствие гостю", text: $welcome, axis: .vertical)
+                    }
                     if editingKeyID != nil { Toggle("Изменить подтверждение открытия", isOn: $changeConfirmation) }
                     if editingKeyID == nil || changeConfirmation { Toggle("Подтверждать нажатие перед открытием", isOn: $confirmation) }
                 }
@@ -151,7 +155,7 @@ struct IssueOwnerKeyScreen: View {
                             let pendingEdit = editingKeyID.flatMap { id in owner?.issuedKeys?.first(where: { $0.id == id })?.pending } != nil
                             if result || pendingEdit || !after.subtracting(before).isEmpty { dismiss() }
                         }
-                    } label: { if model.ownerBusy { ProgressView().tint(Brand.secondaryInk) } else { Text(editingKeyID == nil ? "Выдать ключ" : "Сохранить изменения") } }
+                    } label: { ActionButtonLabel(title: editingKeyID == nil ? "Выдать ключ" : "Сохранить изменения", busy: model.ownerBusy) }
                         .buttonStyle(PrimaryActionStyle()).listRowInsets(EdgeInsets()).listRowBackground(Color.clear)
                         .disabled(model.ownerBusy || selected.isEmpty || label.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
                 } footer: { Text("Ссылка даст выбранному гостю доступ только к отмеченным объектам. Передавайте её лично получателю.") }
@@ -168,8 +172,8 @@ struct IssueOwnerKeyScreen: View {
                 }
             }
             .onChange(of: server) { _ in selected = []; access = [:] }
-            .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Закрыть") { dismiss() }.disabled(model.ownerBusy) } }
-            .interactiveDismissDisabled(model.ownerBusy)
+            .sheetDismissFooter(disabled: model.ownerBusy) { dismiss() }
+
             .alert("Entrixy", isPresented: Binding(get: { model.errorMessage != nil }, set: { if !$0 { model.errorMessage = nil } })) { Button("Понятно") { model.errorMessage = nil } } message: { Text(model.errorMessage ?? "") }
         }
     }
@@ -208,37 +212,37 @@ struct OwnerKeyScreen: View {
                 if let link {
                     Section {
                         InviteQRCode(text: link.absoluteString).frame(maxWidth: .infinity).padding(.vertical, 12)
-                        ShareLink(item: link) { Label("Передать ссылку гостю", systemImage: "square.and.arrow.up") }
+                        ShareLink(item: link) { Label("Передать ссылку гостю", systemImage: "square.and.arrow.up") }.buttonStyle(PrimaryActionStyle())
                         Text(link.absoluteString).font(.caption.monospaced()).textSelection(.enabled).privacySensitive()
                     } footer: { Text("Ключ предназначен одному получателю. При первом добавлении сервер привяжет его к устройству гостя.") }
                 }
                 Section {
                     if key.accessNeedsReview == true {
                         Text("Ключ восстановлен. Проверьте правила передачи доступа перед новой выдачей по цепочке.").font(.footnote).foregroundStyle(Brand.secondaryInk)
-                        Button("Проверить правила передачи") { reviewingRestoredAccess = true; editing = true }
+                        Button("Проверить правила передачи") { reviewingRestoredAccess = true; editing = true }.buttonStyle(SecondaryActionStyle())
                             .disabled(key.pending != nil)
                     }
                     if key.pending != nil {
-                        Button("Проверить результат") { Task { await model.refreshOwners() } }
+                        Button("Проверить результат") { Task { await model.refreshOwners() } }.buttonStyle(SecondaryActionStyle())
                         if model.canSaveOwnerKeyResult(keyID) {
-                            Button("Сохранить результат") { Task { await model.retrySavingOwnerKeyResult(server: server, keyID: keyID) } }
+                            Button("Сохранить результат") { Task { await model.retrySavingOwnerKeyResult(server: server, keyID: keyID) } }.buttonStyle(PrimaryActionStyle())
                         } else if !key.sent {
-                            Button("Повторить запрос") { Task { await model.retryPreparedOwnerKey(server: server, keyID: keyID) } }
+                            Button("Повторить запрос") { Task { await model.retryPreparedOwnerKey(server: server, keyID: keyID) } }.buttonStyle(PrimaryActionStyle())
                             if key.keyID == nil {
-                                Button("Отменить выдачу", role: .destructive) { model.discardUnsentOwnerKey(server: server, keyID: keyID); if self.key == nil { dismiss() } }
+                                Button("Отменить выдачу", role: .destructive) { model.discardUnsentOwnerKey(server: server, keyID: keyID); if self.key == nil { dismiss() } }.buttonStyle(SecondaryActionStyle())
                             }
                         }
                     } else if key.state == .active || key.state == .paused {
-                        Button(key.state == .paused ? "Возобновить доступ" : "Приостановить доступ") { Task { await model.setOwnerKeyMode(server: server, keyID: keyID, paused: key.state != .paused) } }
+                        Button(key.state == .paused ? "Возобновить доступ" : "Приостановить доступ") { Task { await model.setOwnerKeyMode(server: server, keyID: keyID, paused: key.state != .paused) } }.buttonStyle(SecondaryActionStyle())
                     }
                     if key.pending == nil, key.state == .active, let owner,
                        let bundle = try? key.bundle(masterKey: owner.masterKey), let rows = bundle["ble"] as? [[String: Any]], !rows.isEmpty {
-                        Button("Продлить Bluetooth-пропуска на 24 часа") { renewingBLE = true }
+                        Button("Продлить Bluetooth-пропуска на 24 часа") { renewingBLE = true }.buttonStyle(SecondaryActionStyle())
                     }
                     if key.pending == nil && [.active, .paused, .restricted].contains(key.state) {
-                        Button("Написать сообщение") { composing = true }
+                        Button("Написать сообщение") { composing = true }.buttonStyle(SecondaryActionStyle())
                     }
-                    if key.keyID != nil && key.state != .revoked { Button("Отозвать ключ", role: .destructive) { revoking = true } }
+                    if key.keyID != nil && key.state != .revoked { Button("Отозвать ключ", role: .destructive) { revoking = true }.buttonStyle(SecondaryActionStyle()) }
                 }.disabled(model.ownerBusy)
             }
         }

@@ -1138,6 +1138,17 @@ final class AppModel: ObservableObject {
 
     func connection(for id: String) -> GuestConnection { connections[id] ?? .offline }
 
+    /// Presentation only: never reserves a command or changes an error while rendering.
+    func objectActionTitle(guestID: String, object: GuestObject) -> String {
+        if object.kind == "ble" { return ActionIntent.displayTitle(action: .toggle, kind: "ble") }
+        guard let link = actionLinks[guestID], let bundle = link.bundle, let snapshot = link.snapshot,
+              let policy = try? GuestActionPolicy.decode(bundle: bundle, snapshot: snapshot, numberID: object.numberID) else {
+            return "Управлять"
+        }
+        let action = chosenGuestAction(policy: policy, numberID: object.numberID, positions: link.positions)
+        return ActionIntent.displayTitle(action: action, kind: policy.kind)
+    }
+
     func objectConnectionTitle(guestID: String, object: GuestObject) -> String {
         guard let link = actionLinks[guestID], connection(for: guestID) == .connected,
               let bundle = link.bundle, let snapshot = link.snapshot,
@@ -1423,7 +1434,15 @@ struct ActionIntent: Identifiable {
     let action: GuestAction
     let wireAction: String
     let policy: GuestActionPolicy
-    var title: String { policy.kind == "ble" ? "Подать импульс / переключить" : action == .close ? "Закрыть" : (action == .toggle ? "Переключить" : "Открыть") }
+    var title: String { Self.displayTitle(action: action, kind: policy.kind) }
+    static func displayTitle(action: GuestAction, kind: String) -> String {
+        kind == "ble" ? "Подать импульс / переключить" : action == .close ? "Закрыть" : (action == .toggle ? "Переключить" : "Открыть")
+    }
+}
+
+private func chosenGuestAction(policy: GuestActionPolicy, numberID: Int, positions: [Int: String]) -> GuestAction {
+    policy.kind == "device" && ["open", "opening"].contains(positions[numberID] ?? "") ? .close :
+        (policy.toggles && policy.kind == "webhook" ? .toggle : .open)
 }
 
 private final class ActionLink {
@@ -1467,7 +1486,7 @@ extension AppModel {
             if let reason = policy.blockedReason { throw ActionDenied.message(reason) }
             let reachable = policy.serverWebhook || (policy.kind == "device" ? policy.deviceID.map { link.devices.contains($0) } == true : link.hostOnline)
             guard reachable else { throw ActionDenied.message(policy.kind == "device" ? "Контроллер не в сети." : "Телефон владельца не в сети.") }
-            let action: GuestAction = policy.kind == "device" && ["open", "opening"].contains(link.positions[object.numberID] ?? "") ? .close : (policy.toggles && policy.kind == "webhook" ? .toggle : .open)
+            let action = chosenGuestAction(policy: policy, numberID: object.numberID, positions: link.positions)
             let wire = action == .close ? "close" : (action == .toggle ? "toggle" : "")
             return ActionIntent(guestID: guestID, object: object, revision: link.revision, action: action, wireAction: wire, policy: policy)
         } catch let ActionDenied.message(text) { errorMessage = text }

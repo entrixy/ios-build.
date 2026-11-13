@@ -18,10 +18,12 @@ private struct BLEPairingContent: View {
     var body: some View {
         Form {
             Section {
-                TextField("Название объекта", text: $label)
+                AppField("Название объекта") {
+                    TextField("Название объекта", text: $label)
+                }
                 Text("Включите режим привязки на своём контроллере и держите iPhone рядом. Привязка меняет ключ владельца контроллера.")
                     .font(.footnote).foregroundStyle(Brand.secondaryInk)
-                Button("Найти контроллеры") { Task { await model.scan() } }.disabled(model.busy)
+                Button("Найти контроллеры") { Task { await model.scan() } }.buttonStyle(PrimaryActionStyle()).disabled(model.busy)
                 ForEach(model.discoveries) { discovery in
                     Button { selected = discovery } label: {
                         HStack {
@@ -29,7 +31,7 @@ private struct BLEPairingContent: View {
                             Spacer()
                             Text("\(discovery.rssi) dBm").foregroundStyle(Brand.secondaryInk)
                         }
-                    }.disabled(model.busy || app.ownerBusy || label.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || records.contains(where: { $0.peripheralID == discovery.id }))
+                    }.buttonStyle(SecondaryActionStyle()).disabled(model.busy || app.ownerBusy || label.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || records.contains(where: { $0.peripheralID == discovery.id }))
                 }
             } header: { Text("Новая привязка") }
             if model.busy { Section { ProgressView("Bluetooth…") } }
@@ -42,19 +44,19 @@ private struct BLEPairingContent: View {
                         NavigationLink("Bluetooth-доступ гостей") { BLEPermissionsScreen(server: server, deviceID: record.deviceID) }
                     }
                     if record.phase == .prepared {
-                        Button("Отправить сохранённую привязку") { Task { await model.sendPrepared(pairingID: record.id, server: server) } }.disabled(model.busy || app.ownerBusy)
+                        Button("Отправить сохранённую привязку") { Task { await model.sendPrepared(pairingID: record.id, server: server) } }.buttonStyle(PrimaryActionStyle()).disabled(model.busy || app.ownerBusy)
                     }
                     if record.objectID == nil, record.phase != .prepared {
-                        Button("Проверить привязку") { Task { await model.check(pairingID: record.id, server: server) } }.disabled(model.busy || app.ownerBusy)
+                        Button("Проверить привязку") { Task { await model.check(pairingID: record.id, server: server) } }.buttonStyle(SecondaryActionStyle()).disabled(model.busy || app.ownerBusy)
                     }
                     if record.phase == .confirmed, record.objectID == nil {
-                        Button("Добавить на сервер") { Task { _ = await app.registerPairedBLE(server: server, pairingID: record.id) } }
+                        Button("Добавить на сервер") { Task { _ = await app.registerPairedBLE(server: server, pairingID: record.id) } }.buttonStyle(PrimaryActionStyle())
                             .disabled(model.busy || app.ownerBusy)
                     }
                 } header: { Text("Сохранённая привязка") }
             }
         }
-        .navigationTitle("Bluetooth-контроллер")
+        .navigationTitle("Bluetooth-контроллер").navigationBarTitleDisplayMode(.inline)
         .onDisappear { if model.busy { model.suspend() } }
         .confirmationDialog("Привязать свой контроллер?", isPresented: Binding(get: { selected != nil }, set: { if !$0 { selected = nil } }), titleVisibility: .visible) {
             if let selected {

@@ -29,7 +29,7 @@ struct OwnerControlSection: View {
                     HStack {
                         Button("Позвонить") { Task { await control.dial(server: request.server, objectID: object.id, request: request) } }
                             .buttonStyle(PrimaryActionStyle())
-                        Button("Отказать", role: .destructive) { Task { await control.decline(request) } }.padding(.horizontal, 16)
+                        Button("Отказать", role: .destructive) { Task { await control.decline(request) } }.buttonStyle(SecondaryActionStyle())
                     }
                 }.padding(16).background(.background, in: RoundedRectangle(cornerRadius: 22))
             }
@@ -49,9 +49,10 @@ struct OwnerControlSection: View {
                                     .font(.subheadline).foregroundStyle(Brand.secondaryInk)
                                 if let message = ble.messages[object.id] { Text(message).font(.subheadline).foregroundStyle(Brand.secondaryInk) }
                                 if let message = control.messages[object.id] { Text(message).font(.subheadline).foregroundStyle(Brand.secondaryInk) }
+                                ActionCardAffordance(title: "Выбрать действие").padding(.top, 6)
                             }.frame(maxWidth: .infinity, alignment: .leading)
                         }.padding(16).background(.background, in: RoundedRectangle(cornerRadius: 22))
-                    }.buttonStyle(.plain)
+                    }.buttonStyle(CardActionStyle())
                 }
             }
         }

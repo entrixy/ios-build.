@@ -5,3 +5,5 @@ Native iOS application source and automated build checks. Work in progress; this
 Generate the Xcode project with `xcodegen generate`. Run core tests with `swift test`. The Actions workflow builds Debug and Release simulator applications, runs native tests, and captures isolated software test scenarios. Simulator builds cannot be installed on a physical iPhone or submitted to the App Store.
 
 Capture fixtures use synthetic data and do not prove hardware compatibility. No new distribution license is granted; bundled third-party notices remain in ThirdParty and App/Resources.
+
+Interface changes follow [the iOS design code](docs/IOS_DESIGN_CODE.md): branding on main tabs only, task titles without toolbar cancellation, explicit primary/secondary actions, and one screenshot per state.

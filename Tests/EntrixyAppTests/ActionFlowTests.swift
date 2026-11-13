@@ -79,6 +79,25 @@ final class ActionFlowTests: XCTestCase {
         XCTAssertTrue(model.journal.isEmpty)
         XCTAssertNil(model.actionIntent(guestID: guest.id, object: object))
     }
+    @MainActor func testVisibleActionNameFollowsControllerDirectionWithoutSendingOrChangingErrors() async throws {
+        let (model, controller, guest, object) = try await fixture()
+        XCTAssertEqual(model.objectActionTitle(guestID: guest.id, object: object), "Открыть")
+        XCTAssertEqual(model.actionIntent(guestID: guest.id, object: object)?.title, "Открыть")
+        try await model.receiveTestController(Data(#"{"type":"obj_state_update","num_id":7,"position":"open"}"#.utf8), guestID: guest.id)
+        model.errorMessage = "existing notice"
+        for _ in 0..<20 { XCTAssertEqual(model.objectActionTitle(guestID: guest.id, object: object), "Закрыть") }
+        XCTAssertEqual(model.errorMessage, "existing notice")
+        XCTAssertTrue(controller.sent.isEmpty)
+        XCTAssertTrue(model.journal.isEmpty)
+        let intent = try XCTUnwrap(model.actionIntent(guestID: guest.id, object: object))
+        XCTAssertEqual(intent.title, "Закрыть")
+        await model.execute(intent)
+        let packet = try XCTUnwrap(controller.sent.first)
+        let json = try XCTUnwrap(JSONSerialization.jsonObject(with: packet) as? [String: Any])
+        XCTAssertEqual(json["action"] as? String, "close")
+        model.suspend()
+    }
+
     @MainActor func testPINIsRequiredAndFailedAttemptsPersistAcrossLaunches() async throws {
         let (model, controller, guest, object) = try await fixture(template: ["auth_on": true, "auth": "pin"])
         try await model.setActionCode("1234")

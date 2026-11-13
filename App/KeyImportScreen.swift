@@ -56,25 +56,16 @@ struct KeyImportScreen: View {
                             else { importError = model.errorMessage; model.errorMessage = nil }
                         }
                     } label: {
-                        HStack(spacing: 10) {
-                            if model.busy { ProgressView() }
-                            Text("Добавить ключ")
-                        }
+                        ActionButtonLabel(title: "Добавить ключ", busy: model.busy)
                     }
                     .buttonStyle(PrimaryActionStyle())
                     .disabled(invite == nil || model.busy || readingPhoto)
                     }
-                    Button("Отмена", role: .cancel) { dismiss() }
-                        .buttonStyle(.plain)
-                        .font(.body.weight(.medium))
-                        .foregroundStyle(Brand.ink)
-                        .frame(maxWidth: .infinity, minHeight: 48)
-                        .contentShape(Rectangle())
-                        .disabled(model.busy || readingPhoto)
-                }.padding(24)
+                }.padding(DesignMetrics.pageInset)
             }
             .background(Color(uiColor: .systemGroupedBackground))
             .navigationTitle("Добавить ключ").navigationBarTitleDisplayMode(.inline)
+            .sheetDismissFooter(disabled: model.busy || readingPhoto) { dismiss() }
             .sheet(isPresented: $scanning) { QRScannerScreen { value in accept(value); scanning = false } }
             .onChange(of: photo) { value in
                 guard let value else { return }
@@ -91,7 +82,7 @@ struct KeyImportScreen: View {
                 }
             }
         }.tint(Brand.ink)
-            .interactiveDismissDisabled(model.busy || readingPhoto)
+
     }
 
     private func accept(_ value: String) {
@@ -111,16 +102,5 @@ private struct ImportMethodRow: View {
             Image(systemName: "chevron.right").font(.caption.weight(.medium)).foregroundStyle(Brand.secondaryInk)
         }
         .foregroundStyle(Brand.ink).padding(.horizontal, 16).frame(minHeight: 54).contentShape(Rectangle())
-    }
-}
-
-struct PrimaryActionStyle: ButtonStyle {
-    @Environment(\.isEnabled) private var isEnabled
-    func makeBody(configuration: Configuration) -> some View {
-        configuration.label.font(.headline)
-            .foregroundStyle(isEnabled ? Color(uiColor: .systemBackground) : Brand.secondaryInk)
-            .frame(maxWidth: .infinity).frame(minHeight: 54)
-            .background(isEnabled ? Brand.ink : Color(uiColor: .tertiarySystemFill), in: RoundedRectangle(cornerRadius: 14))
-            .opacity(configuration.isPressed ? 0.86 : 1)
     }
 }

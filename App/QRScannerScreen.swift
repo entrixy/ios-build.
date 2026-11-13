@@ -33,12 +33,12 @@ struct QRScannerScreen: View {
                             .multilineTextAlignment(.center)
                         Button("Открыть настройки") {
                             if let url = URL(string: UIApplication.openSettingsURLString) { UIApplication.shared.open(url) }
-                        }.buttonStyle(.borderedProminent)
+                        }.buttonStyle(PrimaryActionStyle())
                     }.padding(32)
                 }
             }
             .navigationTitle("Сканировать QR").navigationBarTitleDisplayMode(.inline)
-            .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Закрыть") { dismiss() } } }
+            .sheetDismissFooter("Закрыть") { dismiss() }
             .onChange(of: phase) { value in
                 if value == .active { permission = AVCaptureDevice.authorizationStatus(for: .video) }
             }

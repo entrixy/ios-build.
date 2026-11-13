@@ -49,9 +49,13 @@ struct ControlScreen: View {
                                             if let text = model.actionMessages[guest.id + "|" + object.id] {
                                                 Text(text).font(.subheadline).foregroundStyle(Brand.secondaryInk).fixedSize(horizontal: false, vertical: true)
                                             }
+                                            ActionCardAffordance(title: model.objectActionTitle(guestID: guest.id, object: object))
+                                                .padding(.top, 6)
                                         }.frame(maxWidth: .infinity, alignment: .leading)
                                     }.padding(16).background(.background, in: RoundedRectangle(cornerRadius: 22))
-                                }.buttonStyle(.plain).accessibilityHint("Управление объектом")
+                                }.buttonStyle(CardActionStyle())
+                                    .accessibilityLabel(object.label + ". " + model.objectActionTitle(guestID: guest.id, object: object))
+                                    .accessibilityHint("Выполнить действие с объектом")
                             }
                         }
                         if !query.isEmpty && !model.guests.flatMap(\.objects).contains(where: matches)
@@ -164,10 +168,10 @@ struct KeyDetailScreen: View {
                     Section {
                         Button { Task { await model.refresh() } } label: {
                             Label("Обновить данные", systemImage: "arrow.clockwise").foregroundStyle(Brand.ink)
-                        }.disabled(model.busy)
+                        }.buttonStyle(SecondaryActionStyle()).disabled(model.busy)
                     }
                     Section {
-                        Button("Удалить ключ с iPhone", role: .destructive) { removing = true }.disabled(model.busy)
+                        Button("Удалить ключ с iPhone", role: .destructive) { removing = true }.buttonStyle(SecondaryActionStyle()).disabled(model.busy)
                     } footer: { Text("Удаление уберёт ключ и его объекты из этого приложения. Повторно добавить ключ можно по исходной ссылке.").foregroundStyle(Brand.secondaryInk) }
                 }
             } else { EmptyScreen(image: "icon-key", title: "Ключ удалён", detail: "Вы можете добавить его снова по ссылке владельца.") }
@@ -191,14 +195,14 @@ struct JournalScreen: View {
     }
     var body: some View {
         VStack(spacing: 0) {
-            HStack(spacing: 0) {
+            HStack(spacing: 8) {
                 ShareLink(item: text) { JournalToolbarItem(symbol: "square.and.arrow.up", title: "Поделиться") }
                 Button { UIPasteboard.general.string = text; copied = true } label: {
                     JournalToolbarItem(symbol: "doc.on.doc", title: "Копировать")
                 }
-                Button { clearing = true } label: { JournalToolbarItem(symbol: "trash", title: "Очистить") }
+                Button(role: .destructive) { clearing = true } label: { JournalToolbarItem(symbol: "trash", title: "Очистить") }
             }
-            .buttonStyle(.plain).foregroundStyle(Brand.ink).disabled(model.journal.isEmpty)
+            .buttonStyle(SecondaryActionStyle()).foregroundStyle(Brand.ink).disabled(model.journal.isEmpty)
             .padding(.vertical, 6).background(Color(uiColor: .secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 16))
             .padding(.horizontal, 20).padding(.top, 12)
             if model.journal.isEmpty {

@@ -24,7 +24,7 @@ private struct DelegationInboxContent: View {
                     }
                     Button("Проверить новые части") {
                         Task { await manager.refreshAdditionalParts(); await manager.checkAll() }
-                    }.disabled(manager.busy || app.busy || app.ownerBusy)
+                    }.buttonStyle(SecondaryActionStyle()).disabled(manager.busy || app.busy || app.ownerBusy)
                 }
             }
             ForEach(app.delegations) { pending in
@@ -32,10 +32,10 @@ private struct DelegationInboxContent: View {
                     KeyValueRow(title: "Сервер", value: pending.link.server)
                     KeyValueRow(title: "Ожидают подтверждения", value: String(pending.parts.count - pending.completedCodes.count))
                     if !pending.sent {
-                        Button("Отправить принятие") { Task { await manager.send(pending.id) } }.disabled(manager.busy || app.busy || app.ownerBusy)
+                        Button("Отправить принятие") { Task { await manager.send(pending.id) } }.buttonStyle(PrimaryActionStyle()).disabled(manager.busy || app.busy || app.ownerBusy)
                     }
-                    Button("Проверить подтверждение") { Task { await manager.check(pending.id) } }.disabled(manager.busy || app.busy || app.ownerBusy)
-                    Button("Удалить ожидание с iPhone", role: .destructive) { removing = pending.id }.disabled(manager.busy || app.busy || app.ownerBusy)
+                    Button("Проверить подтверждение") { Task { await manager.check(pending.id) } }.buttonStyle(SecondaryActionStyle()).disabled(manager.busy || app.busy || app.ownerBusy)
+                    Button("Удалить ожидание с iPhone", role: .destructive) { removing = pending.id }.buttonStyle(SecondaryActionStyle()).disabled(manager.busy || app.busy || app.ownerBusy)
                 } footer: { Text("Подтверждение требует участия передавшего и владельца объектов. Данные получателя сохранены; повторный запрос принятия не выполняется.") }
             }
         }

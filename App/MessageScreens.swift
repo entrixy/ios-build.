@@ -38,7 +38,7 @@ private struct MessageListContent: View {
                 }
             }
         }
-        .navigationTitle("Сообщения")
+        .navigationTitle("Сообщения").navigationBarTitleDisplayMode(.inline)
         .task { await manager.retryAcknowledgements() }
     }
 }
@@ -82,7 +82,9 @@ struct ComposeMessageScreen: View {
                     }
                 }
                 Section {
-                    TextField("Текст сообщения", text: $text, axis: .vertical).lineLimit(3...6)
+                    AppField("Текст сообщения") {
+                        TextField("Текст сообщения", text: $text, axis: .vertical).lineLimit(3...6)
+                    }
                     Text("\(text.count) / 500").font(.caption).foregroundStyle(Brand.secondaryInk)
                     if let notice = manager.message { Text(notice).font(.subheadline).foregroundStyle(Brand.secondaryInk) }
                     Button {
@@ -92,14 +94,14 @@ struct ComposeMessageScreen: View {
                             sentID = app.outgoingMessages.first(where: { !previous.contains($0.id) })?.id
                             if sent { text = "" }
                         }
-                    } label: { if manager.busy { ProgressView() } else { Text("Отправить сообщение") } }
+                    } label: { ActionButtonLabel(title: "Отправить сообщение", busy: manager.busy) }
                         .buttonStyle(PrimaryActionStyle())
                         .disabled(text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || text.count > 500 || text.utf8.count > 2048)
                 } header: { Text("Сообщение получателю") } footer: { Text("Отправка на сервер ещё не подтверждает доставку или чтение получателем.") }
             }.disabled(manager.busy)
             .navigationTitle("Написать сообщение").navigationBarTitleDisplayMode(.inline)
-            .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Закрыть") { dismiss() }.disabled(manager.busy) } }
-            .interactiveDismissDisabled(manager.busy)
+            .sheetDismissFooter(sentID == nil ? "Отмена" : "Закрыть", disabled: manager.busy) { dismiss() }
+
         }
     }
 }

@@ -25,16 +25,16 @@ struct OwnerDelegatedKeyScreen: View {
                     }
                 }
                 Section {
-                    Button("Обновить данные") { Task { await app.refreshOwners() } }.disabled(app.ownerBusy)
+                    Button("Обновить данные") { Task { await app.refreshOwners() } }.buttonStyle(SecondaryActionStyle()).disabled(app.ownerBusy)
                     if key.state == .awaiting && key.revocationPending != true {
                         if key.sent {
-                            Button("Повторить передачу связки") { retrying = true }.disabled(app.ownerBusy)
+                            Button("Повторить передачу связки") { retrying = true }.buttonStyle(PrimaryActionStyle()).disabled(app.ownerBusy)
                         } else {
-                            Button("Подтвердить переданный доступ") { Task { await app.approveDelegatedKey(server: server, keyID: keyID) } }.disabled(app.ownerBusy)
+                            Button("Подтвердить переданный доступ") { Task { await app.approveDelegatedKey(server: server, keyID: keyID) } }.buttonStyle(PrimaryActionStyle()).disabled(app.ownerBusy)
                         }
                     }
                     if key.state != .revoked && key.revocationSent != true {
-                        Button("Отозвать доступ", role: .destructive) { revoking = true }.disabled(app.ownerBusy)
+                        Button("Отозвать доступ", role: .destructive) { revoking = true }.buttonStyle(SecondaryActionStyle()).disabled(app.ownerBusy)
                     }
                 } footer: { Text("Получатель использует собственный ключ. Связка выдаётся только после проверки поручительства и прав передавшего. Передача связки сама по себе не открывает объект.") }
             } else { Text("Переданный ключ недоступен").foregroundStyle(Brand.secondaryInk) }

@@ -87,7 +87,7 @@ enum Brand {
 
 struct BrandNavigationHeader: ViewModifier {
     func body(content: Content) -> some View {
-        content.toolbar {
+        content.navigationBarTitleDisplayMode(.large).toolbar {
             if #available(iOS 26.0, *) {
                 ToolbarItem(placement: .navigationBarLeading) { BrandLogo() }
                     .sharedBackgroundVisibility(.hidden)

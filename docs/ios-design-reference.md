@@ -1,5 +1,7 @@
 # iOS adaptation references
 
+The binding interface rules are in [IOS_DESIGN_CODE.md](IOS_DESIGN_CODE.md). Read them before changing any screen.
+
 Entrixy Android is the source for screen meaning, actions and owned artwork.
 iOS references guide native presentation, not new product scenarios.
 

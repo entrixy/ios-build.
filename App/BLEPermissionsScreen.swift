@@ -18,7 +18,7 @@ private struct BLEPermissionsContent: View {
     var body: some View {
         List {
             Section {
-                Button("Передать настройки контроллеру") { Task { await model.deliverDecisions(server: server, deviceID: deviceID) } }
+                Button("Передать настройки контроллеру") { Task { await model.deliverDecisions(server: server, deviceID: deviceID) } }.buttonStyle(PrimaryActionStyle())
                     .disabled(model.busy || app.ownerBusy || records.isEmpty)
                 if model.busy { ProgressView("Передача по Bluetooth…") }
                 if let text = model.deliveryMessages[deviceID] { Text(text).foregroundStyle(Brand.secondaryInk) }
@@ -32,13 +32,13 @@ private struct BLEPermissionsContent: View {
                     Text(record.revoked ? "Решение владельца: запретить доступ" : "Решение владельца: разрешить доступ")
                     Text(status(record)).foregroundStyle(Brand.secondaryInk)
                     if record.controllerResult == 0x41 {
-                        Button("Подготовить новую версию решения") { Task { await app.refreshOwnerBLEDecision(server: server, record: record) } }
+                        Button("Подготовить новую версию решения") { Task { await app.refreshOwnerBLEDecision(server: server, record: record) } }.buttonStyle(SecondaryActionStyle())
                             .disabled(model.busy || app.ownerBusy)
                     }
                 }
             }
         }
-        .navigationTitle("Bluetooth-доступ")
+        .navigationTitle("Bluetooth-доступ").navigationBarTitleDisplayMode(.inline)
     }
     private func guestLabel(_ record: BLERevocation) -> String {
         owner?.issuedKeys?.first(where: { $0.guestID == Int(record.guestID) })?.label

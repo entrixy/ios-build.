@@ -21,17 +21,23 @@ struct ActionConfirmation: View {
                 Text(intent.object.label).font(.title2.bold()).foregroundStyle(Brand.ink)
                 if needsSetup {
                     Text("Создайте PIN-код приложения из 4–8 цифр. Он хранится только на этом iPhone и подтверждает действия с объектами.")
-                    SecureField("Новый PIN-код", text: $code).keyboardType(.numberPad).textContentType(.newPassword)
-                        .padding(14).background(Color(uiColor: .secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 12))
-                    SecureField("Повторите PIN-код", text: $repeatedCode).keyboardType(.numberPad)
-                        .padding(14).background(Color(uiColor: .secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 12))
+                    AppField("Новый PIN-код") {
+                        SecureField("Новый PIN-код", text: $code).keyboardType(.numberPad).textContentType(.newPassword)
+                            .padding(14).background(Color(uiColor: .secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 12))
+                    }
+                    AppField("Повторите PIN-код") {
+                        SecureField("Повторите PIN-код", text: $repeatedCode).keyboardType(.numberPad)
+                            .padding(14).background(Color(uiColor: .secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 12))
+                    }
                     Button("Сохранить PIN-код") { setup() }.buttonStyle(PrimaryActionStyle())
                         .disabled(working || code != repeatedCode || !(4...8).contains(code.count))
                 } else if intent.policy.authentication != nil {
                     Text("Подтвердите действие способом, заданным владельцем.")
                     if allowsPIN {
-                        SecureField("PIN-код приложения", text: $code).keyboardType(.numberPad).textContentType(.password).focused($codeFocused)
-                            .padding(14).background(Color(uiColor: .secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 12))
+                        AppField("PIN-код приложения") {
+                            SecureField("PIN-код приложения", text: $code).keyboardType(.numberPad).textContentType(.password).focused($codeFocused)
+                                .padding(14).background(Color(uiColor: .secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 12))
+                        }
                         Button(intent.title) { authenticatePIN() }.buttonStyle(PrimaryActionStyle())
                             .disabled(working || !(4...8).contains(code.count))
                     }
@@ -48,11 +54,11 @@ struct ActionConfirmation: View {
                 if let message { Text(message).font(.subheadline).foregroundStyle(.red) }
                 if working { ProgressView() }
                 Spacer()
-            }.padding(24)
+            }.padding(DesignMetrics.pageInset)
             }.background(Color(uiColor: .systemGroupedBackground))
                 .navigationTitle(needsSetup ? "Создать PIN-код" : "Подтвердить действие").navigationBarTitleDisplayMode(.inline)
-                .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Отмена") { dismiss() }.disabled(working) } }
-        }.interactiveDismissDisabled(working)
+                .sheetDismissFooter(disabled: working) { dismiss() }
+        }
             .task {
                 #if DEBUG && targetEnvironment(simulator)
                 if ActionCaptureScenario.current == .codeEntry {
