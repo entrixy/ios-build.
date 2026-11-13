@@ -88,13 +88,18 @@ enum Brand {
 struct BrandNavigationHeader: ViewModifier {
     func body(content: Content) -> some View {
         content.toolbar {
-            ToolbarItem(placement: .navigationBarLeading) { BrandLogo() }
+            if #available(iOS 26.0, *) {
+                ToolbarItem(placement: .navigationBarLeading) { BrandLogo() }
+                    .sharedBackgroundVisibility(.hidden)
+            } else {
+                ToolbarItem(placement: .navigationBarLeading) { BrandLogo() }
+            }
         }
     }
 }
 
 /// Exact polygon geometry and independent LED timing from logo-animated-icon.svg.
-/// The mark stays square in the toolbar, so the system glass background is a circle.
+/// The mark owns its circle and never shares a glass capsule with adjacent actions.
 struct BrandLogo: View {
     private let fixedFaces: [[CGPoint]] = [
         [.init(x: 0, y: 40.7), .init(x: 0, y: 52.4), .init(x: 10.8, y: 56.6), .init(x: 10.8, y: 45)],
@@ -115,7 +120,7 @@ struct BrandLogo: View {
             }
         }
         .frame(width: 15.07, height: 28)
-        .frame(width: 32, height: 32)
+        .frame(width: 44, height: 44)
         .background(Color(uiColor: .secondarySystemGroupedBackground), in: Circle())
         .accessibilityElement(children: .ignore)
         .accessibilityLabel("Entrixy")
