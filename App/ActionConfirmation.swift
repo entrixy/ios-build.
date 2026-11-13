@@ -20,17 +20,17 @@ struct ActionConfirmation: View {
             VStack(alignment: .leading, spacing: 20) {
                 Text(intent.object.label).font(.title2.bold()).foregroundStyle(Brand.ink)
                 if needsSetup {
-                    Text("Создайте код Entrixy из 4–8 цифр. Это код приложения; он хранится только на этом iPhone.")
-                    SecureField("Новый код", text: $code).keyboardType(.numberPad).textContentType(.newPassword)
+                    Text("Создайте PIN-код приложения из 4–8 цифр. Он хранится только на этом iPhone и подтверждает действия с объектами.")
+                    SecureField("Новый PIN-код", text: $code).keyboardType(.numberPad).textContentType(.newPassword)
                         .padding(14).background(Color(uiColor: .secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 12))
-                    SecureField("Повторите код", text: $repeatedCode).keyboardType(.numberPad)
+                    SecureField("Повторите PIN-код", text: $repeatedCode).keyboardType(.numberPad)
                         .padding(14).background(Color(uiColor: .secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 12))
-                    Button("Сохранить код") { setup() }.buttonStyle(PrimaryActionStyle())
+                    Button("Сохранить PIN-код") { setup() }.buttonStyle(PrimaryActionStyle())
                         .disabled(working || code != repeatedCode || !(4...8).contains(code.count))
                 } else if intent.policy.authentication != nil {
                     Text("Подтвердите действие способом, заданным владельцем.")
                     if allowsPIN {
-                        SecureField("Код Entrixy", text: $code).keyboardType(.numberPad).textContentType(.password).focused($codeFocused)
+                        SecureField("PIN-код приложения", text: $code).keyboardType(.numberPad).textContentType(.password).focused($codeFocused)
                             .padding(14).background(Color(uiColor: .secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 12))
                         Button(intent.title) { authenticatePIN() }.buttonStyle(PrimaryActionStyle())
                             .disabled(working || !(4...8).contains(code.count))
@@ -50,7 +50,7 @@ struct ActionConfirmation: View {
                 Spacer()
             }.padding(24)
             }.background(Color(uiColor: .systemGroupedBackground))
-                .navigationTitle(needsSetup ? "Код Entrixy" : "Подтверждение").navigationBarTitleDisplayMode(.inline)
+                .navigationTitle(needsSetup ? "Создать PIN-код" : "Подтвердить действие").navigationBarTitleDisplayMode(.inline)
                 .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Отмена") { dismiss() }.disabled(working) } }
         }.interactiveDismissDisabled(working)
             .task {
