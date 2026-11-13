@@ -18,7 +18,6 @@ struct KeyImportScreen: View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: 24) {
-                    BrandLogo().padding(.top, 8)
                     Text("Вставьте ссылку от владельца или добавьте ключ с помощью QR-кода.")
                         .font(.body).foregroundStyle(Brand.secondaryInk).fixedSize(horizontal: false, vertical: true)
                     VStack(alignment: .leading, spacing: 10) {
@@ -69,6 +68,7 @@ struct KeyImportScreen: View {
             }
             .background(Color(uiColor: .systemGroupedBackground))
             .navigationTitle("Добавить ключ").navigationBarTitleDisplayMode(.inline)
+            .modifier(BrandNavigationHeader())
             .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Отмена") { dismiss() } } }
             .sheet(isPresented: $scanning) { QRScannerScreen { value in accept(value); scanning = false } }
             .onChange(of: photo) { value in

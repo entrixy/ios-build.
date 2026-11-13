@@ -46,12 +46,12 @@ struct RootView: View {
 
     var body: some View {
         TabView(selection: $selectedTab) {
-            NavigationStack { ControlScreen { input = ""; adding = true } }
+            NavigationStack { ControlScreen { input = ""; adding = true }.modifier(BrandNavigationHeader()) }
                 .tabItem { Label("Управление", image: "tab-control") }.tag(AppTab.control)
-            NavigationStack { SettingsScreen() }
+            NavigationStack { SettingsScreen().modifier(BrandNavigationHeader()) }
                 .tabItem { Label("Настройки", image: "tab-settings") }.tag(AppTab.settings)
-            NavigationStack { OwnerGuestsScreen() }.tabItem { Label("Гости", image: "tab-guests") }.tag(AppTab.guests)
-            NavigationStack { JournalScreen() }
+            NavigationStack { OwnerGuestsScreen().modifier(BrandNavigationHeader()) }.tabItem { Label("Гости", image: "tab-guests") }.tag(AppTab.guests)
+            NavigationStack { JournalScreen().modifier(BrandNavigationHeader()) }
                 .tabItem { Label("Журнал", image: "tab-journal") }.tag(AppTab.journal)
         }
         .tint(Brand.primary)
@@ -85,10 +85,83 @@ enum Brand {
 
 }
 
+struct BrandNavigationHeader: ViewModifier {
+    func body(content: Content) -> some View {
+        content.toolbar {
+            ToolbarItem(placement: .navigationBarLeading) { BrandLogo() }
+        }
+    }
+}
+
+/// Exact polygon geometry and independent LED timing from logo-animated-icon.svg.
+/// The mark stays square in the toolbar, so the system glass background is a circle.
 struct BrandLogo: View {
+    private let fixedFaces: [[CGPoint]] = [
+        [.init(x: 0, y: 40.7), .init(x: 0, y: 52.4), .init(x: 10.8, y: 56.6), .init(x: 10.8, y: 45)],
+        [.init(x: 0, y: 17.5), .init(x: 0, y: 29.1), .init(x: 10.8, y: 33.3), .init(x: 10.8, y: 21.7)]
+    ]
+    private let lights: [[CGPoint]] = [
+        [.init(x: 36.7, y: 11.6), .init(x: 10.8, y: 21.7), .init(x: 10.8, y: 10.1), .init(x: 36.7, y: 0)],
+        [.init(x: 36.7, y: 34.9), .init(x: 10.8, y: 45), .init(x: 10.8, y: 33.3), .init(x: 36.7, y: 23.3)],
+        [.init(x: 36.7, y: 58.2), .init(x: 10.8, y: 68.2), .init(x: 10.8, y: 56.6), .init(x: 36.7, y: 46.5)]
+    ]
     var body: some View {
-        Image("brand-horizontal").resizable().scaledToFit().frame(width: 120, height: 28)
-            .accessibilityLabel("Entrixy")
+        ZStack {
+            ForEach(fixedFaces.indices, id: \.self) { index in
+                BrandFacet(vertices: fixedFaces[index]).fill(Brand.ink)
+            }
+            ForEach(lights.indices, id: \.self) { index in
+                BrandLED(vertices: lights[index], initialColor: index)
+            }
+        }
+        .frame(width: 15.07, height: 28)
+        .frame(width: 32, height: 32)
+        .background(Color(uiColor: .secondarySystemGroupedBackground), in: Circle())
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel("Entrixy")
+    }
+}
+
+private struct BrandFacet: Shape {
+    let vertices: [CGPoint]
+    func path(in rect: CGRect) -> Path {
+        var path = Path()
+        for (index, point) in vertices.enumerated() {
+            let mapped = CGPoint(x: rect.minX + point.x / 36.7 * rect.width,
+                                 y: rect.minY + point.y / 68.2 * rect.height)
+            if index == 0 { path.move(to: mapped) } else { path.addLine(to: mapped) }
+        }
+        path.closeSubpath()
+        return path
+    }
+}
+
+private struct BrandLED: View {
+    let vertices: [CGPoint]
+    let initialColor: Int
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.scenePhase) private var phase
+    @State private var colorIndex = 2
+    private var animate: Bool { !reduceMotion && phase == .active }
+    private var colors: [Color] {
+        [Color(red: 226.0/255, green: 116.0/255, blue: 116.0/255),
+         Color(red: 149.0/255, green: 193.0/255, blue: 31.0/255), Brand.ink]
+    }
+    var body: some View {
+        BrandFacet(vertices: vertices).fill(colors[colorIndex])
+            .task(id: animate) {
+                guard animate else { colorIndex = 2; return }
+                colorIndex = initialColor
+                do {
+                    try await Task.sleep(nanoseconds: UInt64(Double.random(in: 0...400) * 1_000_000))
+                    while !Task.isCancelled {
+                        let next = (0..<3).filter { $0 != colorIndex }.randomElement()!
+                        withAnimation(.easeInOut(duration: 0.25)) { colorIndex = next }
+                        let delay = 80 + pow(Double.random(in: 0...1), 2.2) * 1600
+                        try await Task.sleep(nanoseconds: UInt64(delay * 1_000_000))
+                    }
+                } catch { /* View disappeared or motion/foreground preference changed. */ }
+            }
     }
 }
 

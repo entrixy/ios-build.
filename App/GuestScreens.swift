@@ -72,7 +72,6 @@ struct ControlScreen: View {
         .searchable(text: $query, placement: .navigationBarDrawer(displayMode: .automatic), prompt: "Найти объект")
         .navigationTitle("Управление")
         .toolbar {
-            ToolbarItem(placement: .navigationBarLeading) { BrandLogo() }
             ToolbarItem(placement: .navigationBarTrailing) {
                 Button(action: addKey) { Image(systemName: "plus") }
                     .accessibilityLabel("Добавить ключ").disabled(!model.storageReady || model.busy)

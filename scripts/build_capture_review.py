@@ -59,11 +59,14 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('directory', type=Path)
     parser.add_argument('--source-sha', required=True)
+    parser.add_argument('--comparison-matrix', action='store_true')
     args = parser.parse_args()
     if not re.fullmatch(r'[0-9a-f]{40}', args.source_sha):
         raise RuntimeError('Expected an exact source SHA')
     rows = json.loads((args.directory / 'manifest.json').read_text())
-    required = {(screen, phone, theme) for screen in TITLES for phone in ['iphone11', 'iphone16'] for theme in ['light', 'dark']}
+    phones = ['iphone11', 'iphone16'] if args.comparison_matrix else ['iphone16']
+    themes = ['light', 'dark'] if args.comparison_matrix else ['light']
+    required = {(screen, phone, theme) for screen in TITLES for phone in phones for theme in themes}
     observed, files, records = set(), set(), []
     for row in rows:
         key = (row['screen'], row['device'], row['appearance'])

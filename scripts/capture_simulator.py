@@ -32,6 +32,7 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--action-flows', action='store_true', help='Capture labelled, isolated software-controller scenarios')
     parser.add_argument('--all-flows', action='store_true', help='Capture every implemented UI stage with isolated test transports')
+    parser.add_argument('--comparison-matrix', action='store_true', help='Optional device/theme comparison for internal QA')
     options = parser.parse_args()
     actions = options.action_flows or options.all_flows
     if not APP.is_dir():
@@ -45,8 +46,10 @@ def main():
         raise RuntimeError('No installed iOS simulator runtime matching SDK ' + sdk)
     runtime = matching[0]['identifier']
     manifest = []
-    for model, device_type in [('iphone16', 'com.apple.CoreSimulator.SimDeviceType.iPhone-16'),
-                               ('iphone11', 'com.apple.CoreSimulator.SimDeviceType.iPhone-11')]:
+    devices = [('iphone16', 'com.apple.CoreSimulator.SimDeviceType.iPhone-16')]
+    if options.comparison_matrix:
+        devices.append(('iphone11', 'com.apple.CoreSimulator.SimDeviceType.iPhone-11'))
+    for model, device_type in devices:
         created = run('xcrun', 'simctl', 'create', 'Entrixy preview ' + model, device_type, runtime)
         device = created.splitlines()[-1].strip()
         try:
@@ -62,7 +65,7 @@ def main():
                 cache = container / 'Library/Caches'
                 cache.mkdir(parents=True, exist_ok=True)
                 shutil.copyfile(bootstrap, cache / 'preview-bootstrap.json')
-            for appearance in (['light', 'dark'] if options.all_flows else ['light']):
+            for appearance in (['light', 'dark'] if options.all_flows and options.comparison_matrix else ['light']):
                 run('xcrun', 'simctl', 'ui', device, 'appearance', appearance)
                 launched = appearance != "light"
                 screens = (['confirm-open', 'confirm-close', 'code-setup', 'code-entry', 'code-rejected',

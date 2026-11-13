@@ -22,3 +22,5 @@ in key status, not the user's action history. With no real actions, the journal 
 
 No reference screenshots are bundled in the app. No fabricated action rows are used
 for public previews. The incomplete actuation port is not represented by fake controls.
+
+The main four tabs share one leading circular Entrixy mark, without the wordmark. Preserve the exact five polygons from logo-animated-icon.svg. The three LED faces change independently between #E27474, #95C11F and the adaptive base ink: 0.25-second transitions, initial delay up to 400 ms, then 80 + random^2.2 × 1600 ms. Pause animation outside the foreground and respect Reduce Motion. Do not put the horizontal wordmark in a toolbar capsule.
