@@ -1,1500 +1,412 @@
-CCFFC04F-B4F8-499F-867A-F712B6EE8056
-Monitoring boot status for Entrixy preview iphone16 (CCFFC04F-B4F8-499F-867A-F712B6EE8056).
-[2026-11-13 14:51:32 +0000] Status=2, isTerminal=NO, Elapsed=00:37.
-	Waiting on Data Migration
-		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
-		Migration Elapsed:00:32 seconds
-
-[2026-11-13 14:51:33 +0000] Status=2, isTerminal=NO, Elapsed=00:38.
-	Waiting on Data Migration
-		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
-		Migration Elapsed:00:33 seconds
-
-[2026-11-13 14:51:34 +0000] Status=2, isTerminal=NO, Elapsed=00:39.
-	Waiting on Data Migration
-		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
-		Migration Elapsed:00:34 seconds
-
-[2026-11-13 14:51:35 +0000] Status=2, isTerminal=NO, Elapsed=00:40.
-	Waiting on Data Migration
-		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
-		Migration Elapsed:00:35 seconds
-
-[2026-11-13 14:51:36 +0000] Status=2, isTerminal=NO, Elapsed=00:41.
-	Waiting on Data Migration
-		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
-		Migration Elapsed:00:36 seconds
-
-[2026-11-13 14:51:37 +0000] Status=2, isTerminal=NO, Elapsed=00:42.
-	Waiting on Data Migration
-		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
-		Migration Elapsed:00:37 seconds
-
-[2026-11-13 14:51:38 +0000] Status=2, isTerminal=NO, Elapsed=00:43.
-	Waiting on Data Migration
-		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
-		Migration Elapsed:00:38 seconds
-
-[2026-11-13 14:51:39 +0000] Status=2, isTerminal=NO, Elapsed=00:44.
-	Waiting on Data Migration
-		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
-		Migration Elapsed:00:39 seconds
-
-[2026-11-13 14:51:40 +0000] Status=2, isTerminal=NO, Elapsed=00:45.
-	Waiting on Data Migration
-		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
-		Migration Elapsed:00:40 seconds
-
-[2026-11-13 14:51:41 +0000] Status=2, isTerminal=NO, Elapsed=00:46.
+CEE76AE8-3E2C-4818-B8ED-0536A62500A8
+Monitoring boot status for Entrixy preview iphone16 (CEE76AE8-3E2C-4818-B8ED-0536A62500A8).
+[2026-11-13 17:13:28 +0000] Status=2, isTerminal=NO, Elapsed=00:53.
 	Waiting on Data Migration
 		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
 		Migration Elapsed:00:41 seconds
 
-[2026-11-13 14:51:42 +0000] Status=2, isTerminal=NO, Elapsed=00:47.
+[2026-11-13 17:13:29 +0000] Status=2, isTerminal=NO, Elapsed=00:54.
 	Waiting on Data Migration
 		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
 		Migration Elapsed:00:42 seconds
 
-[2026-11-13 14:51:43 +0000] Status=2, isTerminal=NO, Elapsed=00:48.
+[2026-11-13 17:13:30 +0000] Status=2, isTerminal=NO, Elapsed=00:55.
 	Waiting on Data Migration
 		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
 		Migration Elapsed:00:43 seconds
 
-[2026-11-13 14:51:44 +0000] Status=2, isTerminal=NO, Elapsed=00:49.
+[2026-11-13 17:13:31 +0000] Status=2, isTerminal=NO, Elapsed=00:56.
 	Waiting on Data Migration
 		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
 		Migration Elapsed:00:44 seconds
 
-[2026-11-13 14:51:45 +0000] Status=2, isTerminal=NO, Elapsed=00:50.
-	Waiting on Data Migration
-		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
-		Migration Elapsed:00:45 seconds
-
-[2026-11-13 14:51:46 +0000] Status=2, isTerminal=NO, Elapsed=00:51.
-	Waiting on Data Migration
-		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
-		Migration Elapsed:00:46 seconds
-
-[2026-11-13 14:51:47 +0000] Status=2, isTerminal=NO, Elapsed=00:52.
-	Waiting on Data Migration
-		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
-		Migration Elapsed:00:47 seconds
-
-[2026-11-13 14:51:48 +0000] Status=2, isTerminal=NO, Elapsed=00:53.
-	Waiting on Data Migration
-		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
-		Migration Elapsed:00:48 seconds
-
-[2026-11-13 14:51:49 +0000] Status=2, isTerminal=NO, Elapsed=00:54.
-	Waiting on Data Migration
-		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
-		Migration Elapsed:00:49 seconds
-
-[2026-11-13 14:51:54 +0000] Status=2, isTerminal=NO, Elapsed=00:59.
+[2026-11-13 17:13:39 +0000] Status=2, isTerminal=NO, Elapsed=01:04.
 	Waiting on Data Migration
 		Reason:Running plugin com.apple.securityd.KeychainMigrator (KeychainMigrator.migrator, user-agnostic)
-		Migration Elapsed:00:51 seconds
-
-[2026-11-13 14:51:55 +0000] Status=2, isTerminal=NO, Elapsed=01:00.
-	Waiting on Data Migration
-		Reason:Running plugin com.apple.managedconfiguration.migrator (MCProfile.migrator, user-agnostic)
-		Migration Elapsed:00:54 seconds
-
-[2026-11-13 14:51:55 +0000] Status=2, isTerminal=NO, Elapsed=01:00.
-	Waiting on Data Migration
-		Reason:Running plugin com.apple.managedconfiguration.migrator (MCProfile.migrator, user-agnostic)
-		Migration Elapsed:00:55 seconds
-
-[2026-11-13 14:51:58 +0000] Status=2, isTerminal=NO, Elapsed=01:03.
-	Waiting on Data Migration
-		Reason:Running plugin com.apple.managedconfiguration.migrator (MCProfile.migrator, user-agnostic)
-		Migration Elapsed:00:56 seconds
-
-[2026-11-13 14:51:59 +0000] Status=2, isTerminal=NO, Elapsed=01:04.
-	Waiting on Data Migration
-		Reason:Running plugin com.apple.managedconfiguration.migrator (MCProfile.migrator, user-agnostic)
-		Migration Elapsed:00:58 seconds
-
-[2026-11-13 14:52:00 +0000] Status=2, isTerminal=NO, Elapsed=01:05.
-	Waiting on Data Migration
-		Reason:Running plugin com.apple.managedconfiguration.migrator (MCProfile.migrator, user-agnostic)
-		Migration Elapsed:01:00 seconds
-
-[2026-11-13 14:52:01 +0000] Status=2, isTerminal=NO, Elapsed=01:06.
-	Waiting on Data Migration
-		Reason:Running plugin com.apple.managedconfiguration.migrator (MCProfile.migrator, user-agnostic)
-		Migration Elapsed:01:01 seconds
-
-[2026-11-13 14:52:03 +0000] Status=2, isTerminal=NO, Elapsed=01:08.
-	Waiting on Data Migration
-		Reason:Running plugin com.apple.managedconfiguration.migrator (MCProfile.migrator, user-agnostic)
-		Migration Elapsed:01:01 seconds
-
-[2026-11-13 14:52:04 +0000] Status=2, isTerminal=NO, Elapsed=01:09.
-	Waiting on Data Migration
-		Reason:Running plugin com.apple.MobileSafari.migrator (MobileSafari.migrator)
-		Migration Elapsed:01:04 seconds
-
-[2026-11-13 14:52:04 +0000] Status=2, isTerminal=NO, Elapsed=01:09.
-	Waiting on Data Migration
-		Reason:Running plugin com.apple.cloudrecents.migrator (CloudRecentsMigrator.migrator)
-		Migration Elapsed:01:04 seconds
-
-[2026-11-13 14:52:06 +0000] Status=4, isTerminal=NO, Elapsed=01:11.
-	Waiting on System App
-
-[2026-11-13 14:52:07 +0000] Status=4, isTerminal=NO, Elapsed=01:12.
-	Waiting on System App
-
-[2026-11-13 14:52:08 +0000] Status=4, isTerminal=NO, Elapsed=01:13.
-	Waiting on System App
-
-[2026-11-13 14:52:08 +0000] Status=4, isTerminal=NO, Elapsed=01:13.
-	Waiting on System App
-
-[2026-11-13 14:52:09 +0000] Status=4, isTerminal=NO, Elapsed=01:14.
-	Waiting on System App
-
-[2026-11-13 14:52:16 +0000] Status=4294967295, isTerminal=YES, Elapsed=01:21.
-	Finished
-
-Optional simulator command timed out: xcrun simctl status_bar CCFFC04F-B4F8-499F-867A-F712B6EE8056
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-com.entrixy.ios: 34302
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-confirm-open.png
-com.entrixy.ios: 34620
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-confirm-close.png
-com.entrixy.ios: 35099
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-code-setup.png
-com.entrixy.ios: 35275
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-code-entry.png
-com.entrixy.ios: 35634
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-code-rejected.png
-com.entrixy.ios: 35947
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-biometric.png
-com.entrixy.ios: 36309
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-request-sent.png
-com.entrixy.ios: 36757
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-result.png
-com.entrixy.ios: 37176
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-journal.png
-com.entrixy.ios: 38050
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-offline.png
-com.entrixy.ios: 38190
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-control.png
-com.entrixy.ios: 38756
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-settings.png
-com.entrixy.ios: 38805
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-key-detail.png
-com.entrixy.ios: 39455
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-add-key.png
-com.entrixy.ios: 39484
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-guests.png
-com.entrixy.ios: 40146
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-owner-form.png
-com.entrixy.ios: 40253
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-owner-ready.png
-com.entrixy.ios: 40901
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-owner-uncertain.png
-com.entrixy.ios: 41235
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-owner-offline.png
-com.entrixy.ios: 42163
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-object-form.png
-com.entrixy.ios: 42310
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-object-created.png
-com.entrixy.ios: 42959
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-object-edit.png
-com.entrixy.ios: 43032
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-object-renamed.png
-com.entrixy.ios: 43668
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-object-delete-confirm.png
-com.entrixy.ios: 43746
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-object-deleted.png
-com.entrixy.ios: 44385
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-object-uncertain.png
-com.entrixy.ios: 44419
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-issue-form.png
-com.entrixy.ios: 45196
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-issued-key.png
-com.entrixy.ios: 45467
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-issued-list.png
-com.entrixy.ios: 46378
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-issued-paused.png
-com.entrixy.ios: 46501
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-issued-revoked.png
-com.entrixy.ios: 47156
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-issued-uncertain.png
-com.entrixy.ios: 47257
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-issued-revoke-confirm.png
-com.entrixy.ios: 47864
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-owner-confirm.png
-com.entrixy.ios: 47909
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-owner-sending.png
-com.entrixy.ios: 48472
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-owner-result.png
-com.entrixy.ios: 48605
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-owner-journal.png
-com.entrixy.ios: 49210
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-owner-guest-request.png
-com.entrixy.ios: 49763
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-issued-edit-form.png
-com.entrixy.ios: 50181
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-issued-edit-result.png
-com.entrixy.ios: 50684
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-issued-access-form.png
-com.entrixy.ios: 50798
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-backup-form.png
-com.entrixy.ios: 51436
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-backup-export.png
-com.entrixy.ios: 51505
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-backup-preview.png
-com.entrixy.ios: 52166
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-backup-restored.png
-com.entrixy.ios: 52201
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-backup-rejected.png
-com.entrixy.ios: 53650
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-backup-interrupted.png
-com.entrixy.ios: 54170
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-delegation-preview.png
-com.entrixy.ios: 54604
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-delegation-waiting.png
-com.entrixy.ios: 55015
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-delegation-ready.png
-com.entrixy.ios: 55257
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-delegation-rejected.png
-com.entrixy.ios: 55697
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-delegated-awaiting.png
-com.entrixy.ios: 55923
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-delegated-ready.png
-com.entrixy.ios: 56362
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-delegated-uncertain.png
-com.entrixy.ios: 56614
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-delegated-revoked.png
-com.entrixy.ios: 57254
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-delegated-untrusted.png
-com.entrixy.ios: 57542
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-sender-form.png
-com.entrixy.ios: 58407
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-sender-link.png
-com.entrixy.ios: 58564
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-sender-uncertain.png
-com.entrixy.ios: 59034
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-sender-vouched.png
-com.entrixy.ios: 59132
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-sender-revoked.png
-com.entrixy.ios: 59673
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-sender-edit-form.png
-com.entrixy.ios: 59972
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-sender-edited.png
-com.entrixy.ios: 60312
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-message-inbox.png
-com.entrixy.ios: 60671
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-message-read.png
-com.entrixy.ios: 61216
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-message-corrupt.png
-com.entrixy.ios: 61753
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-message-compose.png
-com.entrixy.ios: 62309
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-message-sent.png
-com.entrixy.ios: 62653
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-additional-parts.png
-com.entrixy.ios: 62948
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-ble-scan.png
-com.entrixy.ios: 63305
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-ble-uncertain.png
-com.entrixy.ios: 63587
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-ble-paired.png
-com.entrixy.ios: 63811
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-ble-registered.png
-com.entrixy.ios: 64238
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-ble-owner-confirm.png
-com.entrixy.ios: 64512
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-ble-owner-result.png
-com.entrixy.ios: 65194
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-ble-owner-unknown.png
-com.entrixy.ios: 65546
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-ble-owner-journal.png
-com.entrixy.ios: 66256
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-ble-guest-confirm.png
-com.entrixy.ios: 66286
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-ble-guest-result.png
-com.entrixy.ios: 66906
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-ble-guest-expired.png
-com.entrixy.ios: 66959
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-ble-guest-unknown.png
-com.entrixy.ios: 67560
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-ble-guest-journal.png
-com.entrixy.ios: 67587
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-ble-revoke-pending.png
-com.entrixy.ios: 68205
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-ble-revoke-applied.png
-com.entrixy.ios: 68233
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-ble-revoke-stale.png
-com.entrixy.ios: 68980
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-ble-renewed.png
-com.entrixy.ios: 69396
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-dark-confirm-open.png
-com.entrixy.ios: 70228
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-dark-confirm-close.png
-com.entrixy.ios: 70486
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-dark-code-setup.png
-com.entrixy.ios: 70909
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-dark-code-entry.png
-com.entrixy.ios: 70935
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-dark-code-rejected.png
-com.entrixy.ios: 71586
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-dark-biometric.png
-com.entrixy.ios: 71633
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-dark-request-sent.png
-com.entrixy.ios: 72262
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-dark-result.png
-com.entrixy.ios: 72291
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-dark-journal.png
-com.entrixy.ios: 72995
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-dark-offline.png
-com.entrixy.ios: 73311
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-dark-control.png
-com.entrixy.ios: 74196
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-dark-settings.png
-com.entrixy.ios: 74358
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-dark-key-detail.png
-com.entrixy.ios: 75006
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-dark-add-key.png
-com.entrixy.ios: 75034
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-dark-guests.png
-com.entrixy.ios: 75678
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-dark-owner-form.png
-com.entrixy.ios: 75707
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-dark-owner-ready.png
-com.entrixy.ios: 76354
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-dark-owner-uncertain.png
-com.entrixy.ios: 76380
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-dark-owner-offline.png
-com.entrixy.ios: 77026
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-dark-object-form.png
-com.entrixy.ios: 77078
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-dark-object-created.png
-com.entrixy.ios: 78011
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-dark-object-edit.png
-com.entrixy.ios: 78342
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-dark-object-renamed.png
-com.entrixy.ios: 79095
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-dark-object-delete-confirm.png
-com.entrixy.ios: 79123
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-dark-object-deleted.png
-com.entrixy.ios: 79769
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-dark-object-uncertain.png
-com.entrixy.ios: 79796
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-dark-issue-form.png
-com.entrixy.ios: 80447
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-dark-issued-key.png
-com.entrixy.ios: 80531
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-dark-issued-list.png
-com.entrixy.ios: 81123
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-dark-issued-paused.png
-com.entrixy.ios: 81231
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-dark-issued-revoked.png
-com.entrixy.ios: 81832
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-dark-issued-uncertain.png
-com.entrixy.ios: 82206
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-dark-issued-revoke-confirm.png
-com.entrixy.ios: 83100
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-dark-owner-confirm.png
-com.entrixy.ios: 83218
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-dark-owner-sending.png
-com.entrixy.ios: 83864
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-dark-owner-result.png
-com.entrixy.ios: 83928
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-dark-owner-journal.png
-com.entrixy.ios: 84627
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-dark-owner-guest-request.png
-com.entrixy.ios: 84692
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-dark-issued-edit-form.png
-com.entrixy.ios: 85371
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-dark-issued-edit-result.png
-com.entrixy.ios: 85406
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-dark-issued-access-form.png
-com.entrixy.ios: 86410
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-dark-backup-form.png
-com.entrixy.ios: 86825
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-dark-backup-export.png
-com.entrixy.ios: 87612
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-dark-backup-preview.png
-com.entrixy.ios: 87647
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-dark-backup-restored.png
-com.entrixy.ios: 88387
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-dark-backup-rejected.png
-com.entrixy.ios: 88609
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-dark-backup-interrupted.png
-com.entrixy.ios: 89150
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-dark-delegation-preview.png
-com.entrixy.ios: 89215
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-dark-delegation-waiting.png
-com.entrixy.ios: 89957
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-dark-delegation-ready.png
-com.entrixy.ios: 89986
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-dark-delegation-rejected.png
-com.entrixy.ios: 90882
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-dark-delegated-awaiting.png
-com.entrixy.ios: 91287
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-dark-delegated-ready.png
-com.entrixy.ios: 92084
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-dark-delegated-uncertain.png
-com.entrixy.ios: 92273
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-dark-delegated-revoked.png
-com.entrixy.ios: 92616
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-dark-delegated-untrusted.png
-com.entrixy.ios: 93041
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-dark-sender-form.png
-com.entrixy.ios: 93307
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-dark-sender-link.png
-com.entrixy.ios: 93807
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-dark-sender-uncertain.png
-com.entrixy.ios: 93871
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-dark-sender-vouched.png
-com.entrixy.ios: 94582
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-dark-sender-revoked.png
-com.entrixy.ios: 94608
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-dark-sender-edit-form.png
-com.entrixy.ios: 95622
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-dark-sender-edited.png
-com.entrixy.ios: 95946
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-dark-message-inbox.png
-com.entrixy.ios: 96851
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-dark-message-read.png
-com.entrixy.ios: 96880
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-dark-message-corrupt.png
-com.entrixy.ios: 97623
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-dark-message-compose.png
-com.entrixy.ios: 97651
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-dark-message-sent.png
-com.entrixy.ios: 98397
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-dark-additional-parts.png
-com.entrixy.ios: 98426
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-dark-ble-scan.png
-com.entrixy.ios: 99171
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-dark-ble-uncertain.png
-com.entrixy.ios: 99197
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-dark-ble-paired.png
-com.entrixy.ios: 99940
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-dark-ble-registered.png
-com.entrixy.ios: 594
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-dark-ble-owner-confirm.png
-com.entrixy.ios: 1675
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-dark-ble-owner-result.png
-com.entrixy.ios: 1850
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-dark-ble-owner-unknown.png
-com.entrixy.ios: 2622
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-dark-ble-owner-journal.png
-com.entrixy.ios: 2652
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-dark-ble-guest-confirm.png
-com.entrixy.ios: 3402
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-dark-ble-guest-result.png
-com.entrixy.ios: 3428
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-dark-ble-guest-expired.png
-com.entrixy.ios: 4186
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-dark-ble-guest-unknown.png
-com.entrixy.ios: 4215
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-dark-ble-guest-journal.png
-com.entrixy.ios: 4964
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-dark-ble-revoke-pending.png
-com.entrixy.ios: 4992
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-dark-ble-revoke-applied.png
-com.entrixy.ios: 6026
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-dark-ble-revoke-stale.png
-com.entrixy.ios: 6366
-/Users/runner/Library/Developer/CoreSimulator/Devices/CCFFC04F-B4F8-499F-867A-F712B6EE8056/data/Containers/Data/Application/E2FCAD82-F933-42EE-BAF5-2FCAC26B33D7
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-dark-ble-renewed.png
-6960EFB8-F917-4825-924C-96A2BA1B660E
-Monitoring boot status for Entrixy preview iphone11 (6960EFB8-F917-4825-924C-96A2BA1B660E).
-[2026-11-13 15:17:54 +0000] Status=2, isTerminal=NO, Elapsed=00:29.
-	Waiting on Data Migration
-		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
-		Migration Elapsed:00:25 seconds
-
-[2026-11-13 15:17:54 +0000] Status=2, isTerminal=NO, Elapsed=00:30.
-	Waiting on Data Migration
-		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
-		Migration Elapsed:00:26 seconds
-
-[2026-11-13 15:17:55 +0000] Status=2, isTerminal=NO, Elapsed=00:31.
-	Waiting on Data Migration
-		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
-		Migration Elapsed:00:27 seconds
-
-[2026-11-13 15:17:56 +0000] Status=2, isTerminal=NO, Elapsed=00:32.
-	Waiting on Data Migration
-		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
-		Migration Elapsed:00:28 seconds
-
-[2026-11-13 15:17:57 +0000] Status=2, isTerminal=NO, Elapsed=00:33.
-	Waiting on Data Migration
-		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
-		Migration Elapsed:00:29 seconds
-
-[2026-11-13 15:17:58 +0000] Status=2, isTerminal=NO, Elapsed=00:34.
-	Waiting on Data Migration
-		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
-		Migration Elapsed:00:30 seconds
-
-[2026-11-13 15:17:59 +0000] Status=2, isTerminal=NO, Elapsed=00:35.
-	Waiting on Data Migration
-		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
-		Migration Elapsed:00:31 seconds
-
-[2026-11-13 15:18:00 +0000] Status=2, isTerminal=NO, Elapsed=00:36.
-	Waiting on Data Migration
-		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
-		Migration Elapsed:00:32 seconds
-
-[2026-11-13 15:18:01 +0000] Status=2, isTerminal=NO, Elapsed=00:37.
-	Waiting on Data Migration
-		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
-		Migration Elapsed:00:33 seconds
-
-[2026-11-13 15:18:02 +0000] Status=2, isTerminal=NO, Elapsed=00:38.
-	Waiting on Data Migration
-		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
-		Migration Elapsed:00:34 seconds
-
-[2026-11-13 15:18:03 +0000] Status=2, isTerminal=NO, Elapsed=00:39.
-	Waiting on Data Migration
-		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
-		Migration Elapsed:00:35 seconds
-
-[2026-11-13 15:18:05 +0000] Status=2, isTerminal=NO, Elapsed=00:40.
-	Waiting on Data Migration
-		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
-		Migration Elapsed:00:36 seconds
-
-[2026-11-13 15:18:05 +0000] Status=2, isTerminal=NO, Elapsed=00:41.
-	Waiting on Data Migration
-		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
-		Migration Elapsed:00:37 seconds
-
-[2026-11-13 15:18:06 +0000] Status=2, isTerminal=NO, Elapsed=00:42.
-	Waiting on Data Migration
-		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
-		Migration Elapsed:00:38 seconds
-
-[2026-11-13 15:18:07 +0000] Status=2, isTerminal=NO, Elapsed=00:43.
-	Waiting on Data Migration
-		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
-		Migration Elapsed:00:39 seconds
-
-[2026-11-13 15:18:08 +0000] Status=2, isTerminal=NO, Elapsed=00:44.
-	Waiting on Data Migration
-		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
-		Migration Elapsed:00:40 seconds
-
-[2026-11-13 15:18:09 +0000] Status=2, isTerminal=NO, Elapsed=00:45.
-	Waiting on Data Migration
-		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
-		Migration Elapsed:00:41 seconds
-
-[2026-11-13 15:18:10 +0000] Status=2, isTerminal=NO, Elapsed=00:46.
-	Waiting on Data Migration
-		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
-		Migration Elapsed:00:42 seconds
-
-[2026-11-13 15:18:11 +0000] Status=2, isTerminal=NO, Elapsed=00:47.
-	Waiting on Data Migration
-		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
-		Migration Elapsed:00:43 seconds
-
-[2026-11-13 15:18:12 +0000] Status=2, isTerminal=NO, Elapsed=00:48.
-	Waiting on Data Migration
-		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
-		Migration Elapsed:00:44 seconds
-
-[2026-11-13 15:18:13 +0000] Status=2, isTerminal=NO, Elapsed=00:49.
-	Waiting on Data Migration
-		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
 		Migration Elapsed:00:45 seconds
 
-[2026-11-13 15:18:14 +0000] Status=2, isTerminal=NO, Elapsed=00:50.
+[2026-11-13 17:13:43 +0000] Status=2, isTerminal=NO, Elapsed=01:08.
 	Waiting on Data Migration
-		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
-		Migration Elapsed:00:46 seconds
+		Reason:Running plugin com.apple.accounts.migrator (Accounts.migrator)
+		Migration Elapsed:00:52 seconds
 
-[2026-11-13 15:18:15 +0000] Status=2, isTerminal=NO, Elapsed=00:51.
-	Waiting on Data Migration
-		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
-		Migration Elapsed:00:47 seconds
-
-[2026-11-13 15:18:19 +0000] Status=2, isTerminal=NO, Elapsed=00:55.
-	Waiting on Data Migration
-		Reason:Running plugin com.apple.managedconfiguration.migrator (MCProfile.migrator, user-agnostic)
-		Migration Elapsed:00:48 seconds
-
-[2026-11-13 15:18:21 +0000] Status=2, isTerminal=NO, Elapsed=00:57.
-	Waiting on Data Migration
-		Reason:Running plugin com.apple.managedconfiguration.migrator (MCProfile.migrator, user-agnostic)
-		Migration Elapsed:00:51 seconds
-
-[2026-11-13 15:18:22 +0000] Status=2, isTerminal=NO, Elapsed=00:57.
-	Waiting on Data Migration
-		Reason:Running plugin com.apple.managedconfiguration.migrator (MCProfile.migrator, user-agnostic)
-		Migration Elapsed:00:53 seconds
-
-[2026-11-13 15:18:23 +0000] Status=2, isTerminal=NO, Elapsed=00:59.
-	Waiting on Data Migration
-		Reason:Running plugin com.apple.managedconfiguration.migrator (MCProfile.migrator, user-agnostic)
-		Migration Elapsed:00:54 seconds
-
-[2026-11-13 15:18:24 +0000] Status=2, isTerminal=NO, Elapsed=01:00.
-	Waiting on Data Migration
-		Reason:Running plugin com.apple.managedconfiguration.migrator (MCProfile.migrator, user-agnostic)
-		Migration Elapsed:00:55 seconds
-
-[2026-11-13 15:18:25 +0000] Status=2, isTerminal=NO, Elapsed=01:00.
-	Waiting on Data Migration
-		Reason:Running plugin com.apple.managedconfiguration.migrator (MCProfile.migrator, user-agnostic)
-		Migration Elapsed:00:56 seconds
-
-[2026-11-13 15:18:26 +0000] Status=2, isTerminal=NO, Elapsed=01:01.
-	Waiting on Data Migration
-		Reason:Running plugin com.apple.managedconfiguration.migrator (MCProfile.migrator, user-agnostic)
-		Migration Elapsed:00:56 seconds
-
-[2026-11-13 15:18:28 +0000] Status=2, isTerminal=NO, Elapsed=01:03.
-	Waiting on Data Migration
-		Reason:Running plugin com.apple.managedconfiguration.migrator (MCProfile.migrator, user-agnostic)
-		Migration Elapsed:00:58 seconds
-
-[2026-11-13 15:18:29 +0000] Status=2, isTerminal=NO, Elapsed=01:04.
-	Waiting on Data Migration
-		Reason:Running plugin com.apple.MobileSafari.migrator (MobileSafari.migrator)
-		Migration Elapsed:00:59 seconds
-
-[2026-11-13 15:18:30 +0000] Status=2, isTerminal=NO, Elapsed=01:05.
-	Waiting on Data Migration
-		Reason:Running plugin com.apple.vibration.migrator (Vibrations.migrator)
-		Migration Elapsed:01:01 seconds
-
-[2026-11-13 15:18:31 +0000] Status=2, isTerminal=NO, Elapsed=01:06.
-	Waiting on Data Migration
-		Reason:Running plugin com.apple.managedconfiguration.cleanup.migrator (MCCleanup.migrator)
-		Migration Elapsed:01:01 seconds
-
-[2026-11-13 15:18:34 +0000] Status=4, isTerminal=NO, Elapsed=01:09.
+[2026-11-13 17:13:46 +0000] Status=4, isTerminal=NO, Elapsed=01:11.
 	Waiting on System App
 
-[2026-11-13 15:18:35 +0000] Status=4, isTerminal=NO, Elapsed=01:10.
+[2026-11-13 17:13:48 +0000] Status=4, isTerminal=NO, Elapsed=01:13.
 	Waiting on System App
 
-[2026-11-13 15:18:36 +0000] Status=4, isTerminal=NO, Elapsed=01:11.
+[2026-11-13 17:13:50 +0000] Status=4, isTerminal=NO, Elapsed=01:15.
 	Waiting on System App
 
-[2026-11-13 15:18:37 +0000] Status=4, isTerminal=NO, Elapsed=01:13.
+[2026-11-13 17:13:52 +0000] Status=4, isTerminal=NO, Elapsed=01:17.
 	Waiting on System App
 
-[2026-11-13 15:18:38 +0000] Status=4, isTerminal=NO, Elapsed=01:13.
+[2026-11-13 17:13:52 +0000] Status=4, isTerminal=NO, Elapsed=01:17.
 	Waiting on System App
 
-[2026-11-13 15:18:45 +0000] Status=4294967295, isTerminal=YES, Elapsed=01:21.
+[2026-11-13 17:13:53 +0000] Status=4, isTerminal=NO, Elapsed=01:18.
+	Waiting on System App
+
+[2026-11-13 17:13:54 +0000] Status=4, isTerminal=NO, Elapsed=01:19.
+	Waiting on System App
+
+[2026-11-13 17:13:55 +0000] Status=4, isTerminal=NO, Elapsed=01:20.
+	Waiting on System App
+
+[2026-11-13 17:13:55 +0000] Status=4, isTerminal=NO, Elapsed=01:20.
+	Waiting on System App
+
+[2026-11-13 17:13:57 +0000] Status=4, isTerminal=NO, Elapsed=01:22.
+	Waiting on System App
+
+[2026-11-13 17:14:07 +0000] Status=4294967295, isTerminal=YES, Elapsed=01:32.
 	Finished
 
-Optional simulator command timed out: xcrun simctl status_bar 6960EFB8-F917-4825-924C-96A2BA1B660E
-/Users/runner/Library/Developer/CoreSimulator/Devices/6960EFB8-F917-4825-924C-96A2BA1B660E/data/Containers/Data/Application/6FD310D7-23CF-40B0-BDD0-97564D3FCD73
-com.entrixy.ios: 9103
-/Users/runner/Library/Developer/CoreSimulator/Devices/6960EFB8-F917-4825-924C-96A2BA1B660E/data/Containers/Data/Application/6FD310D7-23CF-40B0-BDD0-97564D3FCD73
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone11-light-confirm-open.png
-com.entrixy.ios: 9964
-/Users/runner/Library/Developer/CoreSimulator/Devices/6960EFB8-F917-4825-924C-96A2BA1B660E/data/Containers/Data/Application/6FD310D7-23CF-40B0-BDD0-97564D3FCD73
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone11-light-confirm-close.png
-com.entrixy.ios: 10019
-/Users/runner/Library/Developer/CoreSimulator/Devices/6960EFB8-F917-4825-924C-96A2BA1B660E/data/Containers/Data/Application/6FD310D7-23CF-40B0-BDD0-97564D3FCD73
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone11-light-code-setup.png
-com.entrixy.ios: 10653
-/Users/runner/Library/Developer/CoreSimulator/Devices/6960EFB8-F917-4825-924C-96A2BA1B660E/data/Containers/Data/Application/6FD310D7-23CF-40B0-BDD0-97564D3FCD73
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone11-light-code-entry.png
-com.entrixy.ios: 10751
-/Users/runner/Library/Developer/CoreSimulator/Devices/6960EFB8-F917-4825-924C-96A2BA1B660E/data/Containers/Data/Application/6FD310D7-23CF-40B0-BDD0-97564D3FCD73
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone11-light-code-rejected.png
-com.entrixy.ios: 11220
-/Users/runner/Library/Developer/CoreSimulator/Devices/6960EFB8-F917-4825-924C-96A2BA1B660E/data/Containers/Data/Application/6FD310D7-23CF-40B0-BDD0-97564D3FCD73
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone11-light-biometric.png
-com.entrixy.ios: 11595
-/Users/runner/Library/Developer/CoreSimulator/Devices/6960EFB8-F917-4825-924C-96A2BA1B660E/data/Containers/Data/Application/6FD310D7-23CF-40B0-BDD0-97564D3FCD73
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone11-light-request-sent.png
-com.entrixy.ios: 12105
-/Users/runner/Library/Developer/CoreSimulator/Devices/6960EFB8-F917-4825-924C-96A2BA1B660E/data/Containers/Data/Application/6FD310D7-23CF-40B0-BDD0-97564D3FCD73
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone11-light-result.png
-com.entrixy.ios: 12831
-/Users/runner/Library/Developer/CoreSimulator/Devices/6960EFB8-F917-4825-924C-96A2BA1B660E/data/Containers/Data/Application/6FD310D7-23CF-40B0-BDD0-97564D3FCD73
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone11-light-journal.png
-com.entrixy.ios: 13080
-/Users/runner/Library/Developer/CoreSimulator/Devices/6960EFB8-F917-4825-924C-96A2BA1B660E/data/Containers/Data/Application/6FD310D7-23CF-40B0-BDD0-97564D3FCD73
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone11-light-offline.png
-com.entrixy.ios: 13586
-/Users/runner/Library/Developer/CoreSimulator/Devices/6960EFB8-F917-4825-924C-96A2BA1B660E/data/Containers/Data/Application/6FD310D7-23CF-40B0-BDD0-97564D3FCD73
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone11-light-control.png
-com.entrixy.ios: 13757
-/Users/runner/Library/Developer/CoreSimulator/Devices/6960EFB8-F917-4825-924C-96A2BA1B660E/data/Containers/Data/Application/6FD310D7-23CF-40B0-BDD0-97564D3FCD73
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone11-light-settings.png
-com.entrixy.ios: 14202
-/Users/runner/Library/Developer/CoreSimulator/Devices/6960EFB8-F917-4825-924C-96A2BA1B660E/data/Containers/Data/Application/6FD310D7-23CF-40B0-BDD0-97564D3FCD73
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone11-light-key-detail.png
-com.entrixy.ios: 14507
-/Users/runner/Library/Developer/CoreSimulator/Devices/6960EFB8-F917-4825-924C-96A2BA1B660E/data/Containers/Data/Application/6FD310D7-23CF-40B0-BDD0-97564D3FCD73
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone11-light-add-key.png
-com.entrixy.ios: 14763
-/Users/runner/Library/Developer/CoreSimulator/Devices/6960EFB8-F917-4825-924C-96A2BA1B660E/data/Containers/Data/Application/6FD310D7-23CF-40B0-BDD0-97564D3FCD73
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone11-light-guests.png
-com.entrixy.ios: 15266
-/Users/runner/Library/Developer/CoreSimulator/Devices/6960EFB8-F917-4825-924C-96A2BA1B660E/data/Containers/Data/Application/6FD310D7-23CF-40B0-BDD0-97564D3FCD73
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone11-light-owner-form.png
-com.entrixy.ios: 15573
-/Users/runner/Library/Developer/CoreSimulator/Devices/6960EFB8-F917-4825-924C-96A2BA1B660E/data/Containers/Data/Application/6FD310D7-23CF-40B0-BDD0-97564D3FCD73
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone11-light-owner-ready.png
-com.entrixy.ios: 16346
-/Users/runner/Library/Developer/CoreSimulator/Devices/6960EFB8-F917-4825-924C-96A2BA1B660E/data/Containers/Data/Application/6FD310D7-23CF-40B0-BDD0-97564D3FCD73
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone11-light-owner-uncertain.png
-com.entrixy.ios: 16725
-/Users/runner/Library/Developer/CoreSimulator/Devices/6960EFB8-F917-4825-924C-96A2BA1B660E/data/Containers/Data/Application/6FD310D7-23CF-40B0-BDD0-97564D3FCD73
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone11-light-owner-offline.png
-com.entrixy.ios: 17218
-/Users/runner/Library/Developer/CoreSimulator/Devices/6960EFB8-F917-4825-924C-96A2BA1B660E/data/Containers/Data/Application/6FD310D7-23CF-40B0-BDD0-97564D3FCD73
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone11-light-object-form.png
-com.entrixy.ios: 17548
-/Users/runner/Library/Developer/CoreSimulator/Devices/6960EFB8-F917-4825-924C-96A2BA1B660E/data/Containers/Data/Application/6FD310D7-23CF-40B0-BDD0-97564D3FCD73
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone11-light-object-created.png
-com.entrixy.ios: 17869
-/Users/runner/Library/Developer/CoreSimulator/Devices/6960EFB8-F917-4825-924C-96A2BA1B660E/data/Containers/Data/Application/6FD310D7-23CF-40B0-BDD0-97564D3FCD73
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone11-light-object-edit.png
-com.entrixy.ios: 18318
-/Users/runner/Library/Developer/CoreSimulator/Devices/6960EFB8-F917-4825-924C-96A2BA1B660E/data/Containers/Data/Application/6FD310D7-23CF-40B0-BDD0-97564D3FCD73
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone11-light-object-renamed.png
-com.entrixy.ios: 18522
-/Users/runner/Library/Developer/CoreSimulator/Devices/6960EFB8-F917-4825-924C-96A2BA1B660E/data/Containers/Data/Application/6FD310D7-23CF-40B0-BDD0-97564D3FCD73
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone11-light-object-delete-confirm.png
-com.entrixy.ios: 19048
-/Users/runner/Library/Developer/CoreSimulator/Devices/6960EFB8-F917-4825-924C-96A2BA1B660E/data/Containers/Data/Application/6FD310D7-23CF-40B0-BDD0-97564D3FCD73
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone11-light-object-deleted.png
-com.entrixy.ios: 19111
-/Users/runner/Library/Developer/CoreSimulator/Devices/6960EFB8-F917-4825-924C-96A2BA1B660E/data/Containers/Data/Application/6FD310D7-23CF-40B0-BDD0-97564D3FCD73
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone11-light-object-uncertain.png
-com.entrixy.ios: 19748
-/Users/runner/Library/Developer/CoreSimulator/Devices/6960EFB8-F917-4825-924C-96A2BA1B660E/data/Containers/Data/Application/6FD310D7-23CF-40B0-BDD0-97564D3FCD73
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone11-light-issue-form.png
-com.entrixy.ios: 20222
-/Users/runner/Library/Developer/CoreSimulator/Devices/6960EFB8-F917-4825-924C-96A2BA1B660E/data/Containers/Data/Application/6FD310D7-23CF-40B0-BDD0-97564D3FCD73
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone11-light-issued-key.png
-com.entrixy.ios: 20958
-/Users/runner/Library/Developer/CoreSimulator/Devices/6960EFB8-F917-4825-924C-96A2BA1B660E/data/Containers/Data/Application/6FD310D7-23CF-40B0-BDD0-97564D3FCD73
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone11-light-issued-list.png
-com.entrixy.ios: 21315
-/Users/runner/Library/Developer/CoreSimulator/Devices/6960EFB8-F917-4825-924C-96A2BA1B660E/data/Containers/Data/Application/6FD310D7-23CF-40B0-BDD0-97564D3FCD73
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone11-light-issued-paused.png
-com.entrixy.ios: 21999
-/Users/runner/Library/Developer/CoreSimulator/Devices/6960EFB8-F917-4825-924C-96A2BA1B660E/data/Containers/Data/Application/6FD310D7-23CF-40B0-BDD0-97564D3FCD73
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone11-light-issued-revoked.png
-com.entrixy.ios: 22077
-/Users/runner/Library/Developer/CoreSimulator/Devices/6960EFB8-F917-4825-924C-96A2BA1B660E/data/Containers/Data/Application/6FD310D7-23CF-40B0-BDD0-97564D3FCD73
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone11-light-issued-uncertain.png
-com.entrixy.ios: 22691
-/Users/runner/Library/Developer/CoreSimulator/Devices/6960EFB8-F917-4825-924C-96A2BA1B660E/data/Containers/Data/Application/6FD310D7-23CF-40B0-BDD0-97564D3FCD73
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone11-light-issued-revoke-confirm.png
-com.entrixy.ios: 22726
-/Users/runner/Library/Developer/CoreSimulator/Devices/6960EFB8-F917-4825-924C-96A2BA1B660E/data/Containers/Data/Application/6FD310D7-23CF-40B0-BDD0-97564D3FCD73
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone11-light-owner-confirm.png
-com.entrixy.ios: 23370
-/Users/runner/Library/Developer/CoreSimulator/Devices/6960EFB8-F917-4825-924C-96A2BA1B660E/data/Containers/Data/Application/6FD310D7-23CF-40B0-BDD0-97564D3FCD73
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone11-light-owner-sending.png
-com.entrixy.ios: 23426
-/Users/runner/Library/Developer/CoreSimulator/Devices/6960EFB8-F917-4825-924C-96A2BA1B660E/data/Containers/Data/Application/6FD310D7-23CF-40B0-BDD0-97564D3FCD73
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone11-light-owner-result.png
-com.entrixy.ios: 24338
-/Users/runner/Library/Developer/CoreSimulator/Devices/6960EFB8-F917-4825-924C-96A2BA1B660E/data/Containers/Data/Application/6FD310D7-23CF-40B0-BDD0-97564D3FCD73
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone11-light-owner-journal.png
-com.entrixy.ios: 24607
-/Users/runner/Library/Developer/CoreSimulator/Devices/6960EFB8-F917-4825-924C-96A2BA1B660E/data/Containers/Data/Application/6FD310D7-23CF-40B0-BDD0-97564D3FCD73
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone11-light-owner-guest-request.png
-com.entrixy.ios: 25490
-/Users/runner/Library/Developer/CoreSimulator/Devices/6960EFB8-F917-4825-924C-96A2BA1B660E/data/Containers/Data/Application/6FD310D7-23CF-40B0-BDD0-97564D3FCD73
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone11-light-issued-edit-form.png
-com.entrixy.ios: 25526
-/Users/runner/Library/Developer/CoreSimulator/Devices/6960EFB8-F917-4825-924C-96A2BA1B660E/data/Containers/Data/Application/6FD310D7-23CF-40B0-BDD0-97564D3FCD73
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone11-light-issued-edit-result.png
-com.entrixy.ios: 26177
-/Users/runner/Library/Developer/CoreSimulator/Devices/6960EFB8-F917-4825-924C-96A2BA1B660E/data/Containers/Data/Application/6FD310D7-23CF-40B0-BDD0-97564D3FCD73
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone11-light-issued-access-form.png
-com.entrixy.ios: 26214
-/Users/runner/Library/Developer/CoreSimulator/Devices/6960EFB8-F917-4825-924C-96A2BA1B660E/data/Containers/Data/Application/6FD310D7-23CF-40B0-BDD0-97564D3FCD73
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone11-light-backup-form.png
-com.entrixy.ios: 26860
-/Users/runner/Library/Developer/CoreSimulator/Devices/6960EFB8-F917-4825-924C-96A2BA1B660E/data/Containers/Data/Application/6FD310D7-23CF-40B0-BDD0-97564D3FCD73
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone11-light-backup-export.png
-com.entrixy.ios: 26895
-/Users/runner/Library/Developer/CoreSimulator/Devices/6960EFB8-F917-4825-924C-96A2BA1B660E/data/Containers/Data/Application/6FD310D7-23CF-40B0-BDD0-97564D3FCD73
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone11-light-backup-preview.png
-com.entrixy.ios: 27548
-/Users/runner/Library/Developer/CoreSimulator/Devices/6960EFB8-F917-4825-924C-96A2BA1B660E/data/Containers/Data/Application/6FD310D7-23CF-40B0-BDD0-97564D3FCD73
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone11-light-backup-restored.png
-com.entrixy.ios: 27580
-/Users/runner/Library/Developer/CoreSimulator/Devices/6960EFB8-F917-4825-924C-96A2BA1B660E/data/Containers/Data/Application/6FD310D7-23CF-40B0-BDD0-97564D3FCD73
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone11-light-backup-rejected.png
-com.entrixy.ios: 28504
-/Users/runner/Library/Developer/CoreSimulator/Devices/6960EFB8-F917-4825-924C-96A2BA1B660E/data/Containers/Data/Application/6FD310D7-23CF-40B0-BDD0-97564D3FCD73
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone11-light-backup-interrupted.png
-com.entrixy.ios: 28840
-/Users/runner/Library/Developer/CoreSimulator/Devices/6960EFB8-F917-4825-924C-96A2BA1B660E/data/Containers/Data/Application/6FD310D7-23CF-40B0-BDD0-97564D3FCD73
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone11-light-delegation-preview.png
-com.entrixy.ios: 29635
-/Users/runner/Library/Developer/CoreSimulator/Devices/6960EFB8-F917-4825-924C-96A2BA1B660E/data/Containers/Data/Application/6FD310D7-23CF-40B0-BDD0-97564D3FCD73
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone11-light-delegation-waiting.png
-com.entrixy.ios: 29671
-/Users/runner/Library/Developer/CoreSimulator/Devices/6960EFB8-F917-4825-924C-96A2BA1B660E/data/Containers/Data/Application/6FD310D7-23CF-40B0-BDD0-97564D3FCD73
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone11-light-delegation-ready.png
-com.entrixy.ios: 30325
-/Users/runner/Library/Developer/CoreSimulator/Devices/6960EFB8-F917-4825-924C-96A2BA1B660E/data/Containers/Data/Application/6FD310D7-23CF-40B0-BDD0-97564D3FCD73
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone11-light-delegation-rejected.png
-com.entrixy.ios: 30357
-/Users/runner/Library/Developer/CoreSimulator/Devices/6960EFB8-F917-4825-924C-96A2BA1B660E/data/Containers/Data/Application/6FD310D7-23CF-40B0-BDD0-97564D3FCD73
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone11-light-delegated-awaiting.png
-com.entrixy.ios: 31006
-/Users/runner/Library/Developer/CoreSimulator/Devices/6960EFB8-F917-4825-924C-96A2BA1B660E/data/Containers/Data/Application/6FD310D7-23CF-40B0-BDD0-97564D3FCD73
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone11-light-delegated-ready.png
-com.entrixy.ios: 31039
-/Users/runner/Library/Developer/CoreSimulator/Devices/6960EFB8-F917-4825-924C-96A2BA1B660E/data/Containers/Data/Application/6FD310D7-23CF-40B0-BDD0-97564D3FCD73
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone11-light-delegated-uncertain.png
-com.entrixy.ios: 31691
-/Users/runner/Library/Developer/CoreSimulator/Devices/6960EFB8-F917-4825-924C-96A2BA1B660E/data/Containers/Data/Application/6FD310D7-23CF-40B0-BDD0-97564D3FCD73
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone11-light-delegated-revoked.png
-com.entrixy.ios: 31730
-/Users/runner/Library/Developer/CoreSimulator/Devices/6960EFB8-F917-4825-924C-96A2BA1B660E/data/Containers/Data/Application/6FD310D7-23CF-40B0-BDD0-97564D3FCD73
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone11-light-delegated-untrusted.png
-com.entrixy.ios: 32379
-/Users/runner/Library/Developer/CoreSimulator/Devices/6960EFB8-F917-4825-924C-96A2BA1B660E/data/Containers/Data/Application/6FD310D7-23CF-40B0-BDD0-97564D3FCD73
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone11-light-sender-form.png
-com.entrixy.ios: 32623
-/Users/runner/Library/Developer/CoreSimulator/Devices/6960EFB8-F917-4825-924C-96A2BA1B660E/data/Containers/Data/Application/6FD310D7-23CF-40B0-BDD0-97564D3FCD73
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone11-light-sender-link.png
-com.entrixy.ios: 33534
-/Users/runner/Library/Developer/CoreSimulator/Devices/6960EFB8-F917-4825-924C-96A2BA1B660E/data/Containers/Data/Application/6FD310D7-23CF-40B0-BDD0-97564D3FCD73
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone11-light-sender-uncertain.png
-com.entrixy.ios: 33819
-/Users/runner/Library/Developer/CoreSimulator/Devices/6960EFB8-F917-4825-924C-96A2BA1B660E/data/Containers/Data/Application/6FD310D7-23CF-40B0-BDD0-97564D3FCD73
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone11-light-sender-vouched.png
-com.entrixy.ios: 34467
-/Users/runner/Library/Developer/CoreSimulator/Devices/6960EFB8-F917-4825-924C-96A2BA1B660E/data/Containers/Data/Application/6FD310D7-23CF-40B0-BDD0-97564D3FCD73
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone11-light-sender-revoked.png
-com.entrixy.ios: 34503
-/Users/runner/Library/Developer/CoreSimulator/Devices/6960EFB8-F917-4825-924C-96A2BA1B660E/data/Containers/Data/Application/6FD310D7-23CF-40B0-BDD0-97564D3FCD73
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone11-light-sender-edit-form.png
-com.entrixy.ios: 35155
-/Users/runner/Library/Developer/CoreSimulator/Devices/6960EFB8-F917-4825-924C-96A2BA1B660E/data/Containers/Data/Application/6FD310D7-23CF-40B0-BDD0-97564D3FCD73
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone11-light-sender-edited.png
-com.entrixy.ios: 35191
-/Users/runner/Library/Developer/CoreSimulator/Devices/6960EFB8-F917-4825-924C-96A2BA1B660E/data/Containers/Data/Application/6FD310D7-23CF-40B0-BDD0-97564D3FCD73
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone11-light-message-inbox.png
-com.entrixy.ios: 35837
-/Users/runner/Library/Developer/CoreSimulator/Devices/6960EFB8-F917-4825-924C-96A2BA1B660E/data/Containers/Data/Application/6FD310D7-23CF-40B0-BDD0-97564D3FCD73
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone11-light-message-read.png
-com.entrixy.ios: 35869
-/Users/runner/Library/Developer/CoreSimulator/Devices/6960EFB8-F917-4825-924C-96A2BA1B660E/data/Containers/Data/Application/6FD310D7-23CF-40B0-BDD0-97564D3FCD73
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone11-light-message-corrupt.png
-com.entrixy.ios: 36519
-/Users/runner/Library/Developer/CoreSimulator/Devices/6960EFB8-F917-4825-924C-96A2BA1B660E/data/Containers/Data/Application/6FD310D7-23CF-40B0-BDD0-97564D3FCD73
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone11-light-message-compose.png
-com.entrixy.ios: 36555
-/Users/runner/Library/Developer/CoreSimulator/Devices/6960EFB8-F917-4825-924C-96A2BA1B660E/data/Containers/Data/Application/6FD310D7-23CF-40B0-BDD0-97564D3FCD73
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone11-light-message-sent.png
-com.entrixy.ios: 37389
-/Users/runner/Library/Developer/CoreSimulator/Devices/6960EFB8-F917-4825-924C-96A2BA1B660E/data/Containers/Data/Application/6FD310D7-23CF-40B0-BDD0-97564D3FCD73
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone11-light-additional-parts.png
-com.entrixy.ios: 37694
-/Users/runner/Library/Developer/CoreSimulator/Devices/6960EFB8-F917-4825-924C-96A2BA1B660E/data/Containers/Data/Application/6FD310D7-23CF-40B0-BDD0-97564D3FCD73
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone11-light-ble-scan.png
-com.entrixy.ios: 38605
-/Users/runner/Library/Developer/CoreSimulator/Devices/6960EFB8-F917-4825-924C-96A2BA1B660E/data/Containers/Data/Application/6FD310D7-23CF-40B0-BDD0-97564D3FCD73
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone11-light-ble-uncertain.png
-com.entrixy.ios: 38646
-/Users/runner/Library/Developer/CoreSimulator/Devices/6960EFB8-F917-4825-924C-96A2BA1B660E/data/Containers/Data/Application/6FD310D7-23CF-40B0-BDD0-97564D3FCD73
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone11-light-ble-paired.png
-com.entrixy.ios: 39295
-/Users/runner/Library/Developer/CoreSimulator/Devices/6960EFB8-F917-4825-924C-96A2BA1B660E/data/Containers/Data/Application/6FD310D7-23CF-40B0-BDD0-97564D3FCD73
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone11-light-ble-registered.png
-com.entrixy.ios: 39330
-/Users/runner/Library/Developer/CoreSimulator/Devices/6960EFB8-F917-4825-924C-96A2BA1B660E/data/Containers/Data/Application/6FD310D7-23CF-40B0-BDD0-97564D3FCD73
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone11-light-ble-owner-confirm.png
-com.entrixy.ios: 39983
-/Users/runner/Library/Developer/CoreSimulator/Devices/6960EFB8-F917-4825-924C-96A2BA1B660E/data/Containers/Data/Application/6FD310D7-23CF-40B0-BDD0-97564D3FCD73
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone11-light-ble-owner-result.png
-com.entrixy.ios: 40018
-/Users/runner/Library/Developer/CoreSimulator/Devices/6960EFB8-F917-4825-924C-96A2BA1B660E/data/Containers/Data/Application/6FD310D7-23CF-40B0-BDD0-97564D3FCD73
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone11-light-ble-owner-unknown.png
-com.entrixy.ios: 40667
-/Users/runner/Library/Developer/CoreSimulator/Devices/6960EFB8-F917-4825-924C-96A2BA1B660E/data/Containers/Data/Application/6FD310D7-23CF-40B0-BDD0-97564D3FCD73
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone11-light-ble-owner-journal.png
-com.entrixy.ios: 40703
-/Users/runner/Library/Developer/CoreSimulator/Devices/6960EFB8-F917-4825-924C-96A2BA1B660E/data/Containers/Data/Application/6FD310D7-23CF-40B0-BDD0-97564D3FCD73
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone11-light-ble-guest-confirm.png
-com.entrixy.ios: 41354
-/Users/runner/Library/Developer/CoreSimulator/Devices/6960EFB8-F917-4825-924C-96A2BA1B660E/data/Containers/Data/Application/6FD310D7-23CF-40B0-BDD0-97564D3FCD73
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone11-light-ble-guest-result.png
-com.entrixy.ios: 41605
-/Users/runner/Library/Developer/CoreSimulator/Devices/6960EFB8-F917-4825-924C-96A2BA1B660E/data/Containers/Data/Application/6FD310D7-23CF-40B0-BDD0-97564D3FCD73
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone11-light-ble-guest-expired.png
-com.entrixy.ios: 42520
-/Users/runner/Library/Developer/CoreSimulator/Devices/6960EFB8-F917-4825-924C-96A2BA1B660E/data/Containers/Data/Application/6FD310D7-23CF-40B0-BDD0-97564D3FCD73
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone11-light-ble-guest-unknown.png
-com.entrixy.ios: 42790
-/Users/runner/Library/Developer/CoreSimulator/Devices/6960EFB8-F917-4825-924C-96A2BA1B660E/data/Containers/Data/Application/6FD310D7-23CF-40B0-BDD0-97564D3FCD73
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone11-light-ble-guest-journal.png
-com.entrixy.ios: 43450
-/Users/runner/Library/Developer/CoreSimulator/Devices/6960EFB8-F917-4825-924C-96A2BA1B660E/data/Containers/Data/Application/6FD310D7-23CF-40B0-BDD0-97564D3FCD73
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone11-light-ble-revoke-pending.png
-com.entrixy.ios: 43485
-/Users/runner/Library/Developer/CoreSimulator/Devices/6960EFB8-F917-4825-924C-96A2BA1B660E/data/Containers/Data/Application/6FD310D7-23CF-40B0-BDD0-97564D3FCD73
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone11-light-ble-revoke-applied.png
-com.entrixy.ios: 44135
-/Users/runner/Library/Developer/CoreSimulator/Devices/6960EFB8-F917-4825-924C-96A2BA1B660E/data/Containers/Data/Application/6FD310D7-23CF-40B0-BDD0-97564D3FCD73
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone11-light-ble-revoke-stale.png
-com.entrixy.ios: 44171
-/Users/runner/Library/Developer/CoreSimulator/Devices/6960EFB8-F917-4825-924C-96A2BA1B660E/data/Containers/Data/Application/6FD310D7-23CF-40B0-BDD0-97564D3FCD73
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone11-light-ble-renewed.png
-com.entrixy.ios: 44827
-/Users/runner/Library/Developer/CoreSimulator/Devices/6960EFB8-F917-4825-924C-96A2BA1B660E/data/Containers/Data/Application/6FD310D7-23CF-40B0-BDD0-97564D3FCD73
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone11-dark-confirm-open.png
-com.entrixy.ios: 44966
-/Users/runner/Library/Developer/CoreSimulator/Devices/6960EFB8-F917-4825-924C-96A2BA1B660E/data/Containers/Data/Application/6FD310D7-23CF-40B0-BDD0-97564D3FCD73
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone11-dark-confirm-close.png
-com.entrixy.ios: 45510
-/Users/runner/Library/Developer/CoreSimulator/Devices/6960EFB8-F917-4825-924C-96A2BA1B660E/data/Containers/Data/Application/6FD310D7-23CF-40B0-BDD0-97564D3FCD73
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone11-dark-code-setup.png
-com.entrixy.ios: 45563
-/Users/runner/Library/Developer/CoreSimulator/Devices/6960EFB8-F917-4825-924C-96A2BA1B660E/data/Containers/Data/Application/6FD310D7-23CF-40B0-BDD0-97564D3FCD73
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone11-dark-code-entry.png
-com.entrixy.ios: 46303
-/Users/runner/Library/Developer/CoreSimulator/Devices/6960EFB8-F917-4825-924C-96A2BA1B660E/data/Containers/Data/Application/6FD310D7-23CF-40B0-BDD0-97564D3FCD73
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone11-dark-code-rejected.png
-com.entrixy.ios: 46686
-/Users/runner/Library/Developer/CoreSimulator/Devices/6960EFB8-F917-4825-924C-96A2BA1B660E/data/Containers/Data/Application/6FD310D7-23CF-40B0-BDD0-97564D3FCD73
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone11-dark-biometric.png
-com.entrixy.ios: 47102
-/Users/runner/Library/Developer/CoreSimulator/Devices/6960EFB8-F917-4825-924C-96A2BA1B660E/data/Containers/Data/Application/6FD310D7-23CF-40B0-BDD0-97564D3FCD73
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone11-dark-request-sent.png
-com.entrixy.ios: 47634
-/Users/runner/Library/Developer/CoreSimulator/Devices/6960EFB8-F917-4825-924C-96A2BA1B660E/data/Containers/Data/Application/6FD310D7-23CF-40B0-BDD0-97564D3FCD73
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone11-dark-result.png
-com.entrixy.ios: 47666
-/Users/runner/Library/Developer/CoreSimulator/Devices/6960EFB8-F917-4825-924C-96A2BA1B660E/data/Containers/Data/Application/6FD310D7-23CF-40B0-BDD0-97564D3FCD73
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone11-dark-journal.png
-com.entrixy.ios: 48319
-/Users/runner/Library/Developer/CoreSimulator/Devices/6960EFB8-F917-4825-924C-96A2BA1B660E/data/Containers/Data/Application/6FD310D7-23CF-40B0-BDD0-97564D3FCD73
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone11-dark-offline.png
-com.entrixy.ios: 48359
-/Users/runner/Library/Developer/CoreSimulator/Devices/6960EFB8-F917-4825-924C-96A2BA1B660E/data/Containers/Data/Application/6FD310D7-23CF-40B0-BDD0-97564D3FCD73
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone11-dark-control.png
-com.entrixy.ios: 49004
-/Users/runner/Library/Developer/CoreSimulator/Devices/6960EFB8-F917-4825-924C-96A2BA1B660E/data/Containers/Data/Application/6FD310D7-23CF-40B0-BDD0-97564D3FCD73
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone11-dark-settings.png
-com.entrixy.ios: 49038
-/Users/runner/Library/Developer/CoreSimulator/Devices/6960EFB8-F917-4825-924C-96A2BA1B660E/data/Containers/Data/Application/6FD310D7-23CF-40B0-BDD0-97564D3FCD73
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone11-dark-key-detail.png
-com.entrixy.ios: 49688
-/Users/runner/Library/Developer/CoreSimulator/Devices/6960EFB8-F917-4825-924C-96A2BA1B660E/data/Containers/Data/Application/6FD310D7-23CF-40B0-BDD0-97564D3FCD73
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone11-dark-add-key.png
-com.entrixy.ios: 49722
-/Users/runner/Library/Developer/CoreSimulator/Devices/6960EFB8-F917-4825-924C-96A2BA1B660E/data/Containers/Data/Application/6FD310D7-23CF-40B0-BDD0-97564D3FCD73
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone11-dark-guests.png
-com.entrixy.ios: 50478
-/Users/runner/Library/Developer/CoreSimulator/Devices/6960EFB8-F917-4825-924C-96A2BA1B660E/data/Containers/Data/Application/6FD310D7-23CF-40B0-BDD0-97564D3FCD73
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone11-dark-owner-form.png
-com.entrixy.ios: 50828
-/Users/runner/Library/Developer/CoreSimulator/Devices/6960EFB8-F917-4825-924C-96A2BA1B660E/data/Containers/Data/Application/6FD310D7-23CF-40B0-BDD0-97564D3FCD73
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone11-dark-owner-ready.png
-com.entrixy.ios: 51717
-/Users/runner/Library/Developer/CoreSimulator/Devices/6960EFB8-F917-4825-924C-96A2BA1B660E/data/Containers/Data/Application/6FD310D7-23CF-40B0-BDD0-97564D3FCD73
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone11-dark-owner-uncertain.png
-com.entrixy.ios: 51815
-/Users/runner/Library/Developer/CoreSimulator/Devices/6960EFB8-F917-4825-924C-96A2BA1B660E/data/Containers/Data/Application/6FD310D7-23CF-40B0-BDD0-97564D3FCD73
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone11-dark-owner-offline.png
-com.entrixy.ios: 52467
-/Users/runner/Library/Developer/CoreSimulator/Devices/6960EFB8-F917-4825-924C-96A2BA1B660E/data/Containers/Data/Application/6FD310D7-23CF-40B0-BDD0-97564D3FCD73
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone11-dark-object-form.png
-com.entrixy.ios: 52500
-/Users/runner/Library/Developer/CoreSimulator/Devices/6960EFB8-F917-4825-924C-96A2BA1B660E/data/Containers/Data/Application/6FD310D7-23CF-40B0-BDD0-97564D3FCD73
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone11-dark-object-created.png
-com.entrixy.ios: 53164
-/Users/runner/Library/Developer/CoreSimulator/Devices/6960EFB8-F917-4825-924C-96A2BA1B660E/data/Containers/Data/Application/6FD310D7-23CF-40B0-BDD0-97564D3FCD73
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone11-dark-object-edit.png
-com.entrixy.ios: 53514
-/Users/runner/Library/Developer/CoreSimulator/Devices/6960EFB8-F917-4825-924C-96A2BA1B660E/data/Containers/Data/Application/6FD310D7-23CF-40B0-BDD0-97564D3FCD73
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone11-dark-object-renamed.png
-com.entrixy.ios: 53870
-/Users/runner/Library/Developer/CoreSimulator/Devices/6960EFB8-F917-4825-924C-96A2BA1B660E/data/Containers/Data/Application/6FD310D7-23CF-40B0-BDD0-97564D3FCD73
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone11-dark-object-delete-confirm.png
-com.entrixy.ios: 54007
-/Users/runner/Library/Developer/CoreSimulator/Devices/6960EFB8-F917-4825-924C-96A2BA1B660E/data/Containers/Data/Application/6FD310D7-23CF-40B0-BDD0-97564D3FCD73
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone11-dark-object-deleted.png
-com.entrixy.ios: 54576
-/Users/runner/Library/Developer/CoreSimulator/Devices/6960EFB8-F917-4825-924C-96A2BA1B660E/data/Containers/Data/Application/6FD310D7-23CF-40B0-BDD0-97564D3FCD73
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone11-dark-object-uncertain.png
-com.entrixy.ios: 54768
-/Users/runner/Library/Developer/CoreSimulator/Devices/6960EFB8-F917-4825-924C-96A2BA1B660E/data/Containers/Data/Application/6FD310D7-23CF-40B0-BDD0-97564D3FCD73
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone11-dark-issue-form.png
-com.entrixy.ios: 55707
-/Users/runner/Library/Developer/CoreSimulator/Devices/6960EFB8-F917-4825-924C-96A2BA1B660E/data/Containers/Data/Application/6FD310D7-23CF-40B0-BDD0-97564D3FCD73
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone11-dark-issued-key.png
-com.entrixy.ios: 56030
-/Users/runner/Library/Developer/CoreSimulator/Devices/6960EFB8-F917-4825-924C-96A2BA1B660E/data/Containers/Data/Application/6FD310D7-23CF-40B0-BDD0-97564D3FCD73
+/Users/runner/Library/Developer/CoreSimulator/Devices/CEE76AE8-3E2C-4818-B8ED-0536A62500A8/data/Containers/Data/Application/9CC9ECA6-E71A-4996-80BC-0E94473DDD89
+com.entrixy.ios: 16710
+/Users/runner/Library/Developer/CoreSimulator/Devices/CEE76AE8-3E2C-4818-B8ED-0536A62500A8/data/Containers/Data/Application/9CC9ECA6-E71A-4996-80BC-0E94473DDD89
+Detected file type 'PNG' from extension
+Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-confirm-open.png
+com.entrixy.ios: 17172
+/Users/runner/Library/Developer/CoreSimulator/Devices/CEE76AE8-3E2C-4818-B8ED-0536A62500A8/data/Containers/Data/Application/9CC9ECA6-E71A-4996-80BC-0E94473DDD89
+Detected file type 'PNG' from extension
+Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-confirm-close.png
+com.entrixy.ios: 17739
+/Users/runner/Library/Developer/CoreSimulator/Devices/CEE76AE8-3E2C-4818-B8ED-0536A62500A8/data/Containers/Data/Application/9CC9ECA6-E71A-4996-80BC-0E94473DDD89
+Detected file type 'PNG' from extension
+Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-code-setup.png
+com.entrixy.ios: 17855
+/Users/runner/Library/Developer/CoreSimulator/Devices/CEE76AE8-3E2C-4818-B8ED-0536A62500A8/data/Containers/Data/Application/9CC9ECA6-E71A-4996-80BC-0E94473DDD89
+Detected file type 'PNG' from extension
+Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-code-entry.png
+com.entrixy.ios: 18344
+/Users/runner/Library/Developer/CoreSimulator/Devices/CEE76AE8-3E2C-4818-B8ED-0536A62500A8/data/Containers/Data/Application/9CC9ECA6-E71A-4996-80BC-0E94473DDD89
+Detected file type 'PNG' from extension
+Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-code-rejected.png
+com.entrixy.ios: 18412
+/Users/runner/Library/Developer/CoreSimulator/Devices/CEE76AE8-3E2C-4818-B8ED-0536A62500A8/data/Containers/Data/Application/9CC9ECA6-E71A-4996-80BC-0E94473DDD89
+Detected file type 'PNG' from extension
+Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-biometric.png
+com.entrixy.ios: 18976
+/Users/runner/Library/Developer/CoreSimulator/Devices/CEE76AE8-3E2C-4818-B8ED-0536A62500A8/data/Containers/Data/Application/9CC9ECA6-E71A-4996-80BC-0E94473DDD89
+Detected file type 'PNG' from extension
+Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-request-sent.png
+com.entrixy.ios: 19106
+/Users/runner/Library/Developer/CoreSimulator/Devices/CEE76AE8-3E2C-4818-B8ED-0536A62500A8/data/Containers/Data/Application/9CC9ECA6-E71A-4996-80BC-0E94473DDD89
+Detected file type 'PNG' from extension
+Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-result.png
+com.entrixy.ios: 19859
+/Users/runner/Library/Developer/CoreSimulator/Devices/CEE76AE8-3E2C-4818-B8ED-0536A62500A8/data/Containers/Data/Application/9CC9ECA6-E71A-4996-80BC-0E94473DDD89
+Detected file type 'PNG' from extension
+Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-journal.png
+com.entrixy.ios: 20135
+/Users/runner/Library/Developer/CoreSimulator/Devices/CEE76AE8-3E2C-4818-B8ED-0536A62500A8/data/Containers/Data/Application/9CC9ECA6-E71A-4996-80BC-0E94473DDD89
+Detected file type 'PNG' from extension
+Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-offline.png
+com.entrixy.ios: 20896
+/Users/runner/Library/Developer/CoreSimulator/Devices/CEE76AE8-3E2C-4818-B8ED-0536A62500A8/data/Containers/Data/Application/9CC9ECA6-E71A-4996-80BC-0E94473DDD89
+Detected file type 'PNG' from extension
+Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-control.png
+com.entrixy.ios: 20972
+/Users/runner/Library/Developer/CoreSimulator/Devices/CEE76AE8-3E2C-4818-B8ED-0536A62500A8/data/Containers/Data/Application/9CC9ECA6-E71A-4996-80BC-0E94473DDD89
+Detected file type 'PNG' from extension
+Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-settings.png
+com.entrixy.ios: 21564
+/Users/runner/Library/Developer/CoreSimulator/Devices/CEE76AE8-3E2C-4818-B8ED-0536A62500A8/data/Containers/Data/Application/9CC9ECA6-E71A-4996-80BC-0E94473DDD89
+Detected file type 'PNG' from extension
+Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-key-detail.png
+com.entrixy.ios: 21610
+/Users/runner/Library/Developer/CoreSimulator/Devices/CEE76AE8-3E2C-4818-B8ED-0536A62500A8/data/Containers/Data/Application/9CC9ECA6-E71A-4996-80BC-0E94473DDD89
+Detected file type 'PNG' from extension
+Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-add-key.png
+com.entrixy.ios: 22203
+/Users/runner/Library/Developer/CoreSimulator/Devices/CEE76AE8-3E2C-4818-B8ED-0536A62500A8/data/Containers/Data/Application/9CC9ECA6-E71A-4996-80BC-0E94473DDD89
+Detected file type 'PNG' from extension
+Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-guests.png
+com.entrixy.ios: 22233
+/Users/runner/Library/Developer/CoreSimulator/Devices/CEE76AE8-3E2C-4818-B8ED-0536A62500A8/data/Containers/Data/Application/9CC9ECA6-E71A-4996-80BC-0E94473DDD89
+Detected file type 'PNG' from extension
+Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-owner-form.png
+com.entrixy.ios: 22829
+/Users/runner/Library/Developer/CoreSimulator/Devices/CEE76AE8-3E2C-4818-B8ED-0536A62500A8/data/Containers/Data/Application/9CC9ECA6-E71A-4996-80BC-0E94473DDD89
+Detected file type 'PNG' from extension
+Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-owner-ready.png
+com.entrixy.ios: 22881
+/Users/runner/Library/Developer/CoreSimulator/Devices/CEE76AE8-3E2C-4818-B8ED-0536A62500A8/data/Containers/Data/Application/9CC9ECA6-E71A-4996-80BC-0E94473DDD89
+Detected file type 'PNG' from extension
+Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-owner-uncertain.png
+com.entrixy.ios: 23694
+/Users/runner/Library/Developer/CoreSimulator/Devices/CEE76AE8-3E2C-4818-B8ED-0536A62500A8/data/Containers/Data/Application/9CC9ECA6-E71A-4996-80BC-0E94473DDD89
+Detected file type 'PNG' from extension
+Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-owner-offline.png
+com.entrixy.ios: 24035
+/Users/runner/Library/Developer/CoreSimulator/Devices/CEE76AE8-3E2C-4818-B8ED-0536A62500A8/data/Containers/Data/Application/9CC9ECA6-E71A-4996-80BC-0E94473DDD89
+Detected file type 'PNG' from extension
+Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-object-form.png
+com.entrixy.ios: 24803
+/Users/runner/Library/Developer/CoreSimulator/Devices/CEE76AE8-3E2C-4818-B8ED-0536A62500A8/data/Containers/Data/Application/9CC9ECA6-E71A-4996-80BC-0E94473DDD89
+Detected file type 'PNG' from extension
+Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-object-created.png
+com.entrixy.ios: 24850
+/Users/runner/Library/Developer/CoreSimulator/Devices/CEE76AE8-3E2C-4818-B8ED-0536A62500A8/data/Containers/Data/Application/9CC9ECA6-E71A-4996-80BC-0E94473DDD89
+Detected file type 'PNG' from extension
+Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-object-edit.png
+com.entrixy.ios: 25444
+/Users/runner/Library/Developer/CoreSimulator/Devices/CEE76AE8-3E2C-4818-B8ED-0536A62500A8/data/Containers/Data/Application/9CC9ECA6-E71A-4996-80BC-0E94473DDD89
+Detected file type 'PNG' from extension
+Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-object-renamed.png
+com.entrixy.ios: 25584
+/Users/runner/Library/Developer/CoreSimulator/Devices/CEE76AE8-3E2C-4818-B8ED-0536A62500A8/data/Containers/Data/Application/9CC9ECA6-E71A-4996-80BC-0E94473DDD89
+Detected file type 'PNG' from extension
+Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-object-delete-confirm.png
+com.entrixy.ios: 26039
+/Users/runner/Library/Developer/CoreSimulator/Devices/CEE76AE8-3E2C-4818-B8ED-0536A62500A8/data/Containers/Data/Application/9CC9ECA6-E71A-4996-80BC-0E94473DDD89
+Detected file type 'PNG' from extension
+Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-object-deleted.png
+com.entrixy.ios: 26120
+/Users/runner/Library/Developer/CoreSimulator/Devices/CEE76AE8-3E2C-4818-B8ED-0536A62500A8/data/Containers/Data/Application/9CC9ECA6-E71A-4996-80BC-0E94473DDD89
+Detected file type 'PNG' from extension
+Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-object-uncertain.png
+com.entrixy.ios: 26708
+/Users/runner/Library/Developer/CoreSimulator/Devices/CEE76AE8-3E2C-4818-B8ED-0536A62500A8/data/Containers/Data/Application/9CC9ECA6-E71A-4996-80BC-0E94473DDD89
+Detected file type 'PNG' from extension
+Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-issue-form.png
+com.entrixy.ios: 27000
+/Users/runner/Library/Developer/CoreSimulator/Devices/CEE76AE8-3E2C-4818-B8ED-0536A62500A8/data/Containers/Data/Application/9CC9ECA6-E71A-4996-80BC-0E94473DDD89
+Detected file type 'PNG' from extension
+Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-issued-key.png
+com.entrixy.ios: 27852
+/Users/runner/Library/Developer/CoreSimulator/Devices/CEE76AE8-3E2C-4818-B8ED-0536A62500A8/data/Containers/Data/Application/9CC9ECA6-E71A-4996-80BC-0E94473DDD89
+Detected file type 'PNG' from extension
+Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-issued-list.png
+com.entrixy.ios: 28104
+/Users/runner/Library/Developer/CoreSimulator/Devices/CEE76AE8-3E2C-4818-B8ED-0536A62500A8/data/Containers/Data/Application/9CC9ECA6-E71A-4996-80BC-0E94473DDD89
+Detected file type 'PNG' from extension
+Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-issued-paused.png
+com.entrixy.ios: 28703
+/Users/runner/Library/Developer/CoreSimulator/Devices/CEE76AE8-3E2C-4818-B8ED-0536A62500A8/data/Containers/Data/Application/9CC9ECA6-E71A-4996-80BC-0E94473DDD89
+Detected file type 'PNG' from extension
+Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-issued-revoked.png
+com.entrixy.ios: 29107
+/Users/runner/Library/Developer/CoreSimulator/Devices/CEE76AE8-3E2C-4818-B8ED-0536A62500A8/data/Containers/Data/Application/9CC9ECA6-E71A-4996-80BC-0E94473DDD89
+Detected file type 'PNG' from extension
+Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-issued-uncertain.png
+com.entrixy.ios: 29318
+/Users/runner/Library/Developer/CoreSimulator/Devices/CEE76AE8-3E2C-4818-B8ED-0536A62500A8/data/Containers/Data/Application/9CC9ECA6-E71A-4996-80BC-0E94473DDD89
+Detected file type 'PNG' from extension
+Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-issued-revoke-confirm.png
+com.entrixy.ios: 29685
+/Users/runner/Library/Developer/CoreSimulator/Devices/CEE76AE8-3E2C-4818-B8ED-0536A62500A8/data/Containers/Data/Application/9CC9ECA6-E71A-4996-80BC-0E94473DDD89
+Detected file type 'PNG' from extension
+Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-owner-confirm.png
+com.entrixy.ios: 29959
+/Users/runner/Library/Developer/CoreSimulator/Devices/CEE76AE8-3E2C-4818-B8ED-0536A62500A8/data/Containers/Data/Application/9CC9ECA6-E71A-4996-80BC-0E94473DDD89
+Detected file type 'PNG' from extension
+Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-owner-sending.png
+com.entrixy.ios: 30151
+/Users/runner/Library/Developer/CoreSimulator/Devices/CEE76AE8-3E2C-4818-B8ED-0536A62500A8/data/Containers/Data/Application/9CC9ECA6-E71A-4996-80BC-0E94473DDD89
+Detected file type 'PNG' from extension
+Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-owner-result.png
+com.entrixy.ios: 30599
+/Users/runner/Library/Developer/CoreSimulator/Devices/CEE76AE8-3E2C-4818-B8ED-0536A62500A8/data/Containers/Data/Application/9CC9ECA6-E71A-4996-80BC-0E94473DDD89
+Detected file type 'PNG' from extension
+Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-owner-journal.png
+com.entrixy.ios: 30994
+/Users/runner/Library/Developer/CoreSimulator/Devices/CEE76AE8-3E2C-4818-B8ED-0536A62500A8/data/Containers/Data/Application/9CC9ECA6-E71A-4996-80BC-0E94473DDD89
+Detected file type 'PNG' from extension
+Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-owner-guest-request.png
+com.entrixy.ios: 31733
+/Users/runner/Library/Developer/CoreSimulator/Devices/CEE76AE8-3E2C-4818-B8ED-0536A62500A8/data/Containers/Data/Application/9CC9ECA6-E71A-4996-80BC-0E94473DDD89
+Detected file type 'PNG' from extension
+Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-issued-edit-form.png
+com.entrixy.ios: 32009
+/Users/runner/Library/Developer/CoreSimulator/Devices/CEE76AE8-3E2C-4818-B8ED-0536A62500A8/data/Containers/Data/Application/9CC9ECA6-E71A-4996-80BC-0E94473DDD89
+Detected file type 'PNG' from extension
+Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-issued-edit-result.png
+com.entrixy.ios: 32606
+/Users/runner/Library/Developer/CoreSimulator/Devices/CEE76AE8-3E2C-4818-B8ED-0536A62500A8/data/Containers/Data/Application/9CC9ECA6-E71A-4996-80BC-0E94473DDD89
+Detected file type 'PNG' from extension
+Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-issued-access-form.png
+com.entrixy.ios: 32635
+/Users/runner/Library/Developer/CoreSimulator/Devices/CEE76AE8-3E2C-4818-B8ED-0536A62500A8/data/Containers/Data/Application/9CC9ECA6-E71A-4996-80BC-0E94473DDD89
+Detected file type 'PNG' from extension
+Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-backup-form.png
+com.entrixy.ios: 33242
+/Users/runner/Library/Developer/CoreSimulator/Devices/CEE76AE8-3E2C-4818-B8ED-0536A62500A8/data/Containers/Data/Application/9CC9ECA6-E71A-4996-80BC-0E94473DDD89
+Detected file type 'PNG' from extension
+Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-backup-export.png
+com.entrixy.ios: 33568
+/Users/runner/Library/Developer/CoreSimulator/Devices/CEE76AE8-3E2C-4818-B8ED-0536A62500A8/data/Containers/Data/Application/9CC9ECA6-E71A-4996-80BC-0E94473DDD89
+Detected file type 'PNG' from extension
+Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-backup-preview.png
+com.entrixy.ios: 33906
+/Users/runner/Library/Developer/CoreSimulator/Devices/CEE76AE8-3E2C-4818-B8ED-0536A62500A8/data/Containers/Data/Application/9CC9ECA6-E71A-4996-80BC-0E94473DDD89
+Detected file type 'PNG' from extension
+Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-backup-restored.png
+com.entrixy.ios: 34447
+/Users/runner/Library/Developer/CoreSimulator/Devices/CEE76AE8-3E2C-4818-B8ED-0536A62500A8/data/Containers/Data/Application/9CC9ECA6-E71A-4996-80BC-0E94473DDD89
+Detected file type 'PNG' from extension
+Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-backup-rejected.png
+com.entrixy.ios: 34531
+/Users/runner/Library/Developer/CoreSimulator/Devices/CEE76AE8-3E2C-4818-B8ED-0536A62500A8/data/Containers/Data/Application/9CC9ECA6-E71A-4996-80BC-0E94473DDD89
+Detected file type 'PNG' from extension
+Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-backup-interrupted.png
+com.entrixy.ios: 35438
+/Users/runner/Library/Developer/CoreSimulator/Devices/CEE76AE8-3E2C-4818-B8ED-0536A62500A8/data/Containers/Data/Application/9CC9ECA6-E71A-4996-80BC-0E94473DDD89
+Detected file type 'PNG' from extension
+Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-delegation-preview.png
+com.entrixy.ios: 35976
+/Users/runner/Library/Developer/CoreSimulator/Devices/CEE76AE8-3E2C-4818-B8ED-0536A62500A8/data/Containers/Data/Application/9CC9ECA6-E71A-4996-80BC-0E94473DDD89
+Detected file type 'PNG' from extension
+Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-delegation-waiting.png
+com.entrixy.ios: 36504
+/Users/runner/Library/Developer/CoreSimulator/Devices/CEE76AE8-3E2C-4818-B8ED-0536A62500A8/data/Containers/Data/Application/9CC9ECA6-E71A-4996-80BC-0E94473DDD89
+Detected file type 'PNG' from extension
+Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-delegation-ready.png
+com.entrixy.ios: 36831
+/Users/runner/Library/Developer/CoreSimulator/Devices/CEE76AE8-3E2C-4818-B8ED-0536A62500A8/data/Containers/Data/Application/9CC9ECA6-E71A-4996-80BC-0E94473DDD89
+Detected file type 'PNG' from extension
+Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-delegation-rejected.png
+com.entrixy.ios: 37137
+/Users/runner/Library/Developer/CoreSimulator/Devices/CEE76AE8-3E2C-4818-B8ED-0536A62500A8/data/Containers/Data/Application/9CC9ECA6-E71A-4996-80BC-0E94473DDD89
+Detected file type 'PNG' from extension
+Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-delegated-awaiting.png
+com.entrixy.ios: 37225
+/Users/runner/Library/Developer/CoreSimulator/Devices/CEE76AE8-3E2C-4818-B8ED-0536A62500A8/data/Containers/Data/Application/9CC9ECA6-E71A-4996-80BC-0E94473DDD89
+Detected file type 'PNG' from extension
+Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-delegated-ready.png
+com.entrixy.ios: 37763
+/Users/runner/Library/Developer/CoreSimulator/Devices/CEE76AE8-3E2C-4818-B8ED-0536A62500A8/data/Containers/Data/Application/9CC9ECA6-E71A-4996-80BC-0E94473DDD89
+Detected file type 'PNG' from extension
+Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-delegated-uncertain.png
+com.entrixy.ios: 37947
+/Users/runner/Library/Developer/CoreSimulator/Devices/CEE76AE8-3E2C-4818-B8ED-0536A62500A8/data/Containers/Data/Application/9CC9ECA6-E71A-4996-80BC-0E94473DDD89
+Detected file type 'PNG' from extension
+Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-delegated-revoked.png
+com.entrixy.ios: 38391
+/Users/runner/Library/Developer/CoreSimulator/Devices/CEE76AE8-3E2C-4818-B8ED-0536A62500A8/data/Containers/Data/Application/9CC9ECA6-E71A-4996-80BC-0E94473DDD89
+Detected file type 'PNG' from extension
+Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-delegated-untrusted.png
+com.entrixy.ios: 38599
+/Users/runner/Library/Developer/CoreSimulator/Devices/CEE76AE8-3E2C-4818-B8ED-0536A62500A8/data/Containers/Data/Application/9CC9ECA6-E71A-4996-80BC-0E94473DDD89
+Detected file type 'PNG' from extension
+Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-sender-form.png
+com.entrixy.ios: 39273
+/Users/runner/Library/Developer/CoreSimulator/Devices/CEE76AE8-3E2C-4818-B8ED-0536A62500A8/data/Containers/Data/Application/9CC9ECA6-E71A-4996-80BC-0E94473DDD89
+Detected file type 'PNG' from extension
+Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-sender-link.png
+com.entrixy.ios: 39736
+/Users/runner/Library/Developer/CoreSimulator/Devices/CEE76AE8-3E2C-4818-B8ED-0536A62500A8/data/Containers/Data/Application/9CC9ECA6-E71A-4996-80BC-0E94473DDD89
+Detected file type 'PNG' from extension
+Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-sender-uncertain.png
+com.entrixy.ios: 40985
+/Users/runner/Library/Developer/CoreSimulator/Devices/CEE76AE8-3E2C-4818-B8ED-0536A62500A8/data/Containers/Data/Application/9CC9ECA6-E71A-4996-80BC-0E94473DDD89
+Detected file type 'PNG' from extension
+Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-sender-vouched.png
+com.entrixy.ios: 41032
+/Users/runner/Library/Developer/CoreSimulator/Devices/CEE76AE8-3E2C-4818-B8ED-0536A62500A8/data/Containers/Data/Application/9CC9ECA6-E71A-4996-80BC-0E94473DDD89
+Detected file type 'PNG' from extension
+Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-sender-revoked.png
+com.entrixy.ios: 41643
+/Users/runner/Library/Developer/CoreSimulator/Devices/CEE76AE8-3E2C-4818-B8ED-0536A62500A8/data/Containers/Data/Application/9CC9ECA6-E71A-4996-80BC-0E94473DDD89
+Detected file type 'PNG' from extension
+Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-sender-edit-form.png
+com.entrixy.ios: 41749
+/Users/runner/Library/Developer/CoreSimulator/Devices/CEE76AE8-3E2C-4818-B8ED-0536A62500A8/data/Containers/Data/Application/9CC9ECA6-E71A-4996-80BC-0E94473DDD89
+Detected file type 'PNG' from extension
+Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-sender-edited.png
+com.entrixy.ios: 42293
+/Users/runner/Library/Developer/CoreSimulator/Devices/CEE76AE8-3E2C-4818-B8ED-0536A62500A8/data/Containers/Data/Application/9CC9ECA6-E71A-4996-80BC-0E94473DDD89
+Detected file type 'PNG' from extension
+Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-message-inbox.png
+com.entrixy.ios: 42435
+/Users/runner/Library/Developer/CoreSimulator/Devices/CEE76AE8-3E2C-4818-B8ED-0536A62500A8/data/Containers/Data/Application/9CC9ECA6-E71A-4996-80BC-0E94473DDD89
+Detected file type 'PNG' from extension
+Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-message-read.png
+com.entrixy.ios: 42966
+/Users/runner/Library/Developer/CoreSimulator/Devices/CEE76AE8-3E2C-4818-B8ED-0536A62500A8/data/Containers/Data/Application/9CC9ECA6-E71A-4996-80BC-0E94473DDD89
+Detected file type 'PNG' from extension
+Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-message-corrupt.png
+com.entrixy.ios: 43328
+/Users/runner/Library/Developer/CoreSimulator/Devices/CEE76AE8-3E2C-4818-B8ED-0536A62500A8/data/Containers/Data/Application/9CC9ECA6-E71A-4996-80BC-0E94473DDD89
+Detected file type 'PNG' from extension
+Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-message-compose.png
+com.entrixy.ios: 44150
+/Users/runner/Library/Developer/CoreSimulator/Devices/CEE76AE8-3E2C-4818-B8ED-0536A62500A8/data/Containers/Data/Application/9CC9ECA6-E71A-4996-80BC-0E94473DDD89
+Detected file type 'PNG' from extension
+Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-message-sent.png
+com.entrixy.ios: 44328
+/Users/runner/Library/Developer/CoreSimulator/Devices/CEE76AE8-3E2C-4818-B8ED-0536A62500A8/data/Containers/Data/Application/9CC9ECA6-E71A-4996-80BC-0E94473DDD89
+Detected file type 'PNG' from extension
+Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-additional-parts.png
+com.entrixy.ios: 44953
+/Users/runner/Library/Developer/CoreSimulator/Devices/CEE76AE8-3E2C-4818-B8ED-0536A62500A8/data/Containers/Data/Application/9CC9ECA6-E71A-4996-80BC-0E94473DDD89
+Detected file type 'PNG' from extension
+Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-ble-scan.png
+com.entrixy.ios: 45026
+/Users/runner/Library/Developer/CoreSimulator/Devices/CEE76AE8-3E2C-4818-B8ED-0536A62500A8/data/Containers/Data/Application/9CC9ECA6-E71A-4996-80BC-0E94473DDD89
+Detected file type 'PNG' from extension
+Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-ble-uncertain.png
+com.entrixy.ios: 45618
+/Users/runner/Library/Developer/CoreSimulator/Devices/CEE76AE8-3E2C-4818-B8ED-0536A62500A8/data/Containers/Data/Application/9CC9ECA6-E71A-4996-80BC-0E94473DDD89
+Detected file type 'PNG' from extension
+Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-ble-paired.png
+com.entrixy.ios: 45655
+/Users/runner/Library/Developer/CoreSimulator/Devices/CEE76AE8-3E2C-4818-B8ED-0536A62500A8/data/Containers/Data/Application/9CC9ECA6-E71A-4996-80BC-0E94473DDD89
+Detected file type 'PNG' from extension
+Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-ble-registered.png
+com.entrixy.ios: 46290
+/Users/runner/Library/Developer/CoreSimulator/Devices/CEE76AE8-3E2C-4818-B8ED-0536A62500A8/data/Containers/Data/Application/9CC9ECA6-E71A-4996-80BC-0E94473DDD89
+Detected file type 'PNG' from extension
+Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-ble-owner-confirm.png
+com.entrixy.ios: 46318
+/Users/runner/Library/Developer/CoreSimulator/Devices/CEE76AE8-3E2C-4818-B8ED-0536A62500A8/data/Containers/Data/Application/9CC9ECA6-E71A-4996-80BC-0E94473DDD89
+Detected file type 'PNG' from extension
+Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-ble-owner-result.png
+com.entrixy.ios: 46937
+/Users/runner/Library/Developer/CoreSimulator/Devices/CEE76AE8-3E2C-4818-B8ED-0536A62500A8/data/Containers/Data/Application/9CC9ECA6-E71A-4996-80BC-0E94473DDD89
+Detected file type 'PNG' from extension
+Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-ble-owner-unknown.png
+com.entrixy.ios: 47201
+/Users/runner/Library/Developer/CoreSimulator/Devices/CEE76AE8-3E2C-4818-B8ED-0536A62500A8/data/Containers/Data/Application/9CC9ECA6-E71A-4996-80BC-0E94473DDD89
+Detected file type 'PNG' from extension
+Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-ble-owner-journal.png
+com.entrixy.ios: 47985
+/Users/runner/Library/Developer/CoreSimulator/Devices/CEE76AE8-3E2C-4818-B8ED-0536A62500A8/data/Containers/Data/Application/9CC9ECA6-E71A-4996-80BC-0E94473DDD89
+Detected file type 'PNG' from extension
+Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-ble-guest-confirm.png
+com.entrixy.ios: 48262
+/Users/runner/Library/Developer/CoreSimulator/Devices/CEE76AE8-3E2C-4818-B8ED-0536A62500A8/data/Containers/Data/Application/9CC9ECA6-E71A-4996-80BC-0E94473DDD89
+Detected file type 'PNG' from extension
+Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-ble-guest-result.png
+com.entrixy.ios: 48925
+/Users/runner/Library/Developer/CoreSimulator/Devices/CEE76AE8-3E2C-4818-B8ED-0536A62500A8/data/Containers/Data/Application/9CC9ECA6-E71A-4996-80BC-0E94473DDD89
+Detected file type 'PNG' from extension
+Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-ble-guest-expired.png
+com.entrixy.ios: 48966
+/Users/runner/Library/Developer/CoreSimulator/Devices/CEE76AE8-3E2C-4818-B8ED-0536A62500A8/data/Containers/Data/Application/9CC9ECA6-E71A-4996-80BC-0E94473DDD89
+Detected file type 'PNG' from extension
+Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-ble-guest-unknown.png
+com.entrixy.ios: 49585
+/Users/runner/Library/Developer/CoreSimulator/Devices/CEE76AE8-3E2C-4818-B8ED-0536A62500A8/data/Containers/Data/Application/9CC9ECA6-E71A-4996-80BC-0E94473DDD89
+Detected file type 'PNG' from extension
+Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-ble-guest-journal.png
+com.entrixy.ios: 49673
+/Users/runner/Library/Developer/CoreSimulator/Devices/CEE76AE8-3E2C-4818-B8ED-0536A62500A8/data/Containers/Data/Application/9CC9ECA6-E71A-4996-80BC-0E94473DDD89
+Detected file type 'PNG' from extension
+Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-ble-revoke-pending.png
+com.entrixy.ios: 50241
+/Users/runner/Library/Developer/CoreSimulator/Devices/CEE76AE8-3E2C-4818-B8ED-0536A62500A8/data/Containers/Data/Application/9CC9ECA6-E71A-4996-80BC-0E94473DDD89
+Detected file type 'PNG' from extension
+Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-ble-revoke-applied.png
+com.entrixy.ios: 50412
+/Users/runner/Library/Developer/CoreSimulator/Devices/CEE76AE8-3E2C-4818-B8ED-0536A62500A8/data/Containers/Data/Application/9CC9ECA6-E71A-4996-80BC-0E94473DDD89
+Detected file type 'PNG' from extension
+Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-ble-revoke-stale.png
+com.entrixy.ios: 50941
+/Users/runner/Library/Developer/CoreSimulator/Devices/CEE76AE8-3E2C-4818-B8ED-0536A62500A8/data/Containers/Data/Application/9CC9ECA6-E71A-4996-80BC-0E94473DDD89
+Detected file type 'PNG' from extension
+Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-ble-renewed.png
+Captured 86 real simulator screenshots
+Prepared review sheet for 86 actual screenshots; visual review remains pending
