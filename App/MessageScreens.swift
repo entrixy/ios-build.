@@ -81,7 +81,7 @@ struct ComposeMessageScreen: View {
                         Text(outgoingMessageStatus(latest)).font(.subheadline).foregroundStyle(Brand.secondaryInk)
                     }
                 }
-                Section("Сообщение получателю") {
+                Section {
                     TextField("Текст сообщения", text: $text, axis: .vertical).lineLimit(3...6)
                     Text("\(text.count) / 500").font(.caption).foregroundStyle(Brand.secondaryInk)
                     if let notice = manager.message { Text(notice).font(.subheadline).foregroundStyle(Brand.secondaryInk) }
@@ -95,7 +95,7 @@ struct ComposeMessageScreen: View {
                     } label: { if manager.busy { ProgressView() } else { Text("Отправить сообщение") } }
                         .buttonStyle(PrimaryActionStyle())
                         .disabled(text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || text.count > 500 || text.utf8.count > 2048)
-                } footer: { Text("Отправка на сервер ещё не подтверждает доставку или чтение получателем.") }
+                } header: { Text("Сообщение получателю") } footer: { Text("Отправка на сервер ещё не подтверждает доставку или чтение получателем.") }
             }.disabled(manager.busy)
             .navigationTitle("Написать сообщение").navigationBarTitleDisplayMode(.inline)
             .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Закрыть") { dismiss() }.disabled(manager.busy) } }
