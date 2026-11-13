@@ -715,6 +715,7 @@ private final class ActionCaptureModel: ObservableObject {
         let cache = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)[0]
         let data: [String: Any] = ["ready": ready, "software_controller": true, "scenario": scenario.rawValue,
             "command_frames": controller.frames.count, "journal_count": model.journal.count,
+            "live_connections": model.connections.values.filter { $0 == .connected }.count,
             "registration_requests": ownerServer.registrations, "sync_requests": ownerServer.syncs,
             "owner_count": model.owners.count, "owner_pending": model.owners.first?.registrationPending ?? false,
             "owned_object_count": model.owners.first?.objects?.count ?? 0, "mutation_requests": ownerServer.mutations,
