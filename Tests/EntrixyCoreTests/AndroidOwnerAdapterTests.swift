@@ -47,7 +47,12 @@ final class AndroidOwnerAdapterTests: XCTestCase {
         XCTAssertEqual(try GuestCrypto.decrypt(key: master, envelope: ble.wrappedBLESecret!), bleSecret)
         XCTAssertEqual(try GuestCrypto.decrypt(key: master, envelope: second.objects!.first!.wrappedSocketSecret!), socket)
         XCTAssertEqual(ble.bleDeviceID, 0xf1234567)
-        XCTAssertTrue(owners.flatMap { $0.objects ?? [] }.allSatisfy { $0.available == false && $0.pending == nil })
+        for owner in owners {
+            for object in owner.objects ?? [] {
+                XCTAssertEqual(object.available, false)
+                XCTAssertNil(object.pending)
+            }
+        }
         XCTAssertEqual(first.bleRevocations?.first?.frame, record.frame); XCTAssertNil(first.bleRevocations?.first?.controllerResult)
         XCTAssertEqual(first.androidKeys?.first?.userKey, user)
         XCTAssertEqual(try GuestCrypto.decrypt(key: master, envelope: first.androidKeys!.first!.wrappedBundleKey!), guestKey)
