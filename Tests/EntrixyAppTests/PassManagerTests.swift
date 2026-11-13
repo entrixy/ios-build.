@@ -72,7 +72,7 @@ final class PassManagerTests: XCTestCase {
         let app = AppModel(storage: storage), manager = PassManager(app: app, api: api)
         api.loseCreateReply = true
         api.beforeCreate = { XCTAssertEqual(storage.state?.passedAccess?.first?.parts[0].sent, true) }
-        let created = await manager.create(label: "Получатель", welcome: "", objects: [invite.id: [7: KeyObjectAccess(depth: 0, pool: 1)]])
+        let created = await manager.create(label: "Получатель", welcome: "", objects: [invite.id: [7: try KeyObjectAccess(depth: 0, pool: 1)]])
         let id = try XCTUnwrap(created)
         let old = try XCTUnwrap(app.passedAccess.first)
         XCTAssertNil(old.group)
@@ -92,7 +92,7 @@ final class PassManagerTests: XCTestCase {
         let invite = try invite(), api = PassAPIStub()
         let storage = PassMemoryStorage(invite)
         let app = AppModel(storage: storage), manager = PassManager(app: app, api: api)
-        let result = await manager.create(label: "Получатель", welcome: "", objects: [invite.id: [7: KeyObjectAccess(depth: 0, pool: 1)]])
+        let result = await manager.create(label: "Получатель", welcome: "", objects: [invite.id: [7: try KeyObjectAccess(depth: 0, pool: 1)]])
         let id = try XCTUnwrap(result), record = try XCTUnwrap(app.passedAccess.first)
         let recipient = BundleKeySeal.makeRecipient(), pub = GuestCrypto.base64URL(try GuestCrypto.signingKey(userKey: "ICEiIyQlJicoKSorLC0uLzAxMjM0NTY3").publicKey.rawRepresentation)
         api.children = [["id": 18, "grp": api.group, "sign_pub": pub, "guest_pub": recipient.publicKey, "pass_mac": String(repeating: "0", count: 64),
@@ -121,12 +121,12 @@ final class PassManagerTests: XCTestCase {
         let storage = PassMemoryStorage(invite)
         let app = AppModel(storage: storage), manager = PassManager(app: app, api: api)
         storage.fail = true
-        let blocked = await manager.create(label: "Получатель", welcome: "", objects: [invite.id: [7: KeyObjectAccess(depth: 0, pool: 1)]])
+        let blocked = await manager.create(label: "Получатель", welcome: "", objects: [invite.id: [7: try KeyObjectAccess(depth: 0, pool: 1)]])
         XCTAssertNil(blocked)
         XCTAssertEqual(api.creates, 0)
         storage.fail = false
         api.afterCreate = { storage.fail = true }
-        _ = await manager.create(label: "Получатель", welcome: "", objects: [invite.id: [7: KeyObjectAccess(depth: 0, pool: 1)]])
+        _ = await manager.create(label: "Получатель", welcome: "", objects: [invite.id: [7: try KeyObjectAccess(depth: 0, pool: 1)]])
         XCTAssertEqual(api.creates, 1)
         let lists = api.lists
         await manager.reload()
@@ -140,7 +140,7 @@ final class PassManagerTests: XCTestCase {
         let invite = try invite(), api = PassAPIStub()
         let storage = PassMemoryStorage(invite)
         let original = AppModel(storage: storage), manager = PassManager(app: original, api: api)
-        _ = await manager.create(label: "Получатель", welcome: "", objects: [invite.id: [7: KeyObjectAccess(depth: 0, pool: 1)]])
+        _ = await manager.create(label: "Получатель", welcome: "", objects: [invite.id: [7: try KeyObjectAccess(depth: 0, pool: 1)]])
         let saved = try XCTUnwrap(original.passedAccess.first)
         let source = try original.backupState()
         let payload = IOSBackupPayload(state: source)
@@ -164,7 +164,7 @@ final class PassManagerTests: XCTestCase {
         let invite = try invite(), api = PassAPIStub()
         let storage = PassMemoryStorage(invite)
         let first = AppModel(storage: storage), manager = PassManager(app: first, api: api)
-        let created = await manager.create(label: "Получатель", welcome: "", objects: [invite.id: [7: KeyObjectAccess(depth: 0, pool: 1)]])
+        let created = await manager.create(label: "Получатель", welcome: "", objects: [invite.id: [7: try KeyObjectAccess(depth: 0, pool: 1)]])
         let id = try XCTUnwrap(created), record = try XCTUnwrap(first.passedAccess.first)
         let recipient = BundleKeySeal.makeRecipient(), pub = GuestCrypto.base64URL(try GuestCrypto.signingKey(userKey: "ICEiIyQlJicoKSorLC0uLzAxMjM0NTY3").publicKey.rawRepresentation)
         api.invitations[0]["status"] = "redeemed"

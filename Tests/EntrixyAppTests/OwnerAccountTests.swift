@@ -486,7 +486,7 @@ final class OwnerAccountTests: XCTestCase {
         _ = await app.addOwner(server: "owner.invalid", accessCode: "")
         _ = await app.createOwnerObject(server: "owner.invalid", label: "Ворота", kind: "webhook", phone: "", url: "https://actuator.invalid/open", secret: "private", claimCode: "")
         _ = await app.createOwnerKey(server: "owner.invalid", label: "Друг", numberIDs: [7], welcome: "", nativeOnly: false,
-            confirmation: true, access: [7: KeyObjectAccess(depth: 2, pool: 8)])
+            confirmation: true, access: [7: try KeyObjectAccess(depth: 2, pool: 8)])
         let owner = app.owners[0], root = owner.issuedKeys![0], pair = try root.secrets(masterKey: owner.masterKey)
         let recipient = BundleKeySeal.makeRecipient(), user = "ICEiIyQlJicoKSorLC0uLzAxMjM0NTY3"
         let pub = GuestCrypto.base64URL(try GuestCrypto.signingKey(userKey: user).publicKey.rawRepresentation)
