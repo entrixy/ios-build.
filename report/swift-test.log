@@ -1,0 +1,168 @@
+Building for debugging...
+[0/8] /Users/runner/work/ios-build./ios-build./.build/arm64-apple-macosx/debug/EntrixyPackageTests.derived/runner.swift
+[1/8] Write sources
+[4/8] Copying Fixtures
+[5/8] Write swift-version-1977FEB4D2752686.txt
+[7/37] Emitting module EntrixyCore
+[8/51] Compiling EntrixyCore DelegationProof.swift
+[9/51] Compiling EntrixyCore DelegationRedemption.swift
+[10/51] Compiling EntrixyCore GuestAPI.swift
+[11/51] Compiling EntrixyCore GuestAction.swift
+[12/51] Compiling EntrixyCore GuestActionPolicy.swift
+[13/51] Compiling EntrixyCore GuestBLECache.swift
+[14/51] Compiling EntrixyCore GuestCrypto.swift
+[15/51] Compiling EntrixyCore GuestEvent.swift
+[16/51] Compiling EntrixyCore GuestInvite.swift
+[17/51] Compiling EntrixyCore GuestLiveSession.swift
+[18/51] Compiling EntrixyCore GuestMessageCrypto.swift
+[19/51] Compiling EntrixyCore GuestObjects.swift
+[20/51] Compiling EntrixyCore GuestSigningIdentity.swift
+[21/51] Compiling EntrixyCore KeyObjectAccess.swift
+[22/51] Compiling EntrixyCore AndroidBackupDocument.swift
+[23/51] Compiling EntrixyCore AndroidKeyRecovery.swift
+[24/51] Compiling EntrixyCore AndroidOwnerAdapter.swift
+[25/51] Compiling EntrixyCore AndroidOwnerMaterial.swift
+[26/51] Compiling EntrixyCore AvatarRequestQueue.swift
+[27/51] Compiling EntrixyCore BLEBundle.swift
+[28/51] Compiling EntrixyCore BLECommandSession.swift
+[29/51] Compiling EntrixyCore BLECrypto.swift
+[30/51] Compiling EntrixyCore BLEGuestGrant.swift
+[31/51] Compiling EntrixyCore BLEPairingRecord.swift
+[32/51] Compiling EntrixyCore BLERevocation.swift
+[33/51] Compiling EntrixyCore BackupEnvelope.swift
+[34/51] Compiling EntrixyCore BundleKeySeal.swift
+[35/51] Compiling EntrixyCore ControlFrameValidation.swift
+[36/51] Compiling EntrixyCore MigrationFingerprint.swift
+[37/51] Compiling EntrixyCore OwnerAPI.swift
+[38/51] Compiling EntrixyCore OwnerAccount.swift
+[39/51] Compiling EntrixyCore OwnerAuthorizedGuest.swift
+[40/51] Compiling EntrixyCore OwnerBackupMerge.swift
+[41/51] Compiling EntrixyCore OwnerCommand.swift
+[42/51] Compiling EntrixyCore OwnerDelegatedKey.swift
+[43/51] Compiling EntrixyCore OwnerIssuedKey.swift
+[44/51] Compiling EntrixyCore OwnerLiveSession.swift
+[45/51] Compiling EntrixyCore OwnerManualPolicy.swift
+[46/51] Compiling EntrixyCore OwnerObject.swift
+[47/51] Compiling EntrixyCore PassSnapshot.swift
+[48/51] Compiling EntrixyCore PassedAccess.swift
+[49/51] Compiling EntrixyCore ReceivedDelegation.swift
+[50/75] Emitting module EntrixyCoreTests
+[51/75] Compiling EntrixyCoreTests DelegationEndToEndTests.swift
+[52/75] Compiling EntrixyCoreTests DelegationProofTests.swift
+[53/75] Compiling EntrixyCoreTests DelegationRedemptionTests.swift
+[54/75] Compiling EntrixyCoreTests GuestAPITests.swift
+[55/75] Compiling EntrixyCoreTests GuestActionTests.swift
+[56/75] Compiling EntrixyCoreTests GuestBLECacheTests.swift
+[57/75] Compiling EntrixyCoreTests GuestCryptoTests.swift
+[58/75] Compiling EntrixyCoreTests GuestEventTests.swift
+[59/75] Compiling EntrixyCoreTests GuestInviteTests.swift
+[60/75] Compiling EntrixyCoreTests GuestMessageCryptoTests.swift
+[61/75] Compiling EntrixyCoreTests GuestObjectsTests.swift
+[62/75] Compiling EntrixyCoreTests AndroidBackupDocumentTests.swift
+/Users/runner/work/ios-build./ios-build./Tests/EntrixyCoreTests/AndroidOwnerAdapterTests.swift:50:9: error: the compiler is unable to type-check this expression in reasonable time; try breaking up the expression into distinct sub-expressions
+48 |         XCTAssertEqual(try GuestCrypto.decrypt(key: master, envelope: second.objects!.first!.wrappedSocketSecret!), socket)
+49 |         XCTAssertEqual(ble.bleDeviceID, 0xf1234567)
+50 |         XCTAssertTrue(owners.flatMap { $0.objects ?? [] }.allSatisfy { $0.available == false && $0.pending == nil })
+   |         `- error: the compiler is unable to type-check this expression in reasonable time; try breaking up the expression into distinct sub-expressions
+51 |         XCTAssertEqual(first.bleRevocations?.first?.frame, record.frame); XCTAssertNil(first.bleRevocations?.first?.controllerResult)
+52 |         XCTAssertEqual(first.androidKeys?.first?.userKey, user)
+[63/75] Compiling EntrixyCoreTests AndroidKeyRecoveryTests.swift
+/Users/runner/work/ios-build./ios-build./Tests/EntrixyCoreTests/AndroidOwnerAdapterTests.swift:50:9: error: the compiler is unable to type-check this expression in reasonable time; try breaking up the expression into distinct sub-expressions
+48 |         XCTAssertEqual(try GuestCrypto.decrypt(key: master, envelope: second.objects!.first!.wrappedSocketSecret!), socket)
+49 |         XCTAssertEqual(ble.bleDeviceID, 0xf1234567)
+50 |         XCTAssertTrue(owners.flatMap { $0.objects ?? [] }.allSatisfy { $0.available == false && $0.pending == nil })
+   |         `- error: the compiler is unable to type-check this expression in reasonable time; try breaking up the expression into distinct sub-expressions
+51 |         XCTAssertEqual(first.bleRevocations?.first?.frame, record.frame); XCTAssertNil(first.bleRevocations?.first?.controllerResult)
+52 |         XCTAssertEqual(first.androidKeys?.first?.userKey, user)
+[64/75] Compiling EntrixyCoreTests AndroidOwnerAdapterTests.swift
+/Users/runner/work/ios-build./ios-build./Tests/EntrixyCoreTests/AndroidOwnerAdapterTests.swift:50:9: error: the compiler is unable to type-check this expression in reasonable time; try breaking up the expression into distinct sub-expressions
+48 |         XCTAssertEqual(try GuestCrypto.decrypt(key: master, envelope: second.objects!.first!.wrappedSocketSecret!), socket)
+49 |         XCTAssertEqual(ble.bleDeviceID, 0xf1234567)
+50 |         XCTAssertTrue(owners.flatMap { $0.objects ?? [] }.allSatisfy { $0.available == false && $0.pending == nil })
+   |         `- error: the compiler is unable to type-check this expression in reasonable time; try breaking up the expression into distinct sub-expressions
+51 |         XCTAssertEqual(first.bleRevocations?.first?.frame, record.frame); XCTAssertNil(first.bleRevocations?.first?.controllerResult)
+52 |         XCTAssertEqual(first.androidKeys?.first?.userKey, user)
+[65/75] Compiling EntrixyCoreTests BLEBundleTests.swift
+/Users/runner/work/ios-build./ios-build./Tests/EntrixyCoreTests/AndroidOwnerAdapterTests.swift:50:9: error: the compiler is unable to type-check this expression in reasonable time; try breaking up the expression into distinct sub-expressions
+48 |         XCTAssertEqual(try GuestCrypto.decrypt(key: master, envelope: second.objects!.first!.wrappedSocketSecret!), socket)
+49 |         XCTAssertEqual(ble.bleDeviceID, 0xf1234567)
+50 |         XCTAssertTrue(owners.flatMap { $0.objects ?? [] }.allSatisfy { $0.available == false && $0.pending == nil })
+   |         `- error: the compiler is unable to type-check this expression in reasonable time; try breaking up the expression into distinct sub-expressions
+51 |         XCTAssertEqual(first.bleRevocations?.first?.frame, record.frame); XCTAssertNil(first.bleRevocations?.first?.controllerResult)
+52 |         XCTAssertEqual(first.androidKeys?.first?.userKey, user)
+[66/75] Compiling EntrixyCoreTests BLECommandSessionTests.swift
+/Users/runner/work/ios-build./ios-build./Tests/EntrixyCoreTests/AndroidOwnerAdapterTests.swift:50:9: error: the compiler is unable to type-check this expression in reasonable time; try breaking up the expression into distinct sub-expressions
+48 |         XCTAssertEqual(try GuestCrypto.decrypt(key: master, envelope: second.objects!.first!.wrappedSocketSecret!), socket)
+49 |         XCTAssertEqual(ble.bleDeviceID, 0xf1234567)
+50 |         XCTAssertTrue(owners.flatMap { $0.objects ?? [] }.allSatisfy { $0.available == false && $0.pending == nil })
+   |         `- error: the compiler is unable to type-check this expression in reasonable time; try breaking up the expression into distinct sub-expressions
+51 |         XCTAssertEqual(first.bleRevocations?.first?.frame, record.frame); XCTAssertNil(first.bleRevocations?.first?.controllerResult)
+52 |         XCTAssertEqual(first.androidKeys?.first?.userKey, user)
+[67/75] Compiling EntrixyCoreTests BLECryptoTests.swift
+/Users/runner/work/ios-build./ios-build./Tests/EntrixyCoreTests/AndroidOwnerAdapterTests.swift:50:9: error: the compiler is unable to type-check this expression in reasonable time; try breaking up the expression into distinct sub-expressions
+48 |         XCTAssertEqual(try GuestCrypto.decrypt(key: master, envelope: second.objects!.first!.wrappedSocketSecret!), socket)
+49 |         XCTAssertEqual(ble.bleDeviceID, 0xf1234567)
+50 |         XCTAssertTrue(owners.flatMap { $0.objects ?? [] }.allSatisfy { $0.available == false && $0.pending == nil })
+   |         `- error: the compiler is unable to type-check this expression in reasonable time; try breaking up the expression into distinct sub-expressions
+51 |         XCTAssertEqual(first.bleRevocations?.first?.frame, record.frame); XCTAssertNil(first.bleRevocations?.first?.controllerResult)
+52 |         XCTAssertEqual(first.androidKeys?.first?.userKey, user)
+[68/75] Compiling EntrixyCoreTests BLELifecycleTests.swift
+/Users/runner/work/ios-build./ios-build./Tests/EntrixyCoreTests/AndroidOwnerAdapterTests.swift:50:9: error: the compiler is unable to type-check this expression in reasonable time; try breaking up the expression into distinct sub-expressions
+48 |         XCTAssertEqual(try GuestCrypto.decrypt(key: master, envelope: second.objects!.first!.wrappedSocketSecret!), socket)
+49 |         XCTAssertEqual(ble.bleDeviceID, 0xf1234567)
+50 |         XCTAssertTrue(owners.flatMap { $0.objects ?? [] }.allSatisfy { $0.available == false && $0.pending == nil })
+   |         `- error: the compiler is unable to type-check this expression in reasonable time; try breaking up the expression into distinct sub-expressions
+51 |         XCTAssertEqual(first.bleRevocations?.first?.frame, record.frame); XCTAssertNil(first.bleRevocations?.first?.controllerResult)
+52 |         XCTAssertEqual(first.androidKeys?.first?.userKey, user)
+[69/75] Compiling EntrixyCoreTests BLEPairingRecordTests.swift
+/Users/runner/work/ios-build./ios-build./Tests/EntrixyCoreTests/AndroidOwnerAdapterTests.swift:50:9: error: the compiler is unable to type-check this expression in reasonable time; try breaking up the expression into distinct sub-expressions
+48 |         XCTAssertEqual(try GuestCrypto.decrypt(key: master, envelope: second.objects!.first!.wrappedSocketSecret!), socket)
+49 |         XCTAssertEqual(ble.bleDeviceID, 0xf1234567)
+50 |         XCTAssertTrue(owners.flatMap { $0.objects ?? [] }.allSatisfy { $0.available == false && $0.pending == nil })
+   |         `- error: the compiler is unable to type-check this expression in reasonable time; try breaking up the expression into distinct sub-expressions
+51 |         XCTAssertEqual(first.bleRevocations?.first?.frame, record.frame); XCTAssertNil(first.bleRevocations?.first?.controllerResult)
+52 |         XCTAssertEqual(first.androidKeys?.first?.userKey, user)
+[70/75] Compiling EntrixyCoreTests BLERevocationTests.swift
+/Users/runner/work/ios-build./ios-build./Tests/EntrixyCoreTests/AndroidOwnerAdapterTests.swift:50:9: error: the compiler is unable to type-check this expression in reasonable time; try breaking up the expression into distinct sub-expressions
+48 |         XCTAssertEqual(try GuestCrypto.decrypt(key: master, envelope: second.objects!.first!.wrappedSocketSecret!), socket)
+49 |         XCTAssertEqual(ble.bleDeviceID, 0xf1234567)
+50 |         XCTAssertTrue(owners.flatMap { $0.objects ?? [] }.allSatisfy { $0.available == false && $0.pending == nil })
+   |         `- error: the compiler is unable to type-check this expression in reasonable time; try breaking up the expression into distinct sub-expressions
+51 |         XCTAssertEqual(first.bleRevocations?.first?.frame, record.frame); XCTAssertNil(first.bleRevocations?.first?.controllerResult)
+52 |         XCTAssertEqual(first.androidKeys?.first?.userKey, user)
+[71/75] Compiling EntrixyCoreTests BackupEnvelopeTests.swift
+/Users/runner/work/ios-build./ios-build./Tests/EntrixyCoreTests/AndroidOwnerAdapterTests.swift:50:9: error: the compiler is unable to type-check this expression in reasonable time; try breaking up the expression into distinct sub-expressions
+48 |         XCTAssertEqual(try GuestCrypto.decrypt(key: master, envelope: second.objects!.first!.wrappedSocketSecret!), socket)
+49 |         XCTAssertEqual(ble.bleDeviceID, 0xf1234567)
+50 |         XCTAssertTrue(owners.flatMap { $0.objects ?? [] }.allSatisfy { $0.available == false && $0.pending == nil })
+   |         `- error: the compiler is unable to type-check this expression in reasonable time; try breaking up the expression into distinct sub-expressions
+51 |         XCTAssertEqual(first.bleRevocations?.first?.frame, record.frame); XCTAssertNil(first.bleRevocations?.first?.controllerResult)
+52 |         XCTAssertEqual(first.androidKeys?.first?.userKey, user)
+[72/75] Compiling EntrixyCoreTests BundleKeySealTests.swift
+/Users/runner/work/ios-build./ios-build./Tests/EntrixyCoreTests/AndroidOwnerAdapterTests.swift:50:9: error: the compiler is unable to type-check this expression in reasonable time; try breaking up the expression into distinct sub-expressions
+48 |         XCTAssertEqual(try GuestCrypto.decrypt(key: master, envelope: second.objects!.first!.wrappedSocketSecret!), socket)
+49 |         XCTAssertEqual(ble.bleDeviceID, 0xf1234567)
+50 |         XCTAssertTrue(owners.flatMap { $0.objects ?? [] }.allSatisfy { $0.available == false && $0.pending == nil })
+   |         `- error: the compiler is unable to type-check this expression in reasonable time; try breaking up the expression into distinct sub-expressions
+51 |         XCTAssertEqual(first.bleRevocations?.first?.frame, record.frame); XCTAssertNil(first.bleRevocations?.first?.controllerResult)
+52 |         XCTAssertEqual(first.androidKeys?.first?.userKey, user)
+[73/75] Compiling EntrixyCoreTests ControlFrameValidationTests.swift
+/Users/runner/work/ios-build./ios-build./Tests/EntrixyCoreTests/AndroidOwnerAdapterTests.swift:50:9: error: the compiler is unable to type-check this expression in reasonable time; try breaking up the expression into distinct sub-expressions
+48 |         XCTAssertEqual(try GuestCrypto.decrypt(key: master, envelope: second.objects!.first!.wrappedSocketSecret!), socket)
+49 |         XCTAssertEqual(ble.bleDeviceID, 0xf1234567)
+50 |         XCTAssertTrue(owners.flatMap { $0.objects ?? [] }.allSatisfy { $0.available == false && $0.pending == nil })
+   |         `- error: the compiler is unable to type-check this expression in reasonable time; try breaking up the expression into distinct sub-expressions
+51 |         XCTAssertEqual(first.bleRevocations?.first?.frame, record.frame); XCTAssertNil(first.bleRevocations?.first?.controllerResult)
+52 |         XCTAssertEqual(first.androidKeys?.first?.userKey, user)
+[74/86] Compiling EntrixyCoreTests KeyObjectAccessTests.swift
+[75/86] Compiling EntrixyCoreTests OwnerAPITests.swift
+[76/86] Compiling EntrixyCoreTests OwnerBackupMergeTests.swift
+[77/86] Compiling EntrixyCoreTests OwnerCommandTests.swift
+[78/86] Compiling EntrixyCoreTests OwnerDelegatedKeyTests.swift
+[79/86] Compiling EntrixyCoreTests OwnerIssuedKeyTests.swift
+[80/86] Compiling EntrixyCoreTests OwnerManualPolicyTests.swift
+[81/86] Compiling EntrixyCoreTests OwnerObjectTests.swift
+[82/86] Compiling EntrixyCoreTests PassedAccessTests.swift
+[83/86] Compiling EntrixyCoreTests ReceivedDelegationTests.swift
+[84/86] Compiling EntrixyCoreTests resource_bundle_accessor.swift
+error: fatalError
