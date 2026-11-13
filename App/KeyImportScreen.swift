@@ -68,7 +68,6 @@ struct KeyImportScreen: View {
             }
             .background(Color(uiColor: .systemGroupedBackground))
             .navigationTitle("Добавить ключ").navigationBarTitleDisplayMode(.inline)
-            .modifier(BrandNavigationHeader())
             .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Отмена") { dismiss() } } }
             .sheet(isPresented: $scanning) { QRScannerScreen { value in accept(value); scanning = false } }
             .onChange(of: photo) { value in
