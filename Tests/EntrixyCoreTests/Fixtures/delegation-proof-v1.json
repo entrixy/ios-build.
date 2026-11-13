@@ -1,0 +1,13 @@
+{
+  "provenance": "Independent Python cryptography + hashlib/hmac; public synthetic keys only",
+  "user_key": "AAECAwQFBgcICQoLDA0ODxAREhMUFRYX",
+  "group": "AAECAwQFBgcICQoLDA0ODw",
+  "secret": "AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8",
+  "sign_public": "yIcpf7dFLl3HqlRUbPYOMkxDwjoUtYxMf6bPS4LHVVU",
+  "guest_public": "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE-1A4jylJjQqTrSXsTDQDe508w8ykeH62_tq-KzAD6sifd2XKnWKI5v9zT1zQjzpZIc9UshuzmLUKwNJXf6B0cg",
+  "server": "controller.invalid",
+  "child_id": 17,
+  "mac": "0ae0666d760db3bcc40bdeeeedce77f63a65cf18cde2855ad66176ce786d20df",
+  "vouch": "lOr1JqLdF0qe9zyTHNRILQvpnUSzeUspV3X8/fPHQtZa7UFBAHwHgZMtnJuwspasZunzcKhJgI3ojQICKRWPBA==",
+  "parent_public": "NmVqk-YliSBOjvPvhxsnW_ZC46-0a1eWrPEh8iGpKe8"
+}

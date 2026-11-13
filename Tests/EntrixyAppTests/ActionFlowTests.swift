@@ -1,0 +1,117 @@
+import XCTest
+import Security
+import EntrixyCore
+@testable import Entrixy
+
+private final class RecordingController: GuestActionTransport {
+    var sent: [Data] = []
+    var closed = false
+    func sendAction(_ frame: Data) async throws { sent.append(frame) }
+    func close() { closed = true }
+}
+
+final class ActionFlowTests: XCTestCase {
+    private let service = "com.entrixy.ios.action-tests." + UUID().uuidString
+    override func tearDown() {
+        SecItemDelete([kSecClass as String: kSecClassGenericPassword, kSecAttrService as String: service] as CFDictionary)
+        super.tearDown()
+    }
+    @MainActor private func fixture(template: [String: Any] = [:]) async throws -> (AppModel, RecordingController, SavedGuest, GuestObject) {
+        let invite = try GuestInvite.parse("https://example.invalid/key#AAECAwQFBgcICQoLDA0ODxAREhMUFRYX" + String(repeating: "A", count: 43))
+        let guest = SavedGuest(invite: invite)
+        let store = KeychainStore(service: service)
+        try store.save(SavedState(identity: Data(repeating: 53, count: 32), guests: [guest]))
+        let model = AppModel(storage: store)
+        let key = Data(repeating: 8, count: 32)
+        let bundle: [String: Any] = ["obj_keys": ["7": GuestCrypto.base64URL(key)], "templates": ["7": template],
+            "sock": ["7": ["guest_id": 513, "token": Data([1, 2, 1]).base64EncodedString(),
+                "sig": Data(repeating: 4, count: 16).base64EncodedString(), "gkey": Data(0..<32).base64EncodedString()]]]
+        let cipher = try GuestCrypto.encrypt(key: key, plaintext: JSONSerialization.data(withJSONObject: ["label": "Тестовый контроллер"]))
+        let snapshot = try JSONSerialization.data(withJSONObject: ["type": "guest_ok", "mode": "on", "numbers": [["id": 7, "type": "device", "device_id": 9, "data_cipher": cipher]]])
+        let controller = RecordingController()
+        try model.attachTestController(controller, guestID: guest.id, bundle: JSONSerialization.data(withJSONObject: bundle), snapshot: snapshot)
+        try await model.receiveTestController(Data(#"{"type":"devices_online","device_ids":[9]}"#.utf8), guestID: guest.id)
+        return (model, controller, guest, try XCTUnwrap(model.guests.first?.objects.first))
+    }
+    @MainActor func testPressChallengeResultAndJournalSurviveRelaunchWithoutReplay() async throws {
+        let (model, controller, guest, object) = try await fixture()
+        let challenge = try JSONSerialization.data(withJSONObject: ["type": "sock_challenge", "number_id": 7, "command_id": "test-1", "nonce": Data(0..<16).base64EncodedString()])
+        try await model.receiveTestController(challenge, guestID: guest.id)
+        XCTAssertTrue(controller.sent.isEmpty)
+        let intent = try XCTUnwrap(model.actionIntent(guestID: guest.id, object: object))
+        await model.execute(intent)
+        XCTAssertEqual(controller.sent.count, 1)
+        XCTAssertEqual(try KeychainStore(service: service).load()?.journal?.count, 1)
+        XCTAssertNil(model.actionIntent(guestID: guest.id, object: object))
+        try await model.receiveTestController(challenge, guestID: guest.id)
+        XCTAssertEqual(controller.sent.count, 2)
+        try await model.receiveTestController(challenge, guestID: guest.id)
+        XCTAssertEqual(controller.sent.count, 2)
+        try await model.receiveTestController(Data(#"{"type":"device_status","number_id":7,"message":"Opened","level":"success"}"#.utf8), guestID: guest.id)
+        XCTAssertEqual(model.journal.first?.result, "Opened")
+        try await model.receiveTestController(Data(#"{"type":"device_status","number_id":7,"message":"Other action","other":true}"#.utf8), guestID: guest.id)
+        XCTAssertEqual(model.journal.first?.result, "Opened")
+        model.suspend()
+        XCTAssertEqual(model.actionMessages[guest.id + "|" + object.id], "Opened")
+        XCTAssertTrue(controller.closed)
+        try await model.receiveTestController(challenge, guestID: guest.id)
+        XCTAssertEqual(controller.sent.count, 2)
+        let restored = AppModel(storage: KeychainStore(service: service))
+        XCTAssertEqual(restored.journal.first?.result, "Opened")
+        XCTAssertEqual(controller.sent.count, 2)
+        // Clearing the journal during another attempt must not swallow its result.
+        let (clearing, secondController, secondGuest, secondObject) = try await fixture()
+        let secondIntent = try XCTUnwrap(clearing.actionIntent(guestID: secondGuest.id, object: secondObject))
+        await clearing.execute(secondIntent)
+        clearing.clearJournal()
+        try await clearing.receiveTestController(Data(#"{"type":"device_status","number_id":7,"message":"Opened","level":"success"}"#.utf8), guestID: secondGuest.id)
+        XCTAssertEqual(clearing.actionMessages[secondGuest.id + "|" + secondObject.id], "Opened")
+        XCTAssertTrue(clearing.journal.isEmpty)
+        XCTAssertEqual(secondController.sent.count, 1)
+        clearing.suspend()
+    }
+    @MainActor func testOfflineOrChangedAuthorizationCannotSend() async throws {
+        let (model, controller, guest, object) = try await fixture()
+        let intent = try XCTUnwrap(model.actionIntent(guestID: guest.id, object: object))
+        try await model.receiveTestController(Data(#"{"type":"device_online","device_id":9,"online":false}"#.utf8), guestID: guest.id)
+        await model.execute(intent)
+        XCTAssertTrue(controller.sent.isEmpty)
+        XCTAssertTrue(model.journal.isEmpty)
+        XCTAssertNil(model.actionIntent(guestID: guest.id, object: object))
+    }
+    @MainActor func testPINIsRequiredAndFailedAttemptsPersistAcrossLaunches() async throws {
+        let (model, controller, guest, object) = try await fixture(template: ["auth_on": true, "auth": "pin"])
+        try await model.setActionCode("1234")
+        let intent = try XCTUnwrap(model.actionIntent(guestID: guest.id, object: object))
+        await model.execute(intent)
+        XCTAssertTrue(controller.sent.isEmpty)
+        let accepted = try await model.authorizeCode("1234", intent: intent)
+        XCTAssertTrue(accepted)
+        await model.execute(intent)
+        XCTAssertEqual(controller.sent.count, 1)
+        model.suspend()
+        let restored = AppModel(storage: KeychainStore(service: service))
+        XCTAssertTrue(restored.hasActionCode)
+        for _ in 0..<5 {
+            let accepted = try await restored.authorizeCode("0000", intent: intent)
+            XCTAssertFalse(accepted)
+        }
+        let saved = try XCTUnwrap(KeychainStore(service: service).load()?.actionCode)
+        XCTAssertEqual(saved.failures, 5)
+        XCTAssertGreaterThan(saved.lockedUntil, Date())
+        let blocked = try await restored.authorizeCode("1234", intent: intent)
+        XCTAssertFalse(blocked)
+    }
+    func testPINUsesIndependentPBKDF2VectorAndEscalatingLockout() throws {
+        let hash = try LocalActionCode.derive("1234", salt: Data(0..<16))
+        XCTAssertEqual(hash.map { String(format: "%02x", $0) }.joined(), "4377fadf9b31b873d27e134c959c727ab5015df85137afdd552ba717e092ccf4")
+        var code = LocalActionCode(salt: Data(0..<16), verifier: hash)
+        for _ in 0..<4 { code.failed() }
+        XCTAssertLessThan(code.lockedUntil, Date())
+        code.failed()
+        XCTAssertGreaterThan(code.lockedUntil.timeIntervalSinceNow, 25)
+        for _ in 0..<5 { code.failed() }
+        XCTAssertGreaterThan(code.lockedUntil.timeIntervalSinceNow, 7100)
+        XCTAssertThrowsError(try LocalActionCode.derive("x123", salt: code.salt))
+    }
+}

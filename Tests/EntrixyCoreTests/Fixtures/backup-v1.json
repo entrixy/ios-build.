@@ -1,0 +1,6 @@
+{
+  "provenance": "Independent Python hashlib PBKDF2 + cryptography AESGCM, Android Backup.kt header and AAD",
+  "password": "Тестовый пароль 2026",
+  "payload": "{\"app\":\"entrixy\",\"ver\":1,\"created\":1800000000,\"device\":\"public-fixture\",\"entries\":{\"public-fixture\":{\"t\":\"s\",\"v\":\"no-real-keys\"}}}",
+  "blob": "RU5UUklYWTEBAQAJJ8AAAQIDBAUGBwgJCgsMDQ4PAAECAwQFBgcICQoLlsPs+4GBYfjPyyYSw9zjh+3oXu5AaJVoYyPtJPqFshKd9U7TnJvwYptmDXdUBAxQP2uXcZm8MqPiCaW30Caz1V3Ax94N53eZXuR4DLZb1cOAhFcDIB3QNvMYIPHzCcWjB+LgTE5Os6LKejLFoAvrShocmI2tKWYqWAeOBaNzXLRd5xi6/CXyhUOA1ailQkBsx48="
+}

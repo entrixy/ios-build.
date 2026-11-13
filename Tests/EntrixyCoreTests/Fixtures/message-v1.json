@@ -1,0 +1,10 @@
+{
+  "provenance": "Independent Python cryptography/hashlib; public synthetic keys only",
+  "text": "Тестовое сообщение получателю",
+  "root_key": "AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8",
+  "root_cipher": "v1:AAECAwQFBgcICQoLl6AGrhRkE5ld_0c5YVeo2KMHBuROq-GsibZsVai5vWK5wBvcf37CJqQfrm5ZAPiIP9uwOIptclQUXuUQTz68CJM-SJVobUzk",
+  "recipient_private": "MIGHAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBG0wawIBAQQgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAdbzRWhRANCAAT7UDiPKUmNCpOtJexMNAN7nTzDzKR4frb-2r4rMAPqyJ93ZcqdYojm_3NPXNCPOlkhz1SyG7OYtQrA0ld_oHRy",
+  "recipient_public": "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE-1A4jylJjQqTrSXsTDQDe508w8ykeH62_tq-KzAD6sifd2XKnWKI5v9zT1zQjzpZIc9UshuzmLUKwNJXf6B0cg",
+  "passed_cipher": "v1:MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE4TgAvq9qfe3k3d-HTkrcwnG_Bp6M_Cxe-YkIS-wzsmAWVyQ0mjd9o241ennPczzSTOEpgb2aGWdbCLHTbtVoAQ.DA0ODxAREhMUFRYXSjZusbdN5SY5atD08T2RICpsLk1JKfvlW5gDrFtVNegsxutBHbFNVR4fHOKvRDUZ|v1:GBkaGxwdHh8gISIjr8uLLJrGDThlSKzrkKh1czDPl77aHAVdBCGp-QJZIOp9VasbvL5uqXzwtNS1FBzQcwzUPGxg8HEiD04zFiav2iQX6oHFJUzQ",
+  "ack_hash": "37617392cfe9d119a65e8b7a"
+}

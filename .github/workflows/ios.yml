@@ -1,0 +1,167 @@
+name: iOS build and protocol tests
+"on":
+  push:
+    branches: [main, master]
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+defaults:
+  run:
+    shell: bash
+concurrency:
+  group: ios-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  verify:
+    runs-on: macos-15
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.3.app/Contents/Developer
+    timeout-minutes: 60
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - name: Prepare build logs
+        run: mkdir -p .local-checks/ci
+      - name: Show Apple toolchain
+        run: |
+          xcodebuild -version 2>&1 | tee .local-checks/ci/toolchain.log
+          swift --version 2>&1 | tee -a .local-checks/ci/toolchain.log
+          python3 - <<'PY'
+          import json, subprocess
+          from pathlib import Path
+          xcode = subprocess.check_output(['xcodebuild', '-version'], text=True).splitlines()[0]
+          sdk = subprocess.check_output(['xcrun', '--sdk', 'iphonesimulator', '--show-sdk-version'], text=True).strip()
+          if int(xcode.split()[1].split('.')[0]) < 26 or int(sdk.split('.')[0]) < 26:
+              raise RuntimeError('App Store preparation requires Xcode 26+ and iOS SDK 26+')
+          Path('.local-checks/ci/toolchain.json').write_text(json.dumps({'xcode': xcode, 'simulator_sdk': sdk}) + '\n')
+          PY
+      - name: Run core vectors and tests with Apple CryptoKit
+        id: core_tests
+        run: swift test 2>&1 | tee .local-checks/ci/swift-test.log
+      - name: Install project generator
+        run: brew install xcodegen 2>&1 | tee .local-checks/ci/xcodegen-install.log
+      - name: Generate native application project
+        run: xcodegen generate 2>&1 | tee .local-checks/ci/project-generation.log
+      - name: Build iPhone simulator application
+        id: debug_build
+        run: |
+          xcodebuild -project Entrixy.xcodeproj -scheme Entrixy \
+            -configuration Debug -sdk iphonesimulator \
+            -destination 'generic/platform=iOS Simulator' \
+            -derivedDataPath .local-checks/DerivedData \
+            CODE_SIGNING_ALLOWED=YES CODE_SIGN_IDENTITY=- build 2>&1 | tee .local-checks/ci/simulator-build.log
+      - name: Verify release build excludes capture fixtures
+        id: release_build
+        run: |
+          xcodebuild -project Entrixy.xcodeproj -scheme Entrixy \
+            -configuration Release -sdk iphonesimulator \
+            -destination 'generic/platform=iOS Simulator' \
+            -derivedDataPath .local-checks/ReleaseDerivedData \
+            CODE_SIGNING_ALLOWED=YES CODE_SIGN_IDENTITY=- build 2>&1 | tee .local-checks/ci/release-build.log
+          python3 scripts/verify_release_isolation.py \
+            .local-checks/DerivedData/Build/Products/Debug-iphonesimulator/Entrixy.app \
+            .local-checks/ReleaseDerivedData/Build/Products/Release-iphonesimulator/Entrixy.app \
+            2>&1 | tee -a .local-checks/ci/release-build.log
+      - name: Test native Keychain migration, journal and QR photo import
+        id: native_tests
+        run: python3 scripts/test_simulator.py 2>&1 | tee .local-checks/ci/native-tests.log
+      - name: Capture new action scenarios on iPhone simulators
+        id: captures
+        run: |
+          python3 scripts/capture_simulator.py --all-flows 2>&1 | tee .local-checks/ci/screenshots.log
+          python3 scripts/build_capture_review.py .local-checks/ci/screenshots --source-sha "$GITHUB_SHA" \
+            2>&1 | tee -a .local-checks/ci/screenshots.log
+      - name: Archive simulator app
+        run: >-
+          ditto -c -k --sequesterRsrc --keepParent
+          .local-checks/DerivedData/Build/Products/Debug-iphonesimulator/Entrixy.app
+          .local-checks/Entrixy-simulator.zip
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: Entrixy-iOS-simulator
+          path: .local-checks/Entrixy-simulator.zip
+          retention-days: 3
+      - name: Save build metadata
+        if: always()
+        env:
+          SOURCE_SHA: ${{ github.sha }}
+          BUILD_RESULT: ${{ job.status }}
+          STEP_RESULTS: ${{ toJSON(steps) }}
+          BUILD_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          mkdir -p .local-checks/ci
+          python3 - <<'PY'
+          import json, os
+          from pathlib import Path
+          data = {key: os.environ[key] for key in ['SOURCE_SHA', 'BUILD_RESULT', 'BUILD_URL']}
+          steps = json.loads(os.environ['STEP_RESULTS'])
+          data['checks'] = {name: steps.get(name, {}).get('outcome', 'skipped')
+                            for name in ['core_tests', 'debug_build', 'release_build', 'native_tests', 'captures']}
+          data['capture_mode'] = 'isolated-software-controller'
+          data['visual_review'] = 'pending'
+          Path('.local-checks/ci/result.json').write_text(json.dumps(data, indent=2) + '\n')
+          PY
+      - name: Upload build logs
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: ios-build-logs
+          path: .local-checks/ci/
+          retention-days: 3
+  report:
+    needs: verify
+    if: always() && github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - name: Download build logs
+        continue-on-error: true
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: ios-build-logs
+          path: ${{ runner.temp }}/ios-build-logs
+      - name: Publish build report for Git access
+        env:
+          SOURCE_SHA: ${{ github.sha }}
+          BUILD_RESULT: ${{ needs.verify.result }}
+          BUILD_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          git config user.name 'Entrixy CI'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          if git ls-remote --exit-code --heads origin ci-results >/dev/null; then
+            git fetch origin ci-results:refs/remotes/origin/ci-results
+            git switch -C ci-results origin/ci-results
+          else
+            git switch --orphan ci-results
+          fi
+          git rm -rf --ignore-unmatch .
+          mkdir -p report
+          python3 - <<'PY'
+          import json, os, shutil
+          from pathlib import Path
+          for source in (Path(os.environ['RUNNER_TEMP']) / 'ios-build-logs').glob('*.log'):
+              shutil.copy2(source, Path('report') / source.name)
+          toolchain = Path(os.environ['RUNNER_TEMP']) / 'ios-build-logs' / 'toolchain.json'
+          if toolchain.is_file():
+              shutil.copy2(toolchain, Path('report/toolchain.json'))
+          captures = Path(os.environ['RUNNER_TEMP']) / 'ios-build-logs' / 'screenshots'
+          if captures.is_dir():
+              destination = Path('report/screenshots')
+              destination.mkdir()
+              for source in captures.iterdir():
+                  if source.suffix == '.png' or source.name in ['manifest.json', 'index.html', 'review.json']:
+                      shutil.copy2(source, destination / source.name)
+          saved = Path(os.environ['RUNNER_TEMP']) / 'ios-build-logs' / 'result.json'
+          data = json.loads(saved.read_text()) if saved.is_file() else {}
+          # The reporting job remains authoritative for cancellation/failure status.
+          data.update({key: os.environ[key] for key in ['SOURCE_SHA', 'BUILD_RESULT', 'BUILD_URL']})
+          Path('report/result.json').write_text(json.dumps(data, indent=2) + '\n')
+          PY
+          git add -- report
+          git commit -m "CI report for $SOURCE_SHA"
+          git push origin HEAD:refs/heads/ci-results

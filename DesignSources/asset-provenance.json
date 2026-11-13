@@ -1,0 +1,77 @@
+[
+  {
+    "asset": "object-1",
+    "source": "Android res/drawable/obj_icon_1.png",
+    "sha256": "16087e7dd6a470b569fecfe6a72eb8f55a3e871b9f8b2e3934af453a8caef3a1"
+  },
+  {
+    "asset": "object-2",
+    "source": "Android res/drawable/obj_icon_2.png",
+    "sha256": "fd33b4a79e658cd79f3c64de034e30b210b4bab03f92b1cb78b934e26b2857b1"
+  },
+  {
+    "asset": "object-3",
+    "source": "Android res/drawable/obj_icon_3.png",
+    "sha256": "36b45194ea19edc7fe37373459c6a5b396c5f0128536b79d9db2d94610bee1c5"
+  },
+  {
+    "asset": "object-4",
+    "source": "Android res/drawable/obj_icon_4.png",
+    "sha256": "6af4e9c126822894dd0b215c7ba91e3c88e318bc256228c8ad7c33ec23653303"
+  },
+  {
+    "asset": "object-5",
+    "source": "Android res/drawable/obj_icon_5.png",
+    "sha256": "84225f5fa8f7e6a9fe69f1ddd244921f2ddc560a47d733b925dfe6f817161497"
+  },
+  {
+    "asset": "object-6",
+    "source": "Android res/drawable/obj_icon_6.png",
+    "sha256": "7991c0bbed30c22342f90d8ca2718c4b22655e4ae3a8c16594e1eecab6d426ba"
+  },
+  {
+    "asset": "object-7",
+    "source": "Android res/drawable/obj_icon_7.png",
+    "sha256": "003c3efd12124344d647f289c5e3bd0bdd0acb6681317f298660af3c7797f1f4"
+  },
+  {
+    "asset": "object-8",
+    "source": "Android res/drawable/obj_icon_8.png",
+    "sha256": "702fd11c176d26463cf15c17e5eaca5e189199d1f6916ca6247d3b89310a6fe3"
+  },
+  {
+    "asset": "brand-horizontal",
+    "source": "website img/logo-h.svg",
+    "sha256": "06ea64d68b4318120c980ebd3a30a4bfdfe54f795aa64edf0fa814554d01f692"
+  },
+  {
+    "asset": "brand-vertical",
+    "source": "website img/logo-v.svg",
+    "sha256": "a2856941b390537fe2b13fd04586e55ee12c4d36a8ff9905ad001d21c77be38e"
+  },
+  {
+    "asset": "tab-control",
+    "source": "https://github.com/google/material-design-icons/blob/10ecc14790612ca8fd164e3f4ffe9c16fc50d5b7/src/navigation/apps/materialiconsoutlined/24px.svg",
+    "sha256": "c739a8e48aa4afc16cf70363c65392d7584094b5b2de9e6de4e47cd710309325"
+  },
+  {
+    "asset": "tab-settings",
+    "source": "https://github.com/google/material-design-icons/blob/10ecc14790612ca8fd164e3f4ffe9c16fc50d5b7/src/action/settings/materialiconsoutlined/24px.svg",
+    "sha256": "814b7a6eea050c073d4a8d7b1f72512b0bd4f71b33beb584c8063fb0bfa78d41"
+  },
+  {
+    "asset": "tab-guests",
+    "source": "https://github.com/google/material-design-icons/blob/10ecc14790612ca8fd164e3f4ffe9c16fc50d5b7/src/social/people_alt/materialiconsoutlined/24px.svg",
+    "sha256": "39e7a0958f5273ed9744baf08ae30e3d06f897235cbec66473d9808d6ef42b1e"
+  },
+  {
+    "asset": "tab-journal",
+    "source": "https://github.com/google/material-design-icons/blob/10ecc14790612ca8fd164e3f4ffe9c16fc50d5b7/src/action/list/materialiconsoutlined/24px.svg",
+    "sha256": "e7155daceae536db745471022afa7433d8726dc5e4b204d6ca2d15c14792a2d6"
+  },
+  {
+    "asset": "icon-key",
+    "source": "https://github.com/google/material-design-icons/blob/10ecc14790612ca8fd164e3f4ffe9c16fc50d5b7/src/communication/vpn_key/materialiconsoutlined/24px.svg",
+    "sha256": "c5851000083b6a32aff7776edf27387e01751f7b8b21d85c07754e7a13ed6de8"
+  }
+]

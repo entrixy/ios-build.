@@ -1,0 +1,91 @@
+{
+  "userKey": "AAECAwQFBgcICQoLDA0ODxAREhMUFRYX",
+  "keyHash": "bffcb3cc4ae9b1be18646be4a2902233285f09e73e64b88a821c94fedf788462",
+  "signPubB64": "NmVqk-YliSBOjvPvhxsnW_ZC46-0a1eWrPEh8iGpKe8",
+  "signHeaders_key_bundle_emptyobj": {
+    "X-Entrixy-Key": "bffcb3cc4ae9b1be18646be4a2902233285f09e73e64b88a821c94fedf788462",
+    "X-Entrixy-Ts": "1767225600",
+    "X-Entrixy-Nonce": "a0a1a2a3a4a5a6a7a8a9aaabacadaeaf",
+    "X-Entrixy-Sig": "cR2M7lYsMgCtDHvn3gUkxuBS7GFfRyK1AX5FkGv8GOR46+WqoCjqgrjBKGjKrY4Yo73QyvV2Q1B2uE1tUxkdAA==",
+    "X-Entrixy-Suite": "v1"
+  },
+  "helloFields": {
+    "key_id": "bffcb3cc4ae9b1be18646be4a2902233285f09e73e64b88a821c94fedf788462",
+    "ts": "1767225600",
+    "nonce": "b0b1b2b3b4b5b6b7b8b9babbbcbdbebf",
+    "suite": "v1",
+    "sig": "a5QrhTmhym9dlv9zKgKvBgURIrKEHXXlBcOv3yXr1LaTgs12PZ8SjoWkR2QKxhyfo1SbutPxOtmnqFiWG+IWAQ=="
+  },
+  "helloFields_fp": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+  "deviceHeaders_key_bundle_emptyobj": {
+    "X-Entrixy-Key": "bffcb3cc4ae9b1be18646be4a2902233285f09e73e64b88a821c94fedf788462",
+    "X-Entrixy-Ts": "1767225600",
+    "X-Entrixy-Nonce": "d0d1d2d3d4d5d6d7d8d9dadbdcdddedf",
+    "X-Entrixy-Sig": "atEN3UEWqP2MizxrmSY9BM9hOKHyqYYYdHW26lu0ZG9iWjDpXCue247zkmKSpzy1N4fng3XHQY/rQA0Qx5drAg==",
+    "X-Entrixy-Suite": "v1"
+  },
+  "devicePub_from_browser": "kNn6qFDo_Fhq90UwBC0BvNmXSNkuJ2b9UOWpFw6T46Q",
+  "pressFields_entrixy_com_5_empty": {
+    "ts": 1767225600,
+    "nonce": "c0c1c2c3c4c5c6c7c8c9cacbcccdcecf",
+    "action": "",
+    "sig": "TCTXfZs0aXEW1Zg5l0flSS4EJtGgY5NGRmCi+IFMJLe0WfHCRwWwXGPYWl+LbpqczZmPSEYVldPlb64LH0U3CQ=="
+  },
+  "passMac": {
+    "wk": "QEFCQ0RFRkdISUpLTE1OT1BRUlNUVVZXWFlaW1xdXl8",
+    "grp": "GRPcode0123456789abcd",
+    "signPub": "NmVqk-YliSBOjvPvhxsnW_ZC46-0a1eWrPEh8iGpKe8",
+    "guestPub": "PUBPLACEHOLDER",
+    "mac": "ebf422f1ee8a40d6c378a6cfd2d842ac65b6c111335234e32a6d0321db7057e8"
+  },
+  "aes": {
+    "key_hex": "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f",
+    "nonce_hex": "101112131415161718191a1b",
+    "plaintext": "hello",
+    "blob": "v1:EBESExQVFhcYGRobFZv0eiaQHT07LXaZWDHfkmv6tzVa",
+    "roundtrip": "hello"
+  },
+  "bundle": {
+    "kGuest_hex": "606162636465666768696a6b6c6d6e6f707172737475767778797a7b7c7d7e7f",
+    "nonce_hex": "202122232425262728292a2b",
+    "plaintext": "{\"obj_ids\":[7],\"obj_keys\":{\"7\":\"gIGCg4SFhoeIiYqLjI2Oj5CRkpOUlZaXmJmam5ydnp8\"},\"obj_keys_prev\":{},\"obj_epoch\":{\"7\":1},\"welcome\":\"hi\",\"host_label\":\"Owner\",\"net_block\":[]}",
+    "blob": "v1:ICEiIyQlJicoKSor7UwQS-JzTDTr8Iha0bIXtSdptQJTyVTlz3s-UrnJBMJ1FEeHaO6uuBDH7xdtPfjYpSJ5NDOp_9liH15z92elq0oe1_zxud7ewVRGpIuBS7kl4uXNtVIX1OdQinUtdVRdEekEK7SszaYsul6CtRIOMLul2BSKhsaajO0QYIH3U0_UK6DOXDXmCfud1c6uBc9DaaZoDxOItJctNI25_YhaZgP7p505VSn2RwIioseCDDVS9dQAZlw95A"
+  },
+  "link": {
+    "url": "https://entrixy.com/key#AAECAwQFBgcICQoLDA0ODxAREhMUFRYXYGFiY2RlZmdoaWprbG1ub3BxcnN0dXZ3eHl6e3x9fn8",
+    "fragment_len": 75,
+    "parsed_userKey": "AAECAwQFBgcICQoLDA0ODxAREhMUFRYX",
+    "parsed_kGuest_hex": "606162636465666768696a6b6c6d6e6f707172737475767778797a7b7c7d7e7f"
+  },
+  "newUserKey_from_30_47": "MDEyMzQ1Njc4OTo7PD0-P0BBQkNERUZH",
+  "seal": {
+    "recipient_priv_scalar_hex": "1111111111111111111111111111111111111111111111111111111111111111",
+    "ephemeral_priv_scalar_hex": "2222222222222222222222222222222222222222222222222222222222222222",
+    "recipient_spki_b64u": "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEAhfmF_C2RDkoJ4-WmZ5pojpPLBUr321s32bluAKC1O0ZSn3ry5dxLS3aPKhaqHZaVvRfx1hZllLyiXxlMG5XlA",
+    "recipient_pub_len": 122,
+    "shared_x_hex": "ccfc261f58193c98ca4ad4a53bbac6f0ee29bc4d48438090446908622ca79af6",
+    "wrap_key_hex": "9e0215f839fa22062f2472fda4206dfb1cb9e66d070c81dc42a7f104fb7e697e",
+    "nonce_hex": "505152535455565758595a5b",
+    "payload_kGuest_hex": "606162636465666768696a6b6c6d6e6f707172737475767778797a7b7c7d7e7f",
+    "sealed": "v1:MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE1lqTl3yqPRsIGFL_V6eeRl8WYFdzBLrq1QXdOkhYnPNQGF6JU3LfYiHqOhN1V-Rz_dtnVfBb1QfDxTP86ckShQ.UFFSU1RVVldYWVpbbCbXwAq20zTWvAwVfFFn0tG9sHbw3-fc2Df3p2dUhIm3Tp400kurOq_9Wp7cSyl1",
+    "openKey_result_hex": "606162636465666768696a6b6c6d6e6f707172737475767778797a7b7c7d7e7f"
+  },
+  "devicePub_b64u": "kNn6qFDo_Fhq90UwBC0BvNmXSNkuJ2b9UOWpFw6T46Q",
+  "ble": {
+    "ownerSecret_hex": "909192939495969798999a9b9c9d9e9fa0a1a2a3a4a5a6a7a8a9aaabacadaeaf",
+    "guest_did": 4660,
+    "valid_until": 1767312000,
+    "token_b64": "NBKACldpAQ==",
+    "sig_b64": "oDIeqlch5FEdIBj0RQqf+g==",
+    "gkey_b64": "ZlrCFMviQoq5sv/Ftp8wUkoxCT2h+g2ypVrBo37EODU=",
+    "kstate_b64": "bNCJL1WZPDWzboYt+GVD3w==",
+    "sock_token_b64": "NBIB",
+    "sock_sig_b64": "t3XbwVuQB/hKZRNRWomujw=="
+  },
+  "fp_v2": {
+    "seed": "abababababababababababababababababababababababababababababababab",
+    "host": "Entrixy.com",
+    "fp": "ad42f7c396529dd6b3e27029ac9c2226e191e45a823b1f79ce1c934242b6b4b4"
+  },
+  "msgHash_of_aes_blob": "cc3b29da33e4352ae2ad20ca"
+}

@@ -1,0 +1,11 @@
+{
+  "provenance": "Independent Python hashlib/hmac; Android BleCrypto.deriveGuestKey + Vault.packSocketShares",
+  "ownerSecret": "AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8=",
+  "guest_id": 513,
+  "token": "AQIB",
+  "sig": "mxTMKSTmSrbmsA/HU7bu7Q==",
+  "gkey": "sNUNF44SU69ZKNT+7xETQEpZQRLIBMX/1mIBEXwhAsI=",
+  "proof": "Gp3BBLBrsS0fZOgT1HGuTA==",
+  "ownerProofOpen": "2LmfJwmjynQXLL6TgkwfKQ==",
+  "ownerProofClose": "dPEK6daq5ZlGf77w7JTzqA=="
+}
