@@ -7,1176 +7,1086 @@
 21 |     let text = normalized((request.results ?? []).compactMap { $0.topCandidates(1).first?.string }.joined(separator: " "))
 
 [#DeprecatedDeclaration]: <https://docs.swift.org/compiler/documentation/diagnostics/deprecated-declaration>
-28EA8B94-3029-4A4E-B1BD-1B44A52A1EEA
-Monitoring boot status for Entrixy preview iphone16 (28EA8B94-3029-4A4E-B1BD-1B44A52A1EEA).
-[2026-11-14 21:46:17 +0000] Status=1, isTerminal=NO, Elapsed=00:05.
+3F30AF2E-D18B-4524-80AB-614682CDBF72
+Monitoring boot status for Entrixy preview iphone16 (3F30AF2E-D18B-4524-80AB-614682CDBF72).
+[2026-11-14 22:37:16 +0000] Status=1, isTerminal=NO, Elapsed=00:04.
 	Waiting on BackBoard
 
-[2026-11-14 21:46:25 +0000] Status=2, isTerminal=NO, Elapsed=00:13.
+[2026-11-14 22:37:22 +0000] Status=2, isTerminal=NO, Elapsed=00:09.
 	Waiting on Data Migration
 		Reason:(null)
-		Migration Elapsed:00:05 seconds
+		Migration Elapsed:00:02 seconds
 
-[2026-11-14 21:46:49 +0000] Status=2, isTerminal=NO, Elapsed=00:20.
+[2026-11-14 22:37:46 +0000] Status=2, isTerminal=NO, Elapsed=00:13.
 	Waiting on Data Migration
 		Reason:Gathering plugins
-		Migration Elapsed:00:13 seconds
+		Migration Elapsed:00:06 seconds
 
-[2026-11-14 21:46:49 +0000] Status=2, isTerminal=NO, Elapsed=00:20.
+[2026-11-14 22:37:46 +0000] Status=2, isTerminal=NO, Elapsed=00:13.
 	Waiting on Data Migration
 		Reason:Gathering plugins
-		Migration Elapsed:00:13 seconds
+		Migration Elapsed:00:06 seconds
 
-[2026-11-14 21:46:49 +0000] Status=2, isTerminal=NO, Elapsed=00:23.
+[2026-11-14 22:37:46 +0000] Status=2, isTerminal=NO, Elapsed=00:16.
 	Waiting on Data Migration
 		Reason:Running plugin com.apple.MobileContainerManager.ContainerMigrator (ContainerMigrator.migrator, user-agnostic)
-		Migration Elapsed:00:14 seconds
+		Migration Elapsed:00:07 seconds
 
-[2026-11-14 21:46:49 +0000] Status=2, isTerminal=NO, Elapsed=00:26.
-	Waiting on Data Migration
-		Reason:Running plugin com.apple.MobileContainerManager.ContainerMigrator (ContainerMigrator.migrator, user-agnostic)
-		Migration Elapsed:00:16 seconds
-
-[2026-11-14 21:46:49 +0000] Status=2, isTerminal=NO, Elapsed=00:30.
+[2026-11-14 22:37:46 +0000] Status=2, isTerminal=NO, Elapsed=00:19.
 	Waiting on Data Migration
 		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
-		Migration Elapsed:00:19 seconds
+		Migration Elapsed:00:10 seconds
 
-[2026-11-14 21:46:49 +0000] Status=2, isTerminal=NO, Elapsed=00:32.
+[2026-11-14 22:37:46 +0000] Status=2, isTerminal=NO, Elapsed=00:21.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
+		Migration Elapsed:00:13 seconds
+
+[2026-11-14 22:37:46 +0000] Status=2, isTerminal=NO, Elapsed=00:24.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
+		Migration Elapsed:00:15 seconds
+
+[2026-11-14 22:37:46 +0000] Status=2, isTerminal=NO, Elapsed=00:26.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
+		Migration Elapsed:00:17 seconds
+
+[2026-11-14 22:37:46 +0000] Status=2, isTerminal=NO, Elapsed=00:28.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
+		Migration Elapsed:00:20 seconds
+
+[2026-11-14 22:37:46 +0000] Status=2, isTerminal=NO, Elapsed=00:30.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
+		Migration Elapsed:00:22 seconds
+
+[2026-11-14 22:37:46 +0000] Status=2, isTerminal=NO, Elapsed=00:33.
 	Waiting on Data Migration
 		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
 		Migration Elapsed:00:23 seconds
 
-[2026-11-14 21:46:49 +0000] Status=2, isTerminal=NO, Elapsed=00:34.
+[2026-11-14 22:37:46 +0000] Status=2, isTerminal=NO, Elapsed=00:34.
 	Waiting on Data Migration
 		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
-		Migration Elapsed:00:24 seconds
+		Migration Elapsed:00:26 seconds
 
-[2026-11-14 21:46:49 +0000] Status=2, isTerminal=NO, Elapsed=00:37.
+[2026-11-14 22:37:47 +0000] Status=2, isTerminal=NO, Elapsed=00:35.
 	Waiting on Data Migration
 		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
 		Migration Elapsed:00:27 seconds
 
-[2026-11-14 21:46:51 +0000] Status=2, isTerminal=NO, Elapsed=00:38.
+[2026-11-14 22:37:48 +0000] Status=2, isTerminal=NO, Elapsed=00:36.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
+		Migration Elapsed:00:28 seconds
+
+[2026-11-14 22:37:48 +0000] Status=2, isTerminal=NO, Elapsed=00:36.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
+		Migration Elapsed:00:29 seconds
+
+[2026-11-14 22:37:51 +0000] Status=2, isTerminal=NO, Elapsed=00:38.
 	Waiting on Data Migration
 		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
 		Migration Elapsed:00:30 seconds
 
-[2026-11-14 21:46:51 +0000] Status=2, isTerminal=NO, Elapsed=00:39.
-	Waiting on Data Migration
-		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
-		Migration Elapsed:00:31 seconds
-
-[2026-11-14 21:46:53 +0000] Status=2, isTerminal=NO, Elapsed=00:40.
+[2026-11-14 22:37:53 +0000] Status=2, isTerminal=NO, Elapsed=00:40.
 	Waiting on Data Migration
 		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
 		Migration Elapsed:00:32 seconds
 
-[2026-11-14 21:46:55 +0000] Status=2, isTerminal=NO, Elapsed=00:42.
+[2026-11-14 22:37:53 +0000] Status=2, isTerminal=NO, Elapsed=00:41.
 	Waiting on Data Migration
 		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
-		Migration Elapsed:00:33 seconds
+		Migration Elapsed:00:34 seconds
 
-[2026-11-14 21:46:55 +0000] Status=2, isTerminal=NO, Elapsed=00:43.
+[2026-11-14 22:37:53 +0000] Status=2, isTerminal=NO, Elapsed=00:41.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
+		Migration Elapsed:00:34 seconds
+
+[2026-11-14 22:37:54 +0000] Status=2, isTerminal=NO, Elapsed=00:42.
 	Waiting on Data Migration
 		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
 		Migration Elapsed:00:35 seconds
 
-[2026-11-14 21:46:57 +0000] Status=2, isTerminal=NO, Elapsed=00:44.
+[2026-11-14 22:37:55 +0000] Status=2, isTerminal=NO, Elapsed=00:43.
 	Waiting on Data Migration
 		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
 		Migration Elapsed:00:36 seconds
 
-[2026-11-14 21:46:57 +0000] Status=2, isTerminal=NO, Elapsed=00:45.
+[2026-11-14 22:37:56 +0000] Status=2, isTerminal=NO, Elapsed=00:44.
 	Waiting on Data Migration
 		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
 		Migration Elapsed:00:37 seconds
 
-[2026-11-14 21:46:58 +0000] Status=2, isTerminal=NO, Elapsed=00:46.
+[2026-11-14 22:37:57 +0000] Status=2, isTerminal=NO, Elapsed=00:45.
 	Waiting on Data Migration
 		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
 		Migration Elapsed:00:38 seconds
 
-[2026-11-14 21:46:59 +0000] Status=2, isTerminal=NO, Elapsed=00:47.
+[2026-11-14 22:37:59 +0000] Status=2, isTerminal=NO, Elapsed=00:47.
 	Waiting on Data Migration
 		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
 		Migration Elapsed:00:39 seconds
 
-[2026-11-14 21:47:00 +0000] Status=2, isTerminal=NO, Elapsed=00:48.
+[2026-11-14 22:38:00 +0000] Status=2, isTerminal=NO, Elapsed=00:48.
 	Waiting on Data Migration
 		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
 		Migration Elapsed:00:40 seconds
 
-[2026-11-14 21:47:00 +0000] Status=2, isTerminal=NO, Elapsed=00:49.
-	Waiting on Data Migration
-		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
-		Migration Elapsed:00:40 seconds
-
-[2026-11-14 21:47:01 +0000] Status=2, isTerminal=NO, Elapsed=00:49.
-	Waiting on Data Migration
-		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
-		Migration Elapsed:00:41 seconds
-
-[2026-11-14 21:47:02 +0000] Status=2, isTerminal=NO, Elapsed=00:50.
+[2026-11-14 22:38:01 +0000] Status=2, isTerminal=NO, Elapsed=00:49.
 	Waiting on Data Migration
 		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
 		Migration Elapsed:00:42 seconds
 
-[2026-11-14 21:47:03 +0000] Status=2, isTerminal=NO, Elapsed=00:51.
+[2026-11-14 22:38:01 +0000] Status=2, isTerminal=NO, Elapsed=00:49.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
+		Migration Elapsed:00:42 seconds
+
+[2026-11-14 22:38:02 +0000] Status=2, isTerminal=NO, Elapsed=00:50.
 	Waiting on Data Migration
 		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
 		Migration Elapsed:00:43 seconds
 
-[2026-11-14 21:47:04 +0000] Status=2, isTerminal=NO, Elapsed=00:52.
+[2026-11-14 22:38:03 +0000] Status=2, isTerminal=NO, Elapsed=00:51.
 	Waiting on Data Migration
 		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
 		Migration Elapsed:00:44 seconds
 
-[2026-11-14 21:47:05 +0000] Status=2, isTerminal=NO, Elapsed=00:53.
+[2026-11-14 22:38:04 +0000] Status=2, isTerminal=NO, Elapsed=00:52.
 	Waiting on Data Migration
 		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
 		Migration Elapsed:00:45 seconds
 
-[2026-11-14 21:47:06 +0000] Status=2, isTerminal=NO, Elapsed=00:55.
+[2026-11-14 22:38:05 +0000] Status=2, isTerminal=NO, Elapsed=00:53.
 	Waiting on Data Migration
 		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
 		Migration Elapsed:00:46 seconds
 
-[2026-11-14 21:47:07 +0000] Status=2, isTerminal=NO, Elapsed=00:55.
+[2026-11-14 22:38:06 +0000] Status=2, isTerminal=NO, Elapsed=00:54.
 	Waiting on Data Migration
 		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
 		Migration Elapsed:00:47 seconds
 
-[2026-11-14 21:47:09 +0000] Status=2, isTerminal=NO, Elapsed=00:57.
+[2026-11-14 22:38:07 +0000] Status=2, isTerminal=NO, Elapsed=00:55.
 	Waiting on Data Migration
 		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
 		Migration Elapsed:00:48 seconds
 
-[2026-11-14 21:47:10 +0000] Status=2, isTerminal=NO, Elapsed=00:58.
+[2026-11-14 22:38:08 +0000] Status=2, isTerminal=NO, Elapsed=00:56.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
+		Migration Elapsed:00:49 seconds
+
+[2026-11-14 22:38:09 +0000] Status=2, isTerminal=NO, Elapsed=00:57.
 	Waiting on Data Migration
 		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
 		Migration Elapsed:00:50 seconds
 
-[2026-11-14 21:47:10 +0000] Status=2, isTerminal=NO, Elapsed=00:59.
-	Waiting on Data Migration
-		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
-		Migration Elapsed:00:50 seconds
-
-[2026-11-14 21:47:11 +0000] Status=2, isTerminal=NO, Elapsed=00:59.
+[2026-11-14 22:38:10 +0000] Status=2, isTerminal=NO, Elapsed=00:58.
 	Waiting on Data Migration
 		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
 		Migration Elapsed:00:51 seconds
 
-[2026-11-14 21:47:12 +0000] Status=2, isTerminal=NO, Elapsed=01:00.
+[2026-11-14 22:38:11 +0000] Status=2, isTerminal=NO, Elapsed=00:59.
 	Waiting on Data Migration
 		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
 		Migration Elapsed:00:52 seconds
 
-[2026-11-14 21:47:13 +0000] Status=2, isTerminal=NO, Elapsed=01:01.
+[2026-11-14 22:38:12 +0000] Status=2, isTerminal=NO, Elapsed=01:00.
 	Waiting on Data Migration
 		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
 		Migration Elapsed:00:53 seconds
 
-[2026-11-14 21:47:14 +0000] Status=2, isTerminal=NO, Elapsed=01:02.
+[2026-11-14 22:38:13 +0000] Status=2, isTerminal=NO, Elapsed=01:01.
 	Waiting on Data Migration
 		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
 		Migration Elapsed:00:54 seconds
 
-[2026-11-14 21:47:15 +0000] Status=2, isTerminal=NO, Elapsed=01:03.
+[2026-11-14 22:38:14 +0000] Status=2, isTerminal=NO, Elapsed=01:02.
 	Waiting on Data Migration
 		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
 		Migration Elapsed:00:55 seconds
 
-[2026-11-14 21:47:16 +0000] Status=2, isTerminal=NO, Elapsed=01:04.
+[2026-11-14 22:38:15 +0000] Status=2, isTerminal=NO, Elapsed=01:03.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
+		Migration Elapsed:00:56 seconds
+
+[2026-11-14 22:38:16 +0000] Status=2, isTerminal=NO, Elapsed=01:04.
 	Waiting on Data Migration
 		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
 		Migration Elapsed:00:57 seconds
 
-[2026-11-14 21:47:17 +0000] Status=2, isTerminal=NO, Elapsed=01:06.
-	Waiting on Data Migration
-		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
-		Migration Elapsed:00:57 seconds
-
-[2026-11-14 21:47:18 +0000] Status=2, isTerminal=NO, Elapsed=01:06.
+[2026-11-14 22:38:17 +0000] Status=2, isTerminal=NO, Elapsed=01:05.
 	Waiting on Data Migration
 		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
 		Migration Elapsed:00:58 seconds
 
-[2026-11-14 21:47:19 +0000] Status=2, isTerminal=NO, Elapsed=01:08.
+[2026-11-14 22:38:18 +0000] Status=2, isTerminal=NO, Elapsed=01:06.
 	Waiting on Data Migration
 		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
 		Migration Elapsed:00:59 seconds
 
-[2026-11-14 21:47:21 +0000] Status=2, isTerminal=NO, Elapsed=01:09.
+[2026-11-14 22:38:19 +0000] Status=2, isTerminal=NO, Elapsed=01:07.
 	Waiting on Data Migration
 		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
 		Migration Elapsed:01:00 seconds
 
-[2026-11-14 21:47:21 +0000] Status=2, isTerminal=NO, Elapsed=01:09.
+[2026-11-14 22:38:21 +0000] Status=2, isTerminal=NO, Elapsed=01:09.
 	Waiting on Data Migration
 		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
 		Migration Elapsed:01:01 seconds
 
-[2026-11-14 21:47:22 +0000] Status=2, isTerminal=NO, Elapsed=01:10.
+[2026-11-14 22:38:21 +0000] Status=2, isTerminal=NO, Elapsed=01:09.
 	Waiting on Data Migration
 		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
 		Migration Elapsed:01:02 seconds
 
-[2026-11-14 21:47:23 +0000] Status=2, isTerminal=NO, Elapsed=01:12.
+[2026-11-14 22:38:22 +0000] Status=2, isTerminal=NO, Elapsed=01:10.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
+		Migration Elapsed:01:03 seconds
+
+[2026-11-14 22:38:23 +0000] Status=2, isTerminal=NO, Elapsed=01:11.
 	Waiting on Data Migration
 		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
 		Migration Elapsed:01:04 seconds
 
-[2026-11-14 21:47:24 +0000] Status=2, isTerminal=NO, Elapsed=01:12.
-	Waiting on Data Migration
-		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
-		Migration Elapsed:01:04 seconds
-
-[2026-11-14 21:47:25 +0000] Status=2, isTerminal=NO, Elapsed=01:13.
+[2026-11-14 22:38:24 +0000] Status=2, isTerminal=NO, Elapsed=01:12.
 	Waiting on Data Migration
 		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
 		Migration Elapsed:01:05 seconds
 
-[2026-11-14 21:47:26 +0000] Status=2, isTerminal=NO, Elapsed=01:14.
+[2026-11-14 22:38:25 +0000] Status=2, isTerminal=NO, Elapsed=01:13.
 	Waiting on Data Migration
 		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
 		Migration Elapsed:01:06 seconds
 
-[2026-11-14 21:47:27 +0000] Status=2, isTerminal=NO, Elapsed=01:15.
+[2026-11-14 22:38:26 +0000] Status=2, isTerminal=NO, Elapsed=01:14.
 	Waiting on Data Migration
 		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
 		Migration Elapsed:01:07 seconds
 
-[2026-11-14 21:47:28 +0000] Status=2, isTerminal=NO, Elapsed=01:16.
+[2026-11-14 22:38:27 +0000] Status=2, isTerminal=NO, Elapsed=01:15.
 	Waiting on Data Migration
 		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
 		Migration Elapsed:01:08 seconds
 
-[2026-11-14 21:47:29 +0000] Status=2, isTerminal=NO, Elapsed=01:17.
+[2026-11-14 22:38:28 +0000] Status=2, isTerminal=NO, Elapsed=01:16.
 	Waiting on Data Migration
 		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
 		Migration Elapsed:01:09 seconds
 
-[2026-11-14 21:47:30 +0000] Status=2, isTerminal=NO, Elapsed=01:19.
+[2026-11-14 22:38:29 +0000] Status=2, isTerminal=NO, Elapsed=01:17.
 	Waiting on Data Migration
 		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
 		Migration Elapsed:01:10 seconds
 
-[2026-11-14 21:47:31 +0000] Status=2, isTerminal=NO, Elapsed=01:19.
+[2026-11-14 22:38:30 +0000] Status=2, isTerminal=NO, Elapsed=01:18.
 	Waiting on Data Migration
 		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
 		Migration Elapsed:01:11 seconds
 
-[2026-11-14 21:47:32 +0000] Status=2, isTerminal=NO, Elapsed=01:20.
+[2026-11-14 22:38:31 +0000] Status=2, isTerminal=NO, Elapsed=01:19.
 	Waiting on Data Migration
 		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
 		Migration Elapsed:01:12 seconds
 
-[2026-11-14 21:47:33 +0000] Status=2, isTerminal=NO, Elapsed=01:21.
+[2026-11-14 22:38:32 +0000] Status=2, isTerminal=NO, Elapsed=01:20.
 	Waiting on Data Migration
 		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
 		Migration Elapsed:01:13 seconds
 
-[2026-11-14 21:47:34 +0000] Status=2, isTerminal=NO, Elapsed=01:22.
+[2026-11-14 22:38:33 +0000] Status=2, isTerminal=NO, Elapsed=01:21.
 	Waiting on Data Migration
 		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
 		Migration Elapsed:01:14 seconds
 
-[2026-11-14 21:47:35 +0000] Status=2, isTerminal=NO, Elapsed=01:23.
+[2026-11-14 22:38:34 +0000] Status=2, isTerminal=NO, Elapsed=01:23.
 	Waiting on Data Migration
 		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
 		Migration Elapsed:01:15 seconds
 
-[2026-11-14 21:47:36 +0000] Status=2, isTerminal=NO, Elapsed=01:24.
+[2026-11-14 22:38:36 +0000] Status=2, isTerminal=NO, Elapsed=01:24.
 	Waiting on Data Migration
 		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
 		Migration Elapsed:01:16 seconds
 
-[2026-11-14 21:47:37 +0000] Status=2, isTerminal=NO, Elapsed=01:25.
+[2026-11-14 22:38:37 +0000] Status=2, isTerminal=NO, Elapsed=01:25.
 	Waiting on Data Migration
 		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
 		Migration Elapsed:01:17 seconds
 
-[2026-11-14 21:47:38 +0000] Status=2, isTerminal=NO, Elapsed=01:26.
+[2026-11-14 22:38:37 +0000] Status=2, isTerminal=NO, Elapsed=01:25.
 	Waiting on Data Migration
 		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
 		Migration Elapsed:01:18 seconds
 
-[2026-11-14 21:47:39 +0000] Status=2, isTerminal=NO, Elapsed=01:27.
+[2026-11-14 22:38:38 +0000] Status=2, isTerminal=NO, Elapsed=01:26.
 	Waiting on Data Migration
 		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
 		Migration Elapsed:01:19 seconds
 
-[2026-11-14 21:47:40 +0000] Status=2, isTerminal=NO, Elapsed=01:28.
+[2026-11-14 22:38:39 +0000] Status=2, isTerminal=NO, Elapsed=01:27.
 	Waiting on Data Migration
 		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
 		Migration Elapsed:01:20 seconds
 
-[2026-11-14 21:47:41 +0000] Status=2, isTerminal=NO, Elapsed=01:29.
+[2026-11-14 22:38:40 +0000] Status=2, isTerminal=NO, Elapsed=01:28.
 	Waiting on Data Migration
 		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
 		Migration Elapsed:01:21 seconds
 
-[2026-11-14 21:47:42 +0000] Status=2, isTerminal=NO, Elapsed=01:30.
+[2026-11-14 22:38:41 +0000] Status=2, isTerminal=NO, Elapsed=01:29.
 	Waiting on Data Migration
 		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
 		Migration Elapsed:01:22 seconds
 
-[2026-11-14 21:47:43 +0000] Status=2, isTerminal=NO, Elapsed=01:31.
+[2026-11-14 22:38:43 +0000] Status=2, isTerminal=NO, Elapsed=01:31.
 	Waiting on Data Migration
 		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
 		Migration Elapsed:01:23 seconds
 
-[2026-11-14 21:47:44 +0000] Status=2, isTerminal=NO, Elapsed=01:32.
+[2026-11-14 22:38:43 +0000] Status=2, isTerminal=NO, Elapsed=01:31.
 	Waiting on Data Migration
 		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
 		Migration Elapsed:01:24 seconds
 
-[2026-11-14 21:47:45 +0000] Status=2, isTerminal=NO, Elapsed=01:33.
+[2026-11-14 22:38:44 +0000] Status=2, isTerminal=NO, Elapsed=01:32.
 	Waiting on Data Migration
 		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
 		Migration Elapsed:01:25 seconds
 
-[2026-11-14 21:47:46 +0000] Status=2, isTerminal=NO, Elapsed=01:34.
+[2026-11-14 22:38:45 +0000] Status=2, isTerminal=NO, Elapsed=01:33.
 	Waiting on Data Migration
 		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
 		Migration Elapsed:01:26 seconds
 
-[2026-11-14 21:47:47 +0000] Status=2, isTerminal=NO, Elapsed=01:35.
+[2026-11-14 22:38:46 +0000] Status=2, isTerminal=NO, Elapsed=01:34.
 	Waiting on Data Migration
 		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
 		Migration Elapsed:01:27 seconds
 
-[2026-11-14 21:47:48 +0000] Status=2, isTerminal=NO, Elapsed=01:36.
+[2026-11-14 22:38:47 +0000] Status=2, isTerminal=NO, Elapsed=01:35.
 	Waiting on Data Migration
 		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
 		Migration Elapsed:01:28 seconds
 
-[2026-11-14 21:47:49 +0000] Status=2, isTerminal=NO, Elapsed=01:37.
+[2026-11-14 22:38:48 +0000] Status=2, isTerminal=NO, Elapsed=01:36.
 	Waiting on Data Migration
 		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
 		Migration Elapsed:01:29 seconds
 
-[2026-11-14 21:47:50 +0000] Status=2, isTerminal=NO, Elapsed=01:38.
+[2026-11-14 22:38:49 +0000] Status=2, isTerminal=NO, Elapsed=01:37.
 	Waiting on Data Migration
 		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
 		Migration Elapsed:01:30 seconds
 
-[2026-11-14 21:47:51 +0000] Status=2, isTerminal=NO, Elapsed=01:39.
+[2026-11-14 22:38:50 +0000] Status=2, isTerminal=NO, Elapsed=01:38.
 	Waiting on Data Migration
 		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
 		Migration Elapsed:01:31 seconds
 
-[2026-11-14 21:47:52 +0000] Status=2, isTerminal=NO, Elapsed=01:40.
+[2026-11-14 22:38:51 +0000] Status=2, isTerminal=NO, Elapsed=01:39.
 	Waiting on Data Migration
 		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
 		Migration Elapsed:01:32 seconds
 
-[2026-11-14 21:47:53 +0000] Status=2, isTerminal=NO, Elapsed=01:41.
+[2026-11-14 22:38:52 +0000] Status=2, isTerminal=NO, Elapsed=01:40.
 	Waiting on Data Migration
 		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
 		Migration Elapsed:01:33 seconds
 
-[2026-11-14 21:47:54 +0000] Status=2, isTerminal=NO, Elapsed=01:42.
+[2026-11-14 22:38:53 +0000] Status=2, isTerminal=NO, Elapsed=01:41.
 	Waiting on Data Migration
 		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
 		Migration Elapsed:01:34 seconds
 
-[2026-11-14 21:47:55 +0000] Status=2, isTerminal=NO, Elapsed=01:43.
+[2026-11-14 22:38:54 +0000] Status=2, isTerminal=NO, Elapsed=01:42.
 	Waiting on Data Migration
 		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
 		Migration Elapsed:01:35 seconds
 
-[2026-11-14 21:47:56 +0000] Status=2, isTerminal=NO, Elapsed=01:44.
+[2026-11-14 22:38:55 +0000] Status=2, isTerminal=NO, Elapsed=01:43.
 	Waiting on Data Migration
 		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
 		Migration Elapsed:01:36 seconds
 
-[2026-11-14 21:47:57 +0000] Status=2, isTerminal=NO, Elapsed=01:45.
+[2026-11-14 22:38:56 +0000] Status=2, isTerminal=NO, Elapsed=01:44.
 	Waiting on Data Migration
 		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
 		Migration Elapsed:01:37 seconds
 
-[2026-11-14 21:47:58 +0000] Status=2, isTerminal=NO, Elapsed=01:46.
+[2026-11-14 22:38:57 +0000] Status=2, isTerminal=NO, Elapsed=01:45.
 	Waiting on Data Migration
 		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
 		Migration Elapsed:01:38 seconds
 
-[2026-11-14 21:47:59 +0000] Status=2, isTerminal=NO, Elapsed=01:47.
+[2026-11-14 22:38:58 +0000] Status=2, isTerminal=NO, Elapsed=01:46.
 	Waiting on Data Migration
 		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
 		Migration Elapsed:01:39 seconds
 
-[2026-11-14 21:48:00 +0000] Status=2, isTerminal=NO, Elapsed=01:48.
+[2026-11-14 22:38:59 +0000] Status=2, isTerminal=NO, Elapsed=01:47.
 	Waiting on Data Migration
 		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
 		Migration Elapsed:01:40 seconds
 
-[2026-11-14 21:48:01 +0000] Status=2, isTerminal=NO, Elapsed=01:49.
+[2026-11-14 22:39:00 +0000] Status=2, isTerminal=NO, Elapsed=01:48.
 	Waiting on Data Migration
 		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
 		Migration Elapsed:01:41 seconds
 
-[2026-11-14 21:48:02 +0000] Status=2, isTerminal=NO, Elapsed=01:50.
+[2026-11-14 22:39:01 +0000] Status=2, isTerminal=NO, Elapsed=01:49.
 	Waiting on Data Migration
 		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
 		Migration Elapsed:01:42 seconds
 
-[2026-11-14 21:48:03 +0000] Status=2, isTerminal=NO, Elapsed=01:51.
+[2026-11-14 22:39:02 +0000] Status=2, isTerminal=NO, Elapsed=01:50.
 	Waiting on Data Migration
 		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
 		Migration Elapsed:01:43 seconds
 
-[2026-11-14 21:48:04 +0000] Status=2, isTerminal=NO, Elapsed=01:52.
+[2026-11-14 22:39:03 +0000] Status=2, isTerminal=NO, Elapsed=01:51.
 	Waiting on Data Migration
 		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
 		Migration Elapsed:01:44 seconds
 
-[2026-11-14 21:48:05 +0000] Status=2, isTerminal=NO, Elapsed=01:54.
+[2026-11-14 22:39:04 +0000] Status=2, isTerminal=NO, Elapsed=01:52.
 	Waiting on Data Migration
 		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
 		Migration Elapsed:01:45 seconds
 
-[2026-11-14 21:48:06 +0000] Status=2, isTerminal=NO, Elapsed=01:55.
+[2026-11-14 22:39:05 +0000] Status=2, isTerminal=NO, Elapsed=01:53.
 	Waiting on Data Migration
 		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
 		Migration Elapsed:01:46 seconds
 
-[2026-11-14 21:48:07 +0000] Status=2, isTerminal=NO, Elapsed=01:56.
+[2026-11-14 22:39:06 +0000] Status=2, isTerminal=NO, Elapsed=01:54.
 	Waiting on Data Migration
 		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
 		Migration Elapsed:01:47 seconds
 
-[2026-11-14 21:48:08 +0000] Status=2, isTerminal=NO, Elapsed=01:56.
+[2026-11-14 22:39:07 +0000] Status=2, isTerminal=NO, Elapsed=01:55.
 	Waiting on Data Migration
 		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
 		Migration Elapsed:01:48 seconds
 
-[2026-11-14 21:48:09 +0000] Status=2, isTerminal=NO, Elapsed=01:57.
+[2026-11-14 22:39:08 +0000] Status=2, isTerminal=NO, Elapsed=01:56.
 	Waiting on Data Migration
 		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
 		Migration Elapsed:01:49 seconds
 
-[2026-11-14 21:48:10 +0000] Status=2, isTerminal=NO, Elapsed=01:58.
+[2026-11-14 22:39:09 +0000] Status=2, isTerminal=NO, Elapsed=01:57.
 	Waiting on Data Migration
 		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
 		Migration Elapsed:01:50 seconds
 
-[2026-11-14 21:48:11 +0000] Status=2, isTerminal=NO, Elapsed=01:59.
+[2026-11-14 22:39:10 +0000] Status=2, isTerminal=NO, Elapsed=01:58.
 	Waiting on Data Migration
 		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
 		Migration Elapsed:01:51 seconds
 
-[2026-11-14 21:48:12 +0000] Status=2, isTerminal=NO, Elapsed=02:00.
+[2026-11-14 22:39:11 +0000] Status=2, isTerminal=NO, Elapsed=01:59.
 	Waiting on Data Migration
 		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
 		Migration Elapsed:01:52 seconds
 
-[2026-11-14 21:48:13 +0000] Status=2, isTerminal=NO, Elapsed=02:01.
+[2026-11-14 22:39:12 +0000] Status=2, isTerminal=NO, Elapsed=02:00.
 	Waiting on Data Migration
 		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
 		Migration Elapsed:01:53 seconds
 
-[2026-11-14 21:48:14 +0000] Status=2, isTerminal=NO, Elapsed=02:02.
+[2026-11-14 22:39:13 +0000] Status=2, isTerminal=NO, Elapsed=02:01.
 	Waiting on Data Migration
 		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
 		Migration Elapsed:01:54 seconds
 
-[2026-11-14 21:48:15 +0000] Status=2, isTerminal=NO, Elapsed=02:03.
+[2026-11-14 22:39:14 +0000] Status=2, isTerminal=NO, Elapsed=02:02.
 	Waiting on Data Migration
 		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
 		Migration Elapsed:01:55 seconds
 
-[2026-11-14 21:48:16 +0000] Status=2, isTerminal=NO, Elapsed=02:04.
+[2026-11-14 22:39:15 +0000] Status=2, isTerminal=NO, Elapsed=02:03.
 	Waiting on Data Migration
 		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
 		Migration Elapsed:01:56 seconds
 
-[2026-11-14 21:48:17 +0000] Status=2, isTerminal=NO, Elapsed=02:05.
+[2026-11-14 22:39:16 +0000] Status=2, isTerminal=NO, Elapsed=02:04.
 	Waiting on Data Migration
 		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
 		Migration Elapsed:01:57 seconds
 
-[2026-11-14 21:48:18 +0000] Status=2, isTerminal=NO, Elapsed=02:06.
+[2026-11-14 22:39:17 +0000] Status=2, isTerminal=NO, Elapsed=02:06.
 	Waiting on Data Migration
 		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
 		Migration Elapsed:01:58 seconds
 
-[2026-11-14 21:48:19 +0000] Status=2, isTerminal=NO, Elapsed=02:07.
+[2026-11-14 22:39:18 +0000] Status=2, isTerminal=NO, Elapsed=02:06.
 	Waiting on Data Migration
 		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
 		Migration Elapsed:01:59 seconds
 
-[2026-11-14 21:48:20 +0000] Status=2, isTerminal=NO, Elapsed=02:08.
+[2026-11-14 22:39:20 +0000] Status=2, isTerminal=NO, Elapsed=02:08.
 	Waiting on Data Migration
 		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
 		Migration Elapsed:02:00 seconds
 
-[2026-11-14 21:48:21 +0000] Status=2, isTerminal=NO, Elapsed=02:09.
+[2026-11-14 22:39:21 +0000] Status=2, isTerminal=NO, Elapsed=02:09.
 	Waiting on Data Migration
 		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
 		Migration Elapsed:02:01 seconds
 
-[2026-11-14 21:48:22 +0000] Status=2, isTerminal=NO, Elapsed=02:10.
+[2026-11-14 22:39:21 +0000] Status=2, isTerminal=NO, Elapsed=02:09.
 	Waiting on Data Migration
 		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
 		Migration Elapsed:02:02 seconds
 
-[2026-11-14 21:48:23 +0000] Status=2, isTerminal=NO, Elapsed=02:11.
+[2026-11-14 22:39:22 +0000] Status=2, isTerminal=NO, Elapsed=02:10.
 	Waiting on Data Migration
 		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
 		Migration Elapsed:02:03 seconds
 
-[2026-11-14 21:48:24 +0000] Status=2, isTerminal=NO, Elapsed=02:12.
+[2026-11-14 22:39:23 +0000] Status=2, isTerminal=NO, Elapsed=02:11.
 	Waiting on Data Migration
 		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
 		Migration Elapsed:02:04 seconds
 
-[2026-11-14 21:48:25 +0000] Status=2, isTerminal=NO, Elapsed=02:13.
+[2026-11-14 22:39:24 +0000] Status=2, isTerminal=NO, Elapsed=02:12.
 	Waiting on Data Migration
 		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
 		Migration Elapsed:02:05 seconds
 
-[2026-11-14 21:48:26 +0000] Status=2, isTerminal=NO, Elapsed=02:14.
+[2026-11-14 22:39:25 +0000] Status=2, isTerminal=NO, Elapsed=02:13.
 	Waiting on Data Migration
 		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
 		Migration Elapsed:02:06 seconds
 
-[2026-11-14 21:48:27 +0000] Status=2, isTerminal=NO, Elapsed=02:16.
+[2026-11-14 22:39:41 +0000] Status=2, isTerminal=NO, Elapsed=02:18.
 	Waiting on Data Migration
-		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
-		Migration Elapsed:02:07 seconds
-
-[2026-11-14 21:48:29 +0000] Status=2, isTerminal=NO, Elapsed=02:17.
-	Waiting on Data Migration
-		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
+		Reason:Running plugin com.apple.securityd.KeychainMigrator (KeychainMigrator.migrator, user-agnostic)
 		Migration Elapsed:02:08 seconds
 
-[2026-11-14 21:48:29 +0000] Status=2, isTerminal=NO, Elapsed=02:17.
+[2026-11-14 22:39:41 +0000] Status=2, isTerminal=NO, Elapsed=02:23.
 	Waiting on Data Migration
-		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
-		Migration Elapsed:02:09 seconds
-
-[2026-11-14 21:48:30 +0000] Status=2, isTerminal=NO, Elapsed=02:19.
-	Waiting on Data Migration
-		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
-		Migration Elapsed:02:10 seconds
-
-[2026-11-14 21:48:31 +0000] Status=2, isTerminal=NO, Elapsed=02:20.
-	Waiting on Data Migration
-		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
+		Reason:Running plugin com.apple.securityd.KeychainMigrator (KeychainMigrator.migrator, user-agnostic)
 		Migration Elapsed:02:11 seconds
 
-[2026-11-14 21:48:32 +0000] Status=2, isTerminal=NO, Elapsed=02:21.
+[2026-11-14 22:39:41 +0000] Status=2, isTerminal=NO, Elapsed=02:26.
 	Waiting on Data Migration
-		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
-		Migration Elapsed:02:12 seconds
-
-[2026-11-14 21:48:34 +0000] Status=2, isTerminal=NO, Elapsed=02:22.
-	Waiting on Data Migration
-		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
-		Migration Elapsed:02:13 seconds
-
-[2026-11-14 21:48:34 +0000] Status=2, isTerminal=NO, Elapsed=02:22.
-	Waiting on Data Migration
-		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
-		Migration Elapsed:02:14 seconds
-
-[2026-11-14 21:48:35 +0000] Status=2, isTerminal=NO, Elapsed=02:24.
-	Waiting on Data Migration
-		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
-		Migration Elapsed:02:15 seconds
-
-[2026-11-14 21:48:36 +0000] Status=2, isTerminal=NO, Elapsed=02:24.
-	Waiting on Data Migration
-		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
+		Reason:Running plugin com.apple.managedconfiguration.migrator (MCProfile.migrator, user-agnostic)
 		Migration Elapsed:02:16 seconds
 
-[2026-11-14 21:48:37 +0000] Status=2, isTerminal=NO, Elapsed=02:25.
-	Waiting on Data Migration
-		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
-		Migration Elapsed:02:17 seconds
-
-[2026-11-14 21:48:52 +0000] Status=2, isTerminal=NO, Elapsed=02:29.
-	Waiting on Data Migration
-		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
-		Migration Elapsed:02:18 seconds
-
-[2026-11-14 21:48:52 +0000] Status=2, isTerminal=NO, Elapsed=02:31.
-	Waiting on Data Migration
-		Reason:Running plugin com.apple.securityd.KeychainMigrator (KeychainMigrator.migrator, user-agnostic)
-		Migration Elapsed:02:21 seconds
-
-[2026-11-14 21:48:52 +0000] Status=2, isTerminal=NO, Elapsed=02:35.
-	Waiting on Data Migration
-		Reason:Running plugin com.apple.securityd.KeychainMigrator (KeychainMigrator.migrator, user-agnostic)
-		Migration Elapsed:02:24 seconds
-
-[2026-11-14 21:48:52 +0000] Status=2, isTerminal=NO, Elapsed=02:38.
+[2026-11-14 22:39:41 +0000] Status=2, isTerminal=NO, Elapsed=02:28.
 	Waiting on Data Migration
 		Reason:Running plugin com.apple.managedconfiguration.migrator (MCProfile.migrator, user-agnostic)
+		Migration Elapsed:02:19 seconds
+
+[2026-11-14 22:39:47 +0000] Status=2, isTerminal=NO, Elapsed=02:32.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.managedconfiguration.migrator (MCProfile.migrator, user-agnostic)
+		Migration Elapsed:02:22 seconds
+
+[2026-11-14 22:39:47 +0000] Status=2, isTerminal=NO, Elapsed=02:34.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.MobileGestalt.MobileGestaltMigrator (MobileGestaltMigrator.migrator, user-agnostic)
+		Migration Elapsed:02:25 seconds
+
+[2026-11-14 22:39:47 +0000] Status=2, isTerminal=NO, Elapsed=02:35.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.addressbook.migrator (AddressBookLegacy.migrator)
+		Migration Elapsed:02:27 seconds
+
+[2026-11-14 22:39:47 +0000] Status=2, isTerminal=NO, Elapsed=02:35.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.MobileSafari.migrator (MobileSafari.migrator)
 		Migration Elapsed:02:28 seconds
 
-[2026-11-14 21:48:52 +0000] Status=2, isTerminal=NO, Elapsed=02:39.
+[2026-11-14 22:39:49 +0000] Status=2, isTerminal=NO, Elapsed=02:35.
 	Waiting on Data Migration
-		Reason:Running plugin com.apple.managedconfiguration.migrator (MCProfile.migrator, user-agnostic)
+		Reason:Running plugin com.apple.MobileSafari.migrator (MobileSafari.migrator)
+		Migration Elapsed:02:28 seconds
+
+[2026-11-14 22:39:49 +0000] Status=2, isTerminal=NO, Elapsed=02:36.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.MobileSafari.migrator (MobileSafari.migrator)
+		Migration Elapsed:02:29 seconds
+
+[2026-11-14 22:40:03 +0000] Status=2, isTerminal=NO, Elapsed=02:38.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.MobileSafari.migrator (MobileSafari.migrator)
 		Migration Elapsed:02:30 seconds
 
-[2026-11-14 21:48:52 +0000] Status=2, isTerminal=NO, Elapsed=02:39.
+[2026-11-14 22:40:03 +0000] Status=2, isTerminal=NO, Elapsed=02:39.
 	Waiting on Data Migration
-		Reason:Running plugin com.apple.managedconfiguration.migrator (MCProfile.migrator, user-agnostic)
+		Reason:Running plugin com.apple.appleaccount.mergebuddyprovisioningresponse.migrator (MergeBuddyProvisioningResponse.migrator)
 		Migration Elapsed:02:31 seconds
 
-[2026-11-14 21:48:52 +0000] Status=2, isTerminal=NO, Elapsed=02:40.
+[2026-11-14 22:40:03 +0000] Status=2, isTerminal=NO, Elapsed=02:39.
 	Waiting on Data Migration
-		Reason:Running plugin com.apple.managedconfiguration.migrator (MCProfile.migrator, user-agnostic)
+		Reason:Running plugin com.apple.facetime.migrator (FaceTimeMigrator.migrator)
 		Migration Elapsed:02:32 seconds
 
-[2026-11-14 21:48:53 +0000] Status=2, isTerminal=NO, Elapsed=02:41.
-	Waiting on Data Migration
-		Reason:Running plugin com.apple.managedconfiguration.migrator (MCProfile.migrator, user-agnostic)
-		Migration Elapsed:02:33 seconds
-
-[2026-11-14 21:48:53 +0000] Status=2, isTerminal=NO, Elapsed=02:41.
-	Waiting on Data Migration
-		Reason:Running plugin com.apple.managedconfiguration.migrator (MCProfile.migrator, user-agnostic)
-		Migration Elapsed:02:34 seconds
-
-[2026-11-14 21:48:55 +0000] Status=2, isTerminal=NO, Elapsed=02:42.
-	Waiting on Data Migration
-		Reason:Running plugin com.apple.managedconfiguration.migrator (MCProfile.migrator, user-agnostic)
-		Migration Elapsed:02:35 seconds
-
-[2026-11-14 21:48:55 +0000] Status=2, isTerminal=NO, Elapsed=02:43.
-	Waiting on Data Migration
-		Reason:Running plugin com.apple.MobileGestalt.MobileGestaltMigrator (MobileGestaltMigrator.migrator, user-agnostic)
-		Migration Elapsed:02:35 seconds
-
-[2026-11-14 21:49:01 +0000] Status=2, isTerminal=NO, Elapsed=02:45.
-	Waiting on Data Migration
-		Reason:Running plugin com.apple.MobileGestalt.MobileGestaltMigrator (MobileGestaltMigrator.migrator, user-agnostic)
-		Migration Elapsed:02:36 seconds
-
-[2026-11-14 21:49:01 +0000] Status=2, isTerminal=NO, Elapsed=02:45.
-	Waiting on Data Migration
-		Reason:Running plugin com.apple.WebBookmarks.migrator (WebBookmarks.migrator)
-		Migration Elapsed:02:38 seconds
-
-[2026-11-14 21:49:01 +0000] Status=2, isTerminal=NO, Elapsed=02:46.
-	Waiting on Data Migration
-		Reason:Running plugin com.apple.MobileSafari.migrator (MobileSafari.migrator)
-		Migration Elapsed:02:38 seconds
-
-[2026-11-14 21:49:01 +0000] Status=2, isTerminal=NO, Elapsed=02:47.
-	Waiting on Data Migration
-		Reason:Running plugin com.apple.MobileSafari.migrator (MobileSafari.migrator)
-		Migration Elapsed:02:40 seconds
-
-[2026-11-14 21:49:01 +0000] Status=2, isTerminal=NO, Elapsed=02:49.
-	Waiting on Data Migration
-		Reason:Running plugin com.apple.MobileSafari.migrator (MobileSafari.migrator)
-		Migration Elapsed:02:40 seconds
-
-[2026-11-14 21:49:02 +0000] Status=2, isTerminal=NO, Elapsed=02:50.
-	Waiting on Data Migration
-		Reason:Running plugin com.apple.MobileSafari.migrator (MobileSafari.migrator)
-		Migration Elapsed:02:41 seconds
-
-[2026-11-14 21:49:02 +0000] Status=2, isTerminal=NO, Elapsed=02:50.
-	Waiting on Data Migration
-		Reason:Running plugin com.apple.MobileSafari.migrator (MobileSafari.migrator)
-		Migration Elapsed:02:42 seconds
-
-[2026-11-14 21:49:04 +0000] Status=2, isTerminal=NO, Elapsed=02:52.
-	Waiting on Data Migration
-		Reason:Running plugin com.apple.dataaccess.migrator (DAAccount.migrator) (Concurrent: Running plugin com.apple.MobileSlideShow (MobileSlideShow.migrator, concurrent after com.apple.accounts.migrator))
-		Migration Elapsed:02:43 seconds
-
-[2026-11-14 21:49:04 +0000] Status=2, isTerminal=NO, Elapsed=02:52.
+[2026-11-14 22:40:03 +0000] Status=2, isTerminal=NO, Elapsed=02:40.
 	Waiting on Data Migration
 		Reason:Running plugin com.apple.PreferencesMigrator (PreferencesMigrator.migrator)
-		Migration Elapsed:02:44 seconds
+		Migration Elapsed:02:33 seconds
 
-[2026-11-14 21:49:09 +0000] Status=2, isTerminal=NO, Elapsed=02:53.
+[2026-11-14 22:40:03 +0000] Status=2, isTerminal=NO, Elapsed=02:42.
 	Waiting on Data Migration
-		Reason:Running plugin com.apple.managedconfiguration.cleanup.migrator (MCCleanup.migrator)
-		Migration Elapsed:02:45 seconds
+		Reason:Running plugin com.apple.coreaudio.HAENDataMigrator (HAENDataMigrator.migrator)
+		Migration Elapsed:02:34 seconds
 
-[2026-11-14 21:49:09 +0000] Status=4, isTerminal=NO, Elapsed=02:55.
+[2026-11-14 22:40:03 +0000] Status=4, isTerminal=NO, Elapsed=02:43.
 	Waiting on System App
 
-[2026-11-14 21:49:09 +0000] Status=4, isTerminal=NO, Elapsed=02:55.
+[2026-11-14 22:40:03 +0000] Status=4, isTerminal=NO, Elapsed=02:44.
 	Waiting on System App
 
-[2026-11-14 21:49:09 +0000] Status=4, isTerminal=NO, Elapsed=02:56.
+[2026-11-14 22:40:03 +0000] Status=4, isTerminal=NO, Elapsed=02:45.
 	Waiting on System App
 
-[2026-11-14 21:49:10 +0000] Status=4, isTerminal=NO, Elapsed=02:58.
+[2026-11-14 22:40:03 +0000] Status=4, isTerminal=NO, Elapsed=02:45.
 	Waiting on System App
 
-[2026-11-14 21:49:12 +0000] Status=4, isTerminal=NO, Elapsed=02:58.
+[2026-11-14 22:40:03 +0000] Status=4, isTerminal=NO, Elapsed=02:47.
 	Waiting on System App
 
-[2026-11-14 21:49:12 +0000] Status=4, isTerminal=NO, Elapsed=03:00.
+[2026-11-14 22:40:03 +0000] Status=4, isTerminal=NO, Elapsed=02:47.
 	Waiting on System App
 
-[2026-11-14 21:49:12 +0000] Status=4, isTerminal=NO, Elapsed=03:00.
+[2026-11-14 22:40:03 +0000] Status=4, isTerminal=NO, Elapsed=02:49.
 	Waiting on System App
 
-[2026-11-14 21:49:14 +0000] Status=4, isTerminal=NO, Elapsed=03:02.
+[2026-11-14 22:40:03 +0000] Status=4, isTerminal=NO, Elapsed=02:49.
 	Waiting on System App
 
-[2026-11-14 21:49:17 +0000] Status=4, isTerminal=NO, Elapsed=03:03.
+[2026-11-14 22:40:03 +0000] Status=4, isTerminal=NO, Elapsed=02:51.
 	Waiting on System App
 
-[2026-11-14 21:49:17 +0000] Status=4, isTerminal=NO, Elapsed=03:04.
+[2026-11-14 22:40:03 +0000] Status=4, isTerminal=NO, Elapsed=02:51.
 	Waiting on System App
 
-[2026-11-14 21:49:17 +0000] Status=4, isTerminal=NO, Elapsed=03:05.
+[2026-11-14 22:40:04 +0000] Status=4, isTerminal=NO, Elapsed=02:52.
 	Waiting on System App
 
-[2026-11-14 21:49:21 +0000] Status=4, isTerminal=NO, Elapsed=03:06.
+[2026-11-14 22:40:05 +0000] Status=4, isTerminal=NO, Elapsed=02:53.
 	Waiting on System App
 
-[2026-11-14 21:49:21 +0000] Status=4, isTerminal=NO, Elapsed=03:07.
+[2026-11-14 22:40:06 +0000] Status=4, isTerminal=NO, Elapsed=02:54.
 	Waiting on System App
 
-[2026-11-14 21:49:21 +0000] Status=4, isTerminal=NO, Elapsed=03:08.
+[2026-11-14 22:40:08 +0000] Status=4, isTerminal=NO, Elapsed=02:55.
 	Waiting on System App
 
-[2026-11-14 21:49:21 +0000] Status=4, isTerminal=NO, Elapsed=03:09.
+[2026-11-14 22:40:08 +0000] Status=4, isTerminal=NO, Elapsed=02:56.
 	Waiting on System App
 
-[2026-11-14 21:49:44 +0000] Status=4, isTerminal=NO, Elapsed=03:10.
+[2026-11-14 22:40:10 +0000] Status=4, isTerminal=NO, Elapsed=02:58.
 	Waiting on System App
 
-[2026-11-14 21:49:44 +0000] Status=4, isTerminal=NO, Elapsed=03:10.
+[2026-11-14 22:40:10 +0000] Status=4, isTerminal=NO, Elapsed=02:58.
 	Waiting on System App
 
-[2026-11-14 21:49:44 +0000] Status=4, isTerminal=NO, Elapsed=03:11.
+[2026-11-14 22:40:13 +0000] Status=4, isTerminal=NO, Elapsed=02:59.
 	Waiting on System App
 
-[2026-11-14 21:49:44 +0000] Status=4, isTerminal=NO, Elapsed=03:13.
+[2026-11-14 22:40:13 +0000] Status=4, isTerminal=NO, Elapsed=03:00.
 	Waiting on System App
 
-[2026-11-14 21:49:44 +0000] Status=4, isTerminal=NO, Elapsed=03:14.
+[2026-11-14 22:40:47 +0000] Status=4, isTerminal=NO, Elapsed=03:02.
 	Waiting on System App
 
-[2026-11-14 21:49:44 +0000] Status=4, isTerminal=NO, Elapsed=03:15.
+[2026-11-14 22:40:47 +0000] Status=4, isTerminal=NO, Elapsed=03:02.
 	Waiting on System App
 
-[2026-11-14 21:49:44 +0000] Status=4, isTerminal=NO, Elapsed=03:16.
+[2026-11-14 22:40:47 +0000] Status=4, isTerminal=NO, Elapsed=03:03.
 	Waiting on System App
 
-[2026-11-14 21:49:44 +0000] Status=4, isTerminal=NO, Elapsed=03:18.
+[2026-11-14 22:40:47 +0000] Status=4, isTerminal=NO, Elapsed=03:04.
 	Waiting on System App
 
-[2026-11-14 21:49:44 +0000] Status=4, isTerminal=NO, Elapsed=03:20.
+[2026-11-14 22:40:47 +0000] Status=4, isTerminal=NO, Elapsed=03:07.
 	Waiting on System App
 
-[2026-11-14 21:49:44 +0000] Status=4, isTerminal=NO, Elapsed=03:22.
+[2026-11-14 22:40:47 +0000] Status=4, isTerminal=NO, Elapsed=03:08.
 	Waiting on System App
 
-[2026-11-14 21:49:44 +0000] Status=4, isTerminal=NO, Elapsed=03:24.
+[2026-11-14 22:40:47 +0000] Status=4, isTerminal=NO, Elapsed=03:10.
 	Waiting on System App
 
-[2026-11-14 21:49:44 +0000] Status=4, isTerminal=NO, Elapsed=03:25.
+[2026-11-14 22:40:47 +0000] Status=4, isTerminal=NO, Elapsed=03:13.
 	Waiting on System App
 
-[2026-11-14 21:49:44 +0000] Status=4, isTerminal=NO, Elapsed=03:26.
-	Waiting on System App
-
-[2026-11-14 21:49:44 +0000] Status=4, isTerminal=NO, Elapsed=03:27.
-	Waiting on System App
-
-[2026-11-14 21:49:44 +0000] Status=4, isTerminal=NO, Elapsed=03:28.
-	Waiting on System App
-
-[2026-11-14 21:49:44 +0000] Status=4, isTerminal=NO, Elapsed=03:29.
-	Waiting on System App
-
-[2026-11-14 21:49:44 +0000] Status=4, isTerminal=NO, Elapsed=03:31.
-	Waiting on System App
-
-[2026-11-14 21:49:44 +0000] Status=4, isTerminal=NO, Elapsed=03:31.
-	Waiting on System App
-
-[2026-11-14 21:49:44 +0000] Status=4, isTerminal=NO, Elapsed=03:32.
-	Waiting on System App
-
-[2026-11-14 21:49:57 +0000] Status=4, isTerminal=NO, Elapsed=03:33.
-	Waiting on System App
-
-[2026-11-14 21:49:57 +0000] Status=4, isTerminal=NO, Elapsed=03:33.
-	Waiting on System App
-
-[2026-11-14 21:49:57 +0000] Status=4, isTerminal=NO, Elapsed=03:35.
-	Waiting on System App
-
-[2026-11-14 21:49:57 +0000] Status=4, isTerminal=NO, Elapsed=03:36.
-	Waiting on System App
-
-[2026-11-14 21:49:57 +0000] Status=4, isTerminal=NO, Elapsed=03:39.
-	Waiting on System App
-
-[2026-11-14 21:49:57 +0000] Status=4294967295, isTerminal=YES, Elapsed=03:43.
+[2026-11-14 22:40:47 +0000] Status=4294967295, isTerminal=YES, Elapsed=03:14.
 	Finished
 
-/Users/runner/Library/Developer/CoreSimulator/Devices/28EA8B94-3029-4A4E-B1BD-1B44A52A1EEA/data/Containers/Data/Application/6C59BED7-41A1-4DE9-86A0-BA848CBCC38D
-com.entrixy.ios: 27756
-/Users/runner/Library/Developer/CoreSimulator/Devices/28EA8B94-3029-4A4E-B1BD-1B44A52A1EEA/data/Containers/Data/Application/6C59BED7-41A1-4DE9-86A0-BA848CBCC38D
+/Users/runner/Library/Developer/CoreSimulator/Devices/3F30AF2E-D18B-4524-80AB-614682CDBF72/data/Containers/Data/Application/3D95D937-BFD8-4D93-A7A4-29C170BD5CB1
+com.entrixy.ios: 27672
+/Users/runner/Library/Developer/CoreSimulator/Devices/3F30AF2E-D18B-4524-80AB-614682CDBF72/data/Containers/Data/Application/3D95D937-BFD8-4D93-A7A4-29C170BD5CB1
 Detected file type 'PNG' from extension
 Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/pending-capture.png
-com.entrixy.ios: 30714
-/Users/runner/Library/Developer/CoreSimulator/Devices/28EA8B94-3029-4A4E-B1BD-1B44A52A1EEA/data/Containers/Data/Application/6C59BED7-41A1-4DE9-86A0-BA848CBCC38D
+Waiting for visible app UI: control {"matched":false,"missing":["Управление","Настройки","Гости","Журнал"]}
 Detected file type 'PNG' from extension
 Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/pending-capture.png
-com.entrixy.ios: 32616
-/Users/runner/Library/Developer/CoreSimulator/Devices/28EA8B94-3029-4A4E-B1BD-1B44A52A1EEA/data/Containers/Data/Application/6C59BED7-41A1-4DE9-86A0-BA848CBCC38D
+Waiting for visible app UI: control {"matched":false,"missing":["Управление","Настройки","Гости","Журнал"]}
 Detected file type 'PNG' from extension
 Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/pending-capture.png
-Waiting for visible app UI: code-setup {"matched":false,"missing":["Создать","код"]}
+Waiting for visible app UI: control {"matched":false,"missing":["Управление","Настройки","Гости","Журнал"]}
 Detected file type 'PNG' from extension
 Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/pending-capture.png
-Waiting for visible app UI: code-setup {"matched":false,"missing":["Создать","код"]}
+com.entrixy.ios: 28731
+/Users/runner/Library/Developer/CoreSimulator/Devices/3F30AF2E-D18B-4524-80AB-614682CDBF72/data/Containers/Data/Application/3D95D937-BFD8-4D93-A7A4-29C170BD5CB1
 Detected file type 'PNG' from extension
 Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/pending-capture.png
-Waiting for visible app UI: code-setup {"matched":false,"missing":["Создать","код"]}
+Waiting for visible app UI: confirm-open {"matched":false,"missing":["Подтвердить"]}
 Detected file type 'PNG' from extension
 Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/pending-capture.png
-com.entrixy.ios: 34625
-/Users/runner/Library/Developer/CoreSimulator/Devices/28EA8B94-3029-4A4E-B1BD-1B44A52A1EEA/data/Containers/Data/Application/6C59BED7-41A1-4DE9-86A0-BA848CBCC38D
+Waiting for visible app UI: confirm-open {"matched":false,"missing":["Подтвердить"]}
+Detected file type 'PNG' from extension
+Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/pending-capture.png
+com.entrixy.ios: 29962
+/Users/runner/Library/Developer/CoreSimulator/Devices/3F30AF2E-D18B-4524-80AB-614682CDBF72/data/Containers/Data/Application/3D95D937-BFD8-4D93-A7A4-29C170BD5CB1
+Detected file type 'PNG' from extension
+Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/pending-capture.png
+com.entrixy.ios: 31180
+/Users/runner/Library/Developer/CoreSimulator/Devices/3F30AF2E-D18B-4524-80AB-614682CDBF72/data/Containers/Data/Application/3D95D937-BFD8-4D93-A7A4-29C170BD5CB1
+Detected file type 'PNG' from extension
+Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/pending-capture.png
+com.entrixy.ios: 31790
+/Users/runner/Library/Developer/CoreSimulator/Devices/3F30AF2E-D18B-4524-80AB-614682CDBF72/data/Containers/Data/Application/3D95D937-BFD8-4D93-A7A4-29C170BD5CB1
 Detected file type 'PNG' from extension
 Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/pending-capture.png
 Waiting for visible app UI: code-entry {"matched":false,"missing":["Подтвердить"]}
 Detected file type 'PNG' from extension
 Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/pending-capture.png
-com.entrixy.ios: 36596
-/Users/runner/Library/Developer/CoreSimulator/Devices/28EA8B94-3029-4A4E-B1BD-1B44A52A1EEA/data/Containers/Data/Application/6C59BED7-41A1-4DE9-86A0-BA848CBCC38D
+com.entrixy.ios: 33298
+/Users/runner/Library/Developer/CoreSimulator/Devices/3F30AF2E-D18B-4524-80AB-614682CDBF72/data/Containers/Data/Application/3D95D937-BFD8-4D93-A7A4-29C170BD5CB1
 Detected file type 'PNG' from extension
 Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/pending-capture.png
-com.entrixy.ios: 38235
-/Users/runner/Library/Developer/CoreSimulator/Devices/28EA8B94-3029-4A4E-B1BD-1B44A52A1EEA/data/Containers/Data/Application/6C59BED7-41A1-4DE9-86A0-BA848CBCC38D
+com.entrixy.ios: 33618
+/Users/runner/Library/Developer/CoreSimulator/Devices/3F30AF2E-D18B-4524-80AB-614682CDBF72/data/Containers/Data/Application/3D95D937-BFD8-4D93-A7A4-29C170BD5CB1
 Detected file type 'PNG' from extension
 Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/pending-capture.png
-com.entrixy.ios: 39241
-/Users/runner/Library/Developer/CoreSimulator/Devices/28EA8B94-3029-4A4E-B1BD-1B44A52A1EEA/data/Containers/Data/Application/6C59BED7-41A1-4DE9-86A0-BA848CBCC38D
+com.entrixy.ios: 34206
+/Users/runner/Library/Developer/CoreSimulator/Devices/3F30AF2E-D18B-4524-80AB-614682CDBF72/data/Containers/Data/Application/3D95D937-BFD8-4D93-A7A4-29C170BD5CB1
 Detected file type 'PNG' from extension
 Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/pending-capture.png
-com.entrixy.ios: 39660
-/Users/runner/Library/Developer/CoreSimulator/Devices/28EA8B94-3029-4A4E-B1BD-1B44A52A1EEA/data/Containers/Data/Application/6C59BED7-41A1-4DE9-86A0-BA848CBCC38D
+com.entrixy.ios: 34841
+/Users/runner/Library/Developer/CoreSimulator/Devices/3F30AF2E-D18B-4524-80AB-614682CDBF72/data/Containers/Data/Application/3D95D937-BFD8-4D93-A7A4-29C170BD5CB1
 Detected file type 'PNG' from extension
 Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/pending-capture.png
-com.entrixy.ios: 40390
-/Users/runner/Library/Developer/CoreSimulator/Devices/28EA8B94-3029-4A4E-B1BD-1B44A52A1EEA/data/Containers/Data/Application/6C59BED7-41A1-4DE9-86A0-BA848CBCC38D
+com.entrixy.ios: 35455
+/Users/runner/Library/Developer/CoreSimulator/Devices/3F30AF2E-D18B-4524-80AB-614682CDBF72/data/Containers/Data/Application/3D95D937-BFD8-4D93-A7A4-29C170BD5CB1
 Detected file type 'PNG' from extension
 Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/pending-capture.png
-com.entrixy.ios: 41204
-/Users/runner/Library/Developer/CoreSimulator/Devices/28EA8B94-3029-4A4E-B1BD-1B44A52A1EEA/data/Containers/Data/Application/6C59BED7-41A1-4DE9-86A0-BA848CBCC38D
+com.entrixy.ios: 36061
+/Users/runner/Library/Developer/CoreSimulator/Devices/3F30AF2E-D18B-4524-80AB-614682CDBF72/data/Containers/Data/Application/3D95D937-BFD8-4D93-A7A4-29C170BD5CB1
 Detected file type 'PNG' from extension
 Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/pending-capture.png
-com.entrixy.ios: 42070
-/Users/runner/Library/Developer/CoreSimulator/Devices/28EA8B94-3029-4A4E-B1BD-1B44A52A1EEA/data/Containers/Data/Application/6C59BED7-41A1-4DE9-86A0-BA848CBCC38D
+com.entrixy.ios: 36611
+/Users/runner/Library/Developer/CoreSimulator/Devices/3F30AF2E-D18B-4524-80AB-614682CDBF72/data/Containers/Data/Application/3D95D937-BFD8-4D93-A7A4-29C170BD5CB1
 Detected file type 'PNG' from extension
 Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/pending-capture.png
-com.entrixy.ios: 42912
-/Users/runner/Library/Developer/CoreSimulator/Devices/28EA8B94-3029-4A4E-B1BD-1B44A52A1EEA/data/Containers/Data/Application/6C59BED7-41A1-4DE9-86A0-BA848CBCC38D
+com.entrixy.ios: 37224
+/Users/runner/Library/Developer/CoreSimulator/Devices/3F30AF2E-D18B-4524-80AB-614682CDBF72/data/Containers/Data/Application/3D95D937-BFD8-4D93-A7A4-29C170BD5CB1
 Detected file type 'PNG' from extension
 Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/pending-capture.png
-com.entrixy.ios: 43371
-/Users/runner/Library/Developer/CoreSimulator/Devices/28EA8B94-3029-4A4E-B1BD-1B44A52A1EEA/data/Containers/Data/Application/6C59BED7-41A1-4DE9-86A0-BA848CBCC38D
+com.entrixy.ios: 37510
+/Users/runner/Library/Developer/CoreSimulator/Devices/3F30AF2E-D18B-4524-80AB-614682CDBF72/data/Containers/Data/Application/3D95D937-BFD8-4D93-A7A4-29C170BD5CB1
 Detected file type 'PNG' from extension
 Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/pending-capture.png
-com.entrixy.ios: 44418
-/Users/runner/Library/Developer/CoreSimulator/Devices/28EA8B94-3029-4A4E-B1BD-1B44A52A1EEA/data/Containers/Data/Application/6C59BED7-41A1-4DE9-86A0-BA848CBCC38D
+com.entrixy.ios: 37892
+/Users/runner/Library/Developer/CoreSimulator/Devices/3F30AF2E-D18B-4524-80AB-614682CDBF72/data/Containers/Data/Application/3D95D937-BFD8-4D93-A7A4-29C170BD5CB1
 Detected file type 'PNG' from extension
 Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/pending-capture.png
-com.entrixy.ios: 45527
-/Users/runner/Library/Developer/CoreSimulator/Devices/28EA8B94-3029-4A4E-B1BD-1B44A52A1EEA/data/Containers/Data/Application/6C59BED7-41A1-4DE9-86A0-BA848CBCC38D
+com.entrixy.ios: 38499
+/Users/runner/Library/Developer/CoreSimulator/Devices/3F30AF2E-D18B-4524-80AB-614682CDBF72/data/Containers/Data/Application/3D95D937-BFD8-4D93-A7A4-29C170BD5CB1
 Detected file type 'PNG' from extension
 Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/pending-capture.png
-com.entrixy.ios: 46178
-/Users/runner/Library/Developer/CoreSimulator/Devices/28EA8B94-3029-4A4E-B1BD-1B44A52A1EEA/data/Containers/Data/Application/6C59BED7-41A1-4DE9-86A0-BA848CBCC38D
+com.entrixy.ios: 38705
+/Users/runner/Library/Developer/CoreSimulator/Devices/3F30AF2E-D18B-4524-80AB-614682CDBF72/data/Containers/Data/Application/3D95D937-BFD8-4D93-A7A4-29C170BD5CB1
 Detected file type 'PNG' from extension
 Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/pending-capture.png
-com.entrixy.ios: 46808
-/Users/runner/Library/Developer/CoreSimulator/Devices/28EA8B94-3029-4A4E-B1BD-1B44A52A1EEA/data/Containers/Data/Application/6C59BED7-41A1-4DE9-86A0-BA848CBCC38D
+com.entrixy.ios: 39347
+/Users/runner/Library/Developer/CoreSimulator/Devices/3F30AF2E-D18B-4524-80AB-614682CDBF72/data/Containers/Data/Application/3D95D937-BFD8-4D93-A7A4-29C170BD5CB1
 Detected file type 'PNG' from extension
 Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/pending-capture.png
-com.entrixy.ios: 47438
-/Users/runner/Library/Developer/CoreSimulator/Devices/28EA8B94-3029-4A4E-B1BD-1B44A52A1EEA/data/Containers/Data/Application/6C59BED7-41A1-4DE9-86A0-BA848CBCC38D
+com.entrixy.ios: 40268
+/Users/runner/Library/Developer/CoreSimulator/Devices/3F30AF2E-D18B-4524-80AB-614682CDBF72/data/Containers/Data/Application/3D95D937-BFD8-4D93-A7A4-29C170BD5CB1
 Detected file type 'PNG' from extension
 Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/pending-capture.png
-com.entrixy.ios: 48593
-/Users/runner/Library/Developer/CoreSimulator/Devices/28EA8B94-3029-4A4E-B1BD-1B44A52A1EEA/data/Containers/Data/Application/6C59BED7-41A1-4DE9-86A0-BA848CBCC38D
+com.entrixy.ios: 40898
+/Users/runner/Library/Developer/CoreSimulator/Devices/3F30AF2E-D18B-4524-80AB-614682CDBF72/data/Containers/Data/Application/3D95D937-BFD8-4D93-A7A4-29C170BD5CB1
 Detected file type 'PNG' from extension
 Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/pending-capture.png
-com.entrixy.ios: 49191
-/Users/runner/Library/Developer/CoreSimulator/Devices/28EA8B94-3029-4A4E-B1BD-1B44A52A1EEA/data/Containers/Data/Application/6C59BED7-41A1-4DE9-86A0-BA848CBCC38D
+com.entrixy.ios: 41519
+/Users/runner/Library/Developer/CoreSimulator/Devices/3F30AF2E-D18B-4524-80AB-614682CDBF72/data/Containers/Data/Application/3D95D937-BFD8-4D93-A7A4-29C170BD5CB1
 Detected file type 'PNG' from extension
 Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/pending-capture.png
-com.entrixy.ios: 49817
-/Users/runner/Library/Developer/CoreSimulator/Devices/28EA8B94-3029-4A4E-B1BD-1B44A52A1EEA/data/Containers/Data/Application/6C59BED7-41A1-4DE9-86A0-BA848CBCC38D
+com.entrixy.ios: 42007
+/Users/runner/Library/Developer/CoreSimulator/Devices/3F30AF2E-D18B-4524-80AB-614682CDBF72/data/Containers/Data/Application/3D95D937-BFD8-4D93-A7A4-29C170BD5CB1
 Detected file type 'PNG' from extension
 Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/pending-capture.png
-com.entrixy.ios: 50425
-/Users/runner/Library/Developer/CoreSimulator/Devices/28EA8B94-3029-4A4E-B1BD-1B44A52A1EEA/data/Containers/Data/Application/6C59BED7-41A1-4DE9-86A0-BA848CBCC38D
+com.entrixy.ios: 42181
+/Users/runner/Library/Developer/CoreSimulator/Devices/3F30AF2E-D18B-4524-80AB-614682CDBF72/data/Containers/Data/Application/3D95D937-BFD8-4D93-A7A4-29C170BD5CB1
 Detected file type 'PNG' from extension
 Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/pending-capture.png
-com.entrixy.ios: 50953
-/Users/runner/Library/Developer/CoreSimulator/Devices/28EA8B94-3029-4A4E-B1BD-1B44A52A1EEA/data/Containers/Data/Application/6C59BED7-41A1-4DE9-86A0-BA848CBCC38D
+com.entrixy.ios: 42908
+/Users/runner/Library/Developer/CoreSimulator/Devices/3F30AF2E-D18B-4524-80AB-614682CDBF72/data/Containers/Data/Application/3D95D937-BFD8-4D93-A7A4-29C170BD5CB1
 Detected file type 'PNG' from extension
 Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/pending-capture.png
-com.entrixy.ios: 51501
-/Users/runner/Library/Developer/CoreSimulator/Devices/28EA8B94-3029-4A4E-B1BD-1B44A52A1EEA/data/Containers/Data/Application/6C59BED7-41A1-4DE9-86A0-BA848CBCC38D
+com.entrixy.ios: 43915
+/Users/runner/Library/Developer/CoreSimulator/Devices/3F30AF2E-D18B-4524-80AB-614682CDBF72/data/Containers/Data/Application/3D95D937-BFD8-4D93-A7A4-29C170BD5CB1
 Detected file type 'PNG' from extension
 Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/pending-capture.png
-com.entrixy.ios: 52184
-/Users/runner/Library/Developer/CoreSimulator/Devices/28EA8B94-3029-4A4E-B1BD-1B44A52A1EEA/data/Containers/Data/Application/6C59BED7-41A1-4DE9-86A0-BA848CBCC38D
+com.entrixy.ios: 44173
+/Users/runner/Library/Developer/CoreSimulator/Devices/3F30AF2E-D18B-4524-80AB-614682CDBF72/data/Containers/Data/Application/3D95D937-BFD8-4D93-A7A4-29C170BD5CB1
 Detected file type 'PNG' from extension
 Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/pending-capture.png
-com.entrixy.ios: 52829
-/Users/runner/Library/Developer/CoreSimulator/Devices/28EA8B94-3029-4A4E-B1BD-1B44A52A1EEA/data/Containers/Data/Application/6C59BED7-41A1-4DE9-86A0-BA848CBCC38D
+com.entrixy.ios: 44581
+/Users/runner/Library/Developer/CoreSimulator/Devices/3F30AF2E-D18B-4524-80AB-614682CDBF72/data/Containers/Data/Application/3D95D937-BFD8-4D93-A7A4-29C170BD5CB1
 Detected file type 'PNG' from extension
 Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/pending-capture.png
-com.entrixy.ios: 53449
-/Users/runner/Library/Developer/CoreSimulator/Devices/28EA8B94-3029-4A4E-B1BD-1B44A52A1EEA/data/Containers/Data/Application/6C59BED7-41A1-4DE9-86A0-BA848CBCC38D
+com.entrixy.ios: 45201
+/Users/runner/Library/Developer/CoreSimulator/Devices/3F30AF2E-D18B-4524-80AB-614682CDBF72/data/Containers/Data/Application/3D95D937-BFD8-4D93-A7A4-29C170BD5CB1
 Detected file type 'PNG' from extension
 Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/pending-capture.png
-com.entrixy.ios: 54079
-/Users/runner/Library/Developer/CoreSimulator/Devices/28EA8B94-3029-4A4E-B1BD-1B44A52A1EEA/data/Containers/Data/Application/6C59BED7-41A1-4DE9-86A0-BA848CBCC38D
+com.entrixy.ios: 45320
+/Users/runner/Library/Developer/CoreSimulator/Devices/3F30AF2E-D18B-4524-80AB-614682CDBF72/data/Containers/Data/Application/3D95D937-BFD8-4D93-A7A4-29C170BD5CB1
 Detected file type 'PNG' from extension
 Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/pending-capture.png
-com.entrixy.ios: 54723
-/Users/runner/Library/Developer/CoreSimulator/Devices/28EA8B94-3029-4A4E-B1BD-1B44A52A1EEA/data/Containers/Data/Application/6C59BED7-41A1-4DE9-86A0-BA848CBCC38D
+com.entrixy.ios: 45860
+/Users/runner/Library/Developer/CoreSimulator/Devices/3F30AF2E-D18B-4524-80AB-614682CDBF72/data/Containers/Data/Application/3D95D937-BFD8-4D93-A7A4-29C170BD5CB1
 Detected file type 'PNG' from extension
 Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/pending-capture.png
-com.entrixy.ios: 55641
-/Users/runner/Library/Developer/CoreSimulator/Devices/28EA8B94-3029-4A4E-B1BD-1B44A52A1EEA/data/Containers/Data/Application/6C59BED7-41A1-4DE9-86A0-BA848CBCC38D
+com.entrixy.ios: 46505
+/Users/runner/Library/Developer/CoreSimulator/Devices/3F30AF2E-D18B-4524-80AB-614682CDBF72/data/Containers/Data/Application/3D95D937-BFD8-4D93-A7A4-29C170BD5CB1
 Detected file type 'PNG' from extension
 Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/pending-capture.png
-com.entrixy.ios: 56463
-/Users/runner/Library/Developer/CoreSimulator/Devices/28EA8B94-3029-4A4E-B1BD-1B44A52A1EEA/data/Containers/Data/Application/6C59BED7-41A1-4DE9-86A0-BA848CBCC38D
+com.entrixy.ios: 47018
+/Users/runner/Library/Developer/CoreSimulator/Devices/3F30AF2E-D18B-4524-80AB-614682CDBF72/data/Containers/Data/Application/3D95D937-BFD8-4D93-A7A4-29C170BD5CB1
 Detected file type 'PNG' from extension
 Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/pending-capture.png
-com.entrixy.ios: 57074
-/Users/runner/Library/Developer/CoreSimulator/Devices/28EA8B94-3029-4A4E-B1BD-1B44A52A1EEA/data/Containers/Data/Application/6C59BED7-41A1-4DE9-86A0-BA848CBCC38D
+com.entrixy.ios: 47651
+/Users/runner/Library/Developer/CoreSimulator/Devices/3F30AF2E-D18B-4524-80AB-614682CDBF72/data/Containers/Data/Application/3D95D937-BFD8-4D93-A7A4-29C170BD5CB1
 Detected file type 'PNG' from extension
 Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/pending-capture.png
-com.entrixy.ios: 57684
-/Users/runner/Library/Developer/CoreSimulator/Devices/28EA8B94-3029-4A4E-B1BD-1B44A52A1EEA/data/Containers/Data/Application/6C59BED7-41A1-4DE9-86A0-BA848CBCC38D
+com.entrixy.ios: 48093
+/Users/runner/Library/Developer/CoreSimulator/Devices/3F30AF2E-D18B-4524-80AB-614682CDBF72/data/Containers/Data/Application/3D95D937-BFD8-4D93-A7A4-29C170BD5CB1
 Detected file type 'PNG' from extension
 Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/pending-capture.png
-com.entrixy.ios: 58299
-/Users/runner/Library/Developer/CoreSimulator/Devices/28EA8B94-3029-4A4E-B1BD-1B44A52A1EEA/data/Containers/Data/Application/6C59BED7-41A1-4DE9-86A0-BA848CBCC38D
+com.entrixy.ios: 48310
+/Users/runner/Library/Developer/CoreSimulator/Devices/3F30AF2E-D18B-4524-80AB-614682CDBF72/data/Containers/Data/Application/3D95D937-BFD8-4D93-A7A4-29C170BD5CB1
 Detected file type 'PNG' from extension
 Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/pending-capture.png
-com.entrixy.ios: 58957
-/Users/runner/Library/Developer/CoreSimulator/Devices/28EA8B94-3029-4A4E-B1BD-1B44A52A1EEA/data/Containers/Data/Application/6C59BED7-41A1-4DE9-86A0-BA848CBCC38D
+com.entrixy.ios: 48924
+/Users/runner/Library/Developer/CoreSimulator/Devices/3F30AF2E-D18B-4524-80AB-614682CDBF72/data/Containers/Data/Application/3D95D937-BFD8-4D93-A7A4-29C170BD5CB1
 Detected file type 'PNG' from extension
 Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/pending-capture.png
-com.entrixy.ios: 59775
-/Users/runner/Library/Developer/CoreSimulator/Devices/28EA8B94-3029-4A4E-B1BD-1B44A52A1EEA/data/Containers/Data/Application/6C59BED7-41A1-4DE9-86A0-BA848CBCC38D
+com.entrixy.ios: 49008
+/Users/runner/Library/Developer/CoreSimulator/Devices/3F30AF2E-D18B-4524-80AB-614682CDBF72/data/Containers/Data/Application/3D95D937-BFD8-4D93-A7A4-29C170BD5CB1
 Detected file type 'PNG' from extension
 Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/pending-capture.png
-com.entrixy.ios: 60418
-/Users/runner/Library/Developer/CoreSimulator/Devices/28EA8B94-3029-4A4E-B1BD-1B44A52A1EEA/data/Containers/Data/Application/6C59BED7-41A1-4DE9-86A0-BA848CBCC38D
+com.entrixy.ios: 49582
+/Users/runner/Library/Developer/CoreSimulator/Devices/3F30AF2E-D18B-4524-80AB-614682CDBF72/data/Containers/Data/Application/3D95D937-BFD8-4D93-A7A4-29C170BD5CB1
 Detected file type 'PNG' from extension
 Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/pending-capture.png
-com.entrixy.ios: 60718
-/Users/runner/Library/Developer/CoreSimulator/Devices/28EA8B94-3029-4A4E-B1BD-1B44A52A1EEA/data/Containers/Data/Application/6C59BED7-41A1-4DE9-86A0-BA848CBCC38D
+com.entrixy.ios: 49840
+/Users/runner/Library/Developer/CoreSimulator/Devices/3F30AF2E-D18B-4524-80AB-614682CDBF72/data/Containers/Data/Application/3D95D937-BFD8-4D93-A7A4-29C170BD5CB1
 Detected file type 'PNG' from extension
 Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/pending-capture.png
-com.entrixy.ios: 61354
-/Users/runner/Library/Developer/CoreSimulator/Devices/28EA8B94-3029-4A4E-B1BD-1B44A52A1EEA/data/Containers/Data/Application/6C59BED7-41A1-4DE9-86A0-BA848CBCC38D
+com.entrixy.ios: 50461
+/Users/runner/Library/Developer/CoreSimulator/Devices/3F30AF2E-D18B-4524-80AB-614682CDBF72/data/Containers/Data/Application/3D95D937-BFD8-4D93-A7A4-29C170BD5CB1
 Detected file type 'PNG' from extension
 Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/pending-capture.png
-com.entrixy.ios: 61987
-/Users/runner/Library/Developer/CoreSimulator/Devices/28EA8B94-3029-4A4E-B1BD-1B44A52A1EEA/data/Containers/Data/Application/6C59BED7-41A1-4DE9-86A0-BA848CBCC38D
+com.entrixy.ios: 51353
+/Users/runner/Library/Developer/CoreSimulator/Devices/3F30AF2E-D18B-4524-80AB-614682CDBF72/data/Containers/Data/Application/3D95D937-BFD8-4D93-A7A4-29C170BD5CB1
 Detected file type 'PNG' from extension
 Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/pending-capture.png
-com.entrixy.ios: 62871
-/Users/runner/Library/Developer/CoreSimulator/Devices/28EA8B94-3029-4A4E-B1BD-1B44A52A1EEA/data/Containers/Data/Application/6C59BED7-41A1-4DE9-86A0-BA848CBCC38D
+com.entrixy.ios: 51553
+/Users/runner/Library/Developer/CoreSimulator/Devices/3F30AF2E-D18B-4524-80AB-614682CDBF72/data/Containers/Data/Application/3D95D937-BFD8-4D93-A7A4-29C170BD5CB1
 Detected file type 'PNG' from extension
 Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/pending-capture.png
-com.entrixy.ios: 63706
-/Users/runner/Library/Developer/CoreSimulator/Devices/28EA8B94-3029-4A4E-B1BD-1B44A52A1EEA/data/Containers/Data/Application/6C59BED7-41A1-4DE9-86A0-BA848CBCC38D
+com.entrixy.ios: 52018
+/Users/runner/Library/Developer/CoreSimulator/Devices/3F30AF2E-D18B-4524-80AB-614682CDBF72/data/Containers/Data/Application/3D95D937-BFD8-4D93-A7A4-29C170BD5CB1
 Detected file type 'PNG' from extension
 Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/pending-capture.png
-com.entrixy.ios: 64308
-/Users/runner/Library/Developer/CoreSimulator/Devices/28EA8B94-3029-4A4E-B1BD-1B44A52A1EEA/data/Containers/Data/Application/6C59BED7-41A1-4DE9-86A0-BA848CBCC38D
+com.entrixy.ios: 52564
+/Users/runner/Library/Developer/CoreSimulator/Devices/3F30AF2E-D18B-4524-80AB-614682CDBF72/data/Containers/Data/Application/3D95D937-BFD8-4D93-A7A4-29C170BD5CB1
 Detected file type 'PNG' from extension
 Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/pending-capture.png
-com.entrixy.ios: 64443
-/Users/runner/Library/Developer/CoreSimulator/Devices/28EA8B94-3029-4A4E-B1BD-1B44A52A1EEA/data/Containers/Data/Application/6C59BED7-41A1-4DE9-86A0-BA848CBCC38D
+com.entrixy.ios: 52687
+/Users/runner/Library/Developer/CoreSimulator/Devices/3F30AF2E-D18B-4524-80AB-614682CDBF72/data/Containers/Data/Application/3D95D937-BFD8-4D93-A7A4-29C170BD5CB1
 Detected file type 'PNG' from extension
 Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/pending-capture.png
-com.entrixy.ios: 64956
-/Users/runner/Library/Developer/CoreSimulator/Devices/28EA8B94-3029-4A4E-B1BD-1B44A52A1EEA/data/Containers/Data/Application/6C59BED7-41A1-4DE9-86A0-BA848CBCC38D
+com.entrixy.ios: 53302
+/Users/runner/Library/Developer/CoreSimulator/Devices/3F30AF2E-D18B-4524-80AB-614682CDBF72/data/Containers/Data/Application/3D95D937-BFD8-4D93-A7A4-29C170BD5CB1
 Detected file type 'PNG' from extension
 Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/pending-capture.png
-com.entrixy.ios: 65555
-/Users/runner/Library/Developer/CoreSimulator/Devices/28EA8B94-3029-4A4E-B1BD-1B44A52A1EEA/data/Containers/Data/Application/6C59BED7-41A1-4DE9-86A0-BA848CBCC38D
+com.entrixy.ios: 54144
+/Users/runner/Library/Developer/CoreSimulator/Devices/3F30AF2E-D18B-4524-80AB-614682CDBF72/data/Containers/Data/Application/3D95D937-BFD8-4D93-A7A4-29C170BD5CB1
 Detected file type 'PNG' from extension
 Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/pending-capture.png
-com.entrixy.ios: 65955
-/Users/runner/Library/Developer/CoreSimulator/Devices/28EA8B94-3029-4A4E-B1BD-1B44A52A1EEA/data/Containers/Data/Application/6C59BED7-41A1-4DE9-86A0-BA848CBCC38D
+com.entrixy.ios: 55037
+/Users/runner/Library/Developer/CoreSimulator/Devices/3F30AF2E-D18B-4524-80AB-614682CDBF72/data/Containers/Data/Application/3D95D937-BFD8-4D93-A7A4-29C170BD5CB1
 Detected file type 'PNG' from extension
 Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/pending-capture.png
-com.entrixy.ios: 66630
-/Users/runner/Library/Developer/CoreSimulator/Devices/28EA8B94-3029-4A4E-B1BD-1B44A52A1EEA/data/Containers/Data/Application/6C59BED7-41A1-4DE9-86A0-BA848CBCC38D
+com.entrixy.ios: 55217
+/Users/runner/Library/Developer/CoreSimulator/Devices/3F30AF2E-D18B-4524-80AB-614682CDBF72/data/Containers/Data/Application/3D95D937-BFD8-4D93-A7A4-29C170BD5CB1
 Detected file type 'PNG' from extension
 Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/pending-capture.png
-com.entrixy.ios: 67319
-/Users/runner/Library/Developer/CoreSimulator/Devices/28EA8B94-3029-4A4E-B1BD-1B44A52A1EEA/data/Containers/Data/Application/6C59BED7-41A1-4DE9-86A0-BA848CBCC38D
+com.entrixy.ios: 55745
+/Users/runner/Library/Developer/CoreSimulator/Devices/3F30AF2E-D18B-4524-80AB-614682CDBF72/data/Containers/Data/Application/3D95D937-BFD8-4D93-A7A4-29C170BD5CB1
 Detected file type 'PNG' from extension
 Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/pending-capture.png
-com.entrixy.ios: 67917
-/Users/runner/Library/Developer/CoreSimulator/Devices/28EA8B94-3029-4A4E-B1BD-1B44A52A1EEA/data/Containers/Data/Application/6C59BED7-41A1-4DE9-86A0-BA848CBCC38D
+com.entrixy.ios: 56371
+/Users/runner/Library/Developer/CoreSimulator/Devices/3F30AF2E-D18B-4524-80AB-614682CDBF72/data/Containers/Data/Application/3D95D937-BFD8-4D93-A7A4-29C170BD5CB1
 Detected file type 'PNG' from extension
 Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/pending-capture.png
-com.entrixy.ios: 68035
-/Users/runner/Library/Developer/CoreSimulator/Devices/28EA8B94-3029-4A4E-B1BD-1B44A52A1EEA/data/Containers/Data/Application/6C59BED7-41A1-4DE9-86A0-BA848CBCC38D
+com.entrixy.ios: 56819
+/Users/runner/Library/Developer/CoreSimulator/Devices/3F30AF2E-D18B-4524-80AB-614682CDBF72/data/Containers/Data/Application/3D95D937-BFD8-4D93-A7A4-29C170BD5CB1
 Detected file type 'PNG' from extension
 Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/pending-capture.png
-com.entrixy.ios: 68563
-/Users/runner/Library/Developer/CoreSimulator/Devices/28EA8B94-3029-4A4E-B1BD-1B44A52A1EEA/data/Containers/Data/Application/6C59BED7-41A1-4DE9-86A0-BA848CBCC38D
+com.entrixy.ios: 57225
+/Users/runner/Library/Developer/CoreSimulator/Devices/3F30AF2E-D18B-4524-80AB-614682CDBF72/data/Containers/Data/Application/3D95D937-BFD8-4D93-A7A4-29C170BD5CB1
 Detected file type 'PNG' from extension
 Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/pending-capture.png
-com.entrixy.ios: 69115
-/Users/runner/Library/Developer/CoreSimulator/Devices/28EA8B94-3029-4A4E-B1BD-1B44A52A1EEA/data/Containers/Data/Application/6C59BED7-41A1-4DE9-86A0-BA848CBCC38D
+com.entrixy.ios: 58081
+/Users/runner/Library/Developer/CoreSimulator/Devices/3F30AF2E-D18B-4524-80AB-614682CDBF72/data/Containers/Data/Application/3D95D937-BFD8-4D93-A7A4-29C170BD5CB1
 Detected file type 'PNG' from extension
 Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/pending-capture.png
-com.entrixy.ios: 69214
-/Users/runner/Library/Developer/CoreSimulator/Devices/28EA8B94-3029-4A4E-B1BD-1B44A52A1EEA/data/Containers/Data/Application/6C59BED7-41A1-4DE9-86A0-BA848CBCC38D
+com.entrixy.ios: 58702
+/Users/runner/Library/Developer/CoreSimulator/Devices/3F30AF2E-D18B-4524-80AB-614682CDBF72/data/Containers/Data/Application/3D95D937-BFD8-4D93-A7A4-29C170BD5CB1
 Detected file type 'PNG' from extension
 Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/pending-capture.png
-com.entrixy.ios: 70114
-/Users/runner/Library/Developer/CoreSimulator/Devices/28EA8B94-3029-4A4E-B1BD-1B44A52A1EEA/data/Containers/Data/Application/6C59BED7-41A1-4DE9-86A0-BA848CBCC38D
+com.entrixy.ios: 58851
+/Users/runner/Library/Developer/CoreSimulator/Devices/3F30AF2E-D18B-4524-80AB-614682CDBF72/data/Containers/Data/Application/3D95D937-BFD8-4D93-A7A4-29C170BD5CB1
 Detected file type 'PNG' from extension
 Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/pending-capture.png
-com.entrixy.ios: 70910
-/Users/runner/Library/Developer/CoreSimulator/Devices/28EA8B94-3029-4A4E-B1BD-1B44A52A1EEA/data/Containers/Data/Application/6C59BED7-41A1-4DE9-86A0-BA848CBCC38D
+com.entrixy.ios: 59472
+/Users/runner/Library/Developer/CoreSimulator/Devices/3F30AF2E-D18B-4524-80AB-614682CDBF72/data/Containers/Data/Application/3D95D937-BFD8-4D93-A7A4-29C170BD5CB1
 Detected file type 'PNG' from extension
 Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/pending-capture.png
-com.entrixy.ios: 71447
-/Users/runner/Library/Developer/CoreSimulator/Devices/28EA8B94-3029-4A4E-B1BD-1B44A52A1EEA/data/Containers/Data/Application/6C59BED7-41A1-4DE9-86A0-BA848CBCC38D
+com.entrixy.ios: 59675
+/Users/runner/Library/Developer/CoreSimulator/Devices/3F30AF2E-D18B-4524-80AB-614682CDBF72/data/Containers/Data/Application/3D95D937-BFD8-4D93-A7A4-29C170BD5CB1
 Detected file type 'PNG' from extension
 Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/pending-capture.png
-com.entrixy.ios: 71762
-/Users/runner/Library/Developer/CoreSimulator/Devices/28EA8B94-3029-4A4E-B1BD-1B44A52A1EEA/data/Containers/Data/Application/6C59BED7-41A1-4DE9-86A0-BA848CBCC38D
+com.entrixy.ios: 60137
+/Users/runner/Library/Developer/CoreSimulator/Devices/3F30AF2E-D18B-4524-80AB-614682CDBF72/data/Containers/Data/Application/3D95D937-BFD8-4D93-A7A4-29C170BD5CB1
 Detected file type 'PNG' from extension
 Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/pending-capture.png
-com.entrixy.ios: 72188
-/Users/runner/Library/Developer/CoreSimulator/Devices/28EA8B94-3029-4A4E-B1BD-1B44A52A1EEA/data/Containers/Data/Application/6C59BED7-41A1-4DE9-86A0-BA848CBCC38D
+com.entrixy.ios: 60629
+/Users/runner/Library/Developer/CoreSimulator/Devices/3F30AF2E-D18B-4524-80AB-614682CDBF72/data/Containers/Data/Application/3D95D937-BFD8-4D93-A7A4-29C170BD5CB1
 Detected file type 'PNG' from extension
 Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/pending-capture.png
-com.entrixy.ios: 72817
-/Users/runner/Library/Developer/CoreSimulator/Devices/28EA8B94-3029-4A4E-B1BD-1B44A52A1EEA/data/Containers/Data/Application/6C59BED7-41A1-4DE9-86A0-BA848CBCC38D
+com.entrixy.ios: 61067
+/Users/runner/Library/Developer/CoreSimulator/Devices/3F30AF2E-D18B-4524-80AB-614682CDBF72/data/Containers/Data/Application/3D95D937-BFD8-4D93-A7A4-29C170BD5CB1
 Detected file type 'PNG' from extension
 Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/pending-capture.png
-com.entrixy.ios: 73744
-/Users/runner/Library/Developer/CoreSimulator/Devices/28EA8B94-3029-4A4E-B1BD-1B44A52A1EEA/data/Containers/Data/Application/6C59BED7-41A1-4DE9-86A0-BA848CBCC38D
+com.entrixy.ios: 61892
+/Users/runner/Library/Developer/CoreSimulator/Devices/3F30AF2E-D18B-4524-80AB-614682CDBF72/data/Containers/Data/Application/3D95D937-BFD8-4D93-A7A4-29C170BD5CB1
 Detected file type 'PNG' from extension
 Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/pending-capture.png
-com.entrixy.ios: 74532
-/Users/runner/Library/Developer/CoreSimulator/Devices/28EA8B94-3029-4A4E-B1BD-1B44A52A1EEA/data/Containers/Data/Application/6C59BED7-41A1-4DE9-86A0-BA848CBCC38D
+com.entrixy.ios: 62125
+/Users/runner/Library/Developer/CoreSimulator/Devices/3F30AF2E-D18B-4524-80AB-614682CDBF72/data/Containers/Data/Application/3D95D937-BFD8-4D93-A7A4-29C170BD5CB1
 Detected file type 'PNG' from extension
 Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/pending-capture.png
-com.entrixy.ios: 74950
-/Users/runner/Library/Developer/CoreSimulator/Devices/28EA8B94-3029-4A4E-B1BD-1B44A52A1EEA/data/Containers/Data/Application/6C59BED7-41A1-4DE9-86A0-BA848CBCC38D
+com.entrixy.ios: 62586
+/Users/runner/Library/Developer/CoreSimulator/Devices/3F30AF2E-D18B-4524-80AB-614682CDBF72/data/Containers/Data/Application/3D95D937-BFD8-4D93-A7A4-29C170BD5CB1
 Detected file type 'PNG' from extension
 Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/pending-capture.png
-com.entrixy.ios: 75187
-/Users/runner/Library/Developer/CoreSimulator/Devices/28EA8B94-3029-4A4E-B1BD-1B44A52A1EEA/data/Containers/Data/Application/6C59BED7-41A1-4DE9-86A0-BA848CBCC38D
+com.entrixy.ios: 63161
+/Users/runner/Library/Developer/CoreSimulator/Devices/3F30AF2E-D18B-4524-80AB-614682CDBF72/data/Containers/Data/Application/3D95D937-BFD8-4D93-A7A4-29C170BD5CB1
 Detected file type 'PNG' from extension
 Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/pending-capture.png
-com.entrixy.ios: 75781
-/Users/runner/Library/Developer/CoreSimulator/Devices/28EA8B94-3029-4A4E-B1BD-1B44A52A1EEA/data/Containers/Data/Application/6C59BED7-41A1-4DE9-86A0-BA848CBCC38D
+com.entrixy.ios: 63268
+/Users/runner/Library/Developer/CoreSimulator/Devices/3F30AF2E-D18B-4524-80AB-614682CDBF72/data/Containers/Data/Application/3D95D937-BFD8-4D93-A7A4-29C170BD5CB1
 Detected file type 'PNG' from extension
 Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/pending-capture.png
-com.entrixy.ios: 76284
-/Users/runner/Library/Developer/CoreSimulator/Devices/28EA8B94-3029-4A4E-B1BD-1B44A52A1EEA/data/Containers/Data/Application/6C59BED7-41A1-4DE9-86A0-BA848CBCC38D
+com.entrixy.ios: 63889
+/Users/runner/Library/Developer/CoreSimulator/Devices/3F30AF2E-D18B-4524-80AB-614682CDBF72/data/Containers/Data/Application/3D95D937-BFD8-4D93-A7A4-29C170BD5CB1
 Detected file type 'PNG' from extension
 Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/pending-capture.png
-com.entrixy.ios: 76549
-/Users/runner/Library/Developer/CoreSimulator/Devices/28EA8B94-3029-4A4E-B1BD-1B44A52A1EEA/data/Containers/Data/Application/6C59BED7-41A1-4DE9-86A0-BA848CBCC38D
+com.entrixy.ios: 64587
+/Users/runner/Library/Developer/CoreSimulator/Devices/3F30AF2E-D18B-4524-80AB-614682CDBF72/data/Containers/Data/Application/3D95D937-BFD8-4D93-A7A4-29C170BD5CB1
 Detected file type 'PNG' from extension
 Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/pending-capture.png
-com.entrixy.ios: 77382
-/Users/runner/Library/Developer/CoreSimulator/Devices/28EA8B94-3029-4A4E-B1BD-1B44A52A1EEA/data/Containers/Data/Application/6C59BED7-41A1-4DE9-86A0-BA848CBCC38D
+com.entrixy.ios: 64974
+/Users/runner/Library/Developer/CoreSimulator/Devices/3F30AF2E-D18B-4524-80AB-614682CDBF72/data/Containers/Data/Application/3D95D937-BFD8-4D93-A7A4-29C170BD5CB1
 Detected file type 'PNG' from extension
 Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/pending-capture.png
-com.entrixy.ios: 78198
-/Users/runner/Library/Developer/CoreSimulator/Devices/28EA8B94-3029-4A4E-B1BD-1B44A52A1EEA/data/Containers/Data/Application/6C59BED7-41A1-4DE9-86A0-BA848CBCC38D
+com.entrixy.ios: 65679
+/Users/runner/Library/Developer/CoreSimulator/Devices/3F30AF2E-D18B-4524-80AB-614682CDBF72/data/Containers/Data/Application/3D95D937-BFD8-4D93-A7A4-29C170BD5CB1
 Detected file type 'PNG' from extension
 Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/pending-capture.png
-com.entrixy.ios: 78808
-/Users/runner/Library/Developer/CoreSimulator/Devices/28EA8B94-3029-4A4E-B1BD-1B44A52A1EEA/data/Containers/Data/Application/6C59BED7-41A1-4DE9-86A0-BA848CBCC38D
+com.entrixy.ios: 66220
+/Users/runner/Library/Developer/CoreSimulator/Devices/3F30AF2E-D18B-4524-80AB-614682CDBF72/data/Containers/Data/Application/3D95D937-BFD8-4D93-A7A4-29C170BD5CB1
 Detected file type 'PNG' from extension
 Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/pending-capture.png
-com.entrixy.ios: 79093
-/Users/runner/Library/Developer/CoreSimulator/Devices/28EA8B94-3029-4A4E-B1BD-1B44A52A1EEA/data/Containers/Data/Application/6C59BED7-41A1-4DE9-86A0-BA848CBCC38D
+com.entrixy.ios: 66380
+/Users/runner/Library/Developer/CoreSimulator/Devices/3F30AF2E-D18B-4524-80AB-614682CDBF72/data/Containers/Data/Application/3D95D937-BFD8-4D93-A7A4-29C170BD5CB1
 Detected file type 'PNG' from extension
 Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/pending-capture.png
-com.entrixy.ios: 79480
-/Users/runner/Library/Developer/CoreSimulator/Devices/28EA8B94-3029-4A4E-B1BD-1B44A52A1EEA/data/Containers/Data/Application/6C59BED7-41A1-4DE9-86A0-BA848CBCC38D
+com.entrixy.ios: 67002
+/Users/runner/Library/Developer/CoreSimulator/Devices/3F30AF2E-D18B-4524-80AB-614682CDBF72/data/Containers/Data/Application/3D95D937-BFD8-4D93-A7A4-29C170BD5CB1
 Detected file type 'PNG' from extension
 Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/pending-capture.png
-com.entrixy.ios: 80089
-/Users/runner/Library/Developer/CoreSimulator/Devices/28EA8B94-3029-4A4E-B1BD-1B44A52A1EEA/data/Containers/Data/Application/6C59BED7-41A1-4DE9-86A0-BA848CBCC38D
+com.entrixy.ios: 67614
+/Users/runner/Library/Developer/CoreSimulator/Devices/3F30AF2E-D18B-4524-80AB-614682CDBF72/data/Containers/Data/Application/3D95D937-BFD8-4D93-A7A4-29C170BD5CB1
 Detected file type 'PNG' from extension
 Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/pending-capture.png
-com.entrixy.ios: 80565
-/Users/runner/Library/Developer/CoreSimulator/Devices/28EA8B94-3029-4A4E-B1BD-1B44A52A1EEA/data/Containers/Data/Application/6C59BED7-41A1-4DE9-86A0-BA848CBCC38D
+com.entrixy.ios: 68570
+/Users/runner/Library/Developer/CoreSimulator/Devices/3F30AF2E-D18B-4524-80AB-614682CDBF72/data/Containers/Data/Application/3D95D937-BFD8-4D93-A7A4-29C170BD5CB1
 Detected file type 'PNG' from extension
 Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/pending-capture.png
-com.entrixy.ios: 81050
-/Users/runner/Library/Developer/CoreSimulator/Devices/28EA8B94-3029-4A4E-B1BD-1B44A52A1EEA/data/Containers/Data/Application/6C59BED7-41A1-4DE9-86A0-BA848CBCC38D
+com.entrixy.ios: 69290
+/Users/runner/Library/Developer/CoreSimulator/Devices/3F30AF2E-D18B-4524-80AB-614682CDBF72/data/Containers/Data/Application/3D95D937-BFD8-4D93-A7A4-29C170BD5CB1
 Detected file type 'PNG' from extension
 Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/pending-capture.png
-com.entrixy.ios: 81857
-/Users/runner/Library/Developer/CoreSimulator/Devices/28EA8B94-3029-4A4E-B1BD-1B44A52A1EEA/data/Containers/Data/Application/6C59BED7-41A1-4DE9-86A0-BA848CBCC38D
+com.entrixy.ios: 69466
+/Users/runner/Library/Developer/CoreSimulator/Devices/3F30AF2E-D18B-4524-80AB-614682CDBF72/data/Containers/Data/Application/3D95D937-BFD8-4D93-A7A4-29C170BD5CB1
 Detected file type 'PNG' from extension
 Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/pending-capture.png
-com.entrixy.ios: 82304
-/Users/runner/Library/Developer/CoreSimulator/Devices/28EA8B94-3029-4A4E-B1BD-1B44A52A1EEA/data/Containers/Data/Application/6C59BED7-41A1-4DE9-86A0-BA848CBCC38D
+com.entrixy.ios: 70086
+/Users/runner/Library/Developer/CoreSimulator/Devices/3F30AF2E-D18B-4524-80AB-614682CDBF72/data/Containers/Data/Application/3D95D937-BFD8-4D93-A7A4-29C170BD5CB1
 Detected file type 'PNG' from extension
 Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/pending-capture.png
-com.entrixy.ios: 82517
-/Users/runner/Library/Developer/CoreSimulator/Devices/28EA8B94-3029-4A4E-B1BD-1B44A52A1EEA/data/Containers/Data/Application/6C59BED7-41A1-4DE9-86A0-BA848CBCC38D
+com.entrixy.ios: 70607
+/Users/runner/Library/Developer/CoreSimulator/Devices/3F30AF2E-D18B-4524-80AB-614682CDBF72/data/Containers/Data/Application/3D95D937-BFD8-4D93-A7A4-29C170BD5CB1
 Detected file type 'PNG' from extension
 Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/pending-capture.png
-com.entrixy.ios: 83138
-/Users/runner/Library/Developer/CoreSimulator/Devices/28EA8B94-3029-4A4E-B1BD-1B44A52A1EEA/data/Containers/Data/Application/6C59BED7-41A1-4DE9-86A0-BA848CBCC38D
+com.entrixy.ios: 70778
+/Users/runner/Library/Developer/CoreSimulator/Devices/3F30AF2E-D18B-4524-80AB-614682CDBF72/data/Containers/Data/Application/3D95D937-BFD8-4D93-A7A4-29C170BD5CB1
 Detected file type 'PNG' from extension
 Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/pending-capture.png
-com.entrixy.ios: 83752
-/Users/runner/Library/Developer/CoreSimulator/Devices/28EA8B94-3029-4A4E-B1BD-1B44A52A1EEA/data/Containers/Data/Application/6C59BED7-41A1-4DE9-86A0-BA848CBCC38D
+com.entrixy.ios: 71642
+/Users/runner/Library/Developer/CoreSimulator/Devices/3F30AF2E-D18B-4524-80AB-614682CDBF72/data/Containers/Data/Application/3D95D937-BFD8-4D93-A7A4-29C170BD5CB1
 Detected file type 'PNG' from extension
 Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/pending-capture.png
-com.entrixy.ios: 84588
-/Users/runner/Library/Developer/CoreSimulator/Devices/28EA8B94-3029-4A4E-B1BD-1B44A52A1EEA/data/Containers/Data/Application/6C59BED7-41A1-4DE9-86A0-BA848CBCC38D
+com.entrixy.ios: 72571
+/Users/runner/Library/Developer/CoreSimulator/Devices/3F30AF2E-D18B-4524-80AB-614682CDBF72/data/Containers/Data/Application/3D95D937-BFD8-4D93-A7A4-29C170BD5CB1
 Detected file type 'PNG' from extension
 Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/pending-capture.png
-com.entrixy.ios: 85479
-/Users/runner/Library/Developer/CoreSimulator/Devices/28EA8B94-3029-4A4E-B1BD-1B44A52A1EEA/data/Containers/Data/Application/6C59BED7-41A1-4DE9-86A0-BA848CBCC38D
+com.entrixy.ios: 73214
+/Users/runner/Library/Developer/CoreSimulator/Devices/3F30AF2E-D18B-4524-80AB-614682CDBF72/data/Containers/Data/Application/3D95D937-BFD8-4D93-A7A4-29C170BD5CB1
 Detected file type 'PNG' from extension
 Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/pending-capture.png
-com.entrixy.ios: 85936
-/Users/runner/Library/Developer/CoreSimulator/Devices/28EA8B94-3029-4A4E-B1BD-1B44A52A1EEA/data/Containers/Data/Application/6C59BED7-41A1-4DE9-86A0-BA848CBCC38D
+com.entrixy.ios: 73837
+/Users/runner/Library/Developer/CoreSimulator/Devices/3F30AF2E-D18B-4524-80AB-614682CDBF72/data/Containers/Data/Application/3D95D937-BFD8-4D93-A7A4-29C170BD5CB1
 Detected file type 'PNG' from extension
 Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/pending-capture.png
-com.entrixy.ios: 86169
-/Users/runner/Library/Developer/CoreSimulator/Devices/28EA8B94-3029-4A4E-B1BD-1B44A52A1EEA/data/Containers/Data/Application/6C59BED7-41A1-4DE9-86A0-BA848CBCC38D
+com.entrixy.ios: 73903
+/Users/runner/Library/Developer/CoreSimulator/Devices/3F30AF2E-D18B-4524-80AB-614682CDBF72/data/Containers/Data/Application/3D95D937-BFD8-4D93-A7A4-29C170BD5CB1
 Detected file type 'PNG' from extension
 Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/pending-capture.png
-com.entrixy.ios: 86775
-/Users/runner/Library/Developer/CoreSimulator/Devices/28EA8B94-3029-4A4E-B1BD-1B44A52A1EEA/data/Containers/Data/Application/6C59BED7-41A1-4DE9-86A0-BA848CBCC38D
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/pending-capture.png
-com.entrixy.ios: 87326
-/Users/runner/Library/Developer/CoreSimulator/Devices/28EA8B94-3029-4A4E-B1BD-1B44A52A1EEA/data/Containers/Data/Application/6C59BED7-41A1-4DE9-86A0-BA848CBCC38D
+com.entrixy.ios: 74508
+/Users/runner/Library/Developer/CoreSimulator/Devices/3F30AF2E-D18B-4524-80AB-614682CDBF72/data/Containers/Data/Application/3D95D937-BFD8-4D93-A7A4-29C170BD5CB1
 Detected file type 'PNG' from extension
 Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/pending-capture.png
 Captured 86 real simulator screenshots
