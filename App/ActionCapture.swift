@@ -34,6 +34,12 @@ enum ActionCaptureScenario: String, CaseIterable {
     case bleGuestConfirm = "ble-guest-confirm", bleGuestResult = "ble-guest-result", bleGuestExpired = "ble-guest-expired", bleGuestUnknown = "ble-guest-unknown", bleGuestJournal = "ble-guest-journal"
     case bleRevokePending = "ble-revoke-pending", bleRevokeApplied = "ble-revoke-applied", bleRevokeStale = "ble-revoke-stale", bleRenewed = "ble-renewed"
     var isBLELifecycle: Bool { [.bleRevokePending, .bleRevokeApplied, .bleRevokeStale, .bleRenewed].contains(self) }
+    var usesTaskFooter: Bool {
+        [.addKey, .ownerForm, .objectForm, .issueForm, .issuedEditForm, .issuedAccessForm,
+         .senderForm, .senderEditForm, .messageCompose, .delegationPreview, .delegationRejected].contains(self)
+    }
+    var presentsPreparedTaskSheet: Bool { usesTaskFooter && self != .addKey }
+    var taskBackgroundTab: AppTab { isIssuance || isSender ? .guests : (isDelegation ? .control : .settings) }
     var isBLEGuest: Bool { [.bleGuestConfirm, .bleGuestResult, .bleGuestExpired, .bleGuestUnknown, .bleGuestJournal].contains(self) }
     var isBLEOwner: Bool { [.bleOwnerConfirm, .bleOwnerResult, .bleOwnerUnknown, .bleOwnerJournal].contains(self) }
     var isBLEPairing: Bool { isBLELifecycle || isBLEOwner || [.bleScan, .bleUncertain, .blePaired, .bleRegistered].contains(self) }
@@ -752,16 +758,21 @@ private final class ActionCaptureModel: ObservableObject {
     }
 }
 
-@MainActor
-struct ActionCaptureRoot: View {
-    @StateObject private var capture: ActionCaptureModel
-    init(scenario: ActionCaptureScenario) { _capture = StateObject(wrappedValue: ActionCaptureModel(scenario: scenario)) }
-    private var banner: some View {
+struct CaptureEnvironmentBadge: View {
+    var body: some View {
         Text("ТЕСТОВЫЙ СТЕНД · БЕЗ ОБОРУДОВАНИЯ")
             .font(.caption2.weight(.semibold)).foregroundStyle(Brand.ink)
             .frame(maxWidth: .infinity).padding(.vertical, 9)
             .background(Color(uiColor: .secondarySystemGroupedBackground))
+            .allowsHitTesting(false)
     }
+}
+
+@MainActor
+struct ActionCaptureRoot: View {
+    @StateObject private var capture: ActionCaptureModel
+    @State private var taskSheetPresented = false
+    init(scenario: ActionCaptureScenario) { _capture = StateObject(wrappedValue: ActionCaptureModel(scenario: scenario)) }
     @ViewBuilder private var content: some View {
         switch capture.scenario {
         case .bleScan, .bleUncertain, .blePaired:
@@ -787,7 +798,7 @@ struct ActionCaptureRoot: View {
             if let manager = capture.senderManager, let record = capture.model.passedAccess.first { EditPassedObjects(manager: manager, accessID: record.id, sourceID: record.parts[0].sourceID) } else { ProgressView() }
         case .senderLink, .senderUncertain, .senderVouched, .senderRevoked, .senderEdited:
             if let manager = capture.senderManager, let record = capture.model.passedAccess.first { NavigationStack { PassedAccessDetail(manager: manager, accessID: record.id) } } else { ProgressView() }
-        case .delegatedUntrusted: NavigationStack { OwnerGuestsScreen() }
+        case .delegatedUntrusted: RootView(initialTab: .guests)
         case .delegatedAwaiting, .delegatedReady, .delegatedUncertain, .delegatedRevoked:
             if let key = capture.model.owners.first?.delegatedKeys?.first { NavigationStack { OwnerDelegatedKeyScreen(server: "controller.invalid", keyID: key.id) } }
             else { ProgressView() }
@@ -803,7 +814,7 @@ struct ActionCaptureRoot: View {
         case .ownerConfirm, .ownerSending, .ownerResult, .ownerGuestRequest: RootView(initialTab: .control)
         case .ownerJournal: RootView(initialTab: .journal)
         case .issueForm: IssueOwnerKeyScreen()
-        case .issuedList: NavigationStack { OwnerGuestsScreen() }
+        case .issuedList: RootView(initialTab: .guests)
         case .issuedEditForm, .issuedAccessForm:
             if let key = capture.model.owners.first?.issuedKeys?.first { IssueOwnerKeyScreen(serverPreset: "controller.invalid", editingKeyID: key.id, editAccessOnLaunch: capture.scenario == .issuedAccessForm) }
             else { ProgressView() }
@@ -830,18 +841,27 @@ struct ActionCaptureRoot: View {
         }
     }
     var body: some View {
-        content
-            .environmentObject(capture.model)
-            .overlay(alignment: .bottom) {
-                banner.padding(.bottom, 76).allowsHitTesting(false)
-            }
-            .sheet(item: $capture.intent) { intent in
-                ActionConfirmation(intent: intent).environmentObject(capture.model)
-                    .overlay(alignment: .bottom) {
-                        banner.padding(.bottom, 8).allowsHitTesting(false)
+        Group {
+            if capture.scenario.presentsPreparedTaskSheet {
+                RootView(initialTab: capture.scenario.taskBackgroundTab)
+                    .sheet(isPresented: $taskSheetPresented) {
+                        content.environmentObject(capture.model)
                     }
+            } else {
+                content
             }
-            .task { await capture.prepare() }
+        }
+        .environmentObject(capture.model)
+        .safeAreaInset(edge: .bottom, spacing: 0) {
+            if !capture.scenario.usesTaskFooter && capture.intent == nil { CaptureEnvironmentBadge() }
+        }
+        .sheet(item: $capture.intent) { intent in
+            ActionConfirmation(intent: intent).environmentObject(capture.model)
+        }
+        .task {
+            await capture.prepare()
+            if capture.ready && capture.scenario.presentsPreparedTaskSheet { taskSheetPresented = true }
+        }
     }
 }
 #endif

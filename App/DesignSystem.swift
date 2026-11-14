@@ -92,6 +92,9 @@ private struct SheetDismissFooter: ViewModifier {
                 Button(title, role: .cancel, action: action)
                     .buttonStyle(SecondaryActionStyle()).disabled(disabled)
                     .padding(.horizontal, DesignMetrics.pageInset).padding(.vertical, 12)
+                #if DEBUG && targetEnvironment(simulator)
+                if ActionCaptureScenario.current != nil { CaptureEnvironmentBadge() }
+                #endif
             }.background(Color(uiColor: .systemGroupedBackground))
         }.interactiveDismissDisabled(disabled)
     }

@@ -73,7 +73,7 @@ def main():
         name = row['file']
         if key in observed or key not in required or name in files or Path(name).name != name or not name.endswith('.png'):
             raise RuntimeError('Unexpected or duplicate capture')
-        if row.get('source_sha') != args.source_sha or not row.get('software_controller'):
+        if row.get('source_sha') != args.source_sha or not row.get('software_controller') or not row.get('visible_text_verified'):
             raise RuntimeError('Capture does not belong to this isolated source build')
         data = (args.directory / name).read_bytes()
         if not data.startswith(b'\x89PNG\r\n\x1a\n'):

@@ -13,7 +13,7 @@ def main():
     try:
         subprocess.run(['xcodebuild', '-project', 'Entrixy.xcodeproj', '-scheme', 'EntrixyTests',
             '-configuration', 'Debug', '-destination', 'id=' + device,
-            '-derivedDataPath', '.local-checks/TestDerivedData', '-parallel-testing-enabled', 'NO',
+            '-derivedDataPath', '.local-checks/DerivedData', '-parallel-testing-enabled', 'NO',
             'CODE_SIGNING_ALLOWED=YES', 'CODE_SIGN_IDENTITY=-', 'test'], check=True, timeout=720)
     finally:
         subprocess.run(['xcrun', 'simctl', 'shutdown', device], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=30)

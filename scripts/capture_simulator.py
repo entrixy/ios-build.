@@ -12,6 +12,7 @@ ROOT = Path(__file__).resolve().parent.parent
 APP = ROOT / '.local-checks/DerivedData/Build/Products/Debug-iphonesimulator/Entrixy.app'
 OUTPUT = ROOT / '.local-checks/ci/screenshots'
 BUNDLE = 'com.entrixy.ios'
+TEXT_TOOL = ROOT / '.local-checks/verify-capture-text'
 
 
 def run(*args, timeout=90, optional=False):
@@ -56,6 +57,63 @@ def prepare_device(model, device_type, runtime):
             print('Cold simulator preparation stalled; preparing one replacement before scenarios', flush=True)
 
 
+def expected_visible_text(screen):
+    if screen == 'code-setup': return ['Создать', 'код']
+    if screen in ['confirm-open', 'confirm-close', 'code-entry', 'code-rejected', 'biometric', 'ble-guest-confirm']:
+        return ['Подтвердить']
+    if screen in ['journal', 'owner-journal', 'ble-owner-journal', 'ble-guest-journal']: return ['Журнал', 'Копировать']
+    if screen == 'settings': return ['Настройки', 'Мои серверы']
+    if screen in ['guests', 'issued-list', 'delegated-untrusted']: return ['Гости']
+    if screen == 'key-detail': return ['Полученный ключ']
+    if screen in ['add-key', 'delegation-preview', 'delegation-rejected']: return ['Добавить ключ']
+    if screen in ['owner-form']: return ['Добавить сервер']
+    if screen in ['owner-ready', 'owner-uncertain', 'owner-offline']: return ['Мои серверы']
+    if screen == 'object-form': return ['Добавить объект']
+    if screen in ['object-edit', 'object-delete-confirm']: return ['Настройка объекта|Удалить объект']
+    if screen.startswith('object-') or screen == 'ble-registered': return ['Мои объекты']
+    if screen == 'issue-form': return ['Выдать ключ']
+    if screen in ['issued-edit-form', 'issued-access-form']: return ['Изменить ключ']
+    if screen.startswith('issued-') or screen == 'ble-renewed': return ['Выданный ключ|Отозвать ключ']
+    if screen == 'sender-form': return ['Передать доступ']
+    if screen == 'sender-edit-form': return ['Объекты получателя']
+    if screen.startswith('sender-'): return ['Переданный ключ|Отозвать доступ']
+    if screen.startswith('delegated-'): return ['Переданный доступ|Отозвать доступ']
+    if screen.startswith('delegation-') or screen == 'additional-parts': return ['Ожидаемые ключи']
+    if screen.startswith('backup-'): return ['Резервная копия|Перенести доступы']
+    if screen == 'message-compose': return ['Написать сообщение']
+    if screen == 'message-read': return ['Сообщение']
+    if screen.startswith('message-'): return ['Сообщения', 'Входящие']
+    if screen in ['ble-scan', 'ble-uncertain', 'ble-paired']: return ['контроллер']
+    if screen.startswith('ble-revoke-'): return ['доступ']
+    if screen == 'owner-confirm': return ['Управление|Открыть|Закрыть']
+    if screen == 'ble-owner-confirm': return ['Управление|Подать импульс']
+    if screen in ['control', 'request-sent', 'result', 'offline', 'owner-sending',
+                  'owner-result', 'owner-guest-request', 'ble-owner-result',
+                  'ble-owner-unknown', 'ble-guest-result', 'ble-guest-expired', 'ble-guest-unknown']:
+        return ['Управление']
+    raise RuntimeError('No visible UI expectation for ' + screen)
+
+
+def capture_visible_screen(device, path, screen):
+    # Only retry a read-only screenshot of the same process. Never relaunch the
+    # scenario or repeat a command to work around a slow launch animation.
+    deadline = time.monotonic() + 60
+    pending = ROOT / '.local-checks/pending-capture.png'
+    while True:
+        run('xcrun', 'simctl', 'io', device, 'screenshot', str(pending))
+        result = subprocess.run([str(TEXT_TOOL), str(pending), *expected_visible_text(screen)],
+                                capture_output=True, text=True, timeout=30)
+        if result.returncode == 0:
+            pending.replace(path)
+            return
+        if result.returncode != 1:
+            raise RuntimeError('Could not verify visible UI: ' + result.stderr[-500:])
+        if time.monotonic() >= deadline:
+            raise RuntimeError('Expected app screen never became visible: ' + screen + ' ' + result.stdout[-300:])
+        print('Waiting for visible app UI: ' + screen + ' ' + result.stdout.strip(), flush=True)
+        time.sleep(1)
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--action-flows', action='store_true', help='Capture labelled, isolated software-controller scenarios')
@@ -66,6 +124,7 @@ def main():
     if not APP.is_dir():
         raise RuntimeError('The simulator app must be built first')
     OUTPUT.mkdir(parents=True, exist_ok=True)
+    run('xcrun', 'swiftc', str(ROOT / 'scripts/verify_capture_text.swift'), '-o', str(TEXT_TOOL), timeout=120)
     runtimes = json.loads(subprocess.check_output(['xcrun', 'simctl', 'list', 'runtimes', '--json']))['runtimes']
     sdk = subprocess.check_output(['xcrun', '--sdk', 'iphonesimulator', '--show-sdk-version'], text=True).strip()
     available = [r for r in runtimes if r.get('isAvailable') and '.iOS-' in r['identifier']]
@@ -233,12 +292,12 @@ def main():
                     if not state.get('ready'):
                         raise RuntimeError('Keychain is not ready, OSStatus=' + str(state.get('status')))
                     path = OUTPUT / (model + ('-' + appearance if options.all_flows else '') + '-' + screen + '.png')
-                    run('xcrun', 'simctl', 'io', device, 'screenshot', str(path))
+                    capture_visible_screen(device, path, screen)
                     if path.read_bytes()[:8] != b'\x89PNG\r\n\x1a\n':
                         raise RuntimeError('Not a PNG screenshot: ' + path.name)
                     manifest.append({'device': model, 'appearance': appearance, 'screen': screen, 'file': path.name,
                                      'source_sha': os.environ.get('GITHUB_SHA'), 'runtime': runtime,
-                                     'software_controller': actions, 'command_frames': state.get('command_frames'),
+                                     'software_controller': actions, 'visible_text_verified': True, 'command_frames': state.get('command_frames'),
                                      'objects': state.get('objects'), 'journal_count': state.get('journal_count'),
                                      'live_connections': state.get('live_connections'),
                                      'registration_requests': state.get('registration_requests'),
