@@ -14,7 +14,7 @@ concurrency:
   cancel-in-progress: true
 jobs:
   verify:
-    runs-on: macos-15
+    runs-on: macos-15-intel
     env:
       DEVELOPER_DIR: /Applications/Xcode_26.3.app/Contents/Developer
     timeout-minutes: 60
@@ -125,7 +125,7 @@ jobs:
         with:
           name: ios-build-logs
           path: ${{ runner.temp }}/ios-build-logs
-      - name: Publish build report for Git access
+      - name: Publish private build report for SSH access
         env:
           SOURCE_SHA: ${{ github.sha }}
           BUILD_RESULT: ${{ needs.verify.result }}
