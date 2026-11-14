@@ -28,6 +28,34 @@ def run(*args, timeout=90, optional=False):
     return result.stdout.strip()
 
 
+def cleanup_device(device):
+    run('xcrun', 'simctl', 'shutdown', device, timeout=30, optional=True)
+    run('xcrun', 'simctl', 'delete', device, timeout=30, optional=True)
+
+
+def prepare_device(model, device_type, runtime):
+    # Recovery is allowed only before any app scenario or command has started.
+    # A fresh simulator replaces a stalled cold boot; actions are never replayed.
+    for attempt in range(2):
+        created = run('xcrun', 'simctl', 'create', 'Entrixy preview ' + model, device_type, runtime)
+        device = created.splitlines()[-1].strip()
+        try:
+            run('xcrun', 'simctl', 'boot', device)
+            run('xcrun', 'simctl', 'bootstatus', device, '-b', timeout=300)
+            run('xcrun', 'simctl', 'install', device, str(APP), timeout=240)
+            container = Path(run('xcrun', 'simctl', 'get_app_container', device, BUNDLE, 'data', timeout=120))
+            # Cosmetic status setup must not run ahead of the app installation.
+            run('xcrun', 'simctl', 'status_bar', device, 'override', '--time', '9:41',
+                '--dataNetwork', 'wifi', '--wifiMode', 'active', '--wifiBars', '3',
+                '--batteryState', 'charged', '--batteryLevel', '100', timeout=15, optional=True)
+            return device, container
+        except (RuntimeError, subprocess.TimeoutExpired):
+            cleanup_device(device)
+            if attempt == 1:
+                raise
+            print('Cold simulator preparation stalled; preparing one replacement before scenarios', flush=True)
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--action-flows', action='store_true', help='Capture labelled, isolated software-controller scenarios')
@@ -50,16 +78,8 @@ def main():
     if options.comparison_matrix:
         devices.append(('iphone11', 'com.apple.CoreSimulator.SimDeviceType.iPhone-11'))
     for model, device_type in devices:
-        created = run('xcrun', 'simctl', 'create', 'Entrixy preview ' + model, device_type, runtime)
-        device = created.splitlines()[-1].strip()
+        device, container = prepare_device(model, device_type, runtime)
         try:
-            run('xcrun', 'simctl', 'boot', device)
-            run('xcrun', 'simctl', 'bootstatus', device, '-b', timeout=240)
-            run('xcrun', 'simctl', 'status_bar', device, 'override', '--time', '9:41',
-                '--dataNetwork', 'wifi', '--wifiMode', 'active', '--wifiBars', '3',
-                '--batteryState', 'charged', '--batteryLevel', '100', timeout=20, optional=True)
-            run('xcrun', 'simctl', 'install', device, str(APP))
-            container = Path(run('xcrun', 'simctl', 'get_app_container', device, BUNDLE, 'data'))
             bootstrap = Path(os.environ.get('RUNNER_TEMP', '/tmp')) / 'preview-bootstrap.json'
             if bootstrap.is_file() and not actions:
                 cache = container / 'Library/Caches'
@@ -233,14 +253,17 @@ def main():
                                      'issued_key_count': state.get('issued_key_count'), 'key_mutation_requests': state.get('key_mutation_requests'),
                                      'issued_key_pending': state.get('issued_key_pending'), 'issued_key_state': state.get('issued_key_state'),
                                      'owner_command_frames': state.get('owner_command_frames'), 'owner_phone_requests': state.get('owner_phone_requests')})
+                    # Retain provenance for completed frames even if a later scenario fails.
+                    pending_manifest = OUTPUT / 'manifest.json.tmp'
+                    pending_manifest.write_text(json.dumps(manifest, indent=2) + '\n')
+                    pending_manifest.replace(OUTPUT / 'manifest.json')
         except Exception:
             run('xcrun', 'simctl', 'spawn', device, 'log', 'show', '--last', '1m',
                 '--style', 'compact', '--predicate', 'eventMessage CONTAINS "com.entrixy.ios"',
                 timeout=30, optional=True)
             raise
         finally:
-            run('xcrun', 'simctl', 'shutdown', device, optional=True)
-            run('xcrun', 'simctl', 'delete', device, optional=True)
+            cleanup_device(device)
     (OUTPUT / 'manifest.json').write_text(json.dumps(manifest, indent=2) + '\n')
     print('Captured', len(manifest), 'real simulator screenshots', flush=True)
 
