@@ -841,7 +841,8 @@ struct ActionCaptureRoot: View {
         }
     }
     var body: some View {
-        Group {
+        VStack(spacing: 0) {
+            Group {
             if capture.scenario.presentsPreparedTaskSheet {
                 RootView(initialTab: capture.scenario.taskBackgroundTab)
                     .sheet(isPresented: $taskSheetPresented) {
@@ -851,10 +852,11 @@ struct ActionCaptureRoot: View {
                 content
             }
         }
-        .environmentObject(capture.model)
-        .safeAreaInset(edge: .bottom, spacing: 0) {
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .clipped()
             if !capture.scenario.usesTaskFooter && capture.intent == nil { CaptureEnvironmentBadge() }
         }
+        .environmentObject(capture.model)
         .sheet(item: $capture.intent) { intent in
             ActionConfirmation(intent: intent).environmentObject(capture.model)
         }

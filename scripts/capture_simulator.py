@@ -58,12 +58,13 @@ def prepare_device(model, device_type, runtime):
 
 
 def expected_visible_text(screen):
+    if screen == 'control': return ['Управление', 'Настройки', 'Гости', 'Журнал']
     if screen == 'code-setup': return ['Создать', 'код']
     if screen in ['confirm-open', 'confirm-close', 'code-entry', 'code-rejected', 'biometric', 'ble-guest-confirm']:
         return ['Подтвердить']
     if screen in ['journal', 'owner-journal', 'ble-owner-journal', 'ble-guest-journal']: return ['Журнал', 'Копировать']
-    if screen == 'settings': return ['Настройки', 'Мои серверы']
-    if screen in ['guests', 'issued-list', 'delegated-untrusted']: return ['Гости']
+    if screen == 'settings': return ['Настройки', 'Мои серверы', 'Гости', 'Журнал']
+    if screen in ['guests', 'issued-list', 'delegated-untrusted']: return ['Гости', 'Настройки', 'Журнал']
     if screen == 'key-detail': return ['Полученный ключ']
     if screen in ['add-key', 'delegation-preview', 'delegation-rejected']: return ['Добавить ключ']
     if screen in ['owner-form']: return ['Добавить сервер']
@@ -163,6 +164,8 @@ def main():
                                 'delegated-awaiting', 'delegated-ready', 'delegated-uncertain', 'delegated-revoked', 'delegated-untrusted',
                                 'sender-form', 'sender-link', 'sender-uncertain', 'sender-vouched', 'sender-revoked', 'sender-edit-form', 'sender-edited',
                                 'message-inbox', 'message-read', 'message-corrupt', 'message-compose', 'message-sent', 'additional-parts', 'ble-scan', 'ble-uncertain', 'ble-paired', 'ble-registered', 'ble-owner-confirm', 'ble-owner-result', 'ble-owner-unknown', 'ble-owner-journal', 'ble-guest-confirm', 'ble-guest-result', 'ble-guest-expired', 'ble-guest-unknown', 'ble-guest-journal', 'ble-revoke-pending', 'ble-revoke-applied', 'ble-revoke-stale', 'ble-renewed']
+                # Check the complete root navigation before spending time on 85 more states.
+                screens = list(dict.fromkeys((['control'] if options.all_flows else []) + screens))
                 for screen in screens:
                     if launched:
                         run('xcrun', 'simctl', 'terminate', device, BUNDLE, optional=True)
