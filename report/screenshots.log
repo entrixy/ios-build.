@@ -1,766 +1,833 @@
-CC670D27-9601-42FE-9FB2-CF9B336CD2E4
-Monitoring boot status for Entrixy preview iphone16 (CC670D27-9601-42FE-9FB2-CF9B336CD2E4).
-[2026-11-14 19:45:09 +0000] Status=2, isTerminal=NO, Elapsed=00:45.
+/Users/runner/work/ios-build./ios-build./scripts/verify_capture_text.swift:19:13: warning: 'usesCPUOnly' was deprecated in macOS 14.0 [#DeprecatedDeclaration]
+17 |     request.recognitionLanguages = ["ru-RU", "en-US"]
+18 |     request.usesLanguageCorrection = false
+19 |     request.usesCPUOnly = true
+   |             `- warning: 'usesCPUOnly' was deprecated in macOS 14.0 [#DeprecatedDeclaration]
+20 |     try VNImageRequestHandler(cgImage: image, options: [:]).perform([request])
+21 |     let text = normalized((request.results ?? []).compactMap { $0.topCandidates(1).first?.string }.joined(separator: " "))
+
+[#DeprecatedDeclaration]: <https://docs.swift.org/compiler/documentation/diagnostics/deprecated-declaration>
+3CF26D1F-464B-4BB9-8FE5-00FC809EB1D4
+Monitoring boot status for Entrixy preview iphone16 (3CF26D1F-464B-4BB9-8FE5-00FC809EB1D4).
+[2026-11-14 21:20:06 +0000] Status=1, isTerminal=NO, Elapsed=00:03.
+	Waiting on BackBoard
+
+[2026-11-14 21:20:07 +0000] Status=2, isTerminal=NO, Elapsed=00:05.
+	Waiting on Data Migration
+		Reason:(null)
+		Migration Elapsed:00:00 seconds
+
+[2026-11-14 21:20:07 +0000] Status=2, isTerminal=NO, Elapsed=00:07.
+	Waiting on Data Migration
+		Reason:Gathering plugins
+		Migration Elapsed:00:02 seconds
+
+[2026-11-14 21:20:07 +0000] Status=2, isTerminal=NO, Elapsed=00:07.
+	Waiting on Data Migration
+		Reason:Gathering plugins
+		Migration Elapsed:00:02 seconds
+
+[2026-11-14 21:20:07 +0000] Status=2, isTerminal=NO, Elapsed=00:08.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.MobileContainerManager.ContainerMigrator (ContainerMigrator.migrator, user-agnostic)
+		Migration Elapsed:00:03 seconds
+
+[2026-11-14 21:20:07 +0000] Status=2, isTerminal=NO, Elapsed=00:09.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
+		Migration Elapsed:00:04 seconds
+
+[2026-11-14 21:20:07 +0000] Status=2, isTerminal=NO, Elapsed=00:12.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
+		Migration Elapsed:00:05 seconds
+
+[2026-11-14 21:20:07 +0000] Status=2, isTerminal=NO, Elapsed=00:13.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
+		Migration Elapsed:00:07 seconds
+
+[2026-11-14 21:20:07 +0000] Status=2, isTerminal=NO, Elapsed=00:15.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
+		Migration Elapsed:00:08 seconds
+
+[2026-11-14 21:20:07 +0000] Status=2, isTerminal=NO, Elapsed=00:17.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
+		Migration Elapsed:00:10 seconds
+
+[2026-11-14 21:20:07 +0000] Status=2, isTerminal=NO, Elapsed=00:20.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
+		Migration Elapsed:00:13 seconds
+
+[2026-11-14 21:20:07 +0000] Status=2, isTerminal=NO, Elapsed=00:22.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
+		Migration Elapsed:00:15 seconds
+
+[2026-11-14 21:20:07 +0000] Status=2, isTerminal=NO, Elapsed=00:23.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
+		Migration Elapsed:00:17 seconds
+
+[2026-11-14 21:20:07 +0000] Status=2, isTerminal=NO, Elapsed=00:23.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
+		Migration Elapsed:00:18 seconds
+
+[2026-11-14 21:20:07 +0000] Status=2, isTerminal=NO, Elapsed=00:24.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
+		Migration Elapsed:00:18 seconds
+
+[2026-11-14 21:20:08 +0000] Status=2, isTerminal=NO, Elapsed=00:24.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
+		Migration Elapsed:00:19 seconds
+
+[2026-11-14 21:20:09 +0000] Status=2, isTerminal=NO, Elapsed=00:25.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
+		Migration Elapsed:00:20 seconds
+
+[2026-11-14 21:20:10 +0000] Status=2, isTerminal=NO, Elapsed=00:26.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
+		Migration Elapsed:00:21 seconds
+
+[2026-11-14 21:20:10 +0000] Status=2, isTerminal=NO, Elapsed=00:27.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
+		Migration Elapsed:00:22 seconds
+
+[2026-11-14 21:20:11 +0000] Status=2, isTerminal=NO, Elapsed=00:28.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
+		Migration Elapsed:00:23 seconds
+
+[2026-11-14 21:20:12 +0000] Status=2, isTerminal=NO, Elapsed=00:29.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
+		Migration Elapsed:00:24 seconds
+
+[2026-11-14 21:20:13 +0000] Status=2, isTerminal=NO, Elapsed=00:30.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
+		Migration Elapsed:00:25 seconds
+
+[2026-11-14 21:20:14 +0000] Status=2, isTerminal=NO, Elapsed=00:31.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
+		Migration Elapsed:00:26 seconds
+
+[2026-11-14 21:20:15 +0000] Status=2, isTerminal=NO, Elapsed=00:32.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
+		Migration Elapsed:00:27 seconds
+
+[2026-11-14 21:20:17 +0000] Status=2, isTerminal=NO, Elapsed=00:33.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
+		Migration Elapsed:00:28 seconds
+
+[2026-11-14 21:20:17 +0000] Status=2, isTerminal=NO, Elapsed=00:34.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
+		Migration Elapsed:00:29 seconds
+
+[2026-11-14 21:20:18 +0000] Status=2, isTerminal=NO, Elapsed=00:35.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
+		Migration Elapsed:00:30 seconds
+
+[2026-11-14 21:20:19 +0000] Status=2, isTerminal=NO, Elapsed=00:36.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
+		Migration Elapsed:00:31 seconds
+
+[2026-11-14 21:20:20 +0000] Status=2, isTerminal=NO, Elapsed=00:37.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
+		Migration Elapsed:00:32 seconds
+
+[2026-11-14 21:20:21 +0000] Status=2, isTerminal=NO, Elapsed=00:38.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
+		Migration Elapsed:00:33 seconds
+
+[2026-11-14 21:20:22 +0000] Status=2, isTerminal=NO, Elapsed=00:39.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
+		Migration Elapsed:00:34 seconds
+
+[2026-11-14 21:20:23 +0000] Status=2, isTerminal=NO, Elapsed=00:40.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
+		Migration Elapsed:00:35 seconds
+
+[2026-11-14 21:20:24 +0000] Status=2, isTerminal=NO, Elapsed=00:41.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
+		Migration Elapsed:00:36 seconds
+
+[2026-11-14 21:20:25 +0000] Status=2, isTerminal=NO, Elapsed=00:42.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
+		Migration Elapsed:00:37 seconds
+
+[2026-11-14 21:20:26 +0000] Status=2, isTerminal=NO, Elapsed=00:43.
 	Waiting on Data Migration
 		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
 		Migration Elapsed:00:38 seconds
 
-[2026-11-14 19:45:10 +0000] Status=2, isTerminal=NO, Elapsed=00:46.
+[2026-11-14 21:20:27 +0000] Status=2, isTerminal=NO, Elapsed=00:44.
 	Waiting on Data Migration
 		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
 		Migration Elapsed:00:39 seconds
 
-[2026-11-14 19:45:11 +0000] Status=2, isTerminal=NO, Elapsed=00:47.
+[2026-11-14 21:20:28 +0000] Status=2, isTerminal=NO, Elapsed=00:45.
 	Waiting on Data Migration
 		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
 		Migration Elapsed:00:40 seconds
 
-[2026-11-14 19:45:13 +0000] Status=2, isTerminal=NO, Elapsed=00:48.
+[2026-11-14 21:20:29 +0000] Status=2, isTerminal=NO, Elapsed=00:46.
 	Waiting on Data Migration
 		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
 		Migration Elapsed:00:41 seconds
 
-[2026-11-14 19:45:14 +0000] Status=2, isTerminal=NO, Elapsed=00:49.
+[2026-11-14 21:20:30 +0000] Status=2, isTerminal=NO, Elapsed=00:47.
 	Waiting on Data Migration
 		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
 		Migration Elapsed:00:42 seconds
 
-[2026-11-14 19:45:16 +0000] Status=2, isTerminal=NO, Elapsed=00:51.
+[2026-11-14 21:20:31 +0000] Status=2, isTerminal=NO, Elapsed=00:48.
 	Waiting on Data Migration
 		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
 		Migration Elapsed:00:43 seconds
 
-[2026-11-14 19:45:16 +0000] Status=2, isTerminal=NO, Elapsed=00:52.
+[2026-11-14 21:20:32 +0000] Status=2, isTerminal=NO, Elapsed=00:49.
 	Waiting on Data Migration
 		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
 		Migration Elapsed:00:44 seconds
 
-[2026-11-14 19:45:18 +0000] Status=2, isTerminal=NO, Elapsed=00:53.
+[2026-11-14 21:20:33 +0000] Status=2, isTerminal=NO, Elapsed=00:50.
 	Waiting on Data Migration
 		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
 		Migration Elapsed:00:45 seconds
 
-[2026-11-14 19:45:18 +0000] Status=2, isTerminal=NO, Elapsed=00:53.
+[2026-11-14 21:20:34 +0000] Status=2, isTerminal=NO, Elapsed=00:51.
 	Waiting on Data Migration
 		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
 		Migration Elapsed:00:46 seconds
 
-[2026-11-14 19:45:18 +0000] Status=2, isTerminal=NO, Elapsed=00:54.
+[2026-11-14 21:20:35 +0000] Status=2, isTerminal=NO, Elapsed=00:52.
 	Waiting on Data Migration
 		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
 		Migration Elapsed:00:47 seconds
 
-[2026-11-14 19:45:20 +0000] Status=2, isTerminal=NO, Elapsed=00:55.
+[2026-11-14 21:20:36 +0000] Status=2, isTerminal=NO, Elapsed=00:53.
 	Waiting on Data Migration
 		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
 		Migration Elapsed:00:48 seconds
 
-[2026-11-14 19:45:21 +0000] Status=2, isTerminal=NO, Elapsed=00:56.
+[2026-11-14 21:20:37 +0000] Status=2, isTerminal=NO, Elapsed=00:54.
 	Waiting on Data Migration
 		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
 		Migration Elapsed:00:49 seconds
 
-[2026-11-14 19:45:22 +0000] Status=2, isTerminal=NO, Elapsed=00:58.
+[2026-11-14 21:20:38 +0000] Status=2, isTerminal=NO, Elapsed=00:55.
 	Waiting on Data Migration
 		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
 		Migration Elapsed:00:50 seconds
 
-[2026-11-14 19:45:22 +0000] Status=2, isTerminal=NO, Elapsed=00:58.
+[2026-11-14 21:20:39 +0000] Status=2, isTerminal=NO, Elapsed=00:56.
 	Waiting on Data Migration
 		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
 		Migration Elapsed:00:51 seconds
 
-[2026-11-14 19:45:23 +0000] Status=2, isTerminal=NO, Elapsed=00:59.
+[2026-11-14 21:20:40 +0000] Status=2, isTerminal=NO, Elapsed=00:57.
 	Waiting on Data Migration
 		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
 		Migration Elapsed:00:52 seconds
 
-[2026-11-14 19:45:24 +0000] Status=2, isTerminal=NO, Elapsed=01:00.
+[2026-11-14 21:20:41 +0000] Status=2, isTerminal=NO, Elapsed=00:58.
 	Waiting on Data Migration
 		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
 		Migration Elapsed:00:53 seconds
 
-[2026-11-14 19:45:25 +0000] Status=2, isTerminal=NO, Elapsed=01:01.
+[2026-11-14 21:20:42 +0000] Status=2, isTerminal=NO, Elapsed=00:59.
 	Waiting on Data Migration
 		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
 		Migration Elapsed:00:54 seconds
 
-[2026-11-14 19:45:26 +0000] Status=2, isTerminal=NO, Elapsed=01:02.
+[2026-11-14 21:20:43 +0000] Status=2, isTerminal=NO, Elapsed=01:00.
 	Waiting on Data Migration
 		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
 		Migration Elapsed:00:55 seconds
 
-[2026-11-14 19:45:27 +0000] Status=2, isTerminal=NO, Elapsed=01:03.
+[2026-11-14 21:20:44 +0000] Status=2, isTerminal=NO, Elapsed=01:01.
 	Waiting on Data Migration
 		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
 		Migration Elapsed:00:56 seconds
 
-[2026-11-14 19:45:28 +0000] Status=2, isTerminal=NO, Elapsed=01:04.
+[2026-11-14 21:20:45 +0000] Status=2, isTerminal=NO, Elapsed=01:02.
 	Waiting on Data Migration
 		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
 		Migration Elapsed:00:57 seconds
 
-[2026-11-14 19:45:29 +0000] Status=2, isTerminal=NO, Elapsed=01:05.
+[2026-11-14 21:20:46 +0000] Status=2, isTerminal=NO, Elapsed=01:03.
 	Waiting on Data Migration
 		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
 		Migration Elapsed:00:58 seconds
 
-[2026-11-14 19:45:30 +0000] Status=2, isTerminal=NO, Elapsed=01:06.
+[2026-11-14 21:20:47 +0000] Status=2, isTerminal=NO, Elapsed=01:04.
 	Waiting on Data Migration
 		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
 		Migration Elapsed:00:59 seconds
 
-[2026-11-14 19:45:31 +0000] Status=2, isTerminal=NO, Elapsed=01:07.
+[2026-11-14 21:20:48 +0000] Status=2, isTerminal=NO, Elapsed=01:05.
 	Waiting on Data Migration
 		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
 		Migration Elapsed:01:00 seconds
 
-[2026-11-14 19:45:32 +0000] Status=2, isTerminal=NO, Elapsed=01:08.
+[2026-11-14 21:20:49 +0000] Status=2, isTerminal=NO, Elapsed=01:06.
 	Waiting on Data Migration
 		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
 		Migration Elapsed:01:01 seconds
 
-[2026-11-14 19:45:33 +0000] Status=2, isTerminal=NO, Elapsed=01:09.
+[2026-11-14 21:20:50 +0000] Status=2, isTerminal=NO, Elapsed=01:07.
 	Waiting on Data Migration
 		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
 		Migration Elapsed:01:02 seconds
 
-[2026-11-14 19:45:34 +0000] Status=2, isTerminal=NO, Elapsed=01:10.
+[2026-11-14 21:20:51 +0000] Status=2, isTerminal=NO, Elapsed=01:08.
 	Waiting on Data Migration
 		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
 		Migration Elapsed:01:03 seconds
 
-[2026-11-14 19:45:35 +0000] Status=2, isTerminal=NO, Elapsed=01:11.
+[2026-11-14 21:20:52 +0000] Status=2, isTerminal=NO, Elapsed=01:09.
 	Waiting on Data Migration
 		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
 		Migration Elapsed:01:04 seconds
 
-[2026-11-14 19:45:36 +0000] Status=2, isTerminal=NO, Elapsed=01:12.
+[2026-11-14 21:20:53 +0000] Status=2, isTerminal=NO, Elapsed=01:10.
 	Waiting on Data Migration
 		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
 		Migration Elapsed:01:05 seconds
 
-[2026-11-14 19:45:37 +0000] Status=2, isTerminal=NO, Elapsed=01:13.
+[2026-11-14 21:20:54 +0000] Status=2, isTerminal=NO, Elapsed=01:11.
 	Waiting on Data Migration
 		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
 		Migration Elapsed:01:06 seconds
 
-[2026-11-14 19:45:38 +0000] Status=2, isTerminal=NO, Elapsed=01:14.
+[2026-11-14 21:20:55 +0000] Status=2, isTerminal=NO, Elapsed=01:12.
 	Waiting on Data Migration
 		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
 		Migration Elapsed:01:07 seconds
 
-[2026-11-14 19:45:39 +0000] Status=2, isTerminal=NO, Elapsed=01:15.
+[2026-11-14 21:20:56 +0000] Status=2, isTerminal=NO, Elapsed=01:13.
 	Waiting on Data Migration
 		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
 		Migration Elapsed:01:08 seconds
 
-[2026-11-14 19:45:40 +0000] Status=2, isTerminal=NO, Elapsed=01:16.
+[2026-11-14 21:20:57 +0000] Status=2, isTerminal=NO, Elapsed=01:14.
 	Waiting on Data Migration
 		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
 		Migration Elapsed:01:09 seconds
 
-[2026-11-14 19:45:41 +0000] Status=2, isTerminal=NO, Elapsed=01:17.
+[2026-11-14 21:20:58 +0000] Status=2, isTerminal=NO, Elapsed=01:15.
 	Waiting on Data Migration
 		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
 		Migration Elapsed:01:10 seconds
 
-[2026-11-14 19:45:42 +0000] Status=2, isTerminal=NO, Elapsed=01:18.
+[2026-11-14 21:20:59 +0000] Status=2, isTerminal=NO, Elapsed=01:16.
 	Waiting on Data Migration
 		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
 		Migration Elapsed:01:11 seconds
 
-[2026-11-14 19:45:43 +0000] Status=2, isTerminal=NO, Elapsed=01:19.
+[2026-11-14 21:21:00 +0000] Status=2, isTerminal=NO, Elapsed=01:17.
 	Waiting on Data Migration
 		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
 		Migration Elapsed:01:12 seconds
 
-[2026-11-14 19:45:44 +0000] Status=2, isTerminal=NO, Elapsed=01:20.
-	Waiting on Data Migration
-		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
-		Migration Elapsed:01:13 seconds
-
-[2026-11-14 19:45:45 +0000] Status=2, isTerminal=NO, Elapsed=01:21.
-	Waiting on Data Migration
-		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
-		Migration Elapsed:01:14 seconds
-
-[2026-11-14 19:45:46 +0000] Status=2, isTerminal=NO, Elapsed=01:22.
-	Waiting on Data Migration
-		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
-		Migration Elapsed:01:15 seconds
-
-[2026-11-14 19:45:47 +0000] Status=2, isTerminal=NO, Elapsed=01:23.
-	Waiting on Data Migration
-		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
-		Migration Elapsed:01:16 seconds
-
-[2026-11-14 19:45:48 +0000] Status=2, isTerminal=NO, Elapsed=01:24.
-	Waiting on Data Migration
-		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
-		Migration Elapsed:01:17 seconds
-
-[2026-11-14 19:45:49 +0000] Status=2, isTerminal=NO, Elapsed=01:25.
-	Waiting on Data Migration
-		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
-		Migration Elapsed:01:18 seconds
-
-[2026-11-14 19:45:50 +0000] Status=2, isTerminal=NO, Elapsed=01:26.
-	Waiting on Data Migration
-		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
-		Migration Elapsed:01:19 seconds
-
-[2026-11-14 19:45:51 +0000] Status=2, isTerminal=NO, Elapsed=01:27.
-	Waiting on Data Migration
-		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
-		Migration Elapsed:01:20 seconds
-
-[2026-11-14 19:45:52 +0000] Status=2, isTerminal=NO, Elapsed=01:28.
-	Waiting on Data Migration
-		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
-		Migration Elapsed:01:21 seconds
-
-[2026-11-14 19:45:53 +0000] Status=2, isTerminal=NO, Elapsed=01:29.
-	Waiting on Data Migration
-		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
-		Migration Elapsed:01:22 seconds
-
-[2026-11-14 19:45:54 +0000] Status=2, isTerminal=NO, Elapsed=01:30.
-	Waiting on Data Migration
-		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
-		Migration Elapsed:01:23 seconds
-
-[2026-11-14 19:45:55 +0000] Status=2, isTerminal=NO, Elapsed=01:31.
-	Waiting on Data Migration
-		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
-		Migration Elapsed:01:24 seconds
-
-[2026-11-14 19:45:56 +0000] Status=2, isTerminal=NO, Elapsed=01:32.
-	Waiting on Data Migration
-		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
-		Migration Elapsed:01:25 seconds
-
-[2026-11-14 19:45:57 +0000] Status=2, isTerminal=NO, Elapsed=01:33.
-	Waiting on Data Migration
-		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
-		Migration Elapsed:01:26 seconds
-
-[2026-11-14 19:45:58 +0000] Status=2, isTerminal=NO, Elapsed=01:34.
-	Waiting on Data Migration
-		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
-		Migration Elapsed:01:27 seconds
-
-[2026-11-14 19:45:59 +0000] Status=2, isTerminal=NO, Elapsed=01:35.
-	Waiting on Data Migration
-		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
-		Migration Elapsed:01:28 seconds
-
-[2026-11-14 19:46:00 +0000] Status=2, isTerminal=NO, Elapsed=01:36.
-	Waiting on Data Migration
-		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
-		Migration Elapsed:01:29 seconds
-
-[2026-11-14 19:46:01 +0000] Status=2, isTerminal=NO, Elapsed=01:37.
-	Waiting on Data Migration
-		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
-		Migration Elapsed:01:30 seconds
-
-[2026-11-14 19:46:02 +0000] Status=2, isTerminal=NO, Elapsed=01:38.
-	Waiting on Data Migration
-		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
-		Migration Elapsed:01:31 seconds
-
-[2026-11-14 19:46:03 +0000] Status=2, isTerminal=NO, Elapsed=01:39.
-	Waiting on Data Migration
-		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
-		Migration Elapsed:01:32 seconds
-
-[2026-11-14 19:46:04 +0000] Status=2, isTerminal=NO, Elapsed=01:40.
-	Waiting on Data Migration
-		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
-		Migration Elapsed:01:33 seconds
-
-[2026-11-14 19:46:05 +0000] Status=2, isTerminal=NO, Elapsed=01:41.
-	Waiting on Data Migration
-		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
-		Migration Elapsed:01:34 seconds
-
-[2026-11-14 19:46:06 +0000] Status=2, isTerminal=NO, Elapsed=01:42.
-	Waiting on Data Migration
-		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
-		Migration Elapsed:01:35 seconds
-
-[2026-11-14 19:46:07 +0000] Status=2, isTerminal=NO, Elapsed=01:43.
-	Waiting on Data Migration
-		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
-		Migration Elapsed:01:36 seconds
-
-[2026-11-14 19:46:08 +0000] Status=2, isTerminal=NO, Elapsed=01:44.
-	Waiting on Data Migration
-		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
-		Migration Elapsed:01:37 seconds
-
-[2026-11-14 19:46:09 +0000] Status=2, isTerminal=NO, Elapsed=01:45.
-	Waiting on Data Migration
-		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
-		Migration Elapsed:01:38 seconds
-
-[2026-11-14 19:46:10 +0000] Status=2, isTerminal=NO, Elapsed=01:46.
-	Waiting on Data Migration
-		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
-		Migration Elapsed:01:39 seconds
-
-[2026-11-14 19:46:51 +0000] Status=2, isTerminal=NO, Elapsed=01:51.
-	Waiting on Data Migration
-		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
-		Migration Elapsed:01:40 seconds
-
-[2026-11-14 19:46:51 +0000] Status=2, isTerminal=NO, Elapsed=01:54.
+[2026-11-14 21:21:21 +0000] Status=2, isTerminal=NO, Elapsed=01:21.
 	Waiting on Data Migration
 		Reason:Running plugin com.apple.securityd.KeychainMigrator (KeychainMigrator.migrator, user-agnostic)
-		Migration Elapsed:01:44 seconds
+		Migration Elapsed:01:13 seconds
 
-[2026-11-14 19:47:02 +0000] Status=2, isTerminal=NO, Elapsed=01:58.
+[2026-11-14 21:21:21 +0000] Status=2, isTerminal=NO, Elapsed=01:25.
 	Waiting on Data Migration
-		Reason:Running plugin com.apple.managedconfiguration.migrator (MCProfile.migrator, user-agnostic)
-		Migration Elapsed:01:47 seconds
+		Reason:Running plugin com.apple.securityd.KeychainMigrator (KeychainMigrator.migrator, user-agnostic)
+		Migration Elapsed:01:16 seconds
 
-[2026-11-14 19:47:02 +0000] Status=2, isTerminal=NO, Elapsed=02:00.
-	Waiting on Data Migration
-		Reason:Running plugin com.apple.MobileSafari.migrator (MobileSafari.migrator)
-		Migration Elapsed:01:51 seconds
-
-[2026-11-14 19:47:02 +0000] Status=2, isTerminal=NO, Elapsed=02:02.
+[2026-11-14 21:21:21 +0000] Status=2, isTerminal=NO, Elapsed=01:27.
 	Waiting on Data Migration
 		Reason:Running plugin com.apple.MobileSafari.migrator (MobileSafari.migrator)
-		Migration Elapsed:01:52 seconds
+		Migration Elapsed:01:20 seconds
 
-[2026-11-14 19:47:02 +0000] Status=2, isTerminal=NO, Elapsed=02:03.
+[2026-11-14 21:21:21 +0000] Status=2, isTerminal=NO, Elapsed=01:28.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.locationd.migrator (CoreLocationMigrator.migrator)
+		Migration Elapsed:01:22 seconds
+
+[2026-11-14 21:21:21 +0000] Status=2, isTerminal=NO, Elapsed=01:30.
 	Waiting on Data Migration
 		Reason:Running plugin com.apple.PreferencesMigrator (PreferencesMigrator.migrator)
-		Migration Elapsed:01:55 seconds
+		Migration Elapsed:01:23 seconds
 
-[2026-11-14 19:47:02 +0000] Status=2, isTerminal=NO, Elapsed=02:05.
-	Waiting on Data Migration
-		Reason:Running plugin com.apple.StocksMigrator (StocksMigrator.migrator)
-		Migration Elapsed:01:56 seconds
-
-[2026-11-14 19:47:02 +0000] Status=4, isTerminal=NO, Elapsed=02:07.
+[2026-11-14 21:21:21 +0000] Status=4, isTerminal=NO, Elapsed=01:31.
 	Waiting on System App
 
-[2026-11-14 19:47:02 +0000] Status=4, isTerminal=NO, Elapsed=02:08.
+[2026-11-14 21:21:21 +0000] Status=4, isTerminal=NO, Elapsed=01:32.
 	Waiting on System App
 
-[2026-11-14 19:47:02 +0000] Status=4, isTerminal=NO, Elapsed=02:09.
+[2026-11-14 21:21:21 +0000] Status=4, isTerminal=NO, Elapsed=01:33.
 	Waiting on System App
 
-[2026-11-14 19:47:12 +0000] Status=4, isTerminal=NO, Elapsed=02:10.
+[2026-11-14 21:21:21 +0000] Status=4, isTerminal=NO, Elapsed=01:33.
 	Waiting on System App
 
-[2026-11-14 19:47:25 +0000] Status=4, isTerminal=NO, Elapsed=02:11.
+[2026-11-14 21:21:21 +0000] Status=4, isTerminal=NO, Elapsed=01:34.
 	Waiting on System App
 
-[2026-11-14 19:47:25 +0000] Status=4, isTerminal=NO, Elapsed=02:12.
+[2026-11-14 21:21:21 +0000] Status=4, isTerminal=NO, Elapsed=01:35.
 	Waiting on System App
 
-[2026-11-14 19:47:25 +0000] Status=4, isTerminal=NO, Elapsed=02:12.
+[2026-11-14 21:21:21 +0000] Status=4, isTerminal=NO, Elapsed=01:36.
 	Waiting on System App
 
-[2026-11-14 19:47:25 +0000] Status=4, isTerminal=NO, Elapsed=02:13.
+[2026-11-14 21:21:21 +0000] Status=4, isTerminal=NO, Elapsed=01:37.
 	Waiting on System App
 
-[2026-11-14 19:47:25 +0000] Status=4, isTerminal=NO, Elapsed=02:14.
+[2026-11-14 21:21:25 +0000] Status=4, isTerminal=NO, Elapsed=01:38.
 	Waiting on System App
 
-[2026-11-14 19:47:25 +0000] Status=4, isTerminal=NO, Elapsed=02:16.
+[2026-11-14 21:21:25 +0000] Status=4, isTerminal=NO, Elapsed=01:40.
 	Waiting on System App
 
-[2026-11-14 19:47:25 +0000] Status=4, isTerminal=NO, Elapsed=02:17.
+[2026-11-14 21:21:25 +0000] Status=4, isTerminal=NO, Elapsed=01:40.
 	Waiting on System App
 
-[2026-11-14 19:47:25 +0000] Status=4, isTerminal=NO, Elapsed=02:17.
+[2026-11-14 21:21:25 +0000] Status=4, isTerminal=NO, Elapsed=01:41.
 	Waiting on System App
 
-[2026-11-14 19:47:25 +0000] Status=4, isTerminal=NO, Elapsed=02:19.
+[2026-11-14 21:21:43 +0000] Status=4, isTerminal=NO, Elapsed=01:42.
 	Waiting on System App
 
-[2026-11-14 19:47:25 +0000] Status=4, isTerminal=NO, Elapsed=02:20.
+[2026-11-14 21:21:43 +0000] Status=4, isTerminal=NO, Elapsed=01:43.
 	Waiting on System App
 
-[2026-11-14 19:47:25 +0000] Status=4, isTerminal=NO, Elapsed=02:20.
+[2026-11-14 21:21:43 +0000] Status=4, isTerminal=NO, Elapsed=01:45.
 	Waiting on System App
 
-[2026-11-14 19:47:25 +0000] Status=4, isTerminal=NO, Elapsed=02:22.
+[2026-11-14 21:21:43 +0000] Status=4, isTerminal=NO, Elapsed=01:46.
 	Waiting on System App
 
-[2026-11-14 19:47:25 +0000] Status=4, isTerminal=NO, Elapsed=02:23.
+[2026-11-14 21:21:43 +0000] Status=4, isTerminal=NO, Elapsed=01:47.
 	Waiting on System App
 
-[2026-11-14 19:47:25 +0000] Status=4, isTerminal=NO, Elapsed=02:23.
+[2026-11-14 21:21:43 +0000] Status=4, isTerminal=NO, Elapsed=01:47.
 	Waiting on System App
 
-[2026-11-14 19:47:25 +0000] Status=4, isTerminal=NO, Elapsed=02:25.
+[2026-11-14 21:21:43 +0000] Status=4, isTerminal=NO, Elapsed=01:50.
 	Waiting on System App
 
-[2026-11-14 19:47:25 +0000] Status=4, isTerminal=NO, Elapsed=02:25.
+[2026-11-14 21:21:43 +0000] Status=4, isTerminal=NO, Elapsed=01:51.
 	Waiting on System App
 
-[2026-11-14 19:47:25 +0000] Status=4, isTerminal=NO, Elapsed=02:26.
-	Waiting on System App
-
-[2026-11-14 19:47:25 +0000] Status=4, isTerminal=NO, Elapsed=02:27.
-	Waiting on System App
-
-[2026-11-14 19:47:25 +0000] Status=4, isTerminal=NO, Elapsed=02:28.
-	Waiting on System App
-
-[2026-11-14 19:47:25 +0000] Status=4294967295, isTerminal=YES, Elapsed=02:32.
+[2026-11-14 21:21:43 +0000] Status=4294967295, isTerminal=YES, Elapsed=01:53.
 	Finished
 
-/Users/runner/Library/Developer/CoreSimulator/Devices/CC670D27-9601-42FE-9FB2-CF9B336CD2E4/data/Containers/Data/Application/BE00E979-6043-4B3C-B041-6A82A55FBF3D
-com.entrixy.ios: 24145
-/Users/runner/Library/Developer/CoreSimulator/Devices/CC670D27-9601-42FE-9FB2-CF9B336CD2E4/data/Containers/Data/Application/BE00E979-6043-4B3C-B041-6A82A55FBF3D
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-confirm-open.png
-com.entrixy.ios: 25561
-/Users/runner/Library/Developer/CoreSimulator/Devices/CC670D27-9601-42FE-9FB2-CF9B336CD2E4/data/Containers/Data/Application/BE00E979-6043-4B3C-B041-6A82A55FBF3D
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-confirm-close.png
-com.entrixy.ios: 26289
-/Users/runner/Library/Developer/CoreSimulator/Devices/CC670D27-9601-42FE-9FB2-CF9B336CD2E4/data/Containers/Data/Application/BE00E979-6043-4B3C-B041-6A82A55FBF3D
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-code-setup.png
-com.entrixy.ios: 26932
-/Users/runner/Library/Developer/CoreSimulator/Devices/CC670D27-9601-42FE-9FB2-CF9B336CD2E4/data/Containers/Data/Application/BE00E979-6043-4B3C-B041-6A82A55FBF3D
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-code-entry.png
-com.entrixy.ios: 28339
-/Users/runner/Library/Developer/CoreSimulator/Devices/CC670D27-9601-42FE-9FB2-CF9B336CD2E4/data/Containers/Data/Application/BE00E979-6043-4B3C-B041-6A82A55FBF3D
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-code-rejected.png
-com.entrixy.ios: 29201
-/Users/runner/Library/Developer/CoreSimulator/Devices/CC670D27-9601-42FE-9FB2-CF9B336CD2E4/data/Containers/Data/Application/BE00E979-6043-4B3C-B041-6A82A55FBF3D
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-biometric.png
-com.entrixy.ios: 29393
-/Users/runner/Library/Developer/CoreSimulator/Devices/CC670D27-9601-42FE-9FB2-CF9B336CD2E4/data/Containers/Data/Application/BE00E979-6043-4B3C-B041-6A82A55FBF3D
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-request-sent.png
-com.entrixy.ios: 29938
-/Users/runner/Library/Developer/CoreSimulator/Devices/CC670D27-9601-42FE-9FB2-CF9B336CD2E4/data/Containers/Data/Application/BE00E979-6043-4B3C-B041-6A82A55FBF3D
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-result.png
-com.entrixy.ios: 29975
-/Users/runner/Library/Developer/CoreSimulator/Devices/CC670D27-9601-42FE-9FB2-CF9B336CD2E4/data/Containers/Data/Application/BE00E979-6043-4B3C-B041-6A82A55FBF3D
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-journal.png
-com.entrixy.ios: 30382
-/Users/runner/Library/Developer/CoreSimulator/Devices/CC670D27-9601-42FE-9FB2-CF9B336CD2E4/data/Containers/Data/Application/BE00E979-6043-4B3C-B041-6A82A55FBF3D
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-offline.png
-com.entrixy.ios: 30598
-/Users/runner/Library/Developer/CoreSimulator/Devices/CC670D27-9601-42FE-9FB2-CF9B336CD2E4/data/Containers/Data/Application/BE00E979-6043-4B3C-B041-6A82A55FBF3D
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-control.png
-com.entrixy.ios: 31061
-/Users/runner/Library/Developer/CoreSimulator/Devices/CC670D27-9601-42FE-9FB2-CF9B336CD2E4/data/Containers/Data/Application/BE00E979-6043-4B3C-B041-6A82A55FBF3D
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-settings.png
-com.entrixy.ios: 31222
-/Users/runner/Library/Developer/CoreSimulator/Devices/CC670D27-9601-42FE-9FB2-CF9B336CD2E4/data/Containers/Data/Application/BE00E979-6043-4B3C-B041-6A82A55FBF3D
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-key-detail.png
-com.entrixy.ios: 31528
-/Users/runner/Library/Developer/CoreSimulator/Devices/CC670D27-9601-42FE-9FB2-CF9B336CD2E4/data/Containers/Data/Application/BE00E979-6043-4B3C-B041-6A82A55FBF3D
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-add-key.png
-com.entrixy.ios: 31998
-/Users/runner/Library/Developer/CoreSimulator/Devices/CC670D27-9601-42FE-9FB2-CF9B336CD2E4/data/Containers/Data/Application/BE00E979-6043-4B3C-B041-6A82A55FBF3D
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-guests.png
-com.entrixy.ios: 32346
-/Users/runner/Library/Developer/CoreSimulator/Devices/CC670D27-9601-42FE-9FB2-CF9B336CD2E4/data/Containers/Data/Application/BE00E979-6043-4B3C-B041-6A82A55FBF3D
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-owner-form.png
-com.entrixy.ios: 32967
-/Users/runner/Library/Developer/CoreSimulator/Devices/CC670D27-9601-42FE-9FB2-CF9B336CD2E4/data/Containers/Data/Application/BE00E979-6043-4B3C-B041-6A82A55FBF3D
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-owner-ready.png
-com.entrixy.ios: 33009
-/Users/runner/Library/Developer/CoreSimulator/Devices/CC670D27-9601-42FE-9FB2-CF9B336CD2E4/data/Containers/Data/Application/BE00E979-6043-4B3C-B041-6A82A55FBF3D
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-owner-uncertain.png
-com.entrixy.ios: 33609
-/Users/runner/Library/Developer/CoreSimulator/Devices/CC670D27-9601-42FE-9FB2-CF9B336CD2E4/data/Containers/Data/Application/BE00E979-6043-4B3C-B041-6A82A55FBF3D
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-owner-offline.png
-com.entrixy.ios: 33656
-/Users/runner/Library/Developer/CoreSimulator/Devices/CC670D27-9601-42FE-9FB2-CF9B336CD2E4/data/Containers/Data/Application/BE00E979-6043-4B3C-B041-6A82A55FBF3D
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-object-form.png
-com.entrixy.ios: 34256
-/Users/runner/Library/Developer/CoreSimulator/Devices/CC670D27-9601-42FE-9FB2-CF9B336CD2E4/data/Containers/Data/Application/BE00E979-6043-4B3C-B041-6A82A55FBF3D
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-object-created.png
-com.entrixy.ios: 34296
-/Users/runner/Library/Developer/CoreSimulator/Devices/CC670D27-9601-42FE-9FB2-CF9B336CD2E4/data/Containers/Data/Application/BE00E979-6043-4B3C-B041-6A82A55FBF3D
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-object-edit.png
-com.entrixy.ios: 34866
-/Users/runner/Library/Developer/CoreSimulator/Devices/CC670D27-9601-42FE-9FB2-CF9B336CD2E4/data/Containers/Data/Application/BE00E979-6043-4B3C-B041-6A82A55FBF3D
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-object-renamed.png
-com.entrixy.ios: 34943
-/Users/runner/Library/Developer/CoreSimulator/Devices/CC670D27-9601-42FE-9FB2-CF9B336CD2E4/data/Containers/Data/Application/BE00E979-6043-4B3C-B041-6A82A55FBF3D
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-object-delete-confirm.png
-com.entrixy.ios: 35551
-/Users/runner/Library/Developer/CoreSimulator/Devices/CC670D27-9601-42FE-9FB2-CF9B336CD2E4/data/Containers/Data/Application/BE00E979-6043-4B3C-B041-6A82A55FBF3D
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-object-deleted.png
-com.entrixy.ios: 35872
-/Users/runner/Library/Developer/CoreSimulator/Devices/CC670D27-9601-42FE-9FB2-CF9B336CD2E4/data/Containers/Data/Application/BE00E979-6043-4B3C-B041-6A82A55FBF3D
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-object-uncertain.png
-com.entrixy.ios: 36491
-/Users/runner/Library/Developer/CoreSimulator/Devices/CC670D27-9601-42FE-9FB2-CF9B336CD2E4/data/Containers/Data/Application/BE00E979-6043-4B3C-B041-6A82A55FBF3D
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-issue-form.png
-com.entrixy.ios: 36709
-/Users/runner/Library/Developer/CoreSimulator/Devices/CC670D27-9601-42FE-9FB2-CF9B336CD2E4/data/Containers/Data/Application/BE00E979-6043-4B3C-B041-6A82A55FBF3D
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-issued-key.png
-com.entrixy.ios: 36988
-/Users/runner/Library/Developer/CoreSimulator/Devices/CC670D27-9601-42FE-9FB2-CF9B336CD2E4/data/Containers/Data/Application/BE00E979-6043-4B3C-B041-6A82A55FBF3D
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-issued-list.png
-com.entrixy.ios: 37349
-/Users/runner/Library/Developer/CoreSimulator/Devices/CC670D27-9601-42FE-9FB2-CF9B336CD2E4/data/Containers/Data/Application/BE00E979-6043-4B3C-B041-6A82A55FBF3D
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-issued-paused.png
-com.entrixy.ios: 37483
-/Users/runner/Library/Developer/CoreSimulator/Devices/CC670D27-9601-42FE-9FB2-CF9B336CD2E4/data/Containers/Data/Application/BE00E979-6043-4B3C-B041-6A82A55FBF3D
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-issued-revoked.png
-com.entrixy.ios: 37983
-/Users/runner/Library/Developer/CoreSimulator/Devices/CC670D27-9601-42FE-9FB2-CF9B336CD2E4/data/Containers/Data/Application/BE00E979-6043-4B3C-B041-6A82A55FBF3D
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-issued-uncertain.png
-com.entrixy.ios: 38030
-/Users/runner/Library/Developer/CoreSimulator/Devices/CC670D27-9601-42FE-9FB2-CF9B336CD2E4/data/Containers/Data/Application/BE00E979-6043-4B3C-B041-6A82A55FBF3D
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-issued-revoke-confirm.png
-com.entrixy.ios: 38632
-/Users/runner/Library/Developer/CoreSimulator/Devices/CC670D27-9601-42FE-9FB2-CF9B336CD2E4/data/Containers/Data/Application/BE00E979-6043-4B3C-B041-6A82A55FBF3D
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-owner-confirm.png
-com.entrixy.ios: 38696
-/Users/runner/Library/Developer/CoreSimulator/Devices/CC670D27-9601-42FE-9FB2-CF9B336CD2E4/data/Containers/Data/Application/BE00E979-6043-4B3C-B041-6A82A55FBF3D
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-owner-sending.png
-com.entrixy.ios: 39488
-/Users/runner/Library/Developer/CoreSimulator/Devices/CC670D27-9601-42FE-9FB2-CF9B336CD2E4/data/Containers/Data/Application/BE00E979-6043-4B3C-B041-6A82A55FBF3D
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-owner-result.png
-com.entrixy.ios: 39733
-/Users/runner/Library/Developer/CoreSimulator/Devices/CC670D27-9601-42FE-9FB2-CF9B336CD2E4/data/Containers/Data/Application/BE00E979-6043-4B3C-B041-6A82A55FBF3D
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-owner-journal.png
-com.entrixy.ios: 40385
-/Users/runner/Library/Developer/CoreSimulator/Devices/CC670D27-9601-42FE-9FB2-CF9B336CD2E4/data/Containers/Data/Application/BE00E979-6043-4B3C-B041-6A82A55FBF3D
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-owner-guest-request.png
-com.entrixy.ios: 40449
-/Users/runner/Library/Developer/CoreSimulator/Devices/CC670D27-9601-42FE-9FB2-CF9B336CD2E4/data/Containers/Data/Application/BE00E979-6043-4B3C-B041-6A82A55FBF3D
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-issued-edit-form.png
-com.entrixy.ios: 41039
-/Users/runner/Library/Developer/CoreSimulator/Devices/CC670D27-9601-42FE-9FB2-CF9B336CD2E4/data/Containers/Data/Application/BE00E979-6043-4B3C-B041-6A82A55FBF3D
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-issued-edit-result.png
-com.entrixy.ios: 41096
-/Users/runner/Library/Developer/CoreSimulator/Devices/CC670D27-9601-42FE-9FB2-CF9B336CD2E4/data/Containers/Data/Application/BE00E979-6043-4B3C-B041-6A82A55FBF3D
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-issued-access-form.png
-com.entrixy.ios: 41665
-/Users/runner/Library/Developer/CoreSimulator/Devices/CC670D27-9601-42FE-9FB2-CF9B336CD2E4/data/Containers/Data/Application/BE00E979-6043-4B3C-B041-6A82A55FBF3D
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-backup-form.png
-com.entrixy.ios: 41741
-/Users/runner/Library/Developer/CoreSimulator/Devices/CC670D27-9601-42FE-9FB2-CF9B336CD2E4/data/Containers/Data/Application/BE00E979-6043-4B3C-B041-6A82A55FBF3D
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-backup-export.png
-com.entrixy.ios: 42329
-/Users/runner/Library/Developer/CoreSimulator/Devices/CC670D27-9601-42FE-9FB2-CF9B336CD2E4/data/Containers/Data/Application/BE00E979-6043-4B3C-B041-6A82A55FBF3D
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-backup-preview.png
-com.entrixy.ios: 42389
-/Users/runner/Library/Developer/CoreSimulator/Devices/CC670D27-9601-42FE-9FB2-CF9B336CD2E4/data/Containers/Data/Application/BE00E979-6043-4B3C-B041-6A82A55FBF3D
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-backup-restored.png
-com.entrixy.ios: 42998
-/Users/runner/Library/Developer/CoreSimulator/Devices/CC670D27-9601-42FE-9FB2-CF9B336CD2E4/data/Containers/Data/Application/BE00E979-6043-4B3C-B041-6A82A55FBF3D
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-backup-rejected.png
-com.entrixy.ios: 43289
-/Users/runner/Library/Developer/CoreSimulator/Devices/CC670D27-9601-42FE-9FB2-CF9B336CD2E4/data/Containers/Data/Application/BE00E979-6043-4B3C-B041-6A82A55FBF3D
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-backup-interrupted.png
-com.entrixy.ios: 43897
-/Users/runner/Library/Developer/CoreSimulator/Devices/CC670D27-9601-42FE-9FB2-CF9B336CD2E4/data/Containers/Data/Application/BE00E979-6043-4B3C-B041-6A82A55FBF3D
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-delegation-preview.png
-com.entrixy.ios: 44161
-/Users/runner/Library/Developer/CoreSimulator/Devices/CC670D27-9601-42FE-9FB2-CF9B336CD2E4/data/Containers/Data/Application/BE00E979-6043-4B3C-B041-6A82A55FBF3D
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-delegation-waiting.png
-com.entrixy.ios: 44394
-/Users/runner/Library/Developer/CoreSimulator/Devices/CC670D27-9601-42FE-9FB2-CF9B336CD2E4/data/Containers/Data/Application/BE00E979-6043-4B3C-B041-6A82A55FBF3D
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-delegation-ready.png
-com.entrixy.ios: 44805
-/Users/runner/Library/Developer/CoreSimulator/Devices/CC670D27-9601-42FE-9FB2-CF9B336CD2E4/data/Containers/Data/Application/BE00E979-6043-4B3C-B041-6A82A55FBF3D
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-delegation-rejected.png
-com.entrixy.ios: 44932
-/Users/runner/Library/Developer/CoreSimulator/Devices/CC670D27-9601-42FE-9FB2-CF9B336CD2E4/data/Containers/Data/Application/BE00E979-6043-4B3C-B041-6A82A55FBF3D
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-delegated-awaiting.png
-com.entrixy.ios: 45447
-/Users/runner/Library/Developer/CoreSimulator/Devices/CC670D27-9601-42FE-9FB2-CF9B336CD2E4/data/Containers/Data/Application/BE00E979-6043-4B3C-B041-6A82A55FBF3D
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-delegated-ready.png
-com.entrixy.ios: 45492
-/Users/runner/Library/Developer/CoreSimulator/Devices/CC670D27-9601-42FE-9FB2-CF9B336CD2E4/data/Containers/Data/Application/BE00E979-6043-4B3C-B041-6A82A55FBF3D
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-delegated-uncertain.png
-com.entrixy.ios: 46090
-/Users/runner/Library/Developer/CoreSimulator/Devices/CC670D27-9601-42FE-9FB2-CF9B336CD2E4/data/Containers/Data/Application/BE00E979-6043-4B3C-B041-6A82A55FBF3D
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-delegated-revoked.png
-com.entrixy.ios: 46132
-/Users/runner/Library/Developer/CoreSimulator/Devices/CC670D27-9601-42FE-9FB2-CF9B336CD2E4/data/Containers/Data/Application/BE00E979-6043-4B3C-B041-6A82A55FBF3D
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-delegated-untrusted.png
-com.entrixy.ios: 46906
-/Users/runner/Library/Developer/CoreSimulator/Devices/CC670D27-9601-42FE-9FB2-CF9B336CD2E4/data/Containers/Data/Application/BE00E979-6043-4B3C-B041-6A82A55FBF3D
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-sender-form.png
-com.entrixy.ios: 47205
-/Users/runner/Library/Developer/CoreSimulator/Devices/CC670D27-9601-42FE-9FB2-CF9B336CD2E4/data/Containers/Data/Application/BE00E979-6043-4B3C-B041-6A82A55FBF3D
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-sender-link.png
-com.entrixy.ios: 47866
-/Users/runner/Library/Developer/CoreSimulator/Devices/CC670D27-9601-42FE-9FB2-CF9B336CD2E4/data/Containers/Data/Application/BE00E979-6043-4B3C-B041-6A82A55FBF3D
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-sender-uncertain.png
-com.entrixy.ios: 47907
-/Users/runner/Library/Developer/CoreSimulator/Devices/CC670D27-9601-42FE-9FB2-CF9B336CD2E4/data/Containers/Data/Application/BE00E979-6043-4B3C-B041-6A82A55FBF3D
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-sender-vouched.png
-com.entrixy.ios: 48506
-/Users/runner/Library/Developer/CoreSimulator/Devices/CC670D27-9601-42FE-9FB2-CF9B336CD2E4/data/Containers/Data/Application/BE00E979-6043-4B3C-B041-6A82A55FBF3D
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-sender-revoked.png
-com.entrixy.ios: 48551
-/Users/runner/Library/Developer/CoreSimulator/Devices/CC670D27-9601-42FE-9FB2-CF9B336CD2E4/data/Containers/Data/Application/BE00E979-6043-4B3C-B041-6A82A55FBF3D
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-sender-edit-form.png
-com.entrixy.ios: 49146
-/Users/runner/Library/Developer/CoreSimulator/Devices/CC670D27-9601-42FE-9FB2-CF9B336CD2E4/data/Containers/Data/Application/BE00E979-6043-4B3C-B041-6A82A55FBF3D
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-sender-edited.png
-com.entrixy.ios: 49192
-/Users/runner/Library/Developer/CoreSimulator/Devices/CC670D27-9601-42FE-9FB2-CF9B336CD2E4/data/Containers/Data/Application/BE00E979-6043-4B3C-B041-6A82A55FBF3D
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-message-inbox.png
-com.entrixy.ios: 49792
-/Users/runner/Library/Developer/CoreSimulator/Devices/CC670D27-9601-42FE-9FB2-CF9B336CD2E4/data/Containers/Data/Application/BE00E979-6043-4B3C-B041-6A82A55FBF3D
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-message-read.png
-com.entrixy.ios: 49836
-/Users/runner/Library/Developer/CoreSimulator/Devices/CC670D27-9601-42FE-9FB2-CF9B336CD2E4/data/Containers/Data/Application/BE00E979-6043-4B3C-B041-6A82A55FBF3D
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-message-corrupt.png
-com.entrixy.ios: 50478
-/Users/runner/Library/Developer/CoreSimulator/Devices/CC670D27-9601-42FE-9FB2-CF9B336CD2E4/data/Containers/Data/Application/BE00E979-6043-4B3C-B041-6A82A55FBF3D
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-message-compose.png
-com.entrixy.ios: 50771
-/Users/runner/Library/Developer/CoreSimulator/Devices/CC670D27-9601-42FE-9FB2-CF9B336CD2E4/data/Containers/Data/Application/BE00E979-6043-4B3C-B041-6A82A55FBF3D
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-message-sent.png
-com.entrixy.ios: 51568
-/Users/runner/Library/Developer/CoreSimulator/Devices/CC670D27-9601-42FE-9FB2-CF9B336CD2E4/data/Containers/Data/Application/BE00E979-6043-4B3C-B041-6A82A55FBF3D
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-additional-parts.png
-com.entrixy.ios: 51606
-/Users/runner/Library/Developer/CoreSimulator/Devices/CC670D27-9601-42FE-9FB2-CF9B336CD2E4/data/Containers/Data/Application/BE00E979-6043-4B3C-B041-6A82A55FBF3D
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-ble-scan.png
-com.entrixy.ios: 52205
-/Users/runner/Library/Developer/CoreSimulator/Devices/CC670D27-9601-42FE-9FB2-CF9B336CD2E4/data/Containers/Data/Application/BE00E979-6043-4B3C-B041-6A82A55FBF3D
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-ble-uncertain.png
-com.entrixy.ios: 52247
-/Users/runner/Library/Developer/CoreSimulator/Devices/CC670D27-9601-42FE-9FB2-CF9B336CD2E4/data/Containers/Data/Application/BE00E979-6043-4B3C-B041-6A82A55FBF3D
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-ble-paired.png
-com.entrixy.ios: 52844
-/Users/runner/Library/Developer/CoreSimulator/Devices/CC670D27-9601-42FE-9FB2-CF9B336CD2E4/data/Containers/Data/Application/BE00E979-6043-4B3C-B041-6A82A55FBF3D
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-ble-registered.png
-com.entrixy.ios: 52888
-/Users/runner/Library/Developer/CoreSimulator/Devices/CC670D27-9601-42FE-9FB2-CF9B336CD2E4/data/Containers/Data/Application/BE00E979-6043-4B3C-B041-6A82A55FBF3D
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-ble-owner-confirm.png
-com.entrixy.ios: 53494
-/Users/runner/Library/Developer/CoreSimulator/Devices/CC670D27-9601-42FE-9FB2-CF9B336CD2E4/data/Containers/Data/Application/BE00E979-6043-4B3C-B041-6A82A55FBF3D
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-ble-owner-result.png
-com.entrixy.ios: 53540
-/Users/runner/Library/Developer/CoreSimulator/Devices/CC670D27-9601-42FE-9FB2-CF9B336CD2E4/data/Containers/Data/Application/BE00E979-6043-4B3C-B041-6A82A55FBF3D
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-ble-owner-unknown.png
-com.entrixy.ios: 54133
-/Users/runner/Library/Developer/CoreSimulator/Devices/CC670D27-9601-42FE-9FB2-CF9B336CD2E4/data/Containers/Data/Application/BE00E979-6043-4B3C-B041-6A82A55FBF3D
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-ble-owner-journal.png
-com.entrixy.ios: 54408
-/Users/runner/Library/Developer/CoreSimulator/Devices/CC670D27-9601-42FE-9FB2-CF9B336CD2E4/data/Containers/Data/Application/BE00E979-6043-4B3C-B041-6A82A55FBF3D
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-ble-guest-confirm.png
-com.entrixy.ios: 55228
-/Users/runner/Library/Developer/CoreSimulator/Devices/CC670D27-9601-42FE-9FB2-CF9B336CD2E4/data/Containers/Data/Application/BE00E979-6043-4B3C-B041-6A82A55FBF3D
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-ble-guest-result.png
-com.entrixy.ios: 55319
-/Users/runner/Library/Developer/CoreSimulator/Devices/CC670D27-9601-42FE-9FB2-CF9B336CD2E4/data/Containers/Data/Application/BE00E979-6043-4B3C-B041-6A82A55FBF3D
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-ble-guest-expired.png
-com.entrixy.ios: 55949
-/Users/runner/Library/Developer/CoreSimulator/Devices/CC670D27-9601-42FE-9FB2-CF9B336CD2E4/data/Containers/Data/Application/BE00E979-6043-4B3C-B041-6A82A55FBF3D
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-ble-guest-unknown.png
-com.entrixy.ios: 56039
-/Users/runner/Library/Developer/CoreSimulator/Devices/CC670D27-9601-42FE-9FB2-CF9B336CD2E4/data/Containers/Data/Application/BE00E979-6043-4B3C-B041-6A82A55FBF3D
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-ble-guest-journal.png
-com.entrixy.ios: 56592
-/Users/runner/Library/Developer/CoreSimulator/Devices/CC670D27-9601-42FE-9FB2-CF9B336CD2E4/data/Containers/Data/Application/BE00E979-6043-4B3C-B041-6A82A55FBF3D
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-ble-revoke-pending.png
-com.entrixy.ios: 56633
-/Users/runner/Library/Developer/CoreSimulator/Devices/CC670D27-9601-42FE-9FB2-CF9B336CD2E4/data/Containers/Data/Application/BE00E979-6043-4B3C-B041-6A82A55FBF3D
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-ble-revoke-applied.png
-com.entrixy.ios: 57230
-/Users/runner/Library/Developer/CoreSimulator/Devices/CC670D27-9601-42FE-9FB2-CF9B336CD2E4/data/Containers/Data/Application/BE00E979-6043-4B3C-B041-6A82A55FBF3D
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-ble-revoke-stale.png
-com.entrixy.ios: 57283
-/Users/runner/Library/Developer/CoreSimulator/Devices/CC670D27-9601-42FE-9FB2-CF9B336CD2E4/data/Containers/Data/Application/BE00E979-6043-4B3C-B041-6A82A55FBF3D
-Detected file type 'PNG' from extension
-Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-ble-renewed.png
-Captured 86 real simulator screenshots
-Prepared review sheet for 86 actual screenshots; visual review remains pending
+/Users/runner/Library/Developer/CoreSimulator/Devices/3CF26D1F-464B-4BB9-8FE5-00FC809EB1D4/data/Containers/Data/Application/A1E07B32-41A4-402A-BCF8-01F52D6C6201
+com.entrixy.ios: 27419
+/Users/runner/Library/Developer/CoreSimulator/Devices/3CF26D1F-464B-4BB9-8FE5-00FC809EB1D4/data/Containers/Data/Application/A1E07B32-41A4-402A-BCF8-01F52D6C6201
+getpwuid_r did not find a match for uid 501
+Timestamp               Ty Process[PID:TID]
+2026-11-14 21:24:38.598 Df SpringBoard[22782:11c35] [com.apple.launchservices:progress] #LSInstallProgressList add subscriber: <_NSProgressSubscriber: 0x600000e84a50> publishingString: com.entrixy.ios
+2026-11-14 21:24:38.598 Df SpringBoard[22782:11c35] [com.apple.launchservices:progress] Subscribing to progress for app com.entrixy.ios,
+2026-11-14 21:24:38.831 Df runningboardd[22785:13e40] [com.apple.runningboard:general] Full encoding handle [app<com.entrixy.ios((null))>:27419], with data eeeab17100006b1b, and pid 27419
+2026-11-14 21:24:38.831 Df runningboardd[22785:13e40] [com.apple.runningboard:process] [app<com.entrixy.ios((null))>:27419] Memory Limits: active 0 inactive 0
+ <RBJetsamProperties| tasklimit=0
+(null)>
+2026-11-14 21:24:38.831 Df runningboardd[22785:13e40] [com.apple.runningboard:process] [app<com.entrixy.ios((null))>:27419] This process will be managed.
+2026-11-14 21:24:38.831 E  runningboardd[22785:13e40] [com.apple.runningboard:process] [app<com.entrixy.ios((null))>:27419] Memorystatus failed with unexpected error: Operation not permitted (1)
+2026-11-14 21:24:38.831 Df runningboardd[22785:13e40] [com.apple.runningboard:process] [app<com.entrixy.ios((null))>:27419] is not freezer eligible, disabling freezing.
+2026-11-14 21:24:38.831 E  runningboardd[22785:13e40] [com.apple.runningboard:process] [app<com.entrixy.ios((null))>:27419] Memorystatus failed with unexpected error: Invalid argument (22)
+2026-11-14 21:24:38.831 E  runningboardd[22785:13e40] [com.apple.runningboard:process] [app<com.entrixy.ios((null))>:27419] Memorystatus failed with unexpected error: Operation not permitted (1)
+2026-11-14 21:24:38.831 Df runningboardd[22785:13e40] [com.apple.runningboard:ttl] Now tracking process: [app<com.entrixy.ios((null))>:27419]
+2026-11-14 21:24:40.365 Df appprotectiond[22801:11d83] [com.apple.appprotection:server] received note: name = com.apple.LaunchServices.applicationRegistered, object = Optional(AppProtection.DistnotedXPCEventStreamTranslator), userInfo = Optional([AnyHashable("bundleIDs"): <__NSSingleObjectArrayI 0x60000000c620>(
+com.entrixy.ios
+)
+, AnyHashable("isPlaceholder"): 1])
+2026-11-14 21:24:40.365 Df appprotectiond[22801:11d83] [com.apple.appprotection:server] Received distnoted event <dictionary: 0x600003e09400> { count = 3, transaction: 0, voucher = 0x600002104d70, contents =
+	"UserInfo" => <dictionary: 0x600002610000> { count = 2, transaction: 0, voucher = 0x0, contents =
+		"isPlaceholder" => <bool: 0x7ff840008670>: true
+		"bundleIDs" => <array: 0x600000c1c0c0> { count = 1, capacity = 1, contents =
+			0: <string: 0x600000c1c150> { string cache = 0x0, length = 15, contents = "com.entrixy.ios" }
+		}
+	}
+	"Name" => <string: 0x600000c1c390> { string cache = 0x0, length = 46, contents = "com.apple.LaunchServices.applicationRegistered" }
+	"XPCEventName" => <string: 0x600000c1c090> { string cache = 0x0, length = 21, contents = "ApplicationRegistered" }
+}
+2026-11-14 21:24:40.366 Df appprotectiond[22801:11d83] [com.apple.appprotection:server] received note: name = com.apple.LaunchServices.applicationRegistered, object = Optional(AppProtection.DistnotedXPCEventStreamTranslator), userInfo = Optional([AnyHashable("isPlaceholder"): 1, AnyHashable("bundleIDs"): <__NSSingleObjectArrayI 0x600000010490>(
+com.entrixy.ios
+)
+])
+2026-11-14 21:24:40.859 Df liveactivitiesd[22856:13b9b] [com.apple.launchservices:progress] #LSInstallProgressList add subscriber: <_NSProgressSubscriber: 0x600000c13780> publishingString: com.entrixy.ios
+2026-11-14 21:24:40.859 Df liveactivitiesd[22856:13b9b] [com.apple.launchservices:progress] Subscribing to progress for app com.entrixy.ios,
+2026-11-14 21:24:41.279 Df appprotectiond[22801:13f43] [com.apple.appprotection:server] processing settings authority event: SettingsAuthorityEvent.promotePreferenceFromProvisionalForApplication(com.entrixy.ios)
+2026-11-14 21:24:41.554 Df appprotectiond[22801:11d83] [com.apple.appprotection:server] Received distnoted event <dictionary: 0x600003e01e00> { count = 3, transaction: 0, voucher = 0x600002104d70, contents =
+	"UserInfo" => <dictionary: 0x600002609f80> { count = 2, transaction: 0, voucher = 0x0, contents =
+		"isPlaceholder" => <bool: 0x7ff840008690>: false
+		"bundleIDs" => <array: 0x600000c20000> { count = 1, capacity = 1, contents =
+			0: <string: 0x600000c20120> { string cache = 0x0, length = 15, contents = "com.entrixy.ios" }
+		}
+	}
+	"Name" => <string: 0x600000c20330> { string cache = 0x0, length = 46, contents = "com.apple.LaunchServices.applicationRegistered" }
+	"XPCEventName" => <string: 0x600000c20930> { string cache = 0x0, length = 21, contents = "ApplicationRegistered" }
+}
+2026-11-14 21:24:43.742 Df SpringBoard[22782:11ebf] [com.apple.SplashBoard:SnapshotReaper] <XBApplicationSnapshotManifestImpl: 0x600002c63600> [com.entrixy.ios] Reaping invalid snapshot <XBApplicationSnapshot: 0x1074f3a30; …792F595E23D3> [com.entrixy.ios]
+ invalidReason: expired. expirationDate: 0001-01-01 00:00:00 +0000; how long ago (seconds): 63930461083.891487
+2026-11-14 21:24:43.742 Df SpringBoard[22782:11ebf] [com.apple.SplashBoard:FileManifest] <XBApplicationSnapshotManifestImpl: 0x600002c63600> [com.entrixy.ios] Deleting snapshot <XBApplicationSnapshot: 0x1074f3a30; …792F595E23D3> [com.entrixy.ios] for reason: _contentType: GeneratedDefault(1)
+2026-11-14 21:24:43.743 Df SpringBoard[22782:11ebf] [com.apple.SplashBoard:FileManifest] <XBApplicationSnapshotManifestImpl: 0x600002c63600> [com.entrixy.ios] We don't have any snapshots, so we're clearing our manifest data.
+2026-11-14 21:24:43.883 Df appprotectiond[22801:11d83] [com.apple.appprotection:server] received note: name = com.apple.LaunchServices.applicationRegistered, object = Optional(AppProtection.DistnotedXPCEventStreamTranslator), userInfo = Optional([AnyHashable("isPlaceholder"): 0, AnyHashable("bundleIDs"): <__NSSingleObjectArrayI 0x60000000c940>(
+com.entrixy.ios
+)
+])
+2026-11-14 21:24:44.637 Df SpringBoard[22782:10689] [com.apple.SpringBoard:TraitsArbiter] [SwitcherOrientation] outSwitcherOrientation: portrait (1), outElementsOrientations: {
+    "sceneID:com.entrixy.ios-8488500F-D955-4890-ABB8-68CE56D5F7DE" = 1;
+}
+2026-11-14 21:24:44.693 Df backboardd[22804:13b22] [com.apple.iohid:default] Connection added: IOHIDEventSystemConnection uuid:43BA4D7C-B22A-4D93-9792-00A03D4C5840 pid:27419 process:Entrixy type:Passive entitlements:0x0 caller:BackBoardServices: ___getHIDEventSystemClient_block_invoke + 325 attributes:{
+    HighFrequency = 0;
+    bundleID = "com.entrixy.ios";
+    pid = 27419;
+} state:0x0 events:0 mask:0x0 dropped:0 dropStatus:0 droppedMask:0x0 lastDroppedTime:NONE
+2026-11-14 21:24:44.693 Df backboardd[22804:13b22] [com.apple.BackBoard:HID] Adding client connection: <BKHIDClientConnection: 0x600001754c00; IOHIDEventSystemConnectionRef: 0x109613800; vpid: 27419(vD8C5); taskPort: 0x915F; bundleID: com.entrixy.ios> for client: IOHIDEventSystemConnection uuid:43BA4D7C-B22A-4D93-9792-00A03D4C5840 pid:27419 process:Entrixy type:Passive entitlements:0x0 caller:BackBoardServices: ___getHIDEventSystemClient_block_invoke + 325 attributes:{
+    HighFrequency = 0;
+    bundleID = "com.entrixy.ios";
+    pid = 27419;
+} state:0x0 events:0 mask:0x0 dropped:0 dropStatus:0 droppedMask:0x0 lastDroppedTime:NONE
+2026-11-14 21:24:44.838 Df SpringBoard[22782:11ebf] [com.apple.SplashBoard:FileManifest] <XBApplicationSnapshotManifestImpl: 0x600002c63600> [com.entrixy.ios] We don't have any snapshots, so we're clearing our manifest data.
+2026-11-14 21:24:45.096 Df appprotectiond[22801:13f43] [com.apple.appprotection:server] processing settings authority event: SettingsAuthorityEvent.promotePreferenceFromProvisionalForApplication(com.entrixy.ios)
+2026-11-14 21:24:45.097 Df appprotectiond[22801:13f43] [com.apple.appprotection:server] processing settings authority event: SettingsAuthorityEvent.promotePreferenceFromProvisionalForApplication(com.entrixy.ios)
+2026-11-14 21:24:46.917 Df searchd[22920:11aab] [com.apple.spotlight:default] Apps changed: (
+    "com.apple.Passbook",
+    "com.apple.MobileAddressBook",
+    "com.apple.Fitness",
+    "com.apple.DocumentsApp",
+    "com.apple.MobileSMS",
+    "com.apple.Maps",
+    "com.apple.Passwords",
+    "com.apple.mobilecal",
+    "com.apple.Bridge",
+    "com.apple.BarcodeScanner",
+    "com.apple.Preferences",
+    "com.apple.reminders",
+    "com.apple.Health",
+    "com.apple.TVRemoteUIService",
+    "com.apple.news",
+    "com.apple.mobileslideshow",
+    "com.apple.mobilesafari",
+    "com.apple.shortcuts",
+    "com.apple.Preview",
+    "com.entrixy.ios"
+)
+2026-11-14 21:24:50.727 Df runningboardd[22785:13e40] [com.apple.runningboard:assertion] [app<com.entrixy.ios((null))>:27419]: applying persistent assertion '22785-22782-866 (target:app<com.entrixy.ios((null))>)'
+2026-11-14 21:24:50.728 Df SpringBoard[22782:11aad] [com.apple.FrontBoard:Process] Asked to bootstrap a new process for handle: [app<com.entrixy.ios((null))>:27419]
+2026-11-14 21:24:50.728 Df SpringBoard[22782:11aad] [com.apple.FrontBoard:Process] A pending process already exists for this handle: <FBApplicationProcess: 0x1075c7300; app<com.entrixy.ios>:<invalid>>
+2026-11-14 21:24:50.730 Df runningboardd[22785:13e40] [com.apple.runningboard:assertion] Using default underlying assertion for app: [app<com.entrixy.ios((null))>:27419]
+2026-11-14 21:24:50.730 Df runningboardd[22785:1403c] [com.apple.runningboard:monitor] Calculated state for app<com.entrixy.ios((null))>: running-active (role: UserInteractiveFocal) (endowments: {(
+    <RBSProcessEndowmentInfo| namespace:com.apple.frontboard.visibility env:(null)  0>
+)})
+2026-11-14 21:24:50.732 Df runningboardd[22785:13e40] [com.apple.runningboard:ttl] Acquiring assertion targeting [app<com.entrixy.ios((null))>:27419] from originator [app<com.entrixy.ios((null))>:27419] with description <RBSAssertionDescriptor| "RB Underlying Assertion" ID:22785-22785-868 target:27419 attributes:[
+	<RBSDomainAttribute| domain:"com.apple.underlying" name:"defaultUnderlyingAppAssertion" sourceEnvironment:"(null)">,
+	<RBSAcquisitionCompletionAttribute| policy:AfterApplication>
+	]>
+2026-11-14 21:24:50.733 Df runningboardd[22785:13e40] [com.apple.runningboard:ttl] Assertion 22785-22785-868 (target:[app<com.entrixy.ios((null))>:27419]) will be created as active
+2026-11-14 21:24:50.735 Df SpringBoard[22782:11ee5] [com.apple.FrontBoard:Process] [app<com.entrixy.ios>:27419] Bootstrap success!
+2026-11-14 21:24:50.736 Df SpringBoard[22782:1206c] [com.apple.runningboard:monitor] Received state update for 27419 (app<com.entrixy.ios((null))>, running-active-Visible
+2026-11-14 21:24:50.746 Df runningboardd[22785:1403c] [com.apple.runningboard:monitor] Calculated state for app<com.entrixy.ios((null))>: running-active (role: UserInteractiveFocal) (endowments: {(
+    <RBSProcessEndowmentInfo| namespace:com.apple.frontboard.visibility env:(null)  0>
+)})
+2026-11-14 21:24:50.749 Df SpringBoard[22782:11ee5] [com.apple.FrontBoard:Process] [app<com.entrixy.ios>:27419] Setting process task state to: Running
+2026-11-14 21:24:50.749 Df SpringBoard[22782:11ee5] [com.apple.FrontBoard:Process] [app<com.entrixy.ios>:27419] Setting process visibility to: Foreground
+2026-11-14 21:24:50.750 Df SpringBoard[22782:11ee5] [com.apple.FrontBoard:ProcessWorkspace] [app<com.entrixy.ios>:27419] Registering event dispatcher after bootstrap
+2026-11-14 21:24:50.750 Df SpringBoard[22782:11ee5] [com.apple.FrontBoard:ProcessWorkspace] [app<com.entrixy.ios>:27419] Initial launch state: FV-Focal[100].
+2026-11-14 21:24:50.750 Df SpringBoard[22782:11ee5] [com.apple.runningboard:process] Starting death monitoring for handle [app<com.entrixy.ios((null))>:27419]
+2026-11-14 21:24:50.772 Df runningboardd[22785:1403e] [com.apple.runningboard:general] [app<com.entrixy.ios((null))>:27419] reported to RB as running
+2026-11-14 21:24:50.772 Df SpringBoard[22782:11ee5] [com.apple.FrontBoard:Process] Adding: <FBApplicationProcess: 0x1075c7300; app<com.entrixy.ios>:27419(vD8C5)>
+2026-11-14 21:24:50.773 Df SpringBoard[22782:11aad] [com.apple.SpringBoard:Common] Fetching initialization context for: com.entrixy.ios
+2026-11-14 21:24:50.774 Df SpringBoard[22782:11aad] [com.apple.SpringBoard:Common] Returning cached initialization context for com.entrixy.ios
+2026-11-14 21:24:50.774 Df CoreSimulatorBridge[22813:10707] Launch successful for 'com.entrixy.ios', pid: 27419
+2026-11-14 21:24:50.775 Df SpringBoard[22782:11aad] [com.apple.SpringBoard:Common] Returning cached initialization context for com.entrixy.ios
+2026-11-14 21:24:50.785 Df SpringBoard[22782:10689] [com.apple.SpringBoard:Common] Returning cached initialization context for com.entrixy.ios
+2026-11-14 21:24:50.786 Df SpringBoard[22782:11e48] [com.apple.FrontBoard:ProcessWorkspace] [app<com.entrixy.ios>:27419] Connection established.
+2026-11-14 21:24:50.786 Df SpringBoard[22782:11e48] [com.apple.FrontBoard:ProcessWorkspace] [app<com.entrixy.ios>:27419] created proxy of <BSXPCServiceConnectionProxy<FBSWorkspaceServiceServerInterface>: 0x600002a088c0>
+2026-11-14 21:24:50.786 Df SpringBoard[22782:12071] [com.apple.FrontBoard:Process] [app<com.entrixy.ios>:27419] Connection to remote process established!
+2026-11-14 21:24:50.787 Df SpringBoard[22782:12071] [com.apple.FrontBoard:ProcessWorkspace] received incoming handshake : process=<FBApplicationProcess: 0x1075c7300; app<com.entrixy.ios>:27419(vD8C5); taskState: Running; visibility: Foreground> remote=<BSAuditToken: 0x600001928700; AUID: 501; EUID: 501; EGID: 20; RUID: 501; RGID: 20; PID: 27419; ASID: 100022; PIDVersion: 55493> remnants=0
+2026-11-14 21:24:50.788 Df SpringBoard[22782:10689] [com.apple.FrontBoard:ProcessScene] [0x600003815f80:(FBSceneManager):sceneID:com.entrixy.ios-8488500F-D955-4890-ABB8-68CE56D5F7DE] Initialized with connection: 0x600000df0d50.
+2026-11-14 21:24:50.788 Df SpringBoard[22782:10689] [com.apple.FrontBoard:ProcessWorkspace] [app<com.entrixy.ios>:27419] Registered new scene: <FBUIApplicationWorkspaceScene: 0x600003815f80; (FBSceneManager):sceneID:com.entrixy.ios-8488500F-D955-4890-ABB8-68CE56D5F7DE> (fromRemnant = 0)
+2026-11-14 21:24:50.789 Df SpringBoard[22782:10689] [com.apple.FrontBoard:Scene] [(FBSceneManager):sceneID:com.entrixy.ios-8488500F-D955-4890-ABB8-68CE56D5F7DE][1] Scene activated.
+2026-11-14 21:24:50.789 Df SpringBoard[22782:11e48] [com.apple.FrontBoard:ProcessWorkspace] [app<com.entrixy.ios>:27419] Workspace interruption policy did change: reconnect
+2026-11-14 21:24:50.790 Df runningboardd[22785:13e40] [com.apple.runningboard:ttl] Acquiring assertion targeting [app<com.entrixy.ios((null))>:27419] from originator [osservice<com.apple.SpringBoard>:22782] with description <RBSAssertionDescriptor| "com.apple.frontboard.after-life.interrupted" ID:22785-22782-871 target:27419 attributes:[
+	<RBSDomainAttribute| domain:"com.apple.frontboard" name:"AfterLife-Interrupted" sourceEnvironment:"(null)">
+	]>
+2026-11-14 21:24:50.790 Df SpringBoard[22782:10689] [com.apple.UIKit:KBProxyForwarding] <StateMachine:0x60000192dc00> Created with presentation environment: <0x600000df5770:<_UISceneKeyboardProxyLayerForwardingPresentationScene: 0x600000df5770> Tracking scene: <FBScene: 0x600003e04b00; FBSceneManager:sceneID:com.entrixy.ios-8488500F-D955-4890-ABB8-68CE56D5F7DE>>
+2026-11-14 21:24:50.790 Df runningboardd[22785:13e40] [com.apple.runningboard:ttl] Assertion 22785-22782-871 (target:[app<com.entrixy.ios((null))>:27419]) will be created as inactive as originator process has not exited
+2026-11-14 21:24:50.793 Df SpringBoard[22782:10689] [com.apple.SpringBoard:AppProtection] <BSCompoundAssertion:0x60000190b340> (SBApplicationAppProtectionAssistant: 0x600001909b40 - com.entrixy.ios) acquire for reason:NULL scene acq:0x60000021efc0 count:1
+2026-11-14 21:24:50.793 Df SpringBoard[22782:10689] [com.apple.SpringBoard:AppProtection] Informing <APSystemAppOutlet: 0x600000cf0240> that <APApplication: com.entrixy.ios> will become foreground visible
+2026-11-14 21:24:50.793 Df SpringBoard[22782:10689] [com.apple.appprotection:framework] scene will become FG visible for <APApplication: com.entrixy.ios>
+2026-11-14 21:24:50.794 Df SpringBoard[22782:10689] [com.apple.appprotection:framework] auth result for <APApplication: com.entrixy.ios>: true (null)
+2026-11-14 21:24:50.795 Df SpringBoard[22782:10689] [com.apple.SpringBoard:KeyboardFocus] [com.apple.springboard] didAddExternalForegroundApplicationSceneHandle pid:27419 scene:com.apple.frontboard.systemappservices/FBSceneManager:sceneID%3Acom.entrixy.ios-8488500F-D955-4890-ABB8-68CE56D5F7DE now:<recentPIDs: [27419]; recentSceneIdentityTokensByPID: {27419: [com.apple.frontboard.systemappservices/FBSceneManager:sceneID%3Acom.entrixy.ios-8488500F-D955-4890-ABB8-68CE56D5F7DE]}>
+2026-11-14 21:24:50.795 Df SpringBoard[22782:10689] [com.apple.SpringBoard:KeyboardFocus] [coordinator] didAddExternalForegroundApplicationSceneHandle pid:27419 scene:com.apple.frontboard.systemappservices/FBSceneManager:sceneID%3Acom.entrixy.ios-8488500F-D955-4890-ABB8-68CE56D5F7DE now:<recentPIDs: [27419]; recentSceneIdentityTokensByPID: {27419: [com.apple.frontboard.systemappservices/FBSceneManager:sceneID%3Acom.entrixy.ios-8488500F-D955-4890-ABB8-68CE56D5F7DE]}>
+2026-11-14 21:24:50.796 Df runningboardd[22785:12487] [com.apple.runningboard:ttl] [app<com.entrixy.ios((null))>:27419] Resuming task.
+2026-11-14 21:24:50.796 Df SpringBoard[22782:10689] [com.apple.UIKit:SceneDeactivation] Now tracking: <FBScene: 0x600003e04b00; FBSceneManager:sceneID:com.entrixy.ios-8488500F-D955-4890-ABB8-68CE56D5F7DE>
+2026-11-14 21:24:50.797 Df SpringBoard[22782:10689] [com.apple.UIKit:SceneDeactivation] [sceneID:com.entrixy.ios-8488500F-D955-4890-ABB8-68CE56D5F7DE] Setting deactivation reasons to: 'systemAnimation' for reason: scene settings update - settings are eligible for deactivation reasons.
+2026-11-14 21:24:50.798 Df SpringBoard[22782:10689] [com.apple.FrontBoard:Scene] [(FBSceneManager):sceneID:com.entrixy.ios-8488500F-D955-4890-ABB8-68CE56D5F7DE] scene content state changed: preparing
+2026-11-14 21:24:50.801 Df SpringBoard[22782:11ee5] [com.apple.FrontBoard:ProcessScene] [0x600003815f80:(FBSceneManager):sceneID:com.entrixy.ios-8488500F-D955-4890-ABB8-68CE56D5F7DE] Scene lifecycle state did change: Foreground
+2026-11-14 21:24:50.801 Df SpringBoard[22782:11ee5] [com.apple.FrontBoard:ProcessScene] [0x600003815f80:(FBSceneManager):sceneID:com.entrixy.ios-8488500F-D955-4890-ABB8-68CE56D5F7DE] Scene state did change: FV-Focal[100].
+2026-11-14 21:24:50.802 Df runningboardd[22785:12487] [com.apple.runningboard:ttl] [app<com.entrixy.ios((null))>:27419] Set darwin role to: UserInteractiveFocal
+2026-11-14 21:24:50.803 E  runningboardd[22785:12487] [com.apple.runningboard:process] [app<com.entrixy.ios((null))>:27419] Error 1 setting Carplay mode to 0: Operation not permitted
+2026-11-14 21:24:50.803 Df runningboardd[22785:12487] [com.apple.runningboard:ttl] [app<com.entrixy.ios((null))>:27419] visiblity is yes
+2026-11-14 21:24:50.803 Df runningboardd[22785:1403e] [com.apple.runningboard:ttl] Acquiring assertion targeting [app<com.entrixy.ios((null))>:27419] from originator [osservice<com.apple.SpringBoard>:22782] with description <RBSAssertionDescriptor| "FBWorkspace (FV-Focal[100])" ID:22785-22782-872 target:27419 attributes:[
+	<RBSDomainAttribute| domain:"com.apple.frontboard" name:"SuspendableLPRunReason-Resume" sourceEnvironment:"(null)">,
+	<RBSDomainAttribute| domain:"com.apple.frontboard" name:"Visibility" sourceEnvironment:"(null)">,
+	<RBSDomainAttribute| domain:"com.apple.frontboard" name:"SuspendableRole-UIFocal" sourceEnvironment:"(null)">,
+	<RBSDomainAttribute| domain:"com.apple.frontboard" name:"SuspendableJetsamPriority-Foreground" sourceEnvironment:"(null)">
+	]>
+2026-11-14 21:24:50.804 Df runningboardd[22785:1403e] [com.apple.runningboard:ttl] Assertion 22785-22782-872 (target:[app<com.entrixy.ios((null))>:27419]) will be created as active
+2026-11-14 21:24:50.806 Df runningboardd[22785:13e40] [com.apple.runningboard:monitor] Calculated state for app<com.entrixy.ios((null))>: running-active (role: UserInteractiveFocal) (endowments: {(
+    <RBSProcessEndowmentInfo| namespace:com.apple.frontboard.visibility env:(null)  0>
+)})
+2026-11-14 21:24:50.809 Df mediaremoted[22789:13bcd] [com.apple.runningboard:process] Hit the server for a process handle eeab17100006b1b that resolved to: [app<com.entrixy.ios((null))>:27419]
+2026-11-14 21:24:50.809 Df mediaremoted[22789:13bcd] [com.apple.runningboard:monitor] Received state update for 27419 (app<com.entrixy.ios((null))>, running-active-Visible
+2026-11-14 21:24:50.810 Df locationd[22807:13f7d] [com.apple.runningboard:process] Hit the server for a process handle eeab17100006b1b that resolved to: [app<com.entrixy.ios((null))>:27419]
+2026-11-14 21:24:50.810 Df locationd[22807:13f7d] [com.apple.runningboard:monitor] Received state update for 27419 (app<com.entrixy.ios((null))>, running-active-Visible
+2026-11-14 21:24:50.810 Df locationd[22807:13f7e] [com.apple.locationd.Core:Core] {"msg":"RBS #AppMonitor process monitor update handler invoked", "pid":27419, "bundleID":com.entrixy.ios, "state":4}
+2026-11-14 21:24:50.810 Df SpringBoard[22782:10689] [com.apple.SpringBoard:AppSwitcher] [Main (EmbeddedDisplay)] dispatch event:
+<SBTransitionSwitcherModifierEvent: 0x11aa146a0; type: MainTransition; transitionID: BE04AFA0-DFC9-44FA-96E0-BC41A17C170A; phase: Prepare; animated: YES; fromAppLayout: 0x0; toAppLayout: <SBAppLayout: 0x600002c91a00; primary: com.entrixy.ios:68CE56D5F7DE; environment: main>; fromEnvironmentMode: home-screen; toEnvironmentMode: application; fromSpaceConfiguration: undefined; toSpaceConfiguration: full; pendingTermination: {(
+)}; morphingPIPLayoutRole: undefined; previousDesktopItems: {(
+)}>
+2026-11-14 21:24:50.811 Df locationd[22807:13fdd] [com.apple.locationd.Core:Core] {"msg":"RBS #AppMonitor Post Application State Change Notification", "notification":ForegroundRunning, "pid":27419, "bundleId":com.entrixy.ios}
+2026-11-14 21:24:50.816 Df SpringBoard[22782:10689] [com.apple.SpringBoard:AppSwitcher] [Main (EmbeddedDisplay)] handle response:
+<SBSwitcherModifierEventResponse: 0x600000e8dbf0> {
+    <SBSwitcherModifierEventResponse: 0x600000e8ca50> {
+	    <SBSwitcherModifierEventResponse: 0x600000e8c4e0> {
+		    <SBTimerEventSwitcherEventResponse: 0x600000e8c5d0; delay: 0.240000; reason: kSBTransitionModifierInvalidateAsyncRenderingReason>;
+		    <SBInvalidateAdjustedAppLayoutsSwitcherEventResponse: 0x600000e8c540>;
+		};
+	    <SBTimerEventSwitcherEventResponse: 0x600000e8c7e0; delay: 0.060000; reason: kSBFullScreenToHomeCornerRadiusDelayReason>;
+	};
+    <SBSwitcherModifierEventResponse: 0x600000e8c480> {
+	    <SBUpdateLayoutSwitcherEventResponse: 0x6000017713c0; updateVisibleItems; layout; style; mode: None>;
+	    <SBRequestFolderSnapshotsSwitcherEventResponse: 0x600000e8c3f0; snapshotRequested: YES>;
+	    <SBIconOverlayVisibilitySwitcherEventResponse: 0x600001772e00; visible: YES; appLayout: <SBAppLayout: 0x600002c91a00; primary: com.entrixy.ios:68CE56D5F7DE; environment: main>>;
+	    <SBIconViewVisibilitySwitc
+2026-11-14 21:24:50.819 Df runningboardd[22785:1403e] [com.apple.runningboard:connection] Setting client for [app<com.entrixy.ios((null))>:27419] as ready
+2026-11-14 21:24:50.822 Df Entrixy[27419:13f31] [com.apple.runningboard:connection] Identity resolved as app<com.entrixy.ios((null))>
+2026-11-14 21:24:50.825 Df SpringBoard[22782:11e49] [com.apple.UserNotifications:Settings] [com.entrixy.ios] Foreground app will not request ephemeral notifications isAppClip: NO wantsEphemeral notifications: NO
+2026-11-14 21:24:50.826 Df SpringBoard[22782:11e49] [com.apple.UserNotifications:RemoteNotifications] [com.entrixy.ios] com.entrixy.ios application state changed to <RBSProcessState| task:running-active debug:none endowmentNamespace:[
+	com.apple.frontboard.visibility
+	]>
+2026-11-14 21:24:50.828 Df SpringBoard[22782:11e49] [com.apple.UserNotifications:RemoteNotifications] [com.entrixy.ios] Ignore becoming foreground for application without push registration
+2026-11-14 21:24:51.595 Df runningboardd[22785:13e40] [com.apple.runningboard:ttl] Acquiring assertion targeting [app<com.entrixy.ios((null))>:27419] from originator [app<com.entrixy.ios((null))>:27419] with description <RBSAssertionDescriptor| "Shared Background Assertion 0 for com.entrixy.ios" ID:22785-27419-873 target:27419 attributes:[
+	<RBSLegacyAttribute| requestedReason:FinishTask reason:FinishTask flags:( PreventTaskSuspend )>,
+	<RBSAcquisitionCompletionAttribute| policy:AfterValidation>
+	]>
+2026-11-14 21:24:51.595 Df runningboardd[22785:13e40] [com.apple.runningboard:ttl] Assertion 22785-27419-873 (target:[app<com.entrixy.ios((null))>:27419]) will be created as inactive as start-time-defining assertions exist
+2026-11-14 21:24:51.805 Df SpringBoard[22782:11e49] [com.apple.FrontBoard:ProcessWorkspace] [app<com.entrixy.ios>:27419] Dropping launch assertion.
+2026-11-14 21:24:51.805 Df runningboardd[22785:1403e] [com.apple.runningboard:ttl] Invalidating assertion 22785-22782-866 (target:app<com.entrixy.ios((null))>) from originator [osservice<com.apple.SpringBoard>:22782]
+2026-11-14 21:24:51.910 Df runningboardd[22785:12a16] [com.apple.runningboard:monitor] Calculated state for app<com.entrixy.ios((null))>: running-active (role: UserInteractiveFocal) (endowments: {(
+    <RBSProcessEndowmentInfo| namespace:com.apple.frontboard.visibility env:(null)  0>
+)})
+2026-11-14 21:24:52.625 Df runningboardd[22785:1403e] [com.apple.runningboard:ttl] Invalidating assertion 22785-27419-873 (target:[app<com.entrixy.ios((null))>:27419]) from originator [app<com.entrixy.ios((null))>:27419]
+2026-11-14 21:24:54.610 Df SpringBoard[22782:10689] [com.apple.SpringBoard:KeyboardFocus] [com.apple.springboard] coalition says I have focus; enforcing policy: {
+    keyboardFocusTarget: <com.apple.frontboard.systemappservices/FBSceneManager:sceneID%3Acom.entrixy.ios-8488500F-D955-4890-ABB8-68CE56D5F7DE pid:27419>;
+    selectionPolicy: KeyboardArbiter;
+    shouldSuppressRemoteDeferring: 0;
+}
+2026-11-14 21:24:54.610 Df SpringBoard[22782:10689] [com.apple.SpringBoard:KeyboardFocus] rules: (keyboardFocus) outbound target changed from:(null) to <com.apple.frontboard.systemappservices/FBSceneManager:sceneID%3Acom.entrixy.ios-8488500F-D955-4890-ABB8-68CE56D5F7DE pid:27419>
+2026-11-14 21:24:54.610 Df SpringBoard[22782:10689] [com.apple.SpringBoard:KeyboardFocus] rules: (keyboardFocus) defer (<com.apple.frontboard.systemappservices/FBSceneManager:com.apple.springboard pid:22782>) -> <com.apple.frontboard.systemappservices/FBSceneManager:sceneID%3Acom.entrixy.ios-8488500F-D955-4890-ABB8-68CE56D5F7DE pid:27419>
+2026-11-14 21:24:54.611 Df SpringBoard[22782:10689] [com.apple.SpringBoard:KeyboardFocus] [coordinator] new enforced policy: {
+    keyboardFocusTarget: <com.apple.frontboard.systemappservices/FBSceneManager:sceneID%3Acom.entrixy.ios-8488500F-D955-4890-ABB8-68CE56D5F7DE pid:27419>;
+    selectionPolicy: KeyboardArbiter;
+    shouldSuppressRemoteDeferring: 0;
+}
+2026-11-14 21:24:54.612 Df SpringBoard[22782:11e49] [com.apple.KeyboardArbiter:Events] set currentFocus PID:27419 sceneIdentity:com.entrixy.ios-8488500F-D955-4890-ABB8-68CE56D5F7DE
+2026-11-14 21:24:54.617 Df backboardd[22804:13b22] [com.apple.BackBoard:EventDelivery] new deferring rules for pid:22782: [
+    [22782-7]; <keyboardFocus; builtin; …board.systemappservices/FBSceneManager:com.apple.springboard>; () -> <token: 0x47364556; pid: 22782>; reason: …gin event deferring in keyboardFocus for window: 0x1074e7080,
+    [22782-5]; <system; builtin; SBMainSystemGestures>; () -> <token: 0xAACEFC15; pid: 22782>; reason: systemGestureSymbol-Main,
+    [22782-4]; <system; builtin>; () -> <token: 0xAACEFC15; pid: 22782>; reason: systemGestures-Main,
+    [22782-8]; <keyboardFocus; …board.systemappservices/FBSceneManager:com.apple.springboard>; () -> <token: …eneID%3Acom.entrixy.ios-8488500F-D955-4890-ABB8-68CE56D5F7DE; pid: 27419>; reason: SpringBoard<com.apple.springboard>: enforcing outbound,
+    [22782-2]; <keyboardFocus; SBKeyboardFocus>; () -> <token: …board.systemappservices/FBSceneManager:com.apple.springboard; pid: 22782>; reason: SB incoming to root scene (symbol),
+    [22782-3]; <systemKeyCommandOverlay>; () -> <token: 0xDE4BAAA8; pid: 22782>; reason: systemKeyCommandOverlayEnvironm
+2026-11-14 21:24:54.618 Df backboardd[22804:13b22] [com.apple.BackBoard:EventDelivery] [keyboardFocus 0x600002117cf0] setRules:forPID(22782): [
+    [22782-7]; <keyboardFocus; builtin; com.apple.frontboard.systemappservices/FBSceneManager:com.apple.springboard>; () -> <token: 0x47364556; pid: 22782>; reason: SBWindowScene: 0x10731a050: Begin event deferring in keyboardFocus for window: 0x1074e7080,
+    [22782-8]; <keyboardFocus; com.apple.frontboard.systemappservices/FBSceneManager:com.apple.springboard>; () -> <token: com.apple.frontboard.systemappservices/FBSceneManager:sceneID%3Acom.entrixy.ios-8488500F-D955-4890-ABB8-68CE56D5F7DE; pid: 27419>; reason: SpringBoard<com.apple.springboard>: enforcing outbound,
+    [22782-2]; <keyboardFocus; SBKeyboardFocus>; () -> <token: com.apple.frontboard.systemappservices/FBSceneManager:com.apple.springboard; pid: 22782>; reason: SB incoming to root scene (symbol),
+    [22782-1]; <keyboardFocus>; () -> <token: com.apple.frontboard.systemappservices/FBSceneManager:com.apple.springboard; pid: 22782>; reason: SB incoming to root scene
+]
+2026-11-14 21:24:54.622 Df backboardd[22804:13b22] [com.apple.BackBoard:EventDelivery] [keyboardFocus 0x600002117e80] setRules:forPID(22782): [
+    [22782-7]; <keyboardFocus; builtin; com.apple.frontboard.systemappservices/FBSceneManager:com.apple.springboard>; () -> <token: 0x47364556; pid: 22782>; reason: SBWindowScene: 0x10731a050: Begin event deferring in keyboardFocus for window: 0x1074e7080,
+    [22782-8]; <keyboardFocus; com.apple.frontboard.systemappservices/FBSceneManager:com.apple.springboard>; () -> <token: com.apple.frontboard.systemappservices/FBSceneManager:sceneID%3Acom.entrixy.ios-8488500F-D955-4890-ABB8-68CE56D5F7DE; pid: 27419>; reason: SpringBoard<com.apple.springboard>: enforcing outbound,
+    [22782-2]; <keyboardFocus; SBKeyboardFocus>; () -> <token: com.apple.frontboard.systemappservices/FBSceneManager:com.apple.springboard; pid: 22782>; reason: SB incoming to root scene (symbol),
+    [22782-1]; <keyboardFocus>; () -> <token: com.apple.frontboard.systemappservices/FBSceneManager:com.apple.springboard; pid: 22782>; reason: SB incoming to root scene
+]
+2026-11-14 21:24:54.629 Df backboardd[22804:13b22] [com.apple.BackBoard:EventDelivery] chain did update (setDeferringRules) <keyboardFocus; display: null> containsEndOfChain: YES; [
+    <token: com.apple.frontboard.systemappservices/FBSceneManager:com.apple.springboard; pid: 22782>,
+    <token: com.apple.frontboard.systemappservices/FBSceneManager:sceneID%3Acom.entrixy.ios-8488500F-D955-4890-ABB8-68CE56D5F7DE; pid: 27419>
+]
+2026-11-14 21:24:54.629 Df backboardd[22804:13b22] [com.apple.BackBoard:EventDelivery] chain did update (setDeferringRules) <keyboardFocus; display: builtin> containsEndOfChain: YES; [
+    <token: com.apple.frontboard.systemappservices/FBSceneManager:com.apple.springboard; pid: 22782>,
+    <token: com.apple.frontboard.systemappservices/FBSceneManager:sceneID%3Acom.entrixy.ios-8488500F-D955-4890-ABB8-68CE56D5F7DE; pid: 27419>
+]
+2026-11-14 21:25:11.729 Df locationd[22807:131ed] [com.apple.locationd.Core:Core] {"msg":"#Warning #ClientResolution the passed keyPath is not registered. Resolving to #nullCKP", "InputCKP":icom.entrixy.ios:}
+2026-11-14 21:25:11.730 Df locationd[22807:131ed] [com.apple.locationd.Core:Core] {"msg":"#CLIUA AppMonitor notification", "notification":4, "pid":27419, "bundleId":com.entrixy.ios, "ClientKey":icom.entrixy.ios:}
+2026-11-14 21:25:11.730 Df locationd[22807:131ed] [com.apple.locationd.Core:Core] {"msg":"#CLIUA Marking change", "clientKey":icom.entrixy.ios:, "reason":Process state from RunningBoard, "AssertionLevel":5, "coming":1}
+2026-11-14 21:25:11.730 Df locationd[22807:131ed] [com.apple.locationd.Core:Core] {"msg":"#CLIUA updating AssertionRecord", "ClientKey":icom.entrixy.ios:, "AssertionLevel":0}
+2026-11-14 21:25:11.730 Df locationd[22807:131ed] [com.apple.locationd.Core:Core] {"msg":"#CLIUA AssertionRecord updated", "ClientKey":icom.entrixy.ios:, "AssertionLevel":5}
+2026-11-14 21:25:11.730 Df locationd[22807:131ed] [com.apple.locationd.Core:Core] {"msg":"#CLIUA in-use level changed for client", "ClientKey":icom.entrixy.ios:}
+2026-11-14 21:25:11.730 Df locationd[22807:131ed] [com.apple.locationd.Core:Core] {"msg":"#Warning #ClientResolution the passed keyPath is not registered. Resolving to #nullCKP", "InputCKP":icom.entrixy.ios:}
+2026-11-14 21:25:11.988 Df SpringBoard[22782:10689] [com.apple.SpringBoard:AppSwitcher] [Main (EmbeddedDisplay)] dispatch event:
+<SBTransitionSwitcherModifierEvent: 0x1073ca300; type: MainTransition; transitionID: BE04AFA0-DFC9-44FA-96E0-BC41A17C170A; phase: Animate; animated: YES; fromAppLayout: 0x0; toAppLayout: <SBAppLayout: 0x600002c91a00; primary: com.entrixy.ios:68CE56D5F7DE; environment: main>; fromEnvironmentMode: home-screen; toEnvironmentMode: application; fromSpaceConfiguration: undefined; toSpaceConfiguration: full; pendingTermination: {(
+)}; morphingPIPLayoutRole: undefined; previousDesktopItems: {(
+)}>
+2026-11-14 21:25:12.046 Df SpringBoard[22782:10689] [com.apple.SpringBoard:Common] Application process state changed for com.entrixy.ios: <SBApplicationProcessState: 0x600000422b80; pid: 27419; taskState: Running; visibility: Foreground>
+2026-11-14 21:25:12.050 Df SpringBoard[22782:10689] [com.apple.SpringBoard:Common] Returning cached initialization context for com.entrixy.ios
+2026-11-14 21:25:12.108 Df SpringBoard[22782:10689] [com.apple.SpringBoard:Common] Application process state changed for com.entrixy.ios: <SBApplicationProcessState: 0x60000043a200; pid: 27419; taskState: Running; visibility: Foreground>
+2026-11-14 21:25:12.109 Df SpringBoard[22782:10689] [com.apple.SpringBoard:Common] SceneWorkspaceDelegate[0x6000002589e0-com.apple.SpringBoard.SceneWorkspace.PrototypeTools] client did connect with handshake: <FBSceneClientHandshake:0x60000043a180; [app<com.entrixy.ios((null))>:27419] remnants=0>
+2026-11-14 21:25:12.109 Df SpringBoard[22782:10689] [com.apple.SpringBoard:Common] SceneWorkspaceDelegate[0x600000241340-com.apple.SpringBoard.SceneWorkspace.DruidUI] client did connect with handshake: <FBSceneClientHandshake:0x60000043a180; [app<com.entrixy.ios((null))>:27419] remnants=0>
+2026-11-14 21:25:12.109 Df SpringBoard[22782:10689] [com.apple.SpringBoard:Common] SceneWorkspaceDelegate[0x600000253200-com.apple.SpringBoard.SceneWorkspace.FullKeyboardAccessUI] client did connect with handshake: <FBSceneClientHandshake:0x60000043a180; [app<com.entrixy.ios((null))>:27419] remnants=0>
+2026-11-14 21:25:12.109 Df SpringBoard[22782:10689] [com.apple.SpringBoard:Common] SceneWorkspaceDelegate[0x600000258880-com.apple.SpringBoard.SceneWorkspace.AudioHUD] client did connect with handshake: <FBSceneClientHandshake:0x600000420860; [app<com.entrixy.ios((null))>:27419] remnants=0>
+2026-11-14 21:25:12.109 Df SpringBoard[22782:10689] [com.apple.SpringBoard:Common] SceneWorkspaceDelegate[0x6000002585c0-com.apple.SpringBoard.SceneWorkspace.PerfPowerHUD] client did connect with handshake: <FBSceneClientHandshake:0x600000420860; [app<com.entrixy.ios((null))>:27419] remnants=0>
+2026-11-14 21:25:12.109 Df SpringBoard[22782:10689] [com.apple.SpringBoard:Common] SceneWorkspaceDelegate[0x600000241c20-com.apple.SpringBoard.SceneWorkspace.InputUI] client did connect with handshake: <FBSceneClientHandshake:0x600000420860; [app<com.entrixy.ios((null))>:27419] remnants=0>
+2026-11-14 21:25:12.110 Df SpringBoard[22782:10689] [com.apple.SpringBoard:Common] SceneWorkspaceDelegate[0x600000258b40-com.apple.SpringBoard.SceneWorkspace.GlitchHUD] client did connect with handshake: <FBSceneClientHandshake:0x600000420860; [app<com.entrixy.ios((null))>:27419] remnants=0>
+2026-11-14 21:25:12.110 Df SpringBoard[22782:10689] [com.apple.SpringBoard:Common] SceneWorkspaceDelegate[0x600000253be0-com.apple.SpringBoard.SceneWorkspace.AssistiveTouchUI] client did connect with handshake: <FBSceneClientHandshake:0x600000420860; [app<com.entrixy.ios((null))>:27419] remnants=0>
+2026-11-14 21:25:12.110 Df SpringBoard[22782:10689] [com.apple.SpringBoard:Common] SceneWorkspaceDelegate[0x600000241f80-com.apple.SpringBoard.SceneWorkspace.OverlayUI] client did connect with handshake: <FBSceneClientHandshake:0x600000420860; [app<com.entrixy.ios((null))>:27419] remnants=0>
+2026-11-14 21:25:12.111 Df SpringBoard[22782:10689] [com.apple.SpringBoard:Common] SceneWorkspaceDelegate[0x6000002533e0-com.apple.SpringBoard.SceneWorkspace.VoiceControlUI] client did connect with handshake: <FBSceneClientHandshake:0x600000420860; [app<com.entrixy.ios((null))>:27419] remnants=0>
+2026-11-14 21:25:12.111 Df SpringBoard[22782:10689] [com.apple.SpringBoard:Common] SceneWorkspaceDelegate[0x6000002582e0-com.apple.SpringBoard.SceneWorkspace.EyedropperUI] client did connect with handshake: <FBSceneClientHandshake:0x600000420860; [app<com.entrixy.ios((null))>:27419] remnants=0>
+2026-11-14 21:25:12.111 Df SpringBoard[22782:10689] [com.apple.SpringBoard:Common] SceneWorkspaceDelegate[0x600000258720-com.apple.SpringBoard.SceneWorkspace.InternalPerfPowerHUD] client did connect with handshake: <FBSceneClientHandshake:0x600000420860; [app<com.entrixy.ios((null))>:27419] remnants=0>
+2026-11-14 21:25:12.111 Df SpringBoard[22782:10689] [com.apple.SpringBoard:Common] SceneWorkspaceDelegate[0x600000258440-com.apple.SpringBoard.SceneWorkspace.Moments] client did connect with handshake: <FBSceneClientHandshake:0x600000420860; [app<com.entrixy.ios((null))>:27419] remnants=0>
+2026-11-14 21:25:12.112 Df SpringBoard[22782:10689] [com.apple.SpringBoard:Common] SceneWorkspaceDelegate[0x600000253da0-com.apple.SpringBoard.SceneWorkspace.AccessibilityUIServerUI] client did connect with handshake: <FBSceneClientHandshake:0x600000420860; [app<com.entrixy.ios((null))>:27419] remnants=0>
+2026-11-14 21:25:12.112 Df SpringBoard[22782:10689] [com.apple.SpringBoard:Common] SceneWorkspaceDelegate[0x600000253520-com.apple.SpringBoard.SceneWorkspace.LiveTranscriptionUI] client did connect with handshake: <FBSceneClientHandshake:0x60000043a140; [app<com.entrixy.ios((null))>:27419] remnants=0>
+2026-11-14 21:25:12.122 Df SpringBoard[22782:10689] [com.apple.UIKit:SceneDeactivation] [sceneID:com.entrixy.ios-8488500F-D955-4890-ABB8-68CE56D5F7DE] Setting deactivation reasons to: '(none)' for reason: updateAllScenesForBand - Assertion removed.
+2026-11-14 21:25:12.137 Df SpringBoard[22782:10689] [com.apple.SpringBoard:TraitsArbiter] [SwitcherOrientation] outSwitcherOrientation: portrait (1), outElementsOrientations: {
+    "sceneID:com.entrixy.ios-8488500F-D955-4890-ABB8-68CE56D5F7DE" = 1;
+}
+2026-11-14 21:25:12.158 Df SpringBoard[22782:10689] [com.apple.SpringBoard:KeyboardFocus] rules: (scene setting) ADDED keyboardFocus environment to scene: sceneID:com.entrixy.ios-8488500F-D955-4890-ABB8-68CE56D5F7DE
+2026-11-14 21:25:12.530 Df SpringBoard[22782:10689] [com.apple.SpringBoard:AppSwitcher] [Main (EmbeddedDisplay)] dispatch event:
+<SBTransitionSwitcherModifierEvent: 0x11aa0fe40; type: MainTransition; transitionID: BE04AFA0-DFC9-44FA-96E0-BC41A17C170A; phase: Complete; animated: YES; fromAppLayout: 0x0; toAppLayout: <SBAppLayout: 0x600002c91a00; primary: com.entrixy.ios:68CE56D5F7DE; environment: main>; fromEnvironmentMode: home-screen; toEnvironmentMode: application; fromSpaceConfiguration: undefined; toSpaceConfiguration: full; pendingTermination: {(
+)}; morphingPIPLayoutRole: undefined; previousDesktopItems: {(
+)}>
+2026-11-14 21:25:12.531 Df SpringBoard[22782:10689] [com.apple.SpringBoard:AppSwitcher] [Main (EmbeddedDisplay)] handle response:
+<SBSwitcherModifierEventResponse: 0x600000c2f330> {
+    <SBPreemptAnimationSwitcherEventResponse: 0x600000c2f120>;
+    <SBSwitcherModifierEventResponse: 0x600000c2ef70> {
+	    <SBInvalidateAdjustedAppLayoutsSwitcherEventResponse: 0x600000c2fcf0>;
+	    <SBSwitcherModifierEventResponse: 0x600000c2ea00> {
+		    <SBRequestFolderSnapshotsSwitcherEventResponse: 0x600000c2df80; snapshotRequested: NO>;
+		    <SBIconOverlayVisibilitySwitcherEventResponse: 0x60000172cd80; visible: NO; appLayout: <SBAppLayout: 0x600002c91a00; primary: com.entrixy.ios:68CE56D5F7DE; environment: main>>;
+		    <SBIconViewVisibilitySwitcherEventResponse: 0x600002252e40; visible: YES; animationSettings: 0x0; appLayout: <SBAppLayout: 0x600002c91a00; primary: com.entrixy.ios:68CE56D5F7DE; environment: main>>;
+		    <SBMatchMoveToIconViewSwitcherEventResponse: 0x6000026f08a0; active: NO; appLayout: <SBAppLayout: 0x600002c91a00; primary: com.entrixy.ios:68CE56D5F7DE; environment: main>>;
+		};
+	};
+}
+2026-11-14 21:25:13.150 Df appleaccountd[22892:10909] [com.apple.appleaccount:daemon] Dataclass App Install Observer - Ignoring ["com.entrixy.ios"]
+2026-11-14 21:25:13.337 Df runningboardd[22785:13f1b] [com.apple.runningboard:assertion] Successfully acquired underlying assertion for [app<com.entrixy.ios((null))>:27419]
+2026-11-14 21:25:13.376 Df SpringBoard[22782:11ee5] [com.apple.FrontBoard:ProcessWorkspace] [app<com.entrixy.ios>:27419] Workspace state did change: XX-None[0] --> FV-Focal[100] (assertion acquired).
+2026-11-14 21:25:13.376 Df SpringBoard[22782:11ee5] [com.apple.FrontBoard:ProcessScene] [0x600003815f80:(FBSceneManager):sceneID:com.entrixy.ios-8488500F-D955-4890-ABB8-68CE56D5F7DE] Sending scene action [Logical Activate][0x95e3] to process 0x1075c7300 (watchdog: 599.96s)
+2026-11-14 21:25:13.376 Df SpringBoard[22782:11ee5] [com.apple.FrontBoard:ProcessScene] [0x600003815f80:(FBSceneManager):sceneID:com.entrixy.ios-8488500F-D955-4890-ABB8-68CE56D5F7DE] Sending scene create.
+2026-11-14 21:25:13.376 Df SpringBoard[22782:14a0d] [com.apple.runningboard:monitor] Received state update for 27419 (app<com.entrixy.ios((null))>, running-active-Visible
+2026-11-14 21:25:13.377 Df mediaremoted[22789:14048] [com.apple.runningboard:monitor] Received state update for 27419 (app<com.entrixy.ios((null))>, running-active-Visible
+2026-11-14 21:25:13.380 Df locationd[22807:131ed] [com.apple.runningboard:monitor] Received state update for 27419 (app<com.entrixy.ios((null))>, running-active-Visible
+2026-11-14 21:25:14.229 Df runningboardd[22785:12487] [com.apple.runningboard:ttl] Acquiring assertion targeting [app<com.entrixy.ios((null))>:27419] from originator [app<com.entrixy.ios((null))>:27419] with description <RBSAssertionDescriptor| "Shared Background Assertion 1 for com.entrixy.ios" ID:22785-27419-886 target:27419 attributes:[
+	<RBSLegacyAttribute| requestedReason:FinishTask reason:FinishTask flags:( PreventTaskSuspend )>,
+	<RBSAcquisitionCompletionAttribute| policy:AfterValidation>
+	]>
+2026-11-14 21:25:14.229 Df runningboardd[22785:12487] [com.apple.runningboard:ttl] Assertion 22785-27419-886 (target:[app<com.entrixy.ios((null))>:27419]) will be created as inactive as start-time-defining assertions exist
+2026-11-14 21:25:14.237 Df Entrixy[27419:13f21] [com.apple.BacklightServices:scenes] 0x600000c19b30 setDelegate:<0x600000c19c20 _UIBacklightEnvironment> hasDelegate:YES for environment:sceneID:com.entrixy.ios-8488500F-D955-4890-ABB8-68CE56D5F7DE
+2026-11-14 21:25:14.243 Df Entrixy[27419:13f21] [com.apple.UIKit:KeyWindow] Scene target of keyboard event deferring environment did change: 1; scene: UIWindowScene: 0x101a0a840; scene identity: com.apple.frontboard.systemappservices/FBSceneManager:sceneID%3Acom.entrixy.ios-8488500F-D955-4890-ABB8-68CE56D5F7DE
+2026-11-14 21:25:14.244 Df Entrixy[27419:13f21] [com.apple.UIKit:KeyWindow] Scene became target of keyboard event deferring environment: UIWindowScene: 0x101a0a840; scene identity: com.apple.frontboard.systemappservices/FBSceneManager:sceneID%3Acom.entrixy.ios-8488500F-D955-4890-ABB8-68CE56D5F7DE
+2026-11-14 21:25:14.742 Df runningboardd[22785:12487] [com.apple.runningboard:ttl] Invalidating assertion 22785-27419-886 (target:[app<com.entrixy.ios((null))>:27419]) from originator [app<com.entrixy.ios((null))>:27419]
+2026-11-14 21:25:14.879 Df Entrixy[27419:13f21] [com.apple.UIKit:KeyWindow] Window did become application key: UIWindow: 0x101711ac0; contextId: 0xB0857609; scene identity: com.apple.frontboard.systemappservices/FBSceneManager:sceneID%3Acom.entrixy.ios-8488500F-D955-4890-ABB8-68CE56D5F7DE
+2026-11-14 21:25:14.880 Df backboardd[22804:14a1f] [com.apple.BackBoard:EventDelivery] new deferring rules for pid:27419: [[27419-1]; <keyboardFocus; builtin; …eneID%3Acom.entrixy.ios-8488500F-D955-4890-ABB8-68CE56D5F7DE>; () -> <token: 0xB0857609; pid: 27419>; reason: …gin event deferring in keyboardFocus for window: 0x101711ac0]
+2026-11-14 21:25:14.880 Df backboardd[22804:14a1f] [com.apple.BackBoard:EventDelivery] [keyboardFocus 0x600002117cf0] setRules:forPID(27419): [[27419-1]; <keyboardFocus; builtin; com.apple.frontboard.systemappservices/FBSceneManager:sceneID%3Acom.entrixy.ios-8488500F-D955-4890-ABB8-68CE56D5F7DE>; () -> <token: 0xB0857609; pid: 27419>; reason: UIWindowScene: 0x101a0a840: Begin event deferring in keyboardFocus for window: 0x101711ac0]
+2026-11-14 21:25:14.881 Df backboardd[22804:14a1f] [com.apple.BackBoard:EventDelivery] [keyboardFocus 0x600002117e80] setRules:forPID(27419): [[27419-1]; <keyboardFocus; builtin; com.apple.frontboard.systemappservices/FBSceneManager:sceneID%3Acom.entrixy.ios-8488500F-D955-4890-ABB8-68CE56D5F7DE>; () -> <token: 0xB0857609; pid: 27419>; reason: UIWindowScene: 0x101a0a840: Begin event deferring in keyboardFocus for window: 0x101711ac0]
+2026-11-14 21:25:14.882 Df backboardd[22804:14a1f] [com.apple.BackBoard:EventDelivery] chain did update (setDeferringRules) <keyboardFocus; display: null; compatibilityDisplay: builtin> containsEndOfChain: YES; [
+    <token: com.apple.frontboard.systemappservices/FBSceneManager:com.apple.springboard; pid: 22782>,
+    <token: com.apple.frontboard.systemappservices/FBSceneManager:sceneID%3Acom.entrixy.ios-8488500F-D955-4890-ABB8-68CE56D5F7DE; pid: 27419>,
+    <token: 0xB0857609; pid: 27419>
+]
+2026-11-14 21:25:14.882 Df backboardd[22804:14a1f] [com.apple.BackBoard:EventDelivery] chain did update (setDeferringRules) <keyboardFocus; display: builtin> containsEndOfChain: YES; [
+    <token: com.apple.frontboard.systemappservices/FBSceneManager:com.apple.springboard; pid: 22782>,
+    <token: com.apple.frontboard.systemappservices/FBSceneManager:sceneID%3Acom.entrixy.ios-8488500F-D955-4890-ABB8-68CE56D5F7DE; pid: 27419>,
+    <token: 0xB0857609; pid: 27419>
+]
+2026-11-14 21:25:14.883 Df Entrixy[27419:13f2e] [com.apple.BackBoard:EventDelivery] policyStatus:<BKSHIDEventDeliveryPolicyObserver: 0x60000260e1c0; token: com.apple.frontboard.systemappservices/FBSceneManager:sceneID%3Acom.entrixy.ios-8488500F-D955-4890-ABB8-68CE56D5F7DE; status: ancestor> was:target
+2026-11-14 21:25:14.884 Df Entrixy[27419:13f21] [com.apple.UIKit:AppLifecycle] sceneOfRecord: sceneID: sceneID:com.entrixy.ios-8488500F-D955-4890-ABB8-68CE56D5F7DE  persistentID: 8488500F-D955-4890-ABB8-68CE56D5F7DE
+2026-11-14 21:25:14.892 Df backboardd[22804:14a36] [com.apple.BackBoard:TouchEvents] new scene host settings: contextID:B0857609 <sceneID:com.entrixy.ios-8488500F-D955-4890-ABB8-68CE56D5F7DE> unspecified -> foreground
+2026-11-14 21:25:15.234 Df securityd[22846:142c2] [com.apple.securityd:item] inserted <genp,acct=primary,svce=com.entrixy.ios.capture.B9CB9AF0-D385-4BAA-97A0-A3E0ECE25ABA,agrp=com.entrixy.ios,sync=0,musr=, |otherAttr,tomb=0,rowid=30,cdat=2026-11-14 21:25:15 +0000,mdat=2026-11-14 21:25:15 +0000,pdmn=cku,sha1=14939BD5E7C43FD803E1C61FC335D5CDBBC0871D,v_Data=<?>,UUID=5C1DA446-B8DF-4766-83B0-B2EC0EAC745C,persistref=75FA2C6ECBCE40B39489A5D407C7935B,clip=0>
+2026-11-14 21:25:18.330 Df splashboardd[27420:14b3d] [com.apple.SplashBoard:Capture] Running image request from SpringBoard.22782 for com.entrixy.ios
+2026-11-14 21:25:18.381 Df splashboardd[27420:13f25] [com.apple.SplashBoard:Capture] Updating window to <XBLaunchStateRequest: 0x60000290c310; groupID: com.entrixy.ios - {DEFAULT GROUP}; statusBar: normal; refSize: {393, 852}; orientation: Portrait; userInterfaceStyle: Light>
+2026-11-14 21:25:18.408 Df splashboardd[27420:13f25] [com.apple.SplashBoard:Capture] [com.entrixy.ios] launch image generation completed after 0.074s
+2026-11-14 21:25:36.010 Df SpringBoard[22782:1206c] [com.apple.FrontBoard:ProcessScene] [0x600003815f80:(FBSceneManager):sceneID:com.entrixy.ios-8488500F-D955-4890-ABB8-68CE56D5F7DE] Scene action [Logical Activate][0x95e3] completed with success: 1
+2026-11-14 21:25:36.010 Df SpringBoard[22782:10689] [com.apple.FrontBoard:Scene] [(FBSceneManager):sceneID:com.entrixy.ios-8488500F-D955-4890-ABB8-68CE56D5F7DE] scene content state changed: ready
+2026-11-14 21:25:36.014 Df runningboardd[22785:1403c] [com.apple.runningboard:ttl] Acquiring assertion targeting [app<com.entrixy.ios((null))>:27419](UIScene:com.apple.frontboard.systemappservices/FBSceneManager:sceneID%3Acom.entrixy.ios-8488500F-D955-4890-ABB8-68CE56D5F7DE) from originator [osservice<com.apple.SpringBoard>:22782] with description <RBSAssertionDescriptor| "injecting  inherited from 'UIScene:com.apple.frontboard.systemappservices/FBSceneManager:com.apple.springboard'" ID:22785-22782-902 target:27419<UIScene:com.apple.frontboard.systemappservices/FBSceneManager:sceneID%3Acom.entrixy.ios-8488500F-D955-4890-ABB8-68CE56D5F7DE> attributes:[
+	<RBSHereditaryGrant| endowmentNamespace:com.apple.boardservices.endpoint-injection UIScene:com.apple.frontboard.systemappservices/FBSceneManager:com.apple.springboard>,
+	<RBSHereditaryGrant| endowmentNamespace:com.apple.frontboard.visibility UIScene:com.apple.frontboard.systemappservices/FBSceneManager:com.apple.springboard>
+	]>
+2026-11-14 21:25:36.014 Df runningboardd[22785:1403c] [com.apple.runningboard:ttl] Assertion 22785-22782-902 (target:[app<com.entrixy.ios((null))>:27419](UIScene:com.apple.frontboard.systemappservices/FBSceneManager:sceneID%3Acom.entrixy.ios-8488500F-D955-4890-ABB8-68CE56D5F7DE)) will be created as active
+2026-11-14 21:25:36.015 Df SpringBoard[22782:10689] [com.apple.FrontBoard:Scene] [(FBSceneManager):sceneID:com.entrixy.ios-8488500F-D955-4890-ABB8-68CE56D5F7DE] Setting parent scene: (FBSceneManager):com.apple.springboard
+2026-11-14 21:25:36.016 Df SpringBoard[22782:10689] [com.apple.FrontBoard:Scene] [(FBSceneManager):sceneID:com.entrixy.ios-8488500F-D955-4890-ABB8-68CE56D5F7DE] propagating 5 settings from (FBSceneManager):com.apple.springboard
+2026-11-14 21:25:36.018 Df runningboardd[22785:13e40] [com.apple.runningboard:monitor] Calculated state for app<com.entrixy.ios((null))>: running-active (role: UserInteractiveFocal) (endowments: {(
+    <RBSProcessEndowmentInfo| namespace:com.apple.frontboard.visibility env:UIScene:com.apple.frontboard.systemappservices/FBSceneManager:sceneID%3Acom.entrixy.ios-8488500F-D955-4890-ABB8-68CE56D5F7DE payload: 5563247943744446693>,
+    <RBSProcessEndowmentInfo| namespace:com.apple.frontboard.visibility env:(null)  0>
+)})
+2026-11-14 21:25:36.019 Df runningboardd[22785:13f1b] [com.apple.runningboard:connection] Inheritance changeset: <RBSInheritanceChangeSet| gained:{(
+    <RBSInheritance| environment:UIScene:com.apple.frontboard.systemappservices/FBSceneManager:sceneID%3Acom.entrixy.ios-8488500F-D955-4890-ABB8-68CE56D5F7DE name:com.apple.frontboard.visibility origID:22785-22782-902 payload 5563247943744446693>
+)} lost:{(
+)}>
+2026-11-14 21:25:36.024 Df SpringBoard[22782:12081] [com.apple.runningboard:monitor] Received state update for 27419 (app<com.entrixy.ios((null))>, running-active-Visible
+2026-11-14 21:25:36.027 Df SpringBoard[22782:10689] [com.apple.FrontBoard:Scene] [(FBSceneManager):sceneID:com.entrixy.ios-8488500F-D955-4890-ABB8-68CE56D5F7DE] Removing parent scene.
+2026-11-14 21:25:36.027 Df runningboardd[22785:13f1b] [com.apple.runningboard:ttl] Invalidating assertion 22785-22782-902 (target:[app<com.entrixy.ios((null))>:27419](UIScene:com.apple.frontboard.systemappservices/FBSceneManager:sceneID%3Acom.entrixy.ios-8488500F-D955-4890-ABB8-68CE56D5F7DE)) from originator [osservice<com.apple.SpringBoard>:22782]
+2026-11-14 21:25:36.032 Df SpringBoard[22782:10689] [com.apple.FrontBoard:Scene] [(FBSceneManager):sceneID:com.entrixy.ios-8488500F-D955-4890-ABB8-68CE56D5F7DE] Setting parent scene: (FBSceneManager):com.apple.springboard
+2026-11-14 21:25:36.033 Df SpringBoard[22782:10689] [com.apple.FrontBoard:Scene] [(FBSceneManager):sceneID:com.entrixy.ios-8488500F-D955-4890-ABB8-68CE56D5F7DE] propagating 5 settings from (FBSceneManager):com.apple.springboard
+2026-11-14 21:25:36.034 Df runningboardd[22785:13f1b] [com.apple.runningboard:ttl] Acquiring assertion targeting [app<com.entrixy.ios((null))>:27419](UIScene:com.apple.frontboard.systemappservices/FBSceneManager:sceneID%3Acom.entrixy.ios-8488500F-D955-4890-ABB8-68CE56D5F7DE) from originator [osservice<com.apple.SpringBoard>:22782] with description <RBSAssertionDescriptor| "injecting  inherited from 'UIScene:com.apple.frontboard.systemappservices/FBSceneManager:com.apple.springboard'" ID:22785-22782-903 target:27419<UIScene:com.apple.frontboard.systemappservices/FBSceneManager:sceneID%3Acom.entrixy.ios-8488500F-D955-4890-ABB8-68CE56D5F7DE> attributes:[
+	<RBSHereditaryGrant| endowmentNamespace:com.apple.boardservices.endpoint-injection UIScene:com.apple.frontboard.systemappservices/FBSceneManager:com.apple.springboard>,
+	<RBSHereditaryGrant| endowmentNamespace:com.apple.frontboard.visibility UIScene:com.apple.frontboard.systemappservices/FBSceneManager:com.apple.springboard>
+	]>
+2026-11-14 21:25:36.034 Df runningboardd[22785:13f1b] [com.apple.runningboard:ttl] Assertion 22785-22782-903 (target:[app<com.entrixy.ios((null))>:27419](UIScene:com.apple.frontboard.systemappservices/FBSceneManager:sceneID%3Acom.entrixy.ios-8488500F-D955-4890-ABB8-68CE56D5F7DE)) will be created as active
+2026-11-14 21:25:36.037 Df runningboardd[22785:1403c] [com.apple.runningboard:connection] Inheritance changeset: <RBSInheritanceChangeSet| gained:{(
+    <RBSInheritance| environment:UIScene:com.apple.frontboard.systemappservices/FBSceneManager:sceneID%3Acom.entrixy.ios-8488500F-D955-4890-ABB8-68CE56D5F7DE name:com.apple.frontboard.visibility origID:22785-22782-903 payload 5563247943744446693>
+)} lost:{(
+)}>
+2026-11-14 21:25:36.047 Df SpringBoard[22782:10689] [com.apple.SpringBoard:AppSwitcher] [Main (EmbeddedDisplay)] dispatch event:
+<SBSceneReadySwitcherModifierEvent: 0x600000c51a10; type: SceneReady; appLayout: <SBAppLayout: 0x600002c91a00; primary: com.entrixy.ios:68CE56D5F7DE; environment: main> {
+    configuration = full;
+    environment = main;
+    centerConfiguration = undefined;
+    preferredDisplayOrdinal = 0;
+    continuousExposeIdentifier = com.entrixy.ios;
+    layoutItems = {
+        primary = <SBDisplayItem: 0x60000179bbc0; type: App; bundleIdentifier: com.entrixy.ios; uniqueIdentifier: sceneID:com.entrixy.ios-8488500F-D955-4890-ABB8-68CE56D5F7DE>;
+    }
+}>
+2026-11-14 21:25:36.089 Df SpringBoard[22782:10689] [com.apple.SpringBoard:Common] Front display did change: <SBApplication: 0x600003d46670; com.entrixy.ios>
+2026-11-14 21:25:36.146 Df log[28480:0] [com.apple.log:] log run noninteractively, parent: 22767 (launchd_sim), args: 'log' 'show' '--last' '1m' '--style' 'compact' '--predicate' 'eventMessage CONTAINS "com.entrixy.ios"'
+2026-11-14 21:25:36.345 Df Entrixy[27419:13f21] [com.apple.UIKit:KeyWindow] Scene became target of keyboard event deferring environment: UIWindowScene: 0x101a0a840; scene identity: com.apple.frontboard.systemappservices/FBSceneManager:sceneID%3Acom.entrixy.ios-8488500F-D955-4890-ABB8-68CE56D5F7DE
+2026-11-14 21:25:36.443 Df runningboardd[22785:1403c] [com.apple.runningboard:connection] Inheritance changeset: <RBSInheritanceChangeSet| gained:{(
+)} lost:{(
+    <RBSInheritance| environment:UIScene:com.apple.frontboard.systemappservices/FBSceneManager:sceneID%3Acom.entrixy.ios-8488500F-D955-4890-ABB8-68CE56D5F7DE name:com.apple.frontboard.visibility origID:22785-22782-902 payload 5563247943744446693>
+)}>
+2026-11-14 21:25:36.791 Df locationd[22807:14a0f] [com.apple.runningboard:monitor] Received state update for 27419 (app<com.entrixy.ios((null))>, running-active-Visible
+2026-11-14 21:25:36.941 Df mediaremoted[22789:141a7] [com.apple.runningboard:monitor] Received state update for 27419 (app<com.entrixy.ios((null))>, running-active-Visible
+Optional simulator command timed out: xcrun simctl shutdown 3CF26D1F-464B-4BB9-8FE5-00FC809EB1D4
+Traceback (most recent call last):
+  File "/Users/runner/work/ios-build./ios-build./scripts/capture_simulator.py", line 331, in <module>
+    main()
+    ~~~~^^
+  File "/Users/runner/work/ios-build./ios-build./scripts/capture_simulator.py", line 189, in main
+    raise RuntimeError('Fresh app startup diagnostic missing; cannot verify running UI')
+RuntimeError: Fresh app startup diagnostic missing; cannot verify running UI
