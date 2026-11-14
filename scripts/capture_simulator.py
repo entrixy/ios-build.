@@ -182,7 +182,10 @@ def main():
                     time.sleep(4)
                     container = Path(run('xcrun', 'simctl', 'get_app_container', device, BUNDLE, 'data'))
                     diagnostic = container / 'Library/Caches' / diagnostic_name
-                    startup_deadline = time.monotonic() + 30
+                    # A fresh Intel simulator can take over a minute between accepting
+                    # launch and making the first scene active (see SpringBoard logs).
+                    # Wait for this same process; never relaunch an action scenario.
+                    startup_deadline = time.monotonic() + 180
                     while not diagnostic.is_file() and time.monotonic() < startup_deadline:
                         time.sleep(0.5)
                     if not diagnostic.is_file():
