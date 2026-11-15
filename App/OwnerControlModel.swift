@@ -128,7 +128,7 @@ final class OwnerControlModel: ObservableObject {
               let owner = app.owners.first(where: { $0.server == server }),
               let object = owner.objects?.first(where: { $0.id == objectID }), let numberID = object.numberID,
               object.pending == nil, object.available != false, let link = links[server], link.authenticated, link.attempt == nil else {
-            app.errorMessage = "Нет готового соединения или предыдущий запрос ещё не завершён."
+            messages[objectID] = "Нет готового соединения или предыдущий запрос ещё не завершён."
             return
         }
         guard app.ownerManualActionAllowed(object) else { return }
@@ -155,7 +155,7 @@ final class OwnerControlModel: ObservableObject {
         } catch {
             messages[objectID] = "Не удалось получить результат команды. Автоматического повтора не будет."
             links[server]?.live.close()
-            app.errorMessage = object.kind == "device" && object.wrappedSocketSecret == nil
+            messages[objectID] = object.kind == "device" && object.wrappedSocketSecret == nil
                 ? "Контроллеру нужна защищённая настройка перед открытием."
                 : "Команда не подтверждена. Повторный запрос автоматически не отправляется."
         }

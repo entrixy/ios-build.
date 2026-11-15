@@ -78,6 +78,19 @@ final class ActionFlowTests: XCTestCase {
         XCTAssertTrue(controller.sent.isEmpty)
         XCTAssertTrue(model.journal.isEmpty)
         XCTAssertNil(model.actionIntent(guestID: guest.id, object: object))
+        XCTAssertNil(model.errorMessage, "Unavailable card taps must not open the global alert")
+        let key = guest.id + "|" + object.id
+        let rejection = try XCTUnwrap(model.actionRejections[key])
+        XCTAssertEqual(rejection.message, "Контроллер не в сети.")
+        XCTAssertNil(model.actionIntent(guestID: guest.id, object: object))
+        XCTAssertNotEqual(model.actionRejections[key]?.id, rejection.id, "Each rejected tap needs fresh feedback")
+        XCTAssertTrue(controller.sent.isEmpty)
+        XCTAssertTrue(model.journal.isEmpty)
+        try await model.receiveTestController(Data(#"{"type":"device_online","device_id":9,"online":true}"#.utf8), guestID: guest.id)
+        XCTAssertNotNil(model.actionIntent(guestID: guest.id, object: object))
+        XCTAssertNil(model.actionRejections[key])
+        XCTAssertTrue(controller.sent.isEmpty, "Recovery does not retry a physical command")
+        model.suspend()
     }
     @MainActor func testVisibleActionNameFollowsControllerDirectionWithoutSendingOrChangingErrors() async throws {
         let (model, controller, guest, object) = try await fixture()

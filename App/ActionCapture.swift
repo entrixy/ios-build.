@@ -411,7 +411,7 @@ private final class ActionCaptureModel: ObservableObject {
                 model.bleGuestControl = BLEGuestControlModel(app: model, transport: bleCentral)
                 let action = model.actionIntent(guestID: guest.id, object: guest.objects[0])
                 if scenario == .bleGuestExpired {
-                    guard action == nil, model.errorMessage != nil, bleCentral.channel.fireWrites == 0 else { throw GuestCrypto.Failure.invalidEnvelope }
+                    guard action == nil, model.errorMessage == nil, model.actionRejections[guest.id + "|" + guest.objects[0].id] != nil, bleCentral.channel.fireWrites == 0 else { throw GuestCrypto.Failure.invalidEnvelope }
                 } else {
                     guard let action else { throw GuestCrypto.Failure.invalidEnvelope }
                     if scenario == .bleGuestConfirm { intent = action }
@@ -700,7 +700,9 @@ private final class ActionCaptureModel: ObservableObject {
                 intent = action
             case .offline:
                 try await model.receiveTestController(Data(#"{"type":"device_online","device_id":9,"online":false}"#.utf8), guestID: guest.id)
-                guard model.actionIntent(guestID: guest.id, object: object) == nil, controller.frames.isEmpty else { throw GuestCrypto.Failure.invalidEnvelope }
+                guard model.actionIntent(guestID: guest.id, object: object) == nil,
+                      model.errorMessage == nil, model.actionRejections[guest.id + "|" + object.id] != nil,
+                      controller.frames.isEmpty, model.journal.isEmpty else { throw GuestCrypto.Failure.invalidEnvelope }
             case .requestSent, .result, .journal:
                 await model.execute(action)
                 guard controller.frames.count == 1, model.journal.count == 1 else { throw GuestCrypto.Failure.invalidEnvelope }

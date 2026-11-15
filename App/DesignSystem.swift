@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 
 /// Shared visual rules are documented in docs/IOS_DESIGN_CODE.md.
 enum DesignMetrics {
@@ -93,5 +94,29 @@ extension View {
     func sheetDismissFooter(_ title: String = "Отмена", disabled: Bool = false,
                             action: @escaping () -> Void) -> some View {
         modifier(SheetDismissFooter(title: title, disabled: disabled, action: action))
+    }
+}
+
+/// Android rejects an unavailable card tap in place, without a modal or command retry.
+struct ActionRejectionFeedback: ViewModifier {
+    let rejection: ActionTapRejection?
+    @State private var highlighted = false
+    func body(content: Content) -> some View {
+        content.overlay {
+            RoundedRectangle(cornerRadius: 22)
+                .fill(Color(uiColor: .systemRed).opacity(highlighted ? 0.15 : 0))
+                .overlay(RoundedRectangle(cornerRadius: 22)
+                    .strokeBorder(Color(uiColor: .systemRed).opacity(highlighted ? 1 : 0), lineWidth: 2))
+                .allowsHitTesting(false)
+        }
+        .task(id: rejection?.id) {
+            highlighted = false
+            guard let rejection else { return }
+            highlighted = true
+            UINotificationFeedbackGenerator().notificationOccurred(.error)
+            UIAccessibility.post(notification: .announcement, argument: rejection.message)
+            do { try await Task.sleep(nanoseconds: 1_000_000_000) } catch { return }
+            highlighted = false
+        }
     }
 }

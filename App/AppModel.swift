@@ -2,8 +2,15 @@ import Foundation
 import Combine
 import EntrixyCore
 
+struct ActionTapRejection {
+    let id = UUID()
+    let message: String
+}
+
 @MainActor
 final class AppModel: ObservableObject {
+    @Published private(set) var actionRejections: [String: ActionTapRejection] = [:]
+
     @Published private(set) var owners: [OwnerAccount] = []
     @Published private(set) var ownerBusy = false
     @Published private(set) var ownerSnapshots: [String: OwnerSnapshot] = [:]
@@ -1461,6 +1468,7 @@ private final class ActionLink {
 
 extension AppModel {
     func actionIntent(guestID: String, object: GuestObject) -> ActionIntent? {
+        actionRejections.removeValue(forKey: guestID + "|" + object.id)
         do {
             if object.kind == "ble" {
                 guard canManageGuestAccess, !busy, !bleGuestControl.busy,
@@ -1489,9 +1497,9 @@ extension AppModel {
             let action = chosenGuestAction(policy: policy, numberID: object.numberID, positions: link.positions)
             let wire = action == .close ? "close" : (action == .toggle ? "toggle" : "")
             return ActionIntent(guestID: guestID, object: object, revision: link.revision, action: action, wireAction: wire, policy: policy)
-        } catch let ActionDenied.message(text) { errorMessage = text }
-        catch BLECommandSession.Failure.expired { errorMessage = "Срок Bluetooth-пропуска истёк. Обновите ключ через интернет; продление разрешает владелец." }
-        catch { errorMessage = "Не удалось проверить защищённые условия доступа к объекту." }
+        } catch let ActionDenied.message(text) { rejectAction(guestID: guestID, object: object, message: text) }
+        catch BLECommandSession.Failure.expired { rejectAction(guestID: guestID, object: object, message: "Срок Bluetooth-пропуска истёк. Обновите ключ через интернет; продление разрешает владелец.") }
+        catch { rejectAction(guestID: guestID, object: object, message: "Не удалось проверить защищённые условия доступа к объекту.") }
         return nil
     }
 
@@ -1499,24 +1507,25 @@ extension AppModel {
         // Recheck after confirmation/authentication. Never change the direction silently.
         if intent.policy.kind == "ble" {
             defer { finishBLEGuestAuthorization(intent.id) }
-            guard let fresh = actionIntent(guestID: intent.guestID, object: intent.object), fresh.revision == intent.revision else {
-                errorMessage = "Bluetooth-пропуск изменился. Нажмите на объект ещё раз."; return
+            guard let fresh = actionIntent(guestID: intent.guestID, object: intent.object) else { return }
+            guard fresh.revision == intent.revision else {
+                rejectAction(guestID: intent.guestID, object: intent.object, message: "Bluetooth-пропуск изменился. Нажмите на объект ещё раз."); return
             }
             let authenticated = authorizedIntent == intent.id; authorizedIntent = nil
-            guard fresh.policy.authentication == nil || authenticated else { errorMessage = "Требуется подтверждение личности."; return }
+            guard fresh.policy.authentication == nil || authenticated else { rejectAction(guestID: intent.guestID, object: intent.object, message: "Требуется подтверждение личности."); return }
             bleAuthorizedIntent = intent.id
             await bleGuestControl.execute(intent)
             return
         }
-        guard let fresh = actionIntent(guestID: intent.guestID, object: intent.object),
-              fresh.revision == intent.revision, fresh.action == intent.action,
+        guard let fresh = actionIntent(guestID: intent.guestID, object: intent.object) else { return }
+        guard fresh.revision == intent.revision, fresh.action == intent.action,
               let link = actionLinks[intent.guestID],
               let guest = guests.first(where: { $0.id == intent.guestID }) else {
-            errorMessage = "Состояние объекта изменилось. Нажмите на объект ещё раз."; return
+            rejectAction(guestID: intent.guestID, object: intent.object, message: "Состояние объекта изменилось. Нажмите на объект ещё раз."); return
         }
         let authenticated = authorizedIntent == intent.id
         authorizedIntent = nil
-        guard fresh.policy.authentication == nil || authenticated else { errorMessage = "Требуется подтверждение личности."; return }
+        guard fresh.policy.authentication == nil || authenticated else { rejectAction(guestID: intent.guestID, object: intent.object, message: "Требуется подтверждение личности."); return }
         let key = intent.guestID + "|" + intent.object.id
         do {
             let frame = try GuestPress.frame(userKey: guest.invite.userKey, host: guest.invite.server,
@@ -1541,8 +1550,12 @@ extension AppModel {
             try await link.live.sendAction(frame)
         } catch {
             stopActions(intent.guestID)
-            errorMessage = "Не удалось получить результат команды. Автоматического повтора не будет."
+            actionMessages[key] = "Не удалось получить результат команды. Автоматического повтора не будет."
         }
+    }
+
+    private func rejectAction(guestID: String, object: GuestObject, message: String) {
+        actionRejections[guestID + "|" + object.id] = ActionTapRejection(message: message)
     }
 
     private enum ActionDenied: Error { case message(String) }
