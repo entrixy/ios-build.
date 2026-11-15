@@ -36,10 +36,10 @@ def main():
     if time.monotonic()>deadline:raise RuntimeError('Catalog did not become ready: '+page)
     time.sleep(.5)
    state=json.loads(status.read_text());assert state=={'ready':True,'page':page,'native_design':True,'network_requests':0,'command_frames':0}
-   path=OUTPUT/('iphone16-light-design-'+page+'.png');deadline=time.monotonic()+90
+   path=OUTPUT/('iphone16-light-design-'+page+'.png');deadline=time.monotonic()+240
    while True:
     run('xcrun','simctl','io',device,'screenshot',str(path))
-    check=subprocess.run([str(TEXT_TOOL),str(path),*expected],capture_output=True,text=True,timeout=30)
+    check=subprocess.run([str(TEXT_TOOL),str(path),*expected],capture_output=True,text=True,timeout=180)
     if check.returncode==0:break
     if check.returncode!=1 or time.monotonic()>deadline:raise RuntimeError(page+': '+check.stdout+check.stderr)
     time.sleep(1)
