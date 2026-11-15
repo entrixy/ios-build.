@@ -26,6 +26,11 @@ final class OwnerControlModel: ObservableObject {
     private var generations: [String: UUID] = [:]
     private var links: [String: Link] = [:]
 
+    @Published private(set) var positions: [String: [Int: String]] = [:]
+    @Published private(set) var onlineDevices: [String: Set<Int>] = [:]
+    func readyForTap(server: String) -> Bool {
+        active && links[server]?.authenticated == true && links[server]?.attempt == nil
+    }
     private final class Link {
         let live: OwnerLiveTransport
         var authenticated = false
@@ -69,7 +74,7 @@ final class OwnerControlModel: ObservableObject {
             if let attempt = link.attempt { messages[attempt.objectID] = "Результат не получен. Автоматического повтора не будет." }
             link.attempt?.timeout?.cancel(); link.live.close()
         }
-        links.removeAll(); phoneRequests.removeAll()
+        links.removeAll(); phoneRequests.removeAll(); positions.removeAll(); onlineDevices.removeAll()
         for server in Array(connections.keys) { connections[server] = .offline }
     }
     private func startMissing() {
@@ -82,6 +87,8 @@ final class OwnerControlModel: ObservableObject {
                 while !Task.isCancelled {
                     guard let self, self.active, self.generations[server] == generation,
                           let owner = self.app.owners.first(where: { $0.server == server }) else { return }
+                    self.positions.removeValue(forKey: server)
+                    self.onlineDevices.removeValue(forKey: server)
                     self.connections[server] = .connecting
                     do {
                         let live = try self.app.makeOwnerLive(owner)
@@ -131,7 +138,7 @@ final class OwnerControlModel: ObservableObject {
             messages[objectID] = "Нет готового соединения или предыдущий запрос ещё не завершён."
             return
         }
-        guard app.ownerManualActionAllowed(object) else { return }
+        guard app.ownerManualActionAllowed(object, server: server, action: action) else { return }
         do {
             guard object.kind == "device" || (object.kind == "webhook" && object.routing["webhook_mode"] == "server") else { throw GuestCrypto.Failure.invalidEnvelope }
             let secret = try object.wrappedSocketSecret.map { try GuestCrypto.decrypt(key: owner.masterKey, envelope: $0) }
@@ -179,6 +186,19 @@ final class OwnerControlModel: ObservableObject {
         }
         if ["key_created", "key_updated", "key_mode_changed", "key_revoked", "numbers_update", "key_delegated", "bundle_request"].contains(type) {
             await app.refreshOwners(); return
+        }
+        if type == "obj_state_update", let number = json["num_id"] as? Int,
+           let position = json["position"] as? String, ["open", "closed", "opening", "closing", "unknown"].contains(position) {
+            positions[server, default: [:]][number] = position
+            return
+        }
+        if type == "devices_online", let ids = json["device_ids"] as? [Int] {
+            onlineDevices[server] = Set(ids); return
+        }
+        if type == "device_online", let id = json["device_id"] as? Int, let online = json["online"] as? Bool {
+            if online { onlineDevices[server, default: []].insert(id) }
+            else { onlineDevices[server, default: []].remove(id) }
+            return
         }
         guard let attempt = link.attempt, json["silent"] as? Bool != true,
               (json["user_key_id"] as? Int ?? 0) == 0 else { return }
@@ -256,7 +276,7 @@ final class OwnerControlModel: ObservableObject {
               let phone = object.localPhone, !phone.isEmpty,
               phone.enumerated().allSatisfy({ $0.element.isASCII && ($0.element.isNumber || ($0.offset == 0 && $0.element == "+")) }),
               let url = URL(string: "tel:" + phone) else { app.errorMessage = "Не удалось прочитать локальный номер владельца."; return }
-        if request == nil, !app.ownerManualActionAllowed(object) { return }
+        if request == nil, !app.ownerManualActionAllowed(object, server: server, action: .open) { return }
         var who = "Я"
         if let request {
             guard phoneRequests.contains(where: { $0.id == request.id }),

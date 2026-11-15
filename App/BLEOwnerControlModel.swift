@@ -25,7 +25,7 @@ import EntrixyCore
               let object = owner.objects?.first(where: { $0.id == objectID }), object.kind == "ble",
               object.ownerCardAvailable,
               let wrapped = object.wrappedBLESecret, let deviceID = object.bleDeviceID,
-              app.ownerManualActionAllowed(object) else { return }
+              app.ownerManualActionAllowed(object, server: server, action: .toggle) else { return }
         busy = true; currentObject = objectID
         let current = UUID(); generation = current
         defer { if generation == current { busy = false; currentObject = nil } }

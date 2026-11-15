@@ -7,6 +7,13 @@ final class OwnerCommandTests: XCTestCase {
         let url = Bundle.module.url(forResource: "socket-owner-grant", withExtension: "json", subdirectory: "Fixtures")!
         return try JSONSerialization.jsonObject(with: Data(contentsOf: url)) as! [String: Any]
     }
+    func testServerWebhookToggleKeepsItsAndroidWireAction() throws {
+        let command = try OwnerCommand(numberID: 7, kind: "webhook", action: .toggle, secret: nil, now: 10)
+        let request = try XCTUnwrap(JSONSerialization.jsonObject(with: command.request()) as? [String: Any])
+        XCTAssertEqual(request["type"] as? String, "host_self_webhook")
+        XCTAssertEqual(request["action"] as? String, "toggle")
+        XCTAssertThrowsError(try OwnerCommand(numberID: 7, kind: "device", action: .toggle, secret: Data(repeating: 1, count: 32), now: 10))
+    }
     private var challenge: [String: Any] {
         ["number_id": 7, "command_id": "owner-fixture", "nonce": Data(0..<16).base64EncodedString()]
     }

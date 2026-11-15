@@ -7,7 +7,7 @@ public struct OwnerManualPolicy {
     public let confirmation: Bool
     public let blockedReason: String?
     public init(_ bytes: Data?) throws {
-        guard let bytes else { authentication = nil; confirmation = true; blockedReason = nil; return }
+        guard let bytes else { authentication = nil; confirmation = false; blockedReason = nil; return }
         guard bytes.count <= 65536, let template = try JSONSerialization.jsonObject(with: bytes) as? [String: Any] else { throw GuestCrypto.Failure.invalidEnvelope }
         func flag(_ field: String) throws -> Bool {
             guard let value = template[field] else { return false }

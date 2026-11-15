@@ -186,7 +186,8 @@ private final class BLEOwnerStorage: StateStorage {
         XCTAssertEqual(central.connects, 0)
         XCTAssertTrue(central.channel.writes.isEmpty)
         XCTAssertTrue(app.journal.isEmpty)
-        XCTAssertNotNil(app.errorMessage)
+        XCTAssertNil(app.errorMessage)
+        XCTAssertNotNil(app.ownerActionRejections[object.id])
         XCTAssertEqual(try OwnerManualPolicy(storage.state!.owners![0].objects![0].localPolicy).authentication, "pin")
     }
 

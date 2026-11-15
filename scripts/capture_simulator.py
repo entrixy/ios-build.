@@ -86,8 +86,8 @@ def expected_visible_text(screen):
     if screen.startswith('message-'): return ['Сообщения', 'Входящие']
     if screen in ['ble-scan', 'ble-uncertain', 'ble-paired']: return ['контроллер']
     if screen.startswith('ble-revoke-'): return ['доступ']
-    if screen == 'owner-confirm': return ['Управление|Открыть|Закрыть']
-    if screen == 'ble-owner-confirm': return ['Управление|Подать импульс']
+    if screen == 'owner-confirm': return ['Подтвердить действие', 'Отмена']
+    if screen == 'ble-owner-confirm': return ['Подтвердить действие', 'Отмена']
     if screen in ['control', 'request-sent', 'result', 'offline', 'owner-sending',
                   'owner-result', 'owner-guest-request', 'ble-owner-result',
                   'ble-owner-unknown', 'ble-guest-result', 'ble-guest-expired', 'ble-guest-unknown']:

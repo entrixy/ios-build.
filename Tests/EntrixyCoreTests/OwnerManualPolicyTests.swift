@@ -3,6 +3,7 @@ import XCTest
 
 final class OwnerManualPolicyTests: XCTestCase {
     func testOriginalOwnerAuthenticationAndCombinedRulesRemainEnforced() throws {
+        XCTAssertFalse(try OwnerManualPolicy(nil).confirmation, "Android's default card tap has no confirmation gate")
         let auth = try OwnerManualPolicy(Data(#"{"auth_on":true,"auth":"biometric","confirm_on":true}"#.utf8))
         XCTAssertEqual(auth.authentication, "biometric"); XCTAssertTrue(auth.confirmation)
         XCTAssertNil(auth.blockedReason)

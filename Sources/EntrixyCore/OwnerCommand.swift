@@ -14,7 +14,7 @@ public struct OwnerCommand {
     private var consumed = false
 
     public init(numberID: Int, kind: String, action: GuestAction, secret: Data?, now: TimeInterval) throws {
-        guard numberID > 0, ["device", "webhook"].contains(kind), action != .toggle,
+        guard numberID > 0, ["device", "webhook"].contains(kind), (kind == "webhook" || action != .toggle),
               kind != "device" || secret?.count == 32 else { throw GuestCrypto.Failure.invalidKey }
         self.numberID = numberID; self.action = action; self.secret = secret; self.kind = kind; started = now
     }

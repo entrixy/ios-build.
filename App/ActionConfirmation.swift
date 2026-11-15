@@ -4,7 +4,13 @@ import SwiftUI
 struct ActionConfirmation: View {
     @EnvironmentObject private var model: AppModel
     @Environment(\.dismiss) private var dismiss
-    let intent: ActionIntent
+    private let guestIntent: ActionIntent?
+    private let ownerIntent: OwnerActionIntent?
+    init(intent: ActionIntent) { guestIntent = intent; ownerIntent = nil }
+    init(ownerIntent: OwnerActionIntent) { self.ownerIntent = ownerIntent; guestIntent = nil }
+    private var authentication: String? { guestIntent?.policy.authentication ?? ownerIntent?.policy.authentication }
+    private var title: String { guestIntent?.title ?? ownerIntent?.title ?? "Подтвердить" }
+    private var objectLabel: String { guestIntent?.object.label ?? ownerIntent?.label ?? "Объект" }
     @State private var code = ""
     @State private var repeatedCode = ""
     @State private var working = false
@@ -12,13 +18,13 @@ struct ActionConfirmation: View {
     @State private var configured = false
     @FocusState private var codeFocused: Bool
 
-    private var needsSetup: Bool { intent.policy.authentication != nil && !model.hasActionCode && !configured }
-    private var allowsPIN: Bool { intent.policy.authentication == "pin" || intent.policy.authentication == "either" }
+    private var needsSetup: Bool { authentication != nil && !model.hasActionCode && !configured }
+    private var allowsPIN: Bool { authentication == "pin" || authentication == "either" }
     var body: some View {
         NavigationStack {
             ScrollView {
             VStack(alignment: .leading, spacing: 20) {
-                Text(intent.object.label).font(.title2.bold()).foregroundStyle(Brand.ink)
+                Text(objectLabel).font(.title2.bold()).foregroundStyle(Brand.ink)
                 if needsSetup {
                     Text("Создайте PIN-код приложения из 4–8 цифр. Он хранится только на этом iPhone и подтверждает действия с объектами.")
                     AppField("Новый PIN-код") {
@@ -31,24 +37,24 @@ struct ActionConfirmation: View {
                     }
                     Button("Сохранить PIN-код") { setup() }.buttonStyle(PrimaryActionStyle())
                         .disabled(working || code != repeatedCode || !(4...8).contains(code.count))
-                } else if intent.policy.authentication != nil {
+                } else if authentication != nil {
                     Text("Подтвердите действие способом, заданным владельцем.")
                     if allowsPIN {
                         AppField("PIN-код приложения") {
                             SecureField("PIN-код приложения", text: $code).keyboardType(.numberPad).textContentType(.password).focused($codeFocused)
                                 .padding(14).background(Color(uiColor: .secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 12))
                         }
-                        Button(intent.title) { authenticatePIN() }.buttonStyle(PrimaryActionStyle())
+                        Button(title) { authenticatePIN() }.buttonStyle(PrimaryActionStyle())
                             .disabled(working || !(4...8).contains(code.count))
                     }
-                    if intent.policy.authentication != "pin" {
+                    if authentication != "pin" {
                         Button("Подтвердить биометрией") { authenticateBio() }.buttonStyle(PrimaryActionStyle()).disabled(working)
                     }
                 } else {
-                    Text("\(intent.title) объект?")
-                    Button(intent.title) {
+                    Text(title == "Позвонить" ? "Подтвердить звонок?" : "\(title) объект?")
+                    Button(title) {
                         working = true
-                        Task { await model.execute(intent); dismiss() }
+                        Task { await perform(); dismiss() }
                     }.buttonStyle(PrimaryActionStyle()).disabled(working)
                 }
                 if let message { Text(message).font(.subheadline).foregroundStyle(.red) }
@@ -71,6 +77,19 @@ struct ActionConfirmation: View {
                 #endif
             }
     }
+    private func perform() async {
+        if let guestIntent { await model.execute(guestIntent) }
+        else if let ownerIntent { await model.execute(ownerIntent) }
+    }
+    private func authorizeCode() async throws -> Bool {
+        if let guestIntent { return try await model.authorizeCode(code, intent: guestIntent) }
+        if let ownerIntent { return try await model.authorizeCode(code, ownerIntent: ownerIntent) }
+        return false
+    }
+    private func authorizeBiometric() async throws {
+        if let guestIntent { try await model.authorizeBiometric(guestIntent) }
+        else if let ownerIntent { try await model.authorizeBiometric(ownerIntent) }
+    }
     private func setup() {
         guard !working else { return }; working = true; message = nil
         Task {
@@ -84,7 +103,7 @@ struct ActionConfirmation: View {
         Task {
             defer { working = false; code = "" }
             do {
-                if try await model.authorizeCode(code, intent: intent) { await model.execute(intent); dismiss() }
+                if try await authorizeCode() { await perform(); dismiss() }
                 else { message = "Код не принят или ввод временно заблокирован. После нескольких ошибок нужно подождать." }
             } catch { message = "Не удалось проверить код в защищённом хранилище." }
         }
@@ -93,7 +112,7 @@ struct ActionConfirmation: View {
         guard !working else { return }; working = true; message = nil
         Task {
             defer { working = false }
-            do { try await model.authorizeBiometric(intent); await model.execute(intent); dismiss() }
+            do { try await authorizeBiometric(); await perform(); dismiss() }
             catch { message = "Биометрия недоступна или подтверждение отменено. Действие не отправлено." }
         }
     }

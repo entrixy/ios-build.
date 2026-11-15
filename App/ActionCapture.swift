@@ -85,6 +85,7 @@ private final class CaptureOwnerSocket: OwnerLiveTransport {
         frames = AsyncThrowingStream { continuation = $0 }
         output = continuation
         emit(["type": "host_ok"])
+        emit(["type": "devices_online", "device_ids": [9]])
     }
     func emit(_ json: [String: Any]) { if let bytes = try? JSONSerialization.data(withJSONObject: json) { output.yield(bytes) } }
     func sendAction(_ frame: Data) async throws {
@@ -335,6 +336,7 @@ private final class ActionCaptureModel: ObservableObject {
     let model: AppModel
     let scenario: ActionCaptureScenario
     @Published var intent: ActionIntent?
+    @Published var ownerIntent: OwnerActionIntent?
     @Published private(set) var backupManager: BackupManager?
     @Published private(set) var delegationManager: DelegationInbox?
     @Published private(set) var senderManager: PassManager?
@@ -599,6 +601,13 @@ private final class ActionCaptureModel: ObservableObject {
                             }
                         }
                     }
+                    if scenario == .ownerConfirm || scenario == .bleOwnerConfirm {
+                        guard let object = model.owners.first?.objects?.first else { throw GuestCrypto.Failure.invalidEnvelope }
+                        try model.setCaptureOwnerConfirmation(object.id)
+                        guard let prepared = model.ownerActionIntent(server: "controller.invalid", objectID: object.id),
+                              prepared.policy.confirmation else { throw GuestCrypto.Failure.invalidEnvelope }
+                        ownerIntent = prepared
+                    }
                     model.errorMessage = nil // Inline owner status remains visible in the captured screen.
                 }
                 writeStatus(ready: true)
@@ -856,11 +865,14 @@ struct ActionCaptureRoot: View {
         }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .clipped()
-            if !capture.scenario.usesTaskFooter && capture.intent == nil { CaptureEnvironmentBadge() }
+            if !capture.scenario.usesTaskFooter && capture.intent == nil && capture.ownerIntent == nil { CaptureEnvironmentBadge() }
         }
         .environmentObject(capture.model)
         .sheet(item: $capture.intent) { intent in
             ActionConfirmation(intent: intent).environmentObject(capture.model)
+        }
+        .sheet(item: $capture.ownerIntent) { intent in
+            ActionConfirmation(ownerIntent: intent).environmentObject(capture.model)
         }
         .task {
             await capture.prepare()

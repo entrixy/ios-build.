@@ -339,6 +339,73 @@ final class OwnerAccountTests: XCTestCase {
         XCTFail("Timed out waiting for owner state")
     }
 
+    @MainActor func testOwnerCardDirectionIsFrozenAndRecheckedWithoutSendingChangedActions() async throws {
+        let storage = OwnerMemoryStorage(), api = RecordingOwnerAPI()
+        let preparing = AppModel(storage: storage, ownerAPI: api)
+        _ = await preparing.addOwner(server: "owner.invalid", accessCode: "")
+        _ = await preparing.createOwnerObject(server: "owner.invalid", label: "Ворота", kind: "device", phone: "", url: "", secret: "", claimCode: "TEST")
+        let master = storage.state!.owners![0].masterKey
+        storage.state!.owners![0].objects![0].wrappedSocketSecret = try GuestCrypto.encrypt(key: master, plaintext: Data(repeating: 7, count: 32))
+        let model = AppModel(storage: storage, ownerAPI: api)
+        let object = try XCTUnwrap(model.owners[0].objects?.first)
+        let channel = RecordingOwnerChannel(); api.liveChannel = channel
+        let control = model.ownerControl
+        control.resume(); defer { control.suspend() }
+        try await waitForOwner { control.connections["owner.invalid"] == .connected }
+        channel.emit(["type": "devices_online", "device_ids": [9]])
+        channel.emit(["type": "obj_state_update", "num_id": 7, "position": "open"])
+        try await waitForOwner { control.positions["owner.invalid"]?[7] == "open" }
+        let close = try XCTUnwrap(model.ownerActionIntent(server: "owner.invalid", objectID: object.id))
+        XCTAssertEqual(close.action, .close)
+        XCTAssertFalse(close.policy.confirmation)
+        XCTAssertTrue(channel.writes.isEmpty)
+        channel.emit(["type": "obj_state_update", "num_id": 7, "position": "closed"])
+        try await waitForOwner { control.positions["owner.invalid"]?[7] == "closed" }
+        await model.execute(close)
+        XCTAssertTrue(channel.writes.isEmpty)
+        XCTAssertTrue(model.journal.isEmpty)
+        XCTAssertNotNil(model.ownerActionRejections[object.id])
+        let open = try XCTUnwrap(model.ownerActionIntent(server: "owner.invalid", objectID: object.id))
+        XCTAssertEqual(open.action, .open)
+        await model.execute(open)
+        XCTAssertEqual(channel.writes.count, 1)
+        XCTAssertEqual(channel.writes.first?["action"] as? String, "open")
+        await model.execute(open)
+        XCTAssertEqual(channel.writes.count, 1)
+        XCTAssertNil(model.errorMessage)
+    }
+
+    @MainActor func testOwnerPINUsesSharedLockoutAndOneAuthorizedPhysicalAttempt() async throws {
+        let storage = OwnerMemoryStorage(), api = RecordingOwnerAPI()
+        let preparing = AppModel(storage: storage, ownerAPI: api)
+        _ = await preparing.addOwner(server: "owner.invalid", accessCode: "")
+        _ = await preparing.createOwnerObject(server: "owner.invalid", label: "Ворота", kind: "webhook", phone: "", url: "https://actuator.invalid/open", secret: "fixture", claimCode: "")
+        storage.state!.owners![0].objects![0].localPolicy = Data(#"{"auth_on":true,"auth":"pin"}"#.utf8)
+        let model = AppModel(storage: storage, ownerAPI: api)
+        let object = try XCTUnwrap(model.owners[0].objects?.first)
+        let channel = RecordingOwnerChannel(); api.liveChannel = channel
+        let control = model.ownerControl
+        control.resume(); defer { control.suspend() }
+        try await waitForOwner { control.connections["owner.invalid"] == .connected }
+        try await model.setActionCode("1234")
+        let intent = try XCTUnwrap(model.ownerActionIntent(server: "owner.invalid", objectID: object.id))
+        await model.execute(intent)
+        XCTAssertTrue(channel.writes.isEmpty)
+        XCTAssertTrue(model.journal.isEmpty)
+        let wrong = try await model.authorizeCode("0000", ownerIntent: intent)
+        XCTAssertFalse(wrong)
+        await model.execute(intent)
+        XCTAssertTrue(channel.writes.isEmpty)
+        let accepted = try await model.authorizeCode("1234", ownerIntent: intent)
+        XCTAssertTrue(accepted)
+        await model.execute(intent)
+        XCTAssertEqual(channel.writes.count, 1)
+        XCTAssertEqual(model.journal.count, 1)
+        await model.execute(intent)
+        XCTAssertEqual(channel.writes.count, 1)
+        XCTAssertNil(model.errorMessage)
+    }
+
     @MainActor func testOwnerCommandPersistsBeforeWireAndUsesOnlyMatchingActualResult() async throws {
         let storage = OwnerMemoryStorage(), api = RecordingOwnerAPI()
         let model = AppModel(storage: storage, ownerAPI: api)

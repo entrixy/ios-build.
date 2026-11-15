@@ -188,7 +188,6 @@ struct KeyDetailScreen: View {
 
 struct JournalScreen: View {
     @EnvironmentObject private var model: AppModel
-    @State private var clearing = false
     @State private var copied = false
     private var text: String {
         model.journal.reversed().map { entry in
@@ -203,7 +202,7 @@ struct JournalScreen: View {
                 Button { UIPasteboard.general.string = text; copied = true } label: {
                     JournalToolbarItem(symbol: "doc.on.doc", title: "Копировать")
                 }
-                Button(role: .destructive) { clearing = true } label: { JournalToolbarItem(symbol: "trash", title: "Очистить") }
+                Button(role: .destructive) { model.clearJournal() } label: { JournalToolbarItem(symbol: "trash", title: "Очистить") }
             }
             .buttonStyle(SecondaryActionStyle(surface: .clear)).foregroundStyle(Brand.ink).disabled(model.journal.isEmpty)
             .padding(.horizontal, DesignMetrics.pageInset).padding(.top, 12).padding(.bottom, 16)
@@ -214,20 +213,23 @@ struct JournalScreen: View {
                 Spacer()
             } else {
                 List(model.journal) { entry in
-                    HStack(alignment: .top, spacing: 16) {
-                        VStack(alignment: .trailing, spacing: 6) {
+                    VStack(alignment: .leading, spacing: 6) {
+                        HStack(alignment: .firstTextBaseline, spacing: 16) {
                             Text(entry.date, format: .dateTime.hour().minute().second())
                                 .font(.subheadline.monospacedDigit()).foregroundStyle(Brand.ink)
+                                .frame(width: 70, alignment: .trailing)
+                            Text(entry.who).font(.subheadline).foregroundStyle(Brand.secondaryInk)
+                        }
+                        HStack(alignment: .firstTextBaseline, spacing: 16) {
                             Text(entry.date, format: .dateTime.day().month(.twoDigits))
                                 .font(.caption).foregroundStyle(Brand.secondaryInk)
-                        }.frame(width: 70, alignment: .trailing)
-                        VStack(alignment: .leading, spacing: 6) {
-                            Text(entry.who).font(.subheadline).foregroundStyle(Brand.secondaryInk)
+                                .frame(width: 70, alignment: .trailing)
                             Text(model.journalLabel(entry)).font(.body.weight(.medium)).foregroundStyle(Brand.ink)
-                            if !entry.result.isEmpty {
-                                Text(entry.result).font(.subheadline)
-                                    .foregroundStyle(entry.level == "danger" ? Color(uiColor: .systemRed) : Brand.secondaryInk)
-                            }
+                        }
+                        if !entry.result.isEmpty {
+                            Text(entry.result).font(.subheadline)
+                                .foregroundStyle(entry.level == "danger" ? Color(uiColor: .systemRed) : Brand.secondaryInk)
+                                .padding(.leading, 86)
                         }
                     }
                     .listRowInsets(EdgeInsets(top: 12, leading: DesignMetrics.pageInset, bottom: 12, trailing: DesignMetrics.pageInset))
@@ -236,10 +238,19 @@ struct JournalScreen: View {
             }
         }
         .background(Color(uiColor: .systemGroupedBackground)).navigationTitle("Журнал")
-        .confirmationDialog("Очистить журнал на этом iPhone?", isPresented: $clearing, titleVisibility: .visible) {
-            Button("Очистить журнал", role: .destructive) { model.clearJournal() }
+        .overlay(alignment: .bottom) {
+            if copied {
+                Text("Журнал скопирован").font(.subheadline)
+                    .padding(.horizontal, 16).padding(.vertical, 10)
+                    .background(.regularMaterial, in: Capsule()).padding(.bottom, 16)
+                    .allowsHitTesting(false).accessibilityAddTraits(.updatesFrequently)
+            }
         }
-        .alert("Журнал скопирован", isPresented: $copied) { Button("Готово", role: .cancel) {} }
+        .task(id: copied) {
+            guard copied else { return }
+            do { try await Task.sleep(nanoseconds: 2_000_000_000) } catch { return }
+            copied = false
+        }
     }
 }
 

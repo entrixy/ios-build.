@@ -55,6 +55,8 @@ final class AppModel: ObservableObject {
     private var actionCode: LocalActionCode?
     private var authenticationBusy = false
     private var authorizedIntent: UUID?
+    private var activeOwnerAction: OwnerActionIntent?
+    @Published private(set) var ownerActionRejections: [UUID: ActionTapRejection] = [:]
     var hasActionCode: Bool { actionCode != nil }
     private let storage: StateStorage
     private let api = GuestAPI()
@@ -455,19 +457,24 @@ final class AppModel: ObservableObject {
         try saveOwners(updated)
     }
 
-    func ownerManualActionAllowed(_ object: OwnerObject) -> Bool {
+    func ownerManualActionAllowed(_ object: OwnerObject, server: String, action: GuestAction) -> Bool {
         do {
             let policy = try OwnerManualPolicy(object.localPolicy)
-            if let reason = policy.blockedReason { errorMessage = reason; return false }
-            guard policy.authentication == nil else { errorMessage = "Защищённое действие владельца сейчас недоступно. Требование кода или биометрии сохранено."; return false }
+            if let reason = policy.blockedReason { rejectOwnerAction(object.id, reason); return false }
+            if policy.authentication != nil {
+                guard foreground, let active = activeOwnerAction, active.server == server,
+                      active.object == object, active.action == action else {
+                    rejectOwnerAction(object.id, "Требуется подтверждение личности."); return false
+                }
+            }
             return true
-        } catch { errorMessage = "Не удалось проверить защищённые правила владельца."; return false }
+        } catch { rejectOwnerAction(object.id, "Не удалось проверить защищённые правила владельца."); return false }
     }
     func beginBLEOwnerAction(server: String, objectID: UUID, proofHash: String) throws -> String {
         guard canManageGuestAccess, let i = owners.firstIndex(where: { $0.server == server }),
               let j = owners[i].objects?.firstIndex(where: { $0.id == objectID }),
               let object = owners[i].objects?[j], object.kind == "ble", object.ownerCardAvailable,
-              !(object.bleProofs ?? []).contains(proofHash), ownerManualActionAllowed(object) else { throw GuestCrypto.Failure.invalidEnvelope }
+              !(object.bleProofs ?? []).contains(proofHash), ownerManualActionAllowed(object, server: server, action: .toggle) else { throw GuestCrypto.Failure.invalidEnvelope }
         let label = (try object.metadata(masterKey: owners[i].masterKey)["label"] as? String) ?? "Bluetooth-объект"
         var updated = owners
         // Fresh NONCE reads are unique on the controller; retain more than its
@@ -1133,7 +1140,7 @@ final class AppModel: ObservableObject {
         bleControl.suspend()
         bleGuestControl.suspend()
         bleAuthorizedIntent = nil
-        authorizedIntent = nil
+        authorizedIntent = nil; activeOwnerAction = nil
         foreground = false
         resumeRequested = false
         for id in Array(actionLinks.keys) { stopActions(id) }
@@ -1656,28 +1663,34 @@ extension AppModel {
         try? ActionBiometrics.enroll()
     }
     func authorizeCode(_ code: String, intent: ActionIntent) async throws -> Bool {
+        try await authorizeCode(code, authentication: intent.policy.authentication, requestID: intent.id)
+    }
+    private func authorizeCode(_ code: String, authentication: String?, requestID: UUID) async throws -> Bool {
         guard !authenticationBusy else { return false }
         authenticationBusy = true
         defer { authenticationBusy = false }
         guard var saved = actionCode, foreground, saved.lockedUntil <= Date(),
-              intent.policy.authentication != "biometric" else { return false }
+              authentication != "biometric" else { return false }
         let candidate = try await Task.detached { try LocalActionCode.derive(code, salt: saved.salt) }.value
         guard foreground else { return false }
         let accepted = saved.matches(candidate)
         if accepted { saved.failures = 0; saved.lockedUntil = .distantPast } else { saved.failed() }
         let previous = actionCode; actionCode = saved
         do { try save(guests) } catch { actionCode = previous; throw error }
-        if accepted { authorizedIntent = intent.id }
+        if accepted { authorizedIntent = requestID }
         return accepted
     }
     func authorizeBiometric(_ intent: ActionIntent) async throws {
+        try await authorizeBiometric(authentication: intent.policy.authentication, requestID: intent.id)
+    }
+    private func authorizeBiometric(authentication: String?, requestID: UUID) async throws {
         guard !authenticationBusy else { throw KeychainStore.Failure(status: -1) }
         authenticationBusy = true
         defer { authenticationBusy = false }
-        guard actionCode != nil, foreground, intent.policy.authentication != "pin" else { throw KeychainStore.Failure(status: -1) }
+        guard actionCode != nil, foreground, authentication != "pin" else { throw KeychainStore.Failure(status: -1) }
         try await Task.detached { try ActionBiometrics.authenticate() }.value
         guard foreground else { throw KeychainStore.Failure(status: -1) }
-        authorizedIntent = intent.id
+        authorizedIntent = requestID
     }
 }
 
@@ -1704,6 +1717,85 @@ extension AppModel {
     func installCaptureGuest(_ guest: SavedGuest) throws {
         guard guest.invite.server == "controller.invalid", guests.isEmpty else { throw GuestCrypto.Failure.invalidEnvelope }
         try save([guest])
+    }
+}
+#endif
+
+extension AppModel {
+    private func rejectOwnerAction(_ id: UUID, _ message: String) {
+        ownerActionRejections[id] = ActionTapRejection(message: message)
+    }
+    func ownerActionIntent(server: String, objectID: UUID) -> OwnerActionIntent? {
+        ownerActionRejections.removeValue(forKey: objectID)
+        do {
+            guard foreground, canManageGuestAccess, !busy, !ownerBusy,
+                  let owner = owners.first(where: { $0.server == server }), !owner.registrationPending,
+                  let object = owner.objects?.first(where: { $0.id == objectID }), object.ownerCardAvailable else {
+                throw ActionDenied.message("Объект сейчас недоступен.")
+            }
+            let policy = try OwnerManualPolicy(object.localPolicy)
+            if let reason = policy.blockedReason { throw ActionDenied.message(reason) }
+            if object.kind == "ble" {
+                guard !bleControl.busy else { throw ActionDenied.message("Предыдущая Bluetooth-команда ещё не завершена.") }
+            } else if object.kind != "call" {
+                guard ownerControl.readyForTap(server: server) else { throw ActionDenied.message("Нет готового соединения или предыдущий запрос ещё не завершён.") }
+                if object.kind == "device" {
+                    guard object.wrappedSocketSecret != nil else { throw ActionDenied.message("Контроллеру нужна защищённая настройка перед открытием.") }
+                    guard let device = object.routing["device_id_ref"].flatMap(Int.init),
+                          ownerControl.onlineDevices[server]?.contains(device) == true else {
+                        throw ActionDenied.message("Контроллер не в сети.")
+                    }
+                }
+            }
+            let metadata = try object.metadata(masterKey: owner.masterKey)
+            let position = object.numberID.flatMap { ownerControl.positions[server]?[$0] }
+            let action: GuestAction = object.kind == "ble" ? .toggle :
+                (object.kind == "device" && ["open", "opening"].contains(position ?? "") ? .close :
+                (object.kind == "webhook" && metadata["wh_toggle"] as? Int == 1 ? .toggle : .open))
+            return OwnerActionIntent(server: server, object: object, label: metadata["label"] as? String ?? "Объект", action: action, policy: policy)
+        } catch let ActionDenied.message(message) { rejectOwnerAction(objectID, message) }
+        catch { rejectOwnerAction(objectID, "Не удалось проверить защищённые данные объекта.") }
+        return nil
+    }
+    private func ownerIntentStillValid(_ intent: OwnerActionIntent) -> Bool {
+        guard ProcessInfo.processInfo.systemUptime - intent.created < 120,
+              let fresh = ownerActionIntent(server: intent.server, objectID: intent.object.id),
+              fresh.object == intent.object, fresh.action == intent.action else { return false }
+        return true
+    }
+    func authorizeCode(_ code: String, ownerIntent: OwnerActionIntent) async throws -> Bool {
+        guard ownerIntentStillValid(ownerIntent) else { return false }
+        return try await authorizeCode(code, authentication: ownerIntent.policy.authentication, requestID: ownerIntent.id)
+    }
+    func authorizeBiometric(_ intent: OwnerActionIntent) async throws {
+        guard ownerIntentStillValid(intent) else { throw KeychainStore.Failure(status: -1) }
+        try await authorizeBiometric(authentication: intent.policy.authentication, requestID: intent.id)
+    }
+    func execute(_ intent: OwnerActionIntent) async {
+        let authenticated = authorizedIntent == intent.id
+        authorizedIntent = nil
+        guard activeOwnerAction == nil, ownerIntentStillValid(intent) else {
+            rejectOwnerAction(intent.object.id, "Состояние объекта изменилось. Нажмите на объект ещё раз."); return
+        }
+        guard intent.policy.authentication == nil || authenticated else {
+            rejectOwnerAction(intent.object.id, "Требуется подтверждение личности."); return
+        }
+        activeOwnerAction = intent
+        defer { activeOwnerAction = nil }
+        if intent.object.kind == "ble" { await bleControl.execute(server: intent.server, objectID: intent.object.id) }
+        else if intent.object.kind == "call" { await ownerControl.dial(server: intent.server, objectID: intent.object.id) }
+        else { await ownerControl.execute(server: intent.server, objectID: intent.object.id, action: intent.action) }
+    }
+}
+
+#if DEBUG && targetEnvironment(simulator)
+extension AppModel {
+    func setCaptureOwnerConfirmation(_ objectID: UUID) throws {
+        guard owners.count == 1, owners[0].server == "controller.invalid",
+              let index = owners[0].objects?.firstIndex(where: { $0.id == objectID }) else { throw GuestCrypto.Failure.invalidEnvelope }
+        var updated = owners
+        updated[0].objects![index].localPolicy = Data(#"{"confirm_on":true}"#.utf8)
+        try saveOwners(updated)
     }
 }
 #endif
