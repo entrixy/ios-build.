@@ -8,7 +8,9 @@ struct EntrixyApp: App {
         WindowGroup {
             Group {
             #if DEBUG && targetEnvironment(simulator)
-            if let scenario = ActionCaptureScenario.current {
+            if let page = NativeDesignCatalog.requestedPage {
+                NativeDesignCatalog(page: page)
+            } else if let scenario = ActionCaptureScenario.current {
                 ActionCaptureRoot(scenario: scenario)
             } else {
                 LiveAppRoot()

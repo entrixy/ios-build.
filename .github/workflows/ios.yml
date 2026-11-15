@@ -67,12 +67,9 @@ jobs:
       - name: Test native Keychain migration, journal and QR photo import
         id: native_tests
         run: python3 scripts/test_simulator.py 2>&1 | tee .local-checks/ci/native-tests.log
-      - name: Capture new action scenarios on iPhone simulators
+      - name: Capture native SwiftUI design catalog on iPhone simulator
         id: captures
-        run: |
-          python3 scripts/capture_simulator.py --all-flows 2>&1 | tee .local-checks/ci/screenshots.log
-          python3 scripts/build_capture_review.py .local-checks/ci/screenshots --source-sha "$GITHUB_SHA" \
-            2>&1 | tee -a .local-checks/ci/screenshots.log
+        run: python3 scripts/capture_native_design.py 2>&1 | tee .local-checks/ci/screenshots.log
       - name: Archive simulator app
         run: >-
           ditto -c -k --sequesterRsrc --keepParent
@@ -99,7 +96,7 @@ jobs:
           steps = json.loads(os.environ['STEP_RESULTS'])
           data['checks'] = {name: steps.get(name, {}).get('outcome', 'skipped')
                             for name in ['core_tests', 'debug_build', 'release_build', 'native_tests', 'captures']}
-          data['capture_mode'] = 'isolated-software-controller'
+          data['capture_mode'] = 'native-swiftui-design-catalog'
           data['visual_review'] = 'pending'
           Path('.local-checks/ci/result.json').write_text(json.dumps(data, indent=2) + '\n')
           PY
