@@ -1,5 +1,5 @@
 Command line invocation:
-    /Applications/Xcode_26.3.app/Contents/Developer/usr/bin/xcodebuild -project Entrixy.xcodeproj -scheme EntrixyTests -configuration Debug -destination id=E833F918-6458-4677-B472-18907EE7B05C -derivedDataPath .local-checks/DerivedData -parallel-testing-enabled NO CODE_SIGNING_ALLOWED=YES CODE_SIGN_IDENTITY=- test
+    /Applications/Xcode_26.3.app/Contents/Developer/usr/bin/xcodebuild -project Entrixy.xcodeproj -scheme EntrixyTests -configuration Debug -destination id=18678302-8004-4D60-9DE8-110A63D46D10 -derivedDataPath .local-checks/DerivedData -parallel-testing-enabled NO CODE_SIGNING_ALLOWED=YES CODE_SIGN_IDENTITY=- test
 
 Build settings from command line:
     CODE_SIGN_IDENTITY = -
@@ -47,19 +47,31 @@ ExecuteExternalTool /Applications/Xcode_26.3.app/Contents/Developer/Toolchains/X
 
 ExecuteExternalTool /Applications/Xcode_26.3.app/Contents/Developer/usr/bin/actool --version --output-format xml1
 
-Build description signature: f1d9eb7d18faef730a7d756c59ef586c
-Build description path: /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Intermediates.noindex/XCBuildData/f1d9eb7d18faef730a7d756c59ef586c.xcbuilddata
+Build description signature: a1f77e9a95432dd1e34020b628842146
+Build description path: /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Intermediates.noindex/XCBuildData/a1f77e9a95432dd1e34020b628842146.xcbuilddata
 ClangStatCache /Applications/Xcode_26.3.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang-stat-cache /Applications/Xcode_26.3.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.2.sdk /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/SDKStatCaches.noindex/iphonesimulator26.2-23C57-dc75598d0054f22ec865fa860f139d72e244bd9a5feaf902f95f61bf06266e52.sdkstatcache
     cd /Users/runner/work/ios-build./ios-build./Entrixy.xcodeproj
     /Applications/Xcode_26.3.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang-stat-cache /Applications/Xcode_26.3.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.2.sdk -o /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/SDKStatCaches.noindex/iphonesimulator26.2-23C57-dc75598d0054f22ec865fa860f139d72e244bd9a5feaf902f95f61bf06266e52.sdkstatcache
 
-WriteAuxiliaryFile /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Intermediates.noindex/Entrixy.build/Debug-iphonesimulator/EntrixyCore.build/Objects-normal/x86_64/EntrixyCore.SwiftConstValuesFileList (in target 'EntrixyCore' from project 'Entrixy' at path '/Users/runner/work/ios-build./ios-build./Package.swift')
+WriteAuxiliaryFile /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Intermediates.noindex/Entrixy.build/Debug-iphonesimulator/Entrixy.build/Objects-normal/x86_64/Entrixy.SwiftConstValuesFileList (in target 'Entrixy' from project 'Entrixy' at path '/Users/runner/work/ios-build./ios-build./Entrixy.xcodeproj')
     cd /Users/runner/work/ios-build./ios-build.
-    write-file /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Intermediates.noindex/Entrixy.build/Debug-iphonesimulator/EntrixyCore.build/Objects-normal/x86_64/EntrixyCore.SwiftConstValuesFileList
+    write-file /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Intermediates.noindex/Entrixy.build/Debug-iphonesimulator/Entrixy.build/Objects-normal/x86_64/Entrixy.SwiftConstValuesFileList
+
+MkDir /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Products/Debug-iphonesimulator/Entrixy.app/PlugIns (in target 'Entrixy' from project 'Entrixy' at path '/Users/runner/work/ios-build./ios-build./Entrixy.xcodeproj')
+    cd /Users/runner/work/ios-build./ios-build.
+    /bin/mkdir -p /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Products/Debug-iphonesimulator/Entrixy.app/PlugIns
+
+MkDir /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Products/Debug-iphonesimulator/Entrixy.app/Frameworks (in target 'Entrixy' from project 'Entrixy' at path '/Users/runner/work/ios-build./ios-build./Entrixy.xcodeproj')
+    cd /Users/runner/work/ios-build./ios-build.
+    /bin/mkdir -p /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Products/Debug-iphonesimulator/Entrixy.app/Frameworks
 
 Copy /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Intermediates.noindex/GeneratedModuleMaps-iphonesimulator/EntrixyCore.modulemap /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Intermediates.noindex/Entrixy.build/Debug-iphonesimulator/EntrixyCore.build/EntrixyCore.modulemap (in target 'EntrixyCore' from project 'Entrixy' at path '/Users/runner/work/ios-build./ios-build./Package.swift')
     cd /Users/runner/work/ios-build./ios-build.
     builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -resolve-src-symlinks /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Intermediates.noindex/Entrixy.build/Debug-iphonesimulator/EntrixyCore.build/EntrixyCore.modulemap /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Intermediates.noindex/GeneratedModuleMaps-iphonesimulator
+
+WriteAuxiliaryFile /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Intermediates.noindex/Entrixy.build/Debug-iphonesimulator/EntrixyCore.build/Objects-normal/x86_64/EntrixyCore.SwiftConstValuesFileList (in target 'EntrixyCore' from project 'Entrixy' at path '/Users/runner/work/ios-build./ios-build./Package.swift')
+    cd /Users/runner/work/ios-build./ios-build.
+    write-file /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Intermediates.noindex/Entrixy.build/Debug-iphonesimulator/EntrixyCore.build/Objects-normal/x86_64/EntrixyCore.SwiftConstValuesFileList
 
 WriteAuxiliaryFile /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Intermediates.noindex/Entrixy.build/Debug-iphonesimulator/EntrixyAppTests.build/empty-EntrixyAppTests.plist (in target 'EntrixyAppTests' from project 'Entrixy' at path '/Users/runner/work/ios-build./ios-build./Entrixy.xcodeproj')
     cd /Users/runner/work/ios-build./ios-build.
@@ -117,21 +129,9 @@ WriteAuxiliaryFile /Users/runner/work/ios-build./ios-build./.local-checks/Derive
     cd /Users/runner/work/ios-build./ios-build.
     write-file /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Intermediates.noindex/Entrixy.build/Debug-iphonesimulator/EntrixyAppTests.build/EntrixyAppTests-all-non-framework-target-headers.hmap
 
-WriteAuxiliaryFile /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Intermediates.noindex/Entrixy.build/Debug-iphonesimulator/Entrixy.build/Objects-normal/x86_64/Entrixy.SwiftConstValuesFileList (in target 'Entrixy' from project 'Entrixy' at path '/Users/runner/work/ios-build./ios-build./Entrixy.xcodeproj')
-    cd /Users/runner/work/ios-build./ios-build.
-    write-file /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Intermediates.noindex/Entrixy.build/Debug-iphonesimulator/Entrixy.build/Objects-normal/x86_64/Entrixy.SwiftConstValuesFileList
-
 MkDir /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Products/Debug-iphonesimulator/Entrixy.app/PlugIns/EntrixyAppTests.xctest (in target 'EntrixyAppTests' from project 'Entrixy' at path '/Users/runner/work/ios-build./ios-build./Entrixy.xcodeproj')
     cd /Users/runner/work/ios-build./ios-build.
     /bin/mkdir -p /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Products/Debug-iphonesimulator/Entrixy.app/PlugIns/EntrixyAppTests.xctest
-
-MkDir /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Products/Debug-iphonesimulator/Entrixy.app/PlugIns (in target 'Entrixy' from project 'Entrixy' at path '/Users/runner/work/ios-build./ios-build./Entrixy.xcodeproj')
-    cd /Users/runner/work/ios-build./ios-build.
-    /bin/mkdir -p /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Products/Debug-iphonesimulator/Entrixy.app/PlugIns
-
-MkDir /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Products/Debug-iphonesimulator/Entrixy.app/Frameworks (in target 'Entrixy' from project 'Entrixy' at path '/Users/runner/work/ios-build./ios-build./Entrixy.xcodeproj')
-    cd /Users/runner/work/ios-build./ios-build.
-    /bin/mkdir -p /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Products/Debug-iphonesimulator/Entrixy.app/Frameworks
 
 SwiftDriver EntrixyCore normal x86_64 com.apple.xcode.tools.swift.compiler (in target 'EntrixyCore' from project 'Entrixy' at path '/Users/runner/work/ios-build./ios-build./Package.swift')
     cd /Users/runner/work/ios-build./ios-build./Entrixy.xcodeproj
@@ -218,8 +218,8 @@ CompileAssetCatalogVariant thinned /Users/runner/work/ios-build./ios-build./.loc
 ExtractAppIntentsMetadata (in target 'EntrixyCore' from project 'Entrixy' at path '/Users/runner/work/ios-build./ios-build./Package.swift')
     cd /Users/runner/work/ios-build./ios-build.
     /Applications/Xcode_26.3.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/appintentsmetadataprocessor --toolchain-dir /Users/runner/Library/Developer/DVTDownloads/MetalToolchain/mounts/058e1b31129b642e40598a87b55aa54b2a29e538/Metal.xctoolchain --module-name EntrixyCore --sdk-root /Applications/Xcode_26.3.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.2.sdk --xcode-version 17C529 --platform-family iOS --deployment-target 16.0 --bundle-identifier ios-build..EntrixyCore --output /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Products/Debug-iphonesimulator/EntrixyCore.appintents --target-triple x86_64-apple-ios16.0-simulator --binary-file /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Products/Debug-iphonesimulator/EntrixyCore.o --dependency-file /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Intermediates.noindex/Entrixy.build/Debug-iphonesimulator/EntrixyCore.build/Objects-normal/x86_64/EntrixyCore_dependency_info.dat --stringsdata-file /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Intermediates.noindex/Entrixy.build/Debug-iphonesimulator/EntrixyCore.build/Objects-normal/x86_64/ExtractedAppShortcutsMetadata.stringsdata --source-file-list /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Intermediates.noindex/Entrixy.build/Debug-iphonesimulator/EntrixyCore.build/Objects-normal/x86_64/EntrixyCore.SwiftFileList --metadata-file-list /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Intermediates.noindex/Entrixy.build/Debug-iphonesimulator/EntrixyCore.build/EntrixyCore.DependencyMetadataFileList --static-metadata-file-list /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Intermediates.noindex/Entrixy.build/Debug-iphonesimulator/EntrixyCore.build/EntrixyCore.DependencyStaticMetadataFileList --swift-const-vals-list /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Intermediates.noindex/Entrixy.build/Debug-iphonesimulator/EntrixyCore.build/Objects-normal/x86_64/EntrixyCore.SwiftConstValuesFileList --force --compile-time-extraction --deployment-aware-processing --validate-assistant-intents --no-app-shortcuts-localization
-2026-11-15 08:31:35.468 appintentsmetadataprocessor[19667:54603] Starting appintentsmetadataprocessor export
-2026-11-15 08:31:35.975 appintentsmetadataprocessor[19667:54603] Extracted no relevant App Intents symbols, skipping writing output
+2026-11-15 13:17:15.031 appintentsmetadataprocessor[19371:52947] Starting appintentsmetadataprocessor export
+2026-11-15 13:17:15.811 appintentsmetadataprocessor[19371:52947] Extracted no relevant App Intents symbols, skipping writing output
 
 CodeSign /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Products/Debug-iphonesimulator/EntrixyCore.o (in target 'EntrixyCore' from project 'Entrixy' at path '/Users/runner/work/ios-build./ios-build./Package.swift')
     cd /Users/runner/work/ios-build./ios-build.
@@ -304,13 +304,13 @@ Copy /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Pr
     cd /Users/runner/work/ios-build./ios-build.
     builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -resolve-src-symlinks -rename /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Intermediates.noindex/Entrixy.build/Debug-iphonesimulator/Entrixy.build/Objects-normal/x86_64/Entrixy.swiftsourceinfo /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Products/Debug-iphonesimulator/Entrixy.swiftmodule/Project/x86_64-apple-ios-simulator.swiftsourceinfo
 
-Ld /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Products/Debug-iphonesimulator/Entrixy.app/Entrixy.debug.dylib normal (in target 'Entrixy' from project 'Entrixy' at path '/Users/runner/work/ios-build./ios-build./Entrixy.xcodeproj')
-    cd /Users/runner/work/ios-build./ios-build.
-    /Applications/Xcode_26.3.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -Xlinker -reproducible -target x86_64-apple-ios16.0-simulator -dynamiclib -isysroot /Applications/Xcode_26.3.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.2.sdk -O0 -L/Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Intermediates.noindex/EagerLinkingTBDs/Debug-iphonesimulator -L/Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Products/Debug-iphonesimulator -F/Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Intermediates.noindex/EagerLinkingTBDs/Debug-iphonesimulator -F/Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Products/Debug-iphonesimulator/PackageFrameworks -F/Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Products/Debug-iphonesimulator -filelist /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Intermediates.noindex/Entrixy.build/Debug-iphonesimulator/Entrixy.build/Objects-normal/x86_64/Entrixy.LinkFileList -install_name @rpath/Entrixy.debug.dylib -Xlinker -rpath -Xlinker /usr/lib/swift -Xlinker -rpath -Xlinker /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Products/Debug-iphonesimulator/PackageFrameworks -Xlinker -rpath -Xlinker @executable_path/Frameworks -dead_strip -Xlinker -object_path_lto -Xlinker /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Intermediates.noindex/Entrixy.build/Debug-iphonesimulator/Entrixy.build/Objects-normal/x86_64/Entrixy_lto.o -rdynamic -Xlinker -no_deduplicate -Xlinker -objc_abi_version -Xlinker 2 -Xlinker -dependency_info -Xlinker /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Intermediates.noindex/Entrixy.build/Debug-iphonesimulator/Entrixy.build/Objects-normal/x86_64/Entrixy_dependency_info.dat -fobjc-link-runtime -L/Applications/Xcode_26.3.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/iphonesimulator -L/usr/lib/swift -Xlinker -add_ast_path -Xlinker /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Intermediates.noindex/Entrixy.build/Debug-iphonesimulator/Entrixy.build/Objects-normal/x86_64/Entrixy.swiftmodule @/Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Intermediates.noindex/Entrixy.build/Debug-iphonesimulator/Entrixy.build/Objects-normal/x86_64/Entrixy-linker-args.resp -Wl,-no_warn_duplicate_libraries -Xlinker -alias -Xlinker _main -Xlinker ___debug_main_executable_dylib_entry_point -Xlinker -no_adhoc_codesign -o /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Products/Debug-iphonesimulator/Entrixy.app/Entrixy.debug.dylib -Xlinker -add_ast_path -Xlinker /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Intermediates.noindex/Entrixy.build/Debug-iphonesimulator/EntrixyCore.build/Objects-normal/x86_64/EntrixyCore.swiftmodule @/Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Intermediates.noindex/Entrixy.build/Debug-iphonesimulator/EntrixyCore.build/Objects-normal/x86_64/EntrixyCore-linker-args.resp
-
 SwiftDriver EntrixyAppTests normal x86_64 com.apple.xcode.tools.swift.compiler (in target 'EntrixyAppTests' from project 'Entrixy' at path '/Users/runner/work/ios-build./ios-build./Entrixy.xcodeproj')
     cd /Users/runner/work/ios-build./ios-build.
     builtin-SwiftDriver -- /Applications/Xcode_26.3.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc -module-name EntrixyAppTests -Onone -enforce-exclusivity\=checked @/Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Intermediates.noindex/Entrixy.build/Debug-iphonesimulator/EntrixyAppTests.build/Objects-normal/x86_64/EntrixyAppTests.SwiftFileList -DDEBUG -plugin-path /Applications/Xcode_26.3.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/host/plugins/testing -enable-bare-slash-regex -enable-experimental-feature DebugDescriptionMacro -sdk /Applications/Xcode_26.3.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.2.sdk -target x86_64-apple-ios16.0-simulator -g -module-cache-path /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/ModuleCache.noindex -Xfrontend -serialize-debugging-options -enable-testing -index-store-path /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Index.noindex/DataStore -Xcc -D_LIBCPP_HARDENING_MODE\=_LIBCPP_HARDENING_MODE_DEBUG -swift-version 5 -I /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Products/Debug-iphonesimulator -Isystem /Applications/Xcode_26.3.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/usr/lib -F /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Products/Debug-iphonesimulator/PackageFrameworks -F /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Products/Debug-iphonesimulator -F /Applications/Xcode_26.3.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Frameworks -F /Applications/Xcode_26.3.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.2.sdk/Developer/Library/Frameworks -c -j4 -enable-batch-mode -incremental -Xcc -ivfsstatcache -Xcc /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/SDKStatCaches.noindex/iphonesimulator26.2-23C57-dc75598d0054f22ec865fa860f139d72e244bd9a5feaf902f95f61bf06266e52.sdkstatcache -output-file-map /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Intermediates.noindex/Entrixy.build/Debug-iphonesimulator/EntrixyAppTests.build/Objects-normal/x86_64/EntrixyAppTests-OutputFileMap.json -use-frontend-parseable-output -save-temps -no-color-diagnostics -explicit-module-build -module-cache-path /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules -clang-scanner-module-cache-path /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/ModuleCache.noindex -sdk-module-cache-path /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/ModuleCache.noindex -serialize-diagnostics -emit-dependencies -emit-module -emit-module-path /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Intermediates.noindex/Entrixy.build/Debug-iphonesimulator/EntrixyAppTests.build/Objects-normal/x86_64/EntrixyAppTests.swiftmodule -validate-clang-modules-once -clang-build-session-file /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/ModuleCache.noindex/Session.modulevalidation -Xcc -I/Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Intermediates.noindex/Entrixy.build/Debug-iphonesimulator/EntrixyAppTests.build/swift-overrides.hmap -emit-const-values -Xfrontend -const-gather-protocols-file -Xfrontend /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Intermediates.noindex/Entrixy.build/Debug-iphonesimulator/EntrixyAppTests.build/Objects-normal/x86_64/EntrixyAppTests_const_extract_protocols.json -Xcc -iquote -Xcc /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Intermediates.noindex/Entrixy.build/Debug-iphonesimulator/EntrixyAppTests.build/EntrixyAppTests-generated-files.hmap -Xcc -I/Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Intermediates.noindex/Entrixy.build/Debug-iphonesimulator/EntrixyAppTests.build/EntrixyAppTests-own-target-headers.hmap -Xcc -I/Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Intermediates.noindex/Entrixy.build/Debug-iphonesimulator/EntrixyAppTests.build/EntrixyAppTests-all-non-framework-target-headers.hmap -Xcc -ivfsoverlay -Xcc /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Intermediates.noindex/Entrixy.build/Debug-iphonesimulator/Entrixy-cd3848b7098c63c1107bd7c4485bf26b-VFS-iphonesimulator/all-product-headers.yaml -Xcc -iquote -Xcc /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Intermediates.noindex/Entrixy.build/Debug-iphonesimulator/EntrixyAppTests.build/EntrixyAppTests-project-headers.hmap -Xcc -I/Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Products/Debug-iphonesimulator/include -Xcc -I/Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Intermediates.noindex/Entrixy.build/Debug-iphonesimulator/EntrixyAppTests.build/DerivedSources-normal/x86_64 -Xcc -I/Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Intermediates.noindex/Entrixy.build/Debug-iphonesimulator/EntrixyAppTests.build/DerivedSources/x86_64 -Xcc -I/Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Intermediates.noindex/Entrixy.build/Debug-iphonesimulator/EntrixyAppTests.build/DerivedSources -Xcc -DDEBUG\=1 -emit-objc-header -emit-objc-header-path /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Intermediates.noindex/Entrixy.build/Debug-iphonesimulator/EntrixyAppTests.build/Objects-normal/x86_64/EntrixyAppTests-Swift.h -working-directory /Users/runner/work/ios-build./ios-build. -experimental-emit-module-separately -disable-cmo
+
+Ld /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Products/Debug-iphonesimulator/Entrixy.app/Entrixy.debug.dylib normal (in target 'Entrixy' from project 'Entrixy' at path '/Users/runner/work/ios-build./ios-build./Entrixy.xcodeproj')
+    cd /Users/runner/work/ios-build./ios-build.
+    /Applications/Xcode_26.3.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -Xlinker -reproducible -target x86_64-apple-ios16.0-simulator -dynamiclib -isysroot /Applications/Xcode_26.3.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.2.sdk -O0 -L/Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Intermediates.noindex/EagerLinkingTBDs/Debug-iphonesimulator -L/Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Products/Debug-iphonesimulator -F/Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Intermediates.noindex/EagerLinkingTBDs/Debug-iphonesimulator -F/Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Products/Debug-iphonesimulator/PackageFrameworks -F/Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Products/Debug-iphonesimulator -filelist /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Intermediates.noindex/Entrixy.build/Debug-iphonesimulator/Entrixy.build/Objects-normal/x86_64/Entrixy.LinkFileList -install_name @rpath/Entrixy.debug.dylib -Xlinker -rpath -Xlinker /usr/lib/swift -Xlinker -rpath -Xlinker /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Products/Debug-iphonesimulator/PackageFrameworks -Xlinker -rpath -Xlinker @executable_path/Frameworks -dead_strip -Xlinker -object_path_lto -Xlinker /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Intermediates.noindex/Entrixy.build/Debug-iphonesimulator/Entrixy.build/Objects-normal/x86_64/Entrixy_lto.o -rdynamic -Xlinker -no_deduplicate -Xlinker -objc_abi_version -Xlinker 2 -Xlinker -dependency_info -Xlinker /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Intermediates.noindex/Entrixy.build/Debug-iphonesimulator/Entrixy.build/Objects-normal/x86_64/Entrixy_dependency_info.dat -fobjc-link-runtime -L/Applications/Xcode_26.3.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/iphonesimulator -L/usr/lib/swift -Xlinker -add_ast_path -Xlinker /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Intermediates.noindex/Entrixy.build/Debug-iphonesimulator/Entrixy.build/Objects-normal/x86_64/Entrixy.swiftmodule @/Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Intermediates.noindex/Entrixy.build/Debug-iphonesimulator/Entrixy.build/Objects-normal/x86_64/Entrixy-linker-args.resp -Wl,-no_warn_duplicate_libraries -Xlinker -alias -Xlinker _main -Xlinker ___debug_main_executable_dylib_entry_point -Xlinker -no_adhoc_codesign -o /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Products/Debug-iphonesimulator/Entrixy.app/Entrixy.debug.dylib -Xlinker -add_ast_path -Xlinker /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Intermediates.noindex/Entrixy.build/Debug-iphonesimulator/EntrixyCore.build/Objects-normal/x86_64/EntrixyCore.swiftmodule @/Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Intermediates.noindex/Entrixy.build/Debug-iphonesimulator/EntrixyCore.build/Objects-normal/x86_64/EntrixyCore-linker-args.resp
 
 ConstructStubExecutorLinkFileList /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Intermediates.noindex/Entrixy.build/Debug-iphonesimulator/Entrixy.build/Entrixy-ExecutorLinkFileList-normal-x86_64.txt (in target 'Entrixy' from project 'Entrixy' at path '/Users/runner/work/ios-build./ios-build./Entrixy.xcodeproj')
     cd /Users/runner/work/ios-build./ios-build.
@@ -329,8 +329,55 @@ SwiftExplicitDependencyCompileModuleFromInterface x86_64 /Users/runner/work/ios-
 
 SwiftExplicitDependencyCompileModuleFromInterface x86_64 /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules/XCTest-268HP3N4QJE2G.swiftmodule
 
+LinkAssetCatalog /Users/runner/work/ios-build./ios-build./App/Assets.xcassets (in target 'Entrixy' from project 'Entrixy' at path '/Users/runner/work/ios-build./ios-build./Entrixy.xcodeproj')
+    cd /Users/runner/work/ios-build./ios-build.
+    builtin-linkAssetCatalog --thinned /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Intermediates.noindex/Entrixy.build/Debug-iphonesimulator/Entrixy.build/assetcatalog_output/thinned --thinned-dependencies /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Intermediates.noindex/Entrixy.build/Debug-iphonesimulator/Entrixy.build/assetcatalog_dependencies_thinned --thinned-info-plist-content /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Intermediates.noindex/Entrixy.build/Debug-iphonesimulator/Entrixy.build/assetcatalog_generated_info.plist_thinned --unthinned /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Intermediates.noindex/Entrixy.build/Debug-iphonesimulator/Entrixy.build/assetcatalog_output/unthinned --unthinned-dependencies /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Intermediates.noindex/Entrixy.build/Debug-iphonesimulator/Entrixy.build/assetcatalog_dependencies_unthinned --unthinned-info-plist-content /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Intermediates.noindex/Entrixy.build/Debug-iphonesimulator/Entrixy.build/assetcatalog_generated_info.plist_unthinned --output /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Products/Debug-iphonesimulator/Entrixy.app --plist-output /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Intermediates.noindex/Entrixy.build/Debug-iphonesimulator/Entrixy.build/assetcatalog_generated_info.plist
+note: Emplaced /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Products/Debug-iphonesimulator/Entrixy.app/AppIcon76x76@2x~ipad.png (in target 'Entrixy' from project 'Entrixy' at path '/Users/runner/work/ios-build./ios-build./Entrixy.xcodeproj')
+note: Emplaced /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Products/Debug-iphonesimulator/Entrixy.app/Assets.car (in target 'Entrixy' from project 'Entrixy' at path '/Users/runner/work/ios-build./ios-build./Entrixy.xcodeproj')
+note: Emplaced /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Products/Debug-iphonesimulator/Entrixy.app/AppIcon60x60@2x.png (in target 'Entrixy' from project 'Entrixy' at path '/Users/runner/work/ios-build./ios-build./Entrixy.xcodeproj')
+
+ProcessInfoPlistFile /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Products/Debug-iphonesimulator/Entrixy.app/Info.plist /Users/runner/work/ios-build./ios-build./.local-checks/Entrixy-Info.plist (in target 'Entrixy' from project 'Entrixy' at path '/Users/runner/work/ios-build./ios-build./Entrixy.xcodeproj')
+    cd /Users/runner/work/ios-build./ios-build.
+    builtin-infoPlistUtility /Users/runner/work/ios-build./ios-build./.local-checks/Entrixy-Info.plist -producttype com.apple.product-type.application -genpkginfo /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Products/Debug-iphonesimulator/Entrixy.app/PkgInfo -expandbuildsettings -format binary -platform iphonesimulator -additionalcontentfile /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Intermediates.noindex/Entrixy.build/Debug-iphonesimulator/Entrixy.build/assetcatalog_generated_info.plist -o /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Products/Debug-iphonesimulator/Entrixy.app/Info.plist
+
+ExtractAppIntentsMetadata (in target 'Entrixy' from project 'Entrixy' at path '/Users/runner/work/ios-build./ios-build./Entrixy.xcodeproj')
+    cd /Users/runner/work/ios-build./ios-build.
+    /Applications/Xcode_26.3.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/appintentsmetadataprocessor --toolchain-dir /Users/runner/Library/Developer/DVTDownloads/MetalToolchain/mounts/058e1b31129b642e40598a87b55aa54b2a29e538/Metal.xctoolchain --module-name Entrixy --sdk-root /Applications/Xcode_26.3.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.2.sdk --xcode-version 17C529 --platform-family iOS --deployment-target 16.0 --bundle-identifier com.entrixy.ios --output /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Products/Debug-iphonesimulator/Entrixy.app --target-triple x86_64-apple-ios16.0-simulator --binary-file /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Products/Debug-iphonesimulator/Entrixy.app/Entrixy --dependency-file /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Intermediates.noindex/Entrixy.build/Debug-iphonesimulator/Entrixy.build/Objects-normal/x86_64/Entrixy_dependency_info.dat --stringsdata-file /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Intermediates.noindex/Entrixy.build/Debug-iphonesimulator/Entrixy.build/Objects-normal/x86_64/ExtractedAppShortcutsMetadata.stringsdata --source-file-list /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Intermediates.noindex/Entrixy.build/Debug-iphonesimulator/Entrixy.build/Objects-normal/x86_64/Entrixy.SwiftFileList --metadata-file-list /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Intermediates.noindex/Entrixy.build/Debug-iphonesimulator/Entrixy.build/Entrixy.DependencyMetadataFileList --static-metadata-file-list /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Intermediates.noindex/Entrixy.build/Debug-iphonesimulator/Entrixy.build/Entrixy.DependencyStaticMetadataFileList --swift-const-vals-list /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Intermediates.noindex/Entrixy.build/Debug-iphonesimulator/Entrixy.build/Objects-normal/x86_64/Entrixy.SwiftConstValuesFileList --compile-time-extraction --deployment-aware-processing --validate-assistant-intents --no-app-shortcuts-localization
+2026-11-15 13:17:23.198 appintentsmetadataprocessor[19425:53189] Starting appintentsmetadataprocessor export
+2026-11-15 13:17:23.205 appintentsmetadataprocessor[19425:53189] warning: Metadata extraction skipped. No AppIntents.framework dependency found.
+
+CopySwiftLibs /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Products/Debug-iphonesimulator/Entrixy.app (in target 'Entrixy' from project 'Entrixy' at path '/Users/runner/work/ios-build./ios-build./Entrixy.xcodeproj')
+    cd /Users/runner/work/ios-build./ios-build.
+    builtin-swiftStdLibTool --copy --verbose --sign - --scan-executable /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Products/Debug-iphonesimulator/Entrixy.app/Entrixy.debug.dylib --scan-folder /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Products/Debug-iphonesimulator/Entrixy.app/Frameworks --scan-folder /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Products/Debug-iphonesimulator/Entrixy.app/PlugIns --scan-folder /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Products/Debug-iphonesimulator/Entrixy.app/SystemExtensions --scan-folder /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Products/Debug-iphonesimulator/Entrixy.app/Extensions --platform iphonesimulator --toolchain /Users/runner/Library/Developer/DVTDownloads/MetalToolchain/mounts/058e1b31129b642e40598a87b55aa54b2a29e538/Metal.xctoolchain --toolchain /Applications/Xcode_26.3.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain --destination /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Products/Debug-iphonesimulator/Entrixy.app/Frameworks --strip-bitcode --strip-bitcode-tool /Applications/Xcode_26.3.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/bitcode_strip --emit-dependency-info /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Intermediates.noindex/Entrixy.build/Debug-iphonesimulator/Entrixy.build/SwiftStdLibToolInputDependencies.dep --filter-for-swift-os
+
+ProcessInfoPlistFile /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Products/Debug-iphonesimulator/Entrixy.app/PlugIns/EntrixyAppTests.xctest/Info.plist /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Intermediates.noindex/Entrixy.build/Debug-iphonesimulator/EntrixyAppTests.build/empty-EntrixyAppTests.plist (in target 'EntrixyAppTests' from project 'Entrixy' at path '/Users/runner/work/ios-build./ios-build./Entrixy.xcodeproj')
+    cd /Users/runner/work/ios-build./ios-build.
+    builtin-infoPlistUtility /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Intermediates.noindex/Entrixy.build/Debug-iphonesimulator/EntrixyAppTests.build/empty-EntrixyAppTests.plist -producttype com.apple.product-type.bundle.unit-test -expandbuildsettings -format binary -platform iphonesimulator -o /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Products/Debug-iphonesimulator/Entrixy.app/PlugIns/EntrixyAppTests.xctest/Info.plist
+
+CopyPNGFile /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Products/Debug-iphonesimulator/Entrixy.app/PlugIns/EntrixyAppTests.xctest/no-qr.png /Users/runner/work/ios-build./ios-build./Tests/EntrixyAppTests/Fixtures/no-qr.png (in target 'EntrixyAppTests' from project 'Entrixy' at path '/Users/runner/work/ios-build./ios-build./Entrixy.xcodeproj')
+    cd /Users/runner/work/ios-build./ios-build.
+    /Applications/Xcode_26.3.app/Contents/Developer/usr/bin/copypng -compress -strip-PNG-text /Users/runner/work/ios-build./ios-build./Tests/EntrixyAppTests/Fixtures/no-qr.png /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Products/Debug-iphonesimulator/Entrixy.app/PlugIns/EntrixyAppTests.xctest/no-qr.png
+
+CopyPNGFile /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Products/Debug-iphonesimulator/Entrixy.app/PlugIns/EntrixyAppTests.xctest/guest-invite-qr.png /Users/runner/work/ios-build./ios-build./Tests/EntrixyAppTests/Fixtures/guest-invite-qr.png (in target 'EntrixyAppTests' from project 'Entrixy' at path '/Users/runner/work/ios-build./ios-build./Entrixy.xcodeproj')
+    cd /Users/runner/work/ios-build./ios-build.
+    /Applications/Xcode_26.3.app/Contents/Developer/usr/bin/copypng -compress -strip-PNG-text /Users/runner/work/ios-build./ios-build./Tests/EntrixyAppTests/Fixtures/guest-invite-qr.png /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Products/Debug-iphonesimulator/Entrixy.app/PlugIns/EntrixyAppTests.xctest/guest-invite-qr.png
+
 SwiftEmitModule normal x86_64 Emitting\ module\ for\ EntrixyAppTests (in target 'EntrixyAppTests' from project 'Entrixy' at path '/Users/runner/work/ios-build./ios-build./Entrixy.xcodeproj')
+
 EmitSwiftModule normal x86_64 (in target 'EntrixyAppTests' from project 'Entrixy' at path '/Users/runner/work/ios-build./ios-build./Entrixy.xcodeproj')
+    cd /Users/runner/work/ios-build./ios-build.
+    
+
+SwiftCompile normal x86_64 Compiling\ BLEGuestControlTests.swift,\ BLEOwnerControlTests.swift,\ BLEPairingTests.swift /Users/runner/work/ios-build./ios-build./Tests/EntrixyAppTests/BLEGuestControlTests.swift /Users/runner/work/ios-build./ios-build./Tests/EntrixyAppTests/BLEOwnerControlTests.swift /Users/runner/work/ios-build./ios-build./Tests/EntrixyAppTests/BLEPairingTests.swift (in target 'EntrixyAppTests' from project 'Entrixy' at path '/Users/runner/work/ios-build./ios-build./Entrixy.xcodeproj')
+SwiftCompile normal x86_64 /Users/runner/work/ios-build./ios-build./Tests/EntrixyAppTests/BLEGuestControlTests.swift (in target 'EntrixyAppTests' from project 'Entrixy' at path '/Users/runner/work/ios-build./ios-build./Entrixy.xcodeproj')
+    cd /Users/runner/work/ios-build./ios-build.
+    
+
+SwiftCompile normal x86_64 /Users/runner/work/ios-build./ios-build./Tests/EntrixyAppTests/BLEOwnerControlTests.swift (in target 'EntrixyAppTests' from project 'Entrixy' at path '/Users/runner/work/ios-build./ios-build./Entrixy.xcodeproj')
+    cd /Users/runner/work/ios-build./ios-build.
+    
+
+SwiftCompile normal x86_64 /Users/runner/work/ios-build./ios-build./Tests/EntrixyAppTests/BLEPairingTests.swift (in target 'EntrixyAppTests' from project 'Entrixy' at path '/Users/runner/work/ios-build./ios-build./Entrixy.xcodeproj')
     cd /Users/runner/work/ios-build./ios-build.
     
 
@@ -357,20 +404,6 @@ SwiftCompile normal x86_64 /Users/runner/work/ios-build./ios-build./Tests/Entrix
     cd /Users/runner/work/ios-build./ios-build.
     
 
-SwiftCompile normal x86_64 Compiling\ BLEGuestControlTests.swift,\ BLEOwnerControlTests.swift,\ BLEPairingTests.swift /Users/runner/work/ios-build./ios-build./Tests/EntrixyAppTests/BLEGuestControlTests.swift /Users/runner/work/ios-build./ios-build./Tests/EntrixyAppTests/BLEOwnerControlTests.swift /Users/runner/work/ios-build./ios-build./Tests/EntrixyAppTests/BLEPairingTests.swift (in target 'EntrixyAppTests' from project 'Entrixy' at path '/Users/runner/work/ios-build./ios-build./Entrixy.xcodeproj')
-
-SwiftCompile normal x86_64 /Users/runner/work/ios-build./ios-build./Tests/EntrixyAppTests/BLEGuestControlTests.swift (in target 'EntrixyAppTests' from project 'Entrixy' at path '/Users/runner/work/ios-build./ios-build./Entrixy.xcodeproj')
-    cd /Users/runner/work/ios-build./ios-build.
-    
-
-SwiftCompile normal x86_64 /Users/runner/work/ios-build./ios-build./Tests/EntrixyAppTests/BLEOwnerControlTests.swift (in target 'EntrixyAppTests' from project 'Entrixy' at path '/Users/runner/work/ios-build./ios-build./Entrixy.xcodeproj')
-    cd /Users/runner/work/ios-build./ios-build.
-    
-
-SwiftCompile normal x86_64 /Users/runner/work/ios-build./ios-build./Tests/EntrixyAppTests/BLEPairingTests.swift (in target 'EntrixyAppTests' from project 'Entrixy' at path '/Users/runner/work/ios-build./ios-build./Entrixy.xcodeproj')
-    cd /Users/runner/work/ios-build./ios-build.
-    
-
 SwiftCompile normal x86_64 Compiling\ ActionFlowTests.swift,\ AppEntryLockTests.swift,\ AppStateTests.swift /Users/runner/work/ios-build./ios-build./Tests/EntrixyAppTests/ActionFlowTests.swift /Users/runner/work/ios-build./ios-build./Tests/EntrixyAppTests/AppEntryLockTests.swift /Users/runner/work/ios-build./ios-build./Tests/EntrixyAppTests/AppStateTests.swift (in target 'EntrixyAppTests' from project 'Entrixy' at path '/Users/runner/work/ios-build./ios-build./Entrixy.xcodeproj')
 
 SwiftCompile normal x86_64 /Users/runner/work/ios-build./ios-build./Tests/EntrixyAppTests/ActionFlowTests.swift (in target 'EntrixyAppTests' from project 'Entrixy' at path '/Users/runner/work/ios-build./ios-build./Entrixy.xcodeproj')
@@ -391,22 +424,7 @@ SwiftDriver\ Compilation\ Requirements EntrixyAppTests normal x86_64 com.apple.x
     cd /Users/runner/work/ios-build./ios-build.
     builtin-Swift-Compilation-Requirements -- /Applications/Xcode_26.3.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc -module-name EntrixyAppTests -Onone -enforce-exclusivity\=checked @/Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Intermediates.noindex/Entrixy.build/Debug-iphonesimulator/EntrixyAppTests.build/Objects-normal/x86_64/EntrixyAppTests.SwiftFileList -DDEBUG -plugin-path /Applications/Xcode_26.3.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/host/plugins/testing -enable-bare-slash-regex -enable-experimental-feature DebugDescriptionMacro -sdk /Applications/Xcode_26.3.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.2.sdk -target x86_64-apple-ios16.0-simulator -g -module-cache-path /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/ModuleCache.noindex -Xfrontend -serialize-debugging-options -enable-testing -index-store-path /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Index.noindex/DataStore -Xcc -D_LIBCPP_HARDENING_MODE\=_LIBCPP_HARDENING_MODE_DEBUG -swift-version 5 -I /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Products/Debug-iphonesimulator -Isystem /Applications/Xcode_26.3.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/usr/lib -F /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Products/Debug-iphonesimulator/PackageFrameworks -F /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Products/Debug-iphonesimulator -F /Applications/Xcode_26.3.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Frameworks -F /Applications/Xcode_26.3.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.2.sdk/Developer/Library/Frameworks -c -j4 -enable-batch-mode -incremental -Xcc -ivfsstatcache -Xcc /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/SDKStatCaches.noindex/iphonesimulator26.2-23C57-dc75598d0054f22ec865fa860f139d72e244bd9a5feaf902f95f61bf06266e52.sdkstatcache -output-file-map /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Intermediates.noindex/Entrixy.build/Debug-iphonesimulator/EntrixyAppTests.build/Objects-normal/x86_64/EntrixyAppTests-OutputFileMap.json -use-frontend-parseable-output -save-temps -no-color-diagnostics -explicit-module-build -module-cache-path /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules -clang-scanner-module-cache-path /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/ModuleCache.noindex -sdk-module-cache-path /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/ModuleCache.noindex -serialize-diagnostics -emit-dependencies -emit-module -emit-module-path /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Intermediates.noindex/Entrixy.build/Debug-iphonesimulator/EntrixyAppTests.build/Objects-normal/x86_64/EntrixyAppTests.swiftmodule -validate-clang-modules-once -clang-build-session-file /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/ModuleCache.noindex/Session.modulevalidation -Xcc -I/Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Intermediates.noindex/Entrixy.build/Debug-iphonesimulator/EntrixyAppTests.build/swift-overrides.hmap -emit-const-values -Xfrontend -const-gather-protocols-file -Xfrontend /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Intermediates.noindex/Entrixy.build/Debug-iphonesimulator/EntrixyAppTests.build/Objects-normal/x86_64/EntrixyAppTests_const_extract_protocols.json -Xcc -iquote -Xcc /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Intermediates.noindex/Entrixy.build/Debug-iphonesimulator/EntrixyAppTests.build/EntrixyAppTests-generated-files.hmap -Xcc -I/Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Intermediates.noindex/Entrixy.build/Debug-iphonesimulator/EntrixyAppTests.build/EntrixyAppTests-own-target-headers.hmap -Xcc -I/Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Intermediates.noindex/Entrixy.build/Debug-iphonesimulator/EntrixyAppTests.build/EntrixyAppTests-all-non-framework-target-headers.hmap -Xcc -ivfsoverlay -Xcc /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Intermediates.noindex/Entrixy.build/Debug-iphonesimulator/Entrixy-cd3848b7098c63c1107bd7c4485bf26b-VFS-iphonesimulator/all-product-headers.yaml -Xcc -iquote -Xcc /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Intermediates.noindex/Entrixy.build/Debug-iphonesimulator/EntrixyAppTests.build/EntrixyAppTests-project-headers.hmap -Xcc -I/Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Products/Debug-iphonesimulator/include -Xcc -I/Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Intermediates.noindex/Entrixy.build/Debug-iphonesimulator/EntrixyAppTests.build/DerivedSources-normal/x86_64 -Xcc -I/Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Intermediates.noindex/Entrixy.build/Debug-iphonesimulator/EntrixyAppTests.build/DerivedSources/x86_64 -Xcc -I/Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Intermediates.noindex/Entrixy.build/Debug-iphonesimulator/EntrixyAppTests.build/DerivedSources -Xcc -DDEBUG\=1 -emit-objc-header -emit-objc-header-path /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Intermediates.noindex/Entrixy.build/Debug-iphonesimulator/EntrixyAppTests.build/Objects-normal/x86_64/EntrixyAppTests-Swift.h -working-directory /Users/runner/work/ios-build./ios-build. -experimental-emit-module-separately -disable-cmo
 
-SwiftDriverJobDiscovery normal x86_64 Compiling BLEGuestControlTests.swift, BLEOwnerControlTests.swift, BLEPairingTests.swift (in target 'EntrixyAppTests' from project 'Entrixy' at path '/Users/runner/work/ios-build./ios-build./Entrixy.xcodeproj')
-
-LinkAssetCatalog /Users/runner/work/ios-build./ios-build./App/Assets.xcassets (in target 'Entrixy' from project 'Entrixy' at path '/Users/runner/work/ios-build./ios-build./Entrixy.xcodeproj')
-    cd /Users/runner/work/ios-build./ios-build.
-    builtin-linkAssetCatalog --thinned /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Intermediates.noindex/Entrixy.build/Debug-iphonesimulator/Entrixy.build/assetcatalog_output/thinned --thinned-dependencies /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Intermediates.noindex/Entrixy.build/Debug-iphonesimulator/Entrixy.build/assetcatalog_dependencies_thinned --thinned-info-plist-content /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Intermediates.noindex/Entrixy.build/Debug-iphonesimulator/Entrixy.build/assetcatalog_generated_info.plist_thinned --unthinned /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Intermediates.noindex/Entrixy.build/Debug-iphonesimulator/Entrixy.build/assetcatalog_output/unthinned --unthinned-dependencies /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Intermediates.noindex/Entrixy.build/Debug-iphonesimulator/Entrixy.build/assetcatalog_dependencies_unthinned --unthinned-info-plist-content /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Intermediates.noindex/Entrixy.build/Debug-iphonesimulator/Entrixy.build/assetcatalog_generated_info.plist_unthinned --output /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Products/Debug-iphonesimulator/Entrixy.app --plist-output /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Intermediates.noindex/Entrixy.build/Debug-iphonesimulator/Entrixy.build/assetcatalog_generated_info.plist
-note: Emplaced /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Products/Debug-iphonesimulator/Entrixy.app/AppIcon76x76@2x~ipad.png (in target 'Entrixy' from project 'Entrixy' at path '/Users/runner/work/ios-build./ios-build./Entrixy.xcodeproj')
-note: Emplaced /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Products/Debug-iphonesimulator/Entrixy.app/AppIcon60x60@2x.png (in target 'Entrixy' from project 'Entrixy' at path '/Users/runner/work/ios-build./ios-build./Entrixy.xcodeproj')
-note: Emplaced /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Products/Debug-iphonesimulator/Entrixy.app/Assets.car (in target 'Entrixy' from project 'Entrixy' at path '/Users/runner/work/ios-build./ios-build./Entrixy.xcodeproj')
-
 SwiftDriverJobDiscovery normal x86_64 Compiling ActionFlowTests.swift, AppEntryLockTests.swift, AppStateTests.swift (in target 'EntrixyAppTests' from project 'Entrixy' at path '/Users/runner/work/ios-build./ios-build./Entrixy.xcodeproj')
-
-SwiftDriverJobDiscovery normal x86_64 Compiling BackupTests.swift, DelegationInboxTests.swift, MessageManagerTests.swift (in target 'EntrixyAppTests' from project 'Entrixy' at path '/Users/runner/work/ios-build./ios-build./Entrixy.xcodeproj')
-
-ProcessInfoPlistFile /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Products/Debug-iphonesimulator/Entrixy.app/Info.plist /Users/runner/work/ios-build./ios-build./.local-checks/Entrixy-Info.plist (in target 'Entrixy' from project 'Entrixy' at path '/Users/runner/work/ios-build./ios-build./Entrixy.xcodeproj')
-    cd /Users/runner/work/ios-build./ios-build.
-    builtin-infoPlistUtility /Users/runner/work/ios-build./ios-build./.local-checks/Entrixy-Info.plist -producttype com.apple.product-type.application -genpkginfo /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Products/Debug-iphonesimulator/Entrixy.app/PkgInfo -expandbuildsettings -format binary -platform iphonesimulator -additionalcontentfile /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Intermediates.noindex/Entrixy.build/Debug-iphonesimulator/Entrixy.build/assetcatalog_generated_info.plist -o /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Products/Debug-iphonesimulator/Entrixy.app/Info.plist
 
 SwiftMergeGeneratedHeaders /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Intermediates.noindex/Entrixy.build/Debug-iphonesimulator/EntrixyAppTests.build/DerivedSources/EntrixyAppTests-Swift.h /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Intermediates.noindex/Entrixy.build/Debug-iphonesimulator/EntrixyAppTests.build/Objects-normal/x86_64/EntrixyAppTests-Swift.h (in target 'EntrixyAppTests' from project 'Entrixy' at path '/Users/runner/work/ios-build./ios-build./Entrixy.xcodeproj')
     cd /Users/runner/work/ios-build./ios-build.
@@ -428,27 +446,9 @@ Copy /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Pr
     cd /Users/runner/work/ios-build./ios-build.
     builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -resolve-src-symlinks -rename /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Intermediates.noindex/Entrixy.build/Debug-iphonesimulator/EntrixyAppTests.build/Objects-normal/x86_64/EntrixyAppTests.swiftsourceinfo /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Products/Debug-iphonesimulator/EntrixyAppTests.swiftmodule/Project/x86_64-apple-ios-simulator.swiftsourceinfo
 
-ExtractAppIntentsMetadata (in target 'Entrixy' from project 'Entrixy' at path '/Users/runner/work/ios-build./ios-build./Entrixy.xcodeproj')
-    cd /Users/runner/work/ios-build./ios-build.
-    /Applications/Xcode_26.3.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/appintentsmetadataprocessor --toolchain-dir /Users/runner/Library/Developer/DVTDownloads/MetalToolchain/mounts/058e1b31129b642e40598a87b55aa54b2a29e538/Metal.xctoolchain --module-name Entrixy --sdk-root /Applications/Xcode_26.3.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.2.sdk --xcode-version 17C529 --platform-family iOS --deployment-target 16.0 --bundle-identifier com.entrixy.ios --output /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Products/Debug-iphonesimulator/Entrixy.app --target-triple x86_64-apple-ios16.0-simulator --binary-file /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Products/Debug-iphonesimulator/Entrixy.app/Entrixy --dependency-file /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Intermediates.noindex/Entrixy.build/Debug-iphonesimulator/Entrixy.build/Objects-normal/x86_64/Entrixy_dependency_info.dat --stringsdata-file /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Intermediates.noindex/Entrixy.build/Debug-iphonesimulator/Entrixy.build/Objects-normal/x86_64/ExtractedAppShortcutsMetadata.stringsdata --source-file-list /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Intermediates.noindex/Entrixy.build/Debug-iphonesimulator/Entrixy.build/Objects-normal/x86_64/Entrixy.SwiftFileList --metadata-file-list /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Intermediates.noindex/Entrixy.build/Debug-iphonesimulator/Entrixy.build/Entrixy.DependencyMetadataFileList --static-metadata-file-list /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Intermediates.noindex/Entrixy.build/Debug-iphonesimulator/Entrixy.build/Entrixy.DependencyStaticMetadataFileList --swift-const-vals-list /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Intermediates.noindex/Entrixy.build/Debug-iphonesimulator/Entrixy.build/Objects-normal/x86_64/Entrixy.SwiftConstValuesFileList --compile-time-extraction --deployment-aware-processing --validate-assistant-intents --no-app-shortcuts-localization
-2026-11-15 08:31:42.744 appintentsmetadataprocessor[19838:55078] Starting appintentsmetadataprocessor export
-2026-11-15 08:31:42.748 appintentsmetadataprocessor[19838:55078] warning: Metadata extraction skipped. No AppIntents.framework dependency found.
+SwiftDriverJobDiscovery normal x86_64 Compiling BackupTests.swift, DelegationInboxTests.swift, MessageManagerTests.swift (in target 'EntrixyAppTests' from project 'Entrixy' at path '/Users/runner/work/ios-build./ios-build./Entrixy.xcodeproj')
 
-CopySwiftLibs /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Products/Debug-iphonesimulator/Entrixy.app (in target 'Entrixy' from project 'Entrixy' at path '/Users/runner/work/ios-build./ios-build./Entrixy.xcodeproj')
-    cd /Users/runner/work/ios-build./ios-build.
-    builtin-swiftStdLibTool --copy --verbose --sign - --scan-executable /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Products/Debug-iphonesimulator/Entrixy.app/Entrixy.debug.dylib --scan-folder /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Products/Debug-iphonesimulator/Entrixy.app/Frameworks --scan-folder /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Products/Debug-iphonesimulator/Entrixy.app/PlugIns --scan-folder /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Products/Debug-iphonesimulator/Entrixy.app/SystemExtensions --scan-folder /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Products/Debug-iphonesimulator/Entrixy.app/Extensions --platform iphonesimulator --toolchain /Users/runner/Library/Developer/DVTDownloads/MetalToolchain/mounts/058e1b31129b642e40598a87b55aa54b2a29e538/Metal.xctoolchain --toolchain /Applications/Xcode_26.3.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain --destination /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Products/Debug-iphonesimulator/Entrixy.app/Frameworks --strip-bitcode --strip-bitcode-tool /Applications/Xcode_26.3.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/bitcode_strip --emit-dependency-info /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Intermediates.noindex/Entrixy.build/Debug-iphonesimulator/Entrixy.build/SwiftStdLibToolInputDependencies.dep --filter-for-swift-os
-
-ProcessInfoPlistFile /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Products/Debug-iphonesimulator/Entrixy.app/PlugIns/EntrixyAppTests.xctest/Info.plist /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Intermediates.noindex/Entrixy.build/Debug-iphonesimulator/EntrixyAppTests.build/empty-EntrixyAppTests.plist (in target 'EntrixyAppTests' from project 'Entrixy' at path '/Users/runner/work/ios-build./ios-build./Entrixy.xcodeproj')
-    cd /Users/runner/work/ios-build./ios-build.
-    builtin-infoPlistUtility /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Intermediates.noindex/Entrixy.build/Debug-iphonesimulator/EntrixyAppTests.build/empty-EntrixyAppTests.plist -producttype com.apple.product-type.bundle.unit-test -expandbuildsettings -format binary -platform iphonesimulator -o /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Products/Debug-iphonesimulator/Entrixy.app/PlugIns/EntrixyAppTests.xctest/Info.plist
-
-CopyPNGFile /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Products/Debug-iphonesimulator/Entrixy.app/PlugIns/EntrixyAppTests.xctest/no-qr.png /Users/runner/work/ios-build./ios-build./Tests/EntrixyAppTests/Fixtures/no-qr.png (in target 'EntrixyAppTests' from project 'Entrixy' at path '/Users/runner/work/ios-build./ios-build./Entrixy.xcodeproj')
-    cd /Users/runner/work/ios-build./ios-build.
-    /Applications/Xcode_26.3.app/Contents/Developer/usr/bin/copypng -compress -strip-PNG-text /Users/runner/work/ios-build./ios-build./Tests/EntrixyAppTests/Fixtures/no-qr.png /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Products/Debug-iphonesimulator/Entrixy.app/PlugIns/EntrixyAppTests.xctest/no-qr.png
-
-CopyPNGFile /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Products/Debug-iphonesimulator/Entrixy.app/PlugIns/EntrixyAppTests.xctest/guest-invite-qr.png /Users/runner/work/ios-build./ios-build./Tests/EntrixyAppTests/Fixtures/guest-invite-qr.png (in target 'EntrixyAppTests' from project 'Entrixy' at path '/Users/runner/work/ios-build./ios-build./Entrixy.xcodeproj')
-    cd /Users/runner/work/ios-build./ios-build.
-    /Applications/Xcode_26.3.app/Contents/Developer/usr/bin/copypng -compress -strip-PNG-text /Users/runner/work/ios-build./ios-build./Tests/EntrixyAppTests/Fixtures/guest-invite-qr.png /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Products/Debug-iphonesimulator/Entrixy.app/PlugIns/EntrixyAppTests.xctest/guest-invite-qr.png
+SwiftDriverJobDiscovery normal x86_64 Compiling BLEGuestControlTests.swift, BLEOwnerControlTests.swift, BLEPairingTests.swift (in target 'EntrixyAppTests' from project 'Entrixy' at path '/Users/runner/work/ios-build./ios-build./Entrixy.xcodeproj')
 
 SwiftDriverJobDiscovery normal x86_64 Compiling OwnerAccountTests.swift, PassManagerTests.swift (in target 'EntrixyAppTests' from project 'Entrixy' at path '/Users/runner/work/ios-build./ios-build./Entrixy.xcodeproj')
 
@@ -460,21 +460,21 @@ Ld /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Prod
     cd /Users/runner/work/ios-build./ios-build.
     /Applications/Xcode_26.3.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -Xlinker -reproducible -target x86_64-apple-ios16.0-simulator -bundle -isysroot /Applications/Xcode_26.3.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.2.sdk -O0 -L/Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Intermediates.noindex/EagerLinkingTBDs/Debug-iphonesimulator -L/Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Products/Debug-iphonesimulator -L/Applications/Xcode_26.3.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/usr/lib -F/Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Intermediates.noindex/EagerLinkingTBDs/Debug-iphonesimulator -F/Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Products/Debug-iphonesimulator/PackageFrameworks -F/Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Products/Debug-iphonesimulator -iframework /Applications/Xcode_26.3.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Frameworks -iframework /Applications/Xcode_26.3.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.2.sdk/Developer/Library/Frameworks -filelist /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Intermediates.noindex/Entrixy.build/Debug-iphonesimulator/EntrixyAppTests.build/Objects-normal/x86_64/EntrixyAppTests.LinkFileList -Xlinker -rpath -Xlinker /usr/lib/swift -Xlinker -rpath -Xlinker /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Products/Debug-iphonesimulator/PackageFrameworks -Xlinker -rpath -Xlinker @loader_path/Frameworks -Xlinker -rpath -Xlinker @executable_path/Frameworks -dead_strip -bundle_loader /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Products/Debug-iphonesimulator/Entrixy.app/Entrixy -Xlinker -object_path_lto -Xlinker /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Intermediates.noindex/Entrixy.build/Debug-iphonesimulator/EntrixyAppTests.build/Objects-normal/x86_64/EntrixyAppTests_lto.o -rdynamic -Xlinker -no_deduplicate -Xlinker -objc_abi_version -Xlinker 2 -Xlinker -dependency_info -Xlinker /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Intermediates.noindex/Entrixy.build/Debug-iphonesimulator/EntrixyAppTests.build/Objects-normal/x86_64/EntrixyAppTests_dependency_info.dat -fobjc-link-runtime -L/Applications/Xcode_26.3.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/iphonesimulator -L/usr/lib/swift -Xlinker -add_ast_path -Xlinker /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Intermediates.noindex/Entrixy.build/Debug-iphonesimulator/EntrixyAppTests.build/Objects-normal/x86_64/EntrixyAppTests.swiftmodule @/Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Intermediates.noindex/Entrixy.build/Debug-iphonesimulator/EntrixyAppTests.build/Objects-normal/x86_64/EntrixyAppTests-linker-args.resp -Wl,-no_warn_duplicate_libraries -Xlinker -needed_framework -Xlinker XCTest -framework XCTest -Xlinker -needed-lXCTestSwiftSupport -lXCTestSwiftSupport /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Products/Debug-iphonesimulator/Entrixy.app/Entrixy.debug.dylib -Xlinker -no_adhoc_codesign -o /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Products/Debug-iphonesimulator/Entrixy.app/PlugIns/EntrixyAppTests.xctest/EntrixyAppTests
 
-ExtractAppIntentsMetadata (in target 'EntrixyAppTests' from project 'Entrixy' at path '/Users/runner/work/ios-build./ios-build./Entrixy.xcodeproj')
-    cd /Users/runner/work/ios-build./ios-build.
-    /Applications/Xcode_26.3.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/appintentsmetadataprocessor --toolchain-dir /Users/runner/Library/Developer/DVTDownloads/MetalToolchain/mounts/058e1b31129b642e40598a87b55aa54b2a29e538/Metal.xctoolchain --module-name EntrixyAppTests --sdk-root /Applications/Xcode_26.3.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.2.sdk --xcode-version 17C529 --platform-family iOS --deployment-target 16.0 --bundle-identifier com.entrixy.ios.tests --output /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Products/Debug-iphonesimulator/Entrixy.app/PlugIns/EntrixyAppTests.xctest --target-triple x86_64-apple-ios16.0-simulator --binary-file /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Products/Debug-iphonesimulator/Entrixy.app/PlugIns/EntrixyAppTests.xctest/EntrixyAppTests --dependency-file /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Intermediates.noindex/Entrixy.build/Debug-iphonesimulator/EntrixyAppTests.build/Objects-normal/x86_64/EntrixyAppTests_dependency_info.dat --stringsdata-file /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Intermediates.noindex/Entrixy.build/Debug-iphonesimulator/EntrixyAppTests.build/Objects-normal/x86_64/ExtractedAppShortcutsMetadata.stringsdata --source-file-list /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Intermediates.noindex/Entrixy.build/Debug-iphonesimulator/EntrixyAppTests.build/Objects-normal/x86_64/EntrixyAppTests.SwiftFileList --metadata-file-list /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Intermediates.noindex/Entrixy.build/Debug-iphonesimulator/EntrixyAppTests.build/EntrixyAppTests.DependencyMetadataFileList --static-metadata-file-list /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Intermediates.noindex/Entrixy.build/Debug-iphonesimulator/EntrixyAppTests.build/EntrixyAppTests.DependencyStaticMetadataFileList --swift-const-vals-list /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Intermediates.noindex/Entrixy.build/Debug-iphonesimulator/EntrixyAppTests.build/Objects-normal/x86_64/EntrixyAppTests.SwiftConstValuesFileList --compile-time-extraction --deployment-aware-processing --validate-assistant-intents --no-app-shortcuts-localization
-2026-11-15 08:31:44.648 appintentsmetadataprocessor[19861:55150] Starting appintentsmetadataprocessor export
-2026-11-15 08:31:44.652 appintentsmetadataprocessor[19861:55150] warning: Metadata extraction skipped. No AppIntents.framework dependency found.
-
 CopySwiftLibs /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Products/Debug-iphonesimulator/Entrixy.app/PlugIns/EntrixyAppTests.xctest (in target 'EntrixyAppTests' from project 'Entrixy' at path '/Users/runner/work/ios-build./ios-build./Entrixy.xcodeproj')
     cd /Users/runner/work/ios-build./ios-build.
     builtin-swiftStdLibTool --copy --verbose --sign - --scan-executable /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Products/Debug-iphonesimulator/Entrixy.app/PlugIns/EntrixyAppTests.xctest/EntrixyAppTests --scan-folder /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Products/Debug-iphonesimulator/Entrixy.app/PlugIns/EntrixyAppTests.xctest/Frameworks --scan-folder /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Products/Debug-iphonesimulator/Entrixy.app/PlugIns/EntrixyAppTests.xctest/PlugIns --scan-folder /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Products/Debug-iphonesimulator/Entrixy.app/PlugIns/EntrixyAppTests.xctest/SystemExtensions --scan-folder /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Products/Debug-iphonesimulator/Entrixy.app/PlugIns/EntrixyAppTests.xctest/Extensions --platform iphonesimulator --toolchain /Users/runner/Library/Developer/DVTDownloads/MetalToolchain/mounts/058e1b31129b642e40598a87b55aa54b2a29e538/Metal.xctoolchain --toolchain /Applications/Xcode_26.3.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain --destination /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Products/Debug-iphonesimulator/Entrixy.app/PlugIns/EntrixyAppTests.xctest/Frameworks --strip-bitcode --scan-executable /Applications/Xcode_26.3.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/usr/lib/libXCTestSwiftSupport.dylib --strip-bitcode-tool /Applications/Xcode_26.3.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/bitcode_strip --emit-dependency-info /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Intermediates.noindex/Entrixy.build/Debug-iphonesimulator/EntrixyAppTests.build/SwiftStdLibToolInputDependencies.dep --filter-for-swift-os
 
+ExtractAppIntentsMetadata (in target 'EntrixyAppTests' from project 'Entrixy' at path '/Users/runner/work/ios-build./ios-build./Entrixy.xcodeproj')
+    cd /Users/runner/work/ios-build./ios-build.
+    /Applications/Xcode_26.3.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/appintentsmetadataprocessor --toolchain-dir /Users/runner/Library/Developer/DVTDownloads/MetalToolchain/mounts/058e1b31129b642e40598a87b55aa54b2a29e538/Metal.xctoolchain --module-name EntrixyAppTests --sdk-root /Applications/Xcode_26.3.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.2.sdk --xcode-version 17C529 --platform-family iOS --deployment-target 16.0 --bundle-identifier com.entrixy.ios.tests --output /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Products/Debug-iphonesimulator/Entrixy.app/PlugIns/EntrixyAppTests.xctest --target-triple x86_64-apple-ios16.0-simulator --binary-file /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Products/Debug-iphonesimulator/Entrixy.app/PlugIns/EntrixyAppTests.xctest/EntrixyAppTests --dependency-file /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Intermediates.noindex/Entrixy.build/Debug-iphonesimulator/EntrixyAppTests.build/Objects-normal/x86_64/EntrixyAppTests_dependency_info.dat --stringsdata-file /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Intermediates.noindex/Entrixy.build/Debug-iphonesimulator/EntrixyAppTests.build/Objects-normal/x86_64/ExtractedAppShortcutsMetadata.stringsdata --source-file-list /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Intermediates.noindex/Entrixy.build/Debug-iphonesimulator/EntrixyAppTests.build/Objects-normal/x86_64/EntrixyAppTests.SwiftFileList --metadata-file-list /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Intermediates.noindex/Entrixy.build/Debug-iphonesimulator/EntrixyAppTests.build/EntrixyAppTests.DependencyMetadataFileList --static-metadata-file-list /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Intermediates.noindex/Entrixy.build/Debug-iphonesimulator/EntrixyAppTests.build/EntrixyAppTests.DependencyStaticMetadataFileList --swift-const-vals-list /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Intermediates.noindex/Entrixy.build/Debug-iphonesimulator/EntrixyAppTests.build/Objects-normal/x86_64/EntrixyAppTests.SwiftConstValuesFileList --compile-time-extraction --deployment-aware-processing --validate-assistant-intents --no-app-shortcuts-localization
+2026-11-15 13:17:32.661 appintentsmetadataprocessor[19613:53635] Starting appintentsmetadataprocessor export
+2026-11-15 13:17:32.668 appintentsmetadataprocessor[19613:53635] warning: Metadata extraction skipped. No AppIntents.framework dependency found.
+
 AppIntentsSSUTraining (in target 'EntrixyAppTests' from project 'Entrixy' at path '/Users/runner/work/ios-build./ios-build./Entrixy.xcodeproj')
     cd /Users/runner/work/ios-build./ios-build.
     /Applications/Xcode_26.3.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/appintentsnltrainingprocessor --infoplist-path /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Products/Debug-iphonesimulator/Entrixy.app/PlugIns/EntrixyAppTests.xctest/Info.plist --temp-dir-path /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Intermediates.noindex/Entrixy.build/Debug-iphonesimulator/EntrixyAppTests.build/ssu --bundle-id com.entrixy.ios.tests --product-path /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Products/Debug-iphonesimulator/Entrixy.app/PlugIns/EntrixyAppTests.xctest --extracted-metadata-path /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Products/Debug-iphonesimulator/Entrixy.app/PlugIns/EntrixyAppTests.xctest/Metadata.appintents --metadata-file-list /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Intermediates.noindex/Entrixy.build/Debug-iphonesimulator/EntrixyAppTests.build/EntrixyAppTests.DependencyMetadataFileList --archive-ssu-assets
-2026-11-15 08:31:44.679 appintentsnltrainingprocessor[19862:55151] Parsing options for appintentsnltrainingprocessor
-2026-11-15 08:31:44.680 appintentsnltrainingprocessor[19862:55151] No AppShortcuts found - Skipping.
+2026-11-15 13:17:32.711 appintentsnltrainingprocessor[19614:53636] Parsing options for appintentsnltrainingprocessor
+2026-11-15 13:17:32.713 appintentsnltrainingprocessor[19614:53636] No AppShortcuts found - Skipping.
 
 CodeSign /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Products/Debug-iphonesimulator/Entrixy.app/PlugIns/EntrixyAppTests.xctest (in target 'EntrixyAppTests' from project 'Entrixy' at path '/Users/runner/work/ios-build./ios-build./Entrixy.xcodeproj')
     cd /Users/runner/work/ios-build./ios-build.
@@ -516,209 +516,209 @@ Validate /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Buil
     cd /Users/runner/work/ios-build./ios-build.
     builtin-validationUtility /Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Build/Products/Debug-iphonesimulator/Entrixy.app -shallow-bundle -infoplist-subpath Info.plist
 
-2026-11-15 08:35:43.417161+0000 Entrixy[22364:65052] [General] Failed to send CA Event for app launch measurements for ca_event_type: 0 event_name: com.apple.app_launch_measurement.FirstFramePresentationMetric
-2026-11-15 08:35:44.742935+0000 Entrixy[22364:65048] [General] Failed to send CA Event for app launch measurements for ca_event_type: 1 event_name: com.apple.app_launch_measurement.ExtendedLaunchMetrics
-Test Suite 'All tests' started at 2026-11-15 08:35:48.660.
-Test Suite 'EntrixyAppTests.xctest' started at 2026-11-15 08:35:48.663.
-Test Suite 'ActionFlowTests' started at 2026-11-15 08:35:48.664.
+2026-11-15 13:24:01.957597+0000 Entrixy[23192:70733] [General] Failed to send CA Event for app launch measurements for ca_event_type: 0 event_name: com.apple.app_launch_measurement.FirstFramePresentationMetric
+2026-11-15 13:24:05.134112+0000 Entrixy[23192:70733] [General] Failed to send CA Event for app launch measurements for ca_event_type: 1 event_name: com.apple.app_launch_measurement.ExtendedLaunchMetrics
+Test Suite 'All tests' started at 2026-11-15 13:24:24.795.
+Test Suite 'EntrixyAppTests.xctest' started at 2026-11-15 13:24:24.804.
+Test Suite 'ActionFlowTests' started at 2026-11-15 13:24:24.805.
 Test Case '-[EntrixyAppTests.ActionFlowTests testOfflineOrChangedAuthorizationCannotSend]' started.
-Test Case '-[EntrixyAppTests.ActionFlowTests testOfflineOrChangedAuthorizationCannotSend]' passed (0.389 seconds).
+Test Case '-[EntrixyAppTests.ActionFlowTests testOfflineOrChangedAuthorizationCannotSend]' passed (1.060 seconds).
 Test Case '-[EntrixyAppTests.ActionFlowTests testPINIsRequiredAndFailedAttemptsPersistAcrossLaunches]' started.
-Test Case '-[EntrixyAppTests.ActionFlowTests testPINIsRequiredAndFailedAttemptsPersistAcrossLaunches]' passed (2.468 seconds).
+Test Case '-[EntrixyAppTests.ActionFlowTests testPINIsRequiredAndFailedAttemptsPersistAcrossLaunches]' passed (3.054 seconds).
 Test Case '-[EntrixyAppTests.ActionFlowTests testPINUsesIndependentPBKDF2VectorAndEscalatingLockout]' started.
-Test Case '-[EntrixyAppTests.ActionFlowTests testPINUsesIndependentPBKDF2VectorAndEscalatingLockout]' passed (0.062 seconds).
+Test Case '-[EntrixyAppTests.ActionFlowTests testPINUsesIndependentPBKDF2VectorAndEscalatingLockout]' passed (0.071 seconds).
 Test Case '-[EntrixyAppTests.ActionFlowTests testPressChallengeResultAndJournalSurviveRelaunchWithoutReplay]' started.
-Test Case '-[EntrixyAppTests.ActionFlowTests testPressChallengeResultAndJournalSurviveRelaunchWithoutReplay]' passed (0.296 seconds).
+Test Case '-[EntrixyAppTests.ActionFlowTests testPressChallengeResultAndJournalSurviveRelaunchWithoutReplay]' passed (0.138 seconds).
 Test Case '-[EntrixyAppTests.ActionFlowTests testVisibleActionNameFollowsControllerDirectionWithoutSendingOrChangingErrors]' started.
-Test Case '-[EntrixyAppTests.ActionFlowTests testVisibleActionNameFollowsControllerDirectionWithoutSendingOrChangingErrors]' passed (0.055 seconds).
-Test Suite 'ActionFlowTests' passed at 2026-11-15 08:35:51.944.
-	 Executed 5 tests, with 0 failures (0 unexpected) in 3.270 (3.280) seconds
-Test Suite 'AppEntryLockTests' started at 2026-11-15 08:35:51.945.
+Test Case '-[EntrixyAppTests.ActionFlowTests testVisibleActionNameFollowsControllerDirectionWithoutSendingOrChangingErrors]' passed (1.972 seconds).
+Test Suite 'ActionFlowTests' passed at 2026-11-15 13:24:31.113.
+	 Executed 5 tests, with 0 failures (0 unexpected) in 6.295 (6.308) seconds
+Test Suite 'AppEntryLockTests' started at 2026-11-15 13:24:31.114.
 Test Case '-[EntrixyAppTests.AppEntryLockTests testColdStartAndBackgroundLockRequireCodeAndDisablingCannotBypassIt]' started.
-Test Case '-[EntrixyAppTests.AppEntryLockTests testColdStartAndBackgroundLockRequireCodeAndDisablingCannotBypassIt]' passed (3.335 seconds).
+Test Case '-[EntrixyAppTests.AppEntryLockTests testColdStartAndBackgroundLockRequireCodeAndDisablingCannotBypassIt]' passed (1.062 seconds).
 Test Case '-[EntrixyAppTests.AppEntryLockTests testFailedPreferenceWriteAndCodeChangePreserveExistingProtection]' started.
-Test Case '-[EntrixyAppTests.AppEntryLockTests testFailedPreferenceWriteAndCodeChangePreserveExistingProtection]' passed (0.692 seconds).
-Test Suite 'AppEntryLockTests' passed at 2026-11-15 08:35:55.975.
-	 Executed 2 tests, with 0 failures (0 unexpected) in 4.026 (4.030) seconds
-Test Suite 'AppStateTests' started at 2026-11-15 08:35:55.976.
+Test Case '-[EntrixyAppTests.AppEntryLockTests testFailedPreferenceWriteAndCodeChangePreserveExistingProtection]' passed (0.990 seconds).
+Test Suite 'AppEntryLockTests' passed at 2026-11-15 13:24:33.170.
+	 Executed 2 tests, with 0 failures (0 unexpected) in 2.052 (2.056) seconds
+Test Suite 'AppStateTests' started at 2026-11-15 13:24:33.171.
 Test Case '-[EntrixyAppTests.AppStateTests testCorruptKeychainNeverCreatesReplacementIdentity]' started.
-Test Case '-[EntrixyAppTests.AppStateTests testCorruptKeychainNeverCreatesReplacementIdentity]' passed (0.016 seconds).
+Test Case '-[EntrixyAppTests.AppStateTests testCorruptKeychainNeverCreatesReplacementIdentity]' passed (0.018 seconds).
 Test Case '-[EntrixyAppTests.AppStateTests testLegacyDiagnosticsAreNotActionHistory]' started.
-Test Case '-[EntrixyAppTests.AppStateTests testLegacyDiagnosticsAreNotActionHistory]' passed (0.033 seconds).
+Test Case '-[EntrixyAppTests.AppStateTests testLegacyDiagnosticsAreNotActionHistory]' passed (0.040 seconds).
 Test Case '-[EntrixyAppTests.AppStateTests testLegacyStateLoadsWithoutJournalAndReusesIdentity]' started.
-Test Case '-[EntrixyAppTests.AppStateTests testLegacyStateLoadsWithoutJournalAndReusesIdentity]' passed (0.087 seconds).
+Test Case '-[EntrixyAppTests.AppStateTests testLegacyStateLoadsWithoutJournalAndReusesIdentity]' passed (20.991 seconds).
 Test Case '-[EntrixyAppTests.AppStateTests testPhotoQRDecodesFullInviteAndRejectsImageWithoutQR]' started.
-2026-11-15 08:35:56.712146+0000 Entrixy[22364:65314] fopen failed for data file: errno = 2 (No such file or directory)
-2026-11-15 08:35:56.712792+0000 Entrixy[22364:65314] Errors found! Invalidating cache...
-2026-11-15 08:36:00.320774+0000 Entrixy[22364:65314] fopen failed for data file: errno = 2 (No such file or directory)
-2026-11-15 08:36:00.321145+0000 Entrixy[22364:65314] Errors found! Invalidating cache...
-Test Case '-[EntrixyAppTests.AppStateTests testPhotoQRDecodesFullInviteAndRejectsImageWithoutQR]' passed (9.633 seconds).
+2026-11-15 13:24:56.978379+0000 Entrixy[23192:71636] fopen failed for data file: errno = 2 (No such file or directory)
+2026-11-15 13:24:56.978925+0000 Entrixy[23192:71636] Errors found! Invalidating cache...
+2026-11-15 13:25:01.393594+0000 Entrixy[23192:71636] fopen failed for data file: errno = 2 (No such file or directory)
+2026-11-15 13:25:01.393956+0000 Entrixy[23192:71636] Errors found! Invalidating cache...
+Test Case '-[EntrixyAppTests.AppStateTests testPhotoQRDecodesFullInviteAndRejectsImageWithoutQR]' passed (15.732 seconds).
 Test Case '-[EntrixyAppTests.AppStateTests testRemovingKeyAndClearingJournalPreserveIdentityAcrossLaunches]' started.
-Test Case '-[EntrixyAppTests.AppStateTests testRemovingKeyAndClearingJournalPreserveIdentityAcrossLaunches]' passed (0.131 seconds).
-Test Suite 'AppStateTests' passed at 2026-11-15 08:36:05.883.
-	 Executed 5 tests, with 0 failures (0 unexpected) in 9.900 (9.907) seconds
-Test Suite 'BLEGuestControlTests' started at 2026-11-15 08:36:05.885.
+Test Case '-[EntrixyAppTests.AppStateTests testRemovingKeyAndClearingJournalPreserveIdentityAcrossLaunches]' passed (0.316 seconds).
+Test Suite 'AppStateTests' passed at 2026-11-15 13:25:10.278.
+	 Executed 5 tests, with 0 failures (0 unexpected) in 37.098 (37.107) seconds
+Test Suite 'BLEGuestControlTests' started at 2026-11-15 13:25:10.279.
 Test Case '-[EntrixyAppTests.BLEGuestControlTests testExpiredOrRemovedKeyNeverFiresAndClockRefusalIsNotActionHistory]' started.
-Test Case '-[EntrixyAppTests.BLEGuestControlTests testExpiredOrRemovedKeyNeverFiresAndClockRefusalIsNotActionHistory]' passed (0.073 seconds).
+Test Case '-[EntrixyAppTests.BLEGuestControlTests testExpiredOrRemovedKeyNeverFiresAndClockRefusalIsNotActionHistory]' passed (0.203 seconds).
 Test Case '-[EntrixyAppTests.BLEGuestControlTests testGuestCarriesSignedRevocationBeforeTimeAndFireWithoutAddingMaintenanceJournal]' started.
-Test Case '-[EntrixyAppTests.BLEGuestControlTests testGuestCarriesSignedRevocationBeforeTimeAndFireWithoutAddingMaintenanceJournal]' passed (0.029 seconds).
+Test Case '-[EntrixyAppTests.BLEGuestControlTests testGuestCarriesSignedRevocationBeforeTimeAndFireWithoutAddingMaintenanceJournal]' passed (5.036 seconds).
 Test Case '-[EntrixyAppTests.BLEGuestControlTests testOfflineGuestHasOneAuthenticatedFireAfterClockAndDurableJournal]' started.
-Test Case '-[EntrixyAppTests.BLEGuestControlTests testOfflineGuestHasOneAuthenticatedFireAfterClockAndDurableJournal]' passed (0.023 seconds).
+Test Case '-[EntrixyAppTests.BLEGuestControlTests testOfflineGuestHasOneAuthenticatedFireAfterClockAndDurableJournal]' passed (0.029 seconds).
 Test Case '-[EntrixyAppTests.BLEGuestControlTests testPINIsRequiredBeforeAnyBLEOperation]' started.
-2026-11-15 08:36:09.284967+0000 Entrixy[22364:65048] [ANMD] Timed out waiting for model to be loaded.
-Test Case '-[EntrixyAppTests.BLEGuestControlTests testPINIsRequiredBeforeAnyBLEOperation]' passed (2.919 seconds).
+2026-11-15 13:25:13.850320+0000 Entrixy[23192:71635] [ANMD] Timed out waiting for model to be loaded.
+Test Case '-[EntrixyAppTests.BLEGuestControlTests testPINIsRequiredBeforeAnyBLEOperation]' passed (0.311 seconds).
 Test Case '-[EntrixyAppTests.BLEGuestControlTests testSaveFailureBlocksFireAndLostFireReplyIsNotRetried]' started.
-Test Case '-[EntrixyAppTests.BLEGuestControlTests testSaveFailureBlocksFireAndLostFireReplyIsNotRetried]' passed (0.044 seconds).
-Test Suite 'BLEGuestControlTests' passed at 2026-11-15 08:36:09.722.
-	 Executed 5 tests, with 0 failures (0 unexpected) in 3.089 (3.836) seconds
-Test Suite 'BLEOwnerControlTests' started at 2026-11-15 08:36:09.722.
+Test Case '-[EntrixyAppTests.BLEGuestControlTests testSaveFailureBlocksFireAndLostFireReplyIsNotRetried]' passed (0.094 seconds).
+Test Suite 'BLEGuestControlTests' passed at 2026-11-15 13:25:15.960.
+	 Executed 5 tests, with 0 failures (0 unexpected) in 5.673 (5.681) seconds
+Test Suite 'BLEOwnerControlTests' started at 2026-11-15 13:25:15.961.
 Test Case '-[EntrixyAppTests.BLEOwnerControlTests testBackgroundDuringScanPreventsConnectAndJournal]' started.
-Test Case '-[EntrixyAppTests.BLEOwnerControlTests testBackgroundDuringScanPreventsConnectAndJournal]' passed (0.013 seconds).
+Test Case '-[EntrixyAppTests.BLEOwnerControlTests testBackgroundDuringScanPreventsConnectAndJournal]' passed (0.186 seconds).
 Test Case '-[EntrixyAppTests.BLEOwnerControlTests testDurableJournalAndProofBeforeOneWriteAndFirstFireResult]' started.
-Test Case '-[EntrixyAppTests.BLEOwnerControlTests testDurableJournalAndProofBeforeOneWriteAndFirstFireResult]' passed (0.018 seconds).
+Test Case '-[EntrixyAppTests.BLEOwnerControlTests testDurableJournalAndProofBeforeOneWriteAndFirstFireResult]' passed (1.043 seconds).
 Test Case '-[EntrixyAppTests.BLEOwnerControlTests testLostWriteAndLegacyWriteAckRemainUnknownWithoutReplay]' started.
-Test Case '-[EntrixyAppTests.BLEOwnerControlTests testLostWriteAndLegacyWriteAckRemainUnknownWithoutReplay]' passed (0.012 seconds).
+Test Case '-[EntrixyAppTests.BLEOwnerControlTests testLostWriteAndLegacyWriteAckRemainUnknownWithoutReplay]' passed (0.032 seconds).
 Test Case '-[EntrixyAppTests.BLEOwnerControlTests testOwnerDeliversSignedDecisionWithoutPhysicalActionAndOnlyResult40Confirms]' started.
-Test Case '-[EntrixyAppTests.BLEOwnerControlTests testOwnerDeliversSignedDecisionWithoutPhysicalActionAndOnlyResult40Confirms]' passed (0.017 seconds).
+Test Case '-[EntrixyAppTests.BLEOwnerControlTests testOwnerDeliversSignedDecisionWithoutPhysicalActionAndOnlyResult40Confirms]' passed (0.027 seconds).
 Test Case '-[EntrixyAppTests.BLEOwnerControlTests testOwnerRefusesFireWhenRevocationReceiptCannotBeSaved]' started.
-Test Case '-[EntrixyAppTests.BLEOwnerControlTests testOwnerRefusesFireWhenRevocationReceiptCannotBeSaved]' passed (0.008 seconds).
+Test Case '-[EntrixyAppTests.BLEOwnerControlTests testOwnerRefusesFireWhenRevocationReceiptCannotBeSaved]' passed (0.026 seconds).
 Test Case '-[EntrixyAppTests.BLEOwnerControlTests testPairedOwnerBLEWorksBeforeServerAcknowledgementWithoutRegisteringOrRetryingMetadata]' started.
-Test Case '-[EntrixyAppTests.BLEOwnerControlTests testPairedOwnerBLEWorksBeforeServerAcknowledgementWithoutRegisteringOrRetryingMetadata]' passed (0.009 seconds).
+Test Case '-[EntrixyAppTests.BLEOwnerControlTests testPairedOwnerBLEWorksBeforeServerAcknowledgementWithoutRegisteringOrRetryingMetadata]' passed (0.017 seconds).
 Test Case '-[EntrixyAppTests.BLEOwnerControlTests testRestoredOwnerAuthenticationCannotBeSkippedByDirectBLEControl]' started.
-Test Case '-[EntrixyAppTests.BLEOwnerControlTests testRestoredOwnerAuthenticationCannotBeSkippedByDirectBLEControl]' passed (0.019 seconds).
+Test Case '-[EntrixyAppTests.BLEOwnerControlTests testRestoredOwnerAuthenticationCannotBeSkippedByDirectBLEControl]' passed (0.034 seconds).
 Test Case '-[EntrixyAppTests.BLEOwnerControlTests testSaveFailureAndUnauthenticatedDiscoveryNeverFire]' started.
-Test Case '-[EntrixyAppTests.BLEOwnerControlTests testSaveFailureAndUnauthenticatedDiscoveryNeverFire]' passed (0.015 seconds).
-Test Suite 'BLEOwnerControlTests' passed at 2026-11-15 08:36:11.765.
-	 Executed 8 tests, with 0 failures (0 unexpected) in 0.111 (2.043) seconds
-Test Suite 'BLEPairingTests' started at 2026-11-15 08:36:11.766.
+Test Case '-[EntrixyAppTests.BLEOwnerControlTests testSaveFailureAndUnauthenticatedDiscoveryNeverFire]' passed (0.024 seconds).
+Test Suite 'BLEOwnerControlTests' passed at 2026-11-15 13:25:17.956.
+	 Executed 8 tests, with 0 failures (0 unexpected) in 1.390 (1.995) seconds
+Test Suite 'BLEPairingTests' started at 2026-11-15 13:25:20.696.
 Test Case '-[EntrixyAppTests.BLEPairingTests testBackgroundInvalidatesScanAndNeverWrites]' started.
-Test Case '-[EntrixyAppTests.BLEPairingTests testBackgroundInvalidatesScanAndNeverWrites]' passed (0.010 seconds).
+Test Case '-[EntrixyAppTests.BLEPairingTests testBackgroundInvalidatesScanAndNeverWrites]' passed (0.013 seconds).
 Test Case '-[EntrixyAppTests.BLEPairingTests testSecretAndSentPersistBeforeOneWriteAndLostReplyDoesNotRePair]' started.
-Test Case '-[EntrixyAppTests.BLEPairingTests testSecretAndSentPersistBeforeOneWriteAndLostReplyDoesNotRePair]' passed (0.013 seconds).
+2026-11-15 13:25:18.006771+0000 Entrixy[23192:71637] [e5rt] E5RT encountered an STL exception. msg = On-device compilation within a VM only supports CPU currently..
+Test Case '-[EntrixyAppTests.BLEPairingTests testSecretAndSentPersistBeforeOneWriteAndLostReplyDoesNotRePair]' passed (0.016 seconds).
 Test Case '-[EntrixyAppTests.BLEPairingTests testStorageFailurePreventsPairWriteAndPreparedUsesSameKey]' started.
-Test Case '-[EntrixyAppTests.BLEPairingTests testStorageFailurePreventsPairWriteAndPreparedUsesSameKey]' passed (0.008 seconds).
-Test Suite 'BLEPairingTests' passed at 2026-11-15 08:36:12.653.
-	 Executed 3 tests, with 0 failures (0 unexpected) in 0.032 (0.887) seconds
-Test Suite 'BackupTests' started at 2026-11-15 08:36:12.654.
+2026-11-15 13:25:20.724482+0000 Entrixy[23192:71637] [Inference] e5rt_e5_compiler_compile failed: (11): OPERATION ERROR
+Test Case '-[EntrixyAppTests.BLEPairingTests testStorageFailurePreventsPairWriteAndPreparedUsesSameKey]' passed (4.122 seconds).
+Test Suite 'BLEPairingTests' passed at 2026-11-15 13:25:24.854.
+	 Executed 3 tests, with 0 failures (0 unexpected) in 4.152 (4.158) seconds
+Test Suite 'BackupTests' started at 2026-11-15 13:25:24.855.
 Test Case '-[EntrixyAppTests.BackupTests testClaimAcknowledgementWriteFailureRetainsSourcePlan]' started.
-2026-11-15 08:36:09.392352+0000 Entrixy[22364:65052] [e5rt] E5RT encountered an STL exception. msg = On-device compilation within a VM only supports CPU currently..
-2026-11-15 08:36:13.176086+0000 Entrixy[22364:65052] [Inference] e5rt_e5_compiler_compile failed: (11): OPERATION ERROR
-2026-11-15 08:36:13.711678+0000 Entrixy[22364:65052] [Inference] E5RTNetwork: unable to compile network: /Library/Developer/CoreSimulator/Volumes/iOS_23C54/Library/Developer/CoreSimulator/Profiles/Runtimes/iOS 26.2.simruntime/Contents/Resources/RuntimeRoot/System/LTest Case '-[EntrixyAppTests.BackupTests testClaimAcknowledgementWriteFailureRetainsSourcePlan]' passed (3.015 seconds).
-ibrary/PrivateFrameworks/Quagga.framework/Networks/anmd-model.espresso.net
+2026-11-15 13:25:24.823280+0000 Entrixy[23192:71637] [Inference] E5RTNetwork: unable to compile network: /Library/Developer/CoreSimulator/Volumes/iOS_23C54/Library/Developer/CoreSimulator/Profiles/Runtimes/iOS 26.2.simruntime/Contents/Resources/RuntimeRoot/System/Library/PrivateFrameworks/Quagga.framework/Networks/anmd-model.espresso.net
+Test Case '-[EntrixyAppTests.BackupTests testClaimAcknowledgementWriteFailureRetainsSourcePlan]' passed (5.653 seconds).
 Test Case '-[EntrixyAppTests.BackupTests testConflictingOwnerRefusesBeforeMigration]' started.
-Test Case '-[EntrixyAppTests.BackupTests testConflictingOwnerRefusesBeforeMigration]' passed (2.344 seconds).
+Test Case '-[EntrixyAppTests.BackupTests testConflictingOwnerRefusesBeforeMigration]' passed (4.730 seconds).
 Test Case '-[EntrixyAppTests.BackupTests testExistingOwnerReceivesAllMissingBackupSecretsAndConflictsStopBeforeClaims]' started.
-Test Case '-[EntrixyAppTests.BackupTests testExistingOwnerReceivesAllMissingBackupSecretsAndConflictsStopBeforeClaims]' passed (3.781 seconds).
+Test Case '-[EntrixyAppTests.BackupTests testExistingOwnerReceivesAllMissingBackupSecretsAndConflictsStopBeforeClaims]' passed (9.214 seconds).
 Test Case '-[EntrixyAppTests.BackupTests testInspectAndFailedPreflightNeverMoveOrReplaceTargetIdentity]' started.
-Test Case '-[EntrixyAppTests.BackupTests testInspectAndFailedPreflightNeverMoveOrReplaceTargetIdentity]' passed (1.975 seconds).
+Test Case '-[EntrixyAppTests.BackupTests testInspectAndFailedPreflightNeverMoveOrReplaceTargetIdentity]' passed (4.639 seconds).
 Test Case '-[EntrixyAppTests.BackupTests testLostGuestReplyResumesFromDurableOwnerCheckpointsAfterRelaunch]' started.
-Test Case '-[EntrixyAppTests.BackupTests testLostGuestReplyResumesFromDurableOwnerCheckpointsAfterRelaunch]' passed (2.133 seconds).
+Test Case '-[EntrixyAppTests.BackupTests testLostGuestReplyResumesFromDurableOwnerCheckpointsAfterRelaunch]' passed (4.158 seconds).
 Test Case '-[EntrixyAppTests.BackupTests testPlanSaveFailureSendsNothing]' started.
-Test Case '-[EntrixyAppTests.BackupTests testPlanSaveFailureSendsNothing]' passed (2.062 seconds).
-Test Suite 'BackupTests' passed at 2026-11-15 08:36:28.679.
-	 Executed 6 tests, with 0 failures (0 unexpected) in 15.312 (16.025) seconds
-Test Suite 'DelegationInboxTests' started at 2026-11-15 08:36:28.680.
+Test Case '-[EntrixyAppTests.BackupTests testPlanSaveFailureSendsNothing]' passed (4.801 seconds).
+Test Suite 'BackupTests' passed at 2026-11-15 13:25:58.076.
+	 Executed 6 tests, with 0 failures (0 unexpected) in 33.195 (33.221) seconds
+Test Suite 'DelegationInboxTests' started at 2026-11-15 13:25:58.077.
 Test Case '-[EntrixyAppTests.DelegationInboxTests testActivationWriteFailureRetainsOriginalRecipientForSafeCheck]' started.
-Test Case '-[EntrixyAppTests.DelegationInboxTests testActivationWriteFailureRetainsOriginalRecipientForSafeCheck]' passed (0.035 seconds).
+Test Case '-[EntrixyAppTests.DelegationInboxTests testActivationWriteFailureRetainsOriginalRecipientForSafeCheck]' passed (0.073 seconds).
 Test Case '-[EntrixyAppTests.DelegationInboxTests testAdditionalPartKeepsInstalledKeysAndRecipientPairWithoutRedeemingOldCodesAgain]' started.
-Test Case '-[EntrixyAppTests.DelegationInboxTests testAdditionalPartKeepsInstalledKeysAndRecipientPairWithoutRedeemingOldCodesAgain]' passed (0.130 seconds).
+Test Case '-[EntrixyAppTests.DelegationInboxTests testAdditionalPartKeepsInstalledKeysAndRecipientPairWithoutRedeemingOldCodesAgain]' passed (0.036 seconds).
 Test Case '-[EntrixyAppTests.DelegationInboxTests testAdditionalPartStorageFailureNeverPostsAReplacementAndBackgroundStopsPolling]' started.
-Test Case '-[EntrixyAppTests.DelegationInboxTests testAdditionalPartStorageFailureNeverPostsAReplacementAndBackgroundStopsPolling]' passed (0.041 seconds).
+Test Case '-[EntrixyAppTests.DelegationInboxTests testAdditionalPartStorageFailureNeverPostsAReplacementAndBackgroundStopsPolling]' passed (0.192 seconds).
 Test Case '-[EntrixyAppTests.DelegationInboxTests testFailedReservationSendsNothing]' started.
-Test Case '-[EntrixyAppTests.DelegationInboxTests testFailedReservationSendsNothing]' passed (0.007 seconds).
+Test Case '-[EntrixyAppTests.DelegationInboxTests testFailedReservationSendsNothing]' passed (0.011 seconds).
 Test Case '-[EntrixyAppTests.DelegationInboxTests testLostReplyPreservesRecipientBeforeRequestAndNeverRedeemsTwiceAfterRelaunch]' started.
-Test Case '-[EntrixyAppTests.DelegationInboxTests testLostReplyPreservesRecipientBeforeRequestAndNeverRedeemsTwiceAfterRelaunch]' passed (0.019 seconds).
-Test Suite 'DelegationInboxTests' passed at 2026-11-15 08:36:28.963.
-	 Executed 5 tests, with 0 failures (0 unexpected) in 0.232 (0.283) seconds
-Test Suite 'MessageManagerTests' started at 2026-11-15 08:36:28.964.
+Test Case '-[EntrixyAppTests.DelegationInboxTests testLostReplyPreservesRecipientBeforeRequestAndNeverRedeemsTwiceAfterRelaunch]' passed (0.036 seconds).
+Test Suite 'DelegationInboxTests' passed at 2026-11-15 13:25:58.438.
+	 Executed 5 tests, with 0 failures (0 unexpected) in 0.348 (0.361) seconds
+Test Suite 'MessageManagerTests' started at 2026-11-15 13:25:58.440.
 Test Case '-[EntrixyAppTests.MessageManagerTests testEncryptedBackupRetainsIncomingReadStateAndTextForTheRestoredAccess]' started.
-Test Case '-[EntrixyAppTests.MessageManagerTests testEncryptedBackupRetainsIncomingReadStateAndTextForTheRestoredAccess]' passed (1.597 seconds).
+Test Case '-[EntrixyAppTests.MessageManagerTests testEncryptedBackupRetainsIncomingReadStateAndTextForTheRestoredAccess]' passed (4.103 seconds).
 Test Case '-[EntrixyAppTests.MessageManagerTests testInvalidCipherAndStorageFailureNeverAcknowledgeDelivery]' started.
-Test Case '-[EntrixyAppTests.MessageManagerTests testInvalidCipherAndStorageFailureNeverAcknowledgeDelivery]' passed (0.034 seconds).
+Test Case '-[EntrixyAppTests.MessageManagerTests testInvalidCipherAndStorageFailureNeverAcknowledgeDelivery]' passed (0.020 seconds).
 Test Case '-[EntrixyAppTests.MessageManagerTests testLostReadAcknowledgementRetriesSameCipherHashAfterRelaunchWithoutInventingAnAction]' started.
-Test Case '-[EntrixyAppTests.MessageManagerTests testLostReadAcknowledgementRetriesSameCipherHashAfterRelaunchWithoutInventingAnAction]' passed (0.022 seconds).
+Test Case '-[EntrixyAppTests.MessageManagerTests testLostReadAcknowledgementRetriesSameCipherHashAfterRelaunchWithoutInventingAnAction]' passed (0.163 seconds).
 Test Case '-[EntrixyAppTests.MessageManagerTests testPassedMessageRequiresRecipientProofAndSealsOnlyToThatRecipient]' started.
-Test Case '-[EntrixyAppTests.MessageManagerTests testPassedMessageRequiresRecipientProofAndSealsOnlyToThatRecipient]' passed (0.057 seconds).
+Test Case '-[EntrixyAppTests.MessageManagerTests testPassedMessageRequiresRecipientProofAndSealsOnlyToThatRecipient]' passed (0.043 seconds).
 Test Case '-[EntrixyAppTests.MessageManagerTests testReceivedCipherAndActualDisplayPersistBeforeDeliveryAndReadAcknowledgements]' started.
-Test Case '-[EntrixyAppTests.MessageManagerTests testReceivedCipherAndActualDisplayPersistBeforeDeliveryAndReadAcknowledgements]' passed (0.045 seconds).
-Test Suite 'MessageManagerTests' passed at 2026-11-15 08:36:30.734.
-	 Executed 5 tests, with 0 failures (0 unexpected) in 1.754 (1.770) seconds
-Test Suite 'OwnerAccountTests' started at 2026-11-15 08:36:30.737.
+Test Case '-[EntrixyAppTests.MessageManagerTests testReceivedCipherAndActualDisplayPersistBeforeDeliveryAndReadAcknowledgements]' passed (0.028 seconds).
+Test Suite 'MessageManagerTests' passed at 2026-11-15 13:26:02.806.
+	 Executed 5 tests, with 0 failures (0 unexpected) in 4.357 (4.366) seconds
+Test Suite 'OwnerAccountTests' started at 2026-11-15 13:26:02.808.
 Test Case '-[EntrixyAppTests.OwnerAccountTests testBackgroundCancelsOwnerCommandWithoutReplay]' started.
-Test Case '-[EntrixyAppTests.OwnerAccountTests testBackgroundCancelsOwnerCommandWithoutReplay]' passed (0.113 seconds).
+Test Case '-[EntrixyAppTests.OwnerAccountTests testBackgroundCancelsOwnerCommandWithoutReplay]' passed (0.053 seconds).
 Test Case '-[EntrixyAppTests.OwnerAccountTests testBLEPauseResumeRenewRevokeAndDeleteKeepDurableDecisionsAndSecrets]' started.
-Test Case '-[EntrixyAppTests.OwnerAccountTests testBLEPauseResumeRenewRevokeAndDeleteKeepDurableDecisionsAndSecrets]' passed (0.045 seconds).
+Test Case '-[EntrixyAppTests.OwnerAccountTests testBLEPauseResumeRenewRevokeAndDeleteKeepDurableDecisionsAndSecrets]' passed (0.181 seconds).
 Test Case '-[EntrixyAppTests.OwnerAccountTests testClaimReplySaveFailureRetainsDeviceWithoutRepeatingClaim]' started.
-Test Case '-[EntrixyAppTests.OwnerAccountTests testClaimReplySaveFailureRetainsDeviceWithoutRepeatingClaim]' passed (0.010 seconds).
+Test Case '-[EntrixyAppTests.OwnerAccountTests testClaimReplySaveFailureRetainsDeviceWithoutRepeatingClaim]' passed (0.014 seconds).
 Test Case '-[EntrixyAppTests.OwnerAccountTests testControllerClaimCreateRenameAndDeletePersistBeforeEveryRequest]' started.
-Test Case '-[EntrixyAppTests.OwnerAccountTests testControllerClaimCreateRenameAndDeletePersistBeforeEveryRequest]' passed (0.021 seconds).
+Test Case '-[EntrixyAppTests.OwnerAccountTests testControllerClaimCreateRenameAndDeletePersistBeforeEveryRequest]' passed (0.023 seconds).
 Test Case '-[EntrixyAppTests.OwnerAccountTests testCredentialSaveFailureRetriesOnlyStorage]' started.
-Test Case '-[EntrixyAppTests.OwnerAccountTests testCredentialSaveFailureRetriesOnlyStorage]' passed (0.067 seconds).
+Test Case '-[EntrixyAppTests.OwnerAccountTests testCredentialSaveFailureRetriesOnlyStorage]' passed (0.010 seconds).
 Test Case '-[EntrixyAppTests.OwnerAccountTests testExplicitDelegationLimitsPersistBeforeWireAndSurviveLostEditReply]' started.
-Test Case '-[EntrixyAppTests.OwnerAccountTests testExplicitDelegationLimitsPersistBeforeWireAndSurviveLostEditReply]' passed (0.110 seconds).
+Test Case '-[EntrixyAppTests.OwnerAccountTests testExplicitDelegationLimitsPersistBeforeWireAndSurviveLostEditReply]' passed (0.239 seconds).
 Test Case '-[EntrixyAppTests.OwnerAccountTests testGuestIssueSharePauseResumeRevokeUsePersistedKeyAndNoJournalFabrication]' started.
-Test Case '-[EntrixyAppTests.OwnerAccountTests testGuestIssueSharePauseResumeRevokeUsePersistedKeyAndNoJournalFabrication]' passed (0.021 seconds).
+Test Case '-[EntrixyAppTests.OwnerAccountTests testGuestIssueSharePauseResumeRevokeUsePersistedKeyAndNoJournalFabrication]' passed (0.033 seconds).
 Test Case '-[EntrixyAppTests.OwnerAccountTests testGuestKeyEditAndLostReplyKeepTheExistingInvitation]' started.
-Test Case '-[EntrixyAppTests.OwnerAccountTests testGuestKeyEditAndLostReplyKeepTheExistingInvitation]' passed (0.018 seconds).
+Test Case '-[EntrixyAppTests.OwnerAccountTests testGuestKeyEditAndLostReplyKeepTheExistingInvitation]' passed (0.025 seconds).
 Test Case '-[EntrixyAppTests.OwnerAccountTests testLostKeyCreationReplyReconcilesAcrossLaunchWithoutRegeneration]' started.
-Test Case '-[EntrixyAppTests.OwnerAccountTests testLostKeyCreationReplyReconcilesAcrossLaunchWithoutRegeneration]' passed (0.044 seconds).
+Test Case '-[EntrixyAppTests.OwnerAccountTests testLostKeyCreationReplyReconcilesAcrossLaunchWithoutRegeneration]' passed (0.048 seconds).
 Test Case '-[EntrixyAppTests.OwnerAccountTests testLostObjectReplyReconcilesAcrossLaunchWithoutNewMutation]' started.
-Test Case '-[EntrixyAppTests.OwnerAccountTests testLostObjectReplyReconcilesAcrossLaunchWithoutNewMutation]' passed (0.011 seconds).
+Test Case '-[EntrixyAppTests.OwnerAccountTests testLostObjectReplyReconcilesAcrossLaunchWithoutNewMutation]' passed (0.018 seconds).
 Test Case '-[EntrixyAppTests.OwnerAccountTests testLostReplyAndRelaunchNeverRegisterAgain]' started.
 Test Case '-[EntrixyAppTests.OwnerAccountTests testLostReplyAndRelaunchNeverRegisterAgain]' passed (0.009 seconds).
 Test Case '-[EntrixyAppTests.OwnerAccountTests testObjectSaveFailureSendsNoMutation]' started.
-Test Case '-[EntrixyAppTests.OwnerAccountTests testObjectSaveFailureSendsNoMutation]' passed (0.007 seconds).
+Test Case '-[EntrixyAppTests.OwnerAccountTests testObjectSaveFailureSendsNoMutation]' passed (0.011 seconds).
 Test Case '-[EntrixyAppTests.OwnerAccountTests testOwnerCardDirectionIsFrozenAndRecheckedWithoutSendingChangedActions]' started.
-Test Case '-[EntrixyAppTests.OwnerAccountTests testOwnerCardDirectionIsFrozenAndRecheckedWithoutSendingChangedActions]' passed (0.050 seconds).
+Test Case '-[EntrixyAppTests.OwnerAccountTests testOwnerCardDirectionIsFrozenAndRecheckedWithoutSendingChangedActions]' passed (0.136 seconds).
 Test Case '-[EntrixyAppTests.OwnerAccountTests testOwnerCommandPersistsBeforeWireAndUsesOnlyMatchingActualResult]' started.
-Test Case '-[EntrixyAppTests.OwnerAccountTests testOwnerCommandPersistsBeforeWireAndUsesOnlyMatchingActualResult]' passed (0.032 seconds).
+Test Case '-[EntrixyAppTests.OwnerAccountTests testOwnerCommandPersistsBeforeWireAndUsesOnlyMatchingActualResult]' passed (0.049 seconds).
 Test Case '-[EntrixyAppTests.OwnerAccountTests testOwnerDelegatedBundlePersistsBeforeUploadAndRecoversLostReplyWithoutReissue]' started.
-Test Case '-[EntrixyAppTests.OwnerAccountTests testOwnerDelegatedBundlePersistsBeforeUploadAndRecoversLostReplyWithoutReissue]' passed (0.039 seconds).
+Test Case '-[EntrixyAppTests.OwnerAccountTests testOwnerDelegatedBundlePersistsBeforeUploadAndRecoversLostReplyWithoutReissue]' passed (0.082 seconds).
 Test Case '-[EntrixyAppTests.OwnerAccountTests testOwnerMessageIsSavedBeforeWireAndAnAcceptedReplyNeverClaimsRead]' started.
-Test Case '-[EntrixyAppTests.OwnerAccountTests testOwnerMessageIsSavedBeforeWireAndAnAcceptedReplyNeverClaimsRead]' passed (0.017 seconds).
+Test Case '-[EntrixyAppTests.OwnerAccountTests testOwnerMessageIsSavedBeforeWireAndAnAcceptedReplyNeverClaimsRead]' passed (0.273 seconds).
 Test Case '-[EntrixyAppTests.OwnerAccountTests testOwnerPhoneHandoffDoesNotClaimACompletedCall]' started.
-Test Case '-[EntrixyAppTests.OwnerAccountTests testOwnerPhoneHandoffDoesNotClaimACompletedCall]' passed (0.012 seconds).
+Test Case '-[EntrixyAppTests.OwnerAccountTests testOwnerPhoneHandoffDoesNotClaimACompletedCall]' passed (0.015 seconds).
 Test Case '-[EntrixyAppTests.OwnerAccountTests testOwnerPINUsesSharedLockoutAndOneAuthorizedPhysicalAttempt]' started.
-Test Case '-[EntrixyAppTests.OwnerAccountTests testOwnerPINUsesSharedLockoutAndOneAuthorizedPhysicalAttempt]' passed (0.193 seconds).
+Test Case '-[EntrixyAppTests.OwnerAccountTests testOwnerPINUsesSharedLockoutAndOneAuthorizedPhysicalAttempt]' passed (0.311 seconds).
 Test Case '-[EntrixyAppTests.OwnerAccountTests testOwnerSecurityEditPreservesExistingConditionsAndRollsBackOnStorageFailure]' started.
-Test Case '-[EntrixyAppTests.OwnerAccountTests testOwnerSecurityEditPreservesExistingConditionsAndRollsBackOnStorageFailure]' passed (0.013 seconds).
+Test Case '-[EntrixyAppTests.OwnerAccountTests testOwnerSecurityEditPreservesExistingConditionsAndRollsBackOnStorageFailure]' passed (0.020 seconds).
 Test Case '-[EntrixyAppTests.OwnerAccountTests testReceivedKeyIDCanBeSavedWithoutAnotherCreateAfterStorageFailure]' started.
-Test Case '-[EntrixyAppTests.OwnerAccountTests testReceivedKeyIDCanBeSavedWithoutAnotherCreateAfterStorageFailure]' passed (0.018 seconds).
+Test Case '-[EntrixyAppTests.OwnerAccountTests testReceivedKeyIDCanBeSavedWithoutAnotherCreateAfterStorageFailure]' passed (0.022 seconds).
 Test Case '-[EntrixyAppTests.OwnerAccountTests testRegistrationPersistsBeforeNetworkAndCredentialsBeforeSync]' started.
-Test Case '-[EntrixyAppTests.OwnerAccountTests testRegistrationPersistsBeforeNetworkAndCredentialsBeforeSync]' passed (0.007 seconds).
+Test Case '-[EntrixyAppTests.OwnerAccountTests testRegistrationPersistsBeforeNetworkAndCredentialsBeforeSync]' passed (0.009 seconds).
 Test Case '-[EntrixyAppTests.OwnerAccountTests testSignedGuestPhoneRequestNeedsExplicitTapAndReplayIsDurablyRejected]' started.
-Test Case '-[EntrixyAppTests.OwnerAccountTests testSignedGuestPhoneRequestNeedsExplicitTapAndReplayIsDurablyRejected]' passed (0.365 seconds).
+Test Case '-[EntrixyAppTests.OwnerAccountTests testSignedGuestPhoneRequestNeedsExplicitTapAndReplayIsDurablyRejected]' passed (0.089 seconds).
 Test Case '-[EntrixyAppTests.OwnerAccountTests testStorageFailurePreventsRegistration]' started.
-Test Case '-[EntrixyAppTests.OwnerAccountTests testStorageFailurePreventsRegistration]' passed (0.005 seconds).
+Test Case '-[EntrixyAppTests.OwnerAccountTests testStorageFailurePreventsRegistration]' passed (0.006 seconds).
 Test Case '-[EntrixyAppTests.OwnerAccountTests testSyncFailurePreservesAccountAndLastSnapshot]' started.
-Test Case '-[EntrixyAppTests.OwnerAccountTests testSyncFailurePreservesAccountAndLastSnapshot]' passed (0.010 seconds).
-Test Suite 'OwnerAccountTests' passed at 2026-11-15 08:36:32.730.
-	 Executed 24 tests, with 0 failures (0 unexpected) in 1.237 (1.993) seconds
-Test Suite 'PassManagerTests' started at 2026-11-15 08:36:32.731.
+Test Case '-[EntrixyAppTests.OwnerAccountTests testSyncFailurePreservesAccountAndLastSnapshot]' passed (0.011 seconds).
+Test Suite 'OwnerAccountTests' passed at 2026-11-15 13:26:08.353.
+	 Executed 24 tests, with 0 failures (0 unexpected) in 1.687 (5.546) seconds
+Test Suite 'PassManagerTests' started at 2026-11-15 13:26:08.355.
 Test Case '-[EntrixyAppTests.PassManagerTests testDelegatedRequestsPersistWithNoInventedResultAndDoNotReturnAfterClearOrFailedSave]' started.
-Test Case '-[EntrixyAppTests.PassManagerTests testDelegatedRequestsPersistWithNoInventedResultAndDoNotReturnAfterClearOrFailedSave]' passed (0.021 seconds).
+Test Case '-[EntrixyAppTests.PassManagerTests testDelegatedRequestsPersistWithNoInventedResultAndDoNotReturnAfterClearOrFailedSave]' passed (0.723 seconds).
 Test Case '-[EntrixyAppTests.PassManagerTests testLostCreateReplyRecoversSameLinkAfterRelaunchWithoutSecondCreate]' started.
-Test Case '-[EntrixyAppTests.PassManagerTests testLostCreateReplyRecoversSameLinkAfterRelaunchWithoutSecondCreate]' passed (0.020 seconds).
+Test Case '-[EntrixyAppTests.PassManagerTests testLostCreateReplyRecoversSameLinkAfterRelaunchWithoutSecondCreate]' passed (0.026 seconds).
 Test Case '-[EntrixyAppTests.PassManagerTests testPassedSecretsSurviveEncryptedBackupAndMigrationWithoutReplacingIdentity]' started.
-Test Case '-[EntrixyAppTests.PassManagerTests testPassedSecretsSurviveEncryptedBackupAndMigrationWithoutReplacingIdentity]' passed (1.713 seconds).
+Test Case '-[EntrixyAppTests.PassManagerTests testPassedSecretsSurviveEncryptedBackupAndMigrationWithoutReplacingIdentity]' passed (2.861 seconds).
 Test Case '-[EntrixyAppTests.PassManagerTests testRecipientMACPrecedesVouchAndLostRevokeReplyIsReadBackWithoutAnotherRequest]' started.
-Test Case '-[EntrixyAppTests.PassManagerTests testRecipientMACPrecedesVouchAndLostRevokeReplyIsReadBackWithoutAnotherRequest]' passed (0.174 seconds).
+Test Case '-[EntrixyAppTests.PassManagerTests testRecipientMACPrecedesVouchAndLostRevokeReplyIsReadBackWithoutAnotherRequest]' passed (0.189 seconds).
 Test Case '-[EntrixyAppTests.PassManagerTests testRemovingAcceptedObjectsRecoversLostReplyWithoutAnotherEdit]' started.
-Test Case '-[EntrixyAppTests.PassManagerTests testRemovingAcceptedObjectsRecoversLostReplyWithoutAnotherEdit]' passed (0.228 seconds).
+Test Case '-[EntrixyAppTests.PassManagerTests testRemovingAcceptedObjectsRecoversLostReplyWithoutAnotherEdit]' passed (0.045 seconds).
 Test Case '-[EntrixyAppTests.PassManagerTests testSaveFailureBeforeCreateSendsNoMutationAndAckFailureRetriesOnlySaving]' started.
-Test Case '-[EntrixyAppTests.PassManagerTests testSaveFailureBeforeCreateSendsNoMutationAndAckFailureRetriesOnlySaving]' passed (0.031 seconds).
-Test Suite 'PassManagerTests' passed at 2026-11-15 08:36:35.216.
-	 Executed 6 tests, with 0 failures (0 unexpected) in 2.187 (2.485) seconds
-Test Suite 'EntrixyAppTests.xctest' passed at 2026-11-15 08:36:35.217.
-	 Executed 74 tests, with 0 failures (0 unexpected) in 41.151 (46.554) seconds
-Test Suite 'All tests' passed at 2026-11-15 08:36:35.218.
-	 Executed 74 tests, with 0 failures (0 unexpected) in 41.151 (46.558) seconds
-2026-11-15 08:36:38.890 xcodebuild[19489:54139] [MT] IDETestOperationsObserverDebug: 293.779 elapsed -- Testing started completed.
-2026-11-15 08:36:38.891 xcodebuild[19489:54139] [MT] IDETestOperationsObserverDebug: 0.000 sec, +0.000 sec -- start
-2026-11-15 08:36:38.891 xcodebuild[19489:54139] [MT] IDETestOperationsObserverDebug: 293.779 sec, +293.779 sec -- end
+Test Case '-[EntrixyAppTests.PassManagerTests testSaveFailureBeforeCreateSendsNoMutationAndAckFailureRetriesOnlySaving]' passed (0.047 seconds).
+Test Suite 'PassManagerTests' passed at 2026-11-15 13:26:12.256.
+	 Executed 6 tests, with 0 failures (0 unexpected) in 3.890 (3.902) seconds
+Test Suite 'EntrixyAppTests.xctest' passed at 2026-11-15 13:26:12.257.
+	 Executed 74 tests, with 0 failures (0 unexpected) in 100.137 (107.453) seconds
+Test Suite 'All tests' passed at 2026-11-15 13:26:12.259.
+	 Executed 74 tests, with 0 failures (0 unexpected) in 100.137 (107.464) seconds
+2026-11-15 13:26:22.514 xcodebuild[19035:52112] [MT] IDETestOperationsObserverDebug: 529.136 elapsed -- Testing started completed.
+2026-11-15 13:26:22.516 xcodebuild[19035:52112] [MT] IDETestOperationsObserverDebug: 0.000 sec, +0.000 sec -- start
+2026-11-15 13:26:22.517 xcodebuild[19035:52112] [MT] IDETestOperationsObserverDebug: 529.136 sec, +529.136 sec -- end
 
 Test session results, code coverage, and logs:
-	/Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Logs/Test/Test-EntrixyTests-2026.11.15_08-31-27-+0000.xcresult
+	/Users/runner/work/ios-build./ios-build./.local-checks/DerivedData/Logs/Test/Test-EntrixyTests-2026.11.15_13-17-01-+0000.xcresult
 
 ** TEST SUCCEEDED **
 
