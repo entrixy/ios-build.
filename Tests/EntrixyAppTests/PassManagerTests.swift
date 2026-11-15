@@ -13,6 +13,7 @@ private final class PassAPIStub: DelegationTransport {
     let group = String(repeating: "B", count: 22), code = String(repeating: "C", count: 22)
     var invitations: [[String: Any]] = []
     var children: [[String: Any]] = []
+    var journalEvents: [[String: Any]] = []
     var creates = 0, lists = 0, vouches = 0, revokes = 0, edits = 0
     var loseEditReply = false
     var loseCreateReply = false, loseRevokeReply = false
@@ -28,7 +29,7 @@ private final class PassAPIStub: DelegationTransport {
         switch operation {
         case .list:
             lists += 1
-            return try JSONSerialization.data(withJSONObject: ["objects": [["id": 7, "depth": 2, "pool_left": 8, "native_only": 0]], "invites": invitations, "children": children])
+            return try JSONSerialization.data(withJSONObject: ["objects": [["id": 7, "depth": 2, "pool_left": 8, "native_only": 0]], "invites": invitations, "children": children, "journal": journalEvents])
         case .create:
             creates += 1; beforeCreate?()
             invitations = [["code": code, "grp": group, "status": "new", "objects": json["objects"]!]]
@@ -66,6 +67,34 @@ private final class PassAPIStub: DelegationTransport {
 @MainActor
 final class PassManagerTests: XCTestCase {
     private func invite() throws -> GuestInvite { try GuestInvite.parse("https://sender.invalid/key#AAECAwQFBgcICQoLDA0ODxAREhMUFRYX" + String(repeating: "A", count: 43)) }
+    func testDelegatedRequestsPersistWithNoInventedResultAndDoNotReturnAfterClearOrFailedSave() async throws {
+        let invite = try invite(), api = PassAPIStub(), storage = PassMemoryStorage(try self.invite())
+        let app = AppModel(storage: storage), manager = PassManager(app: app, api: api)
+        api.journalEvents = [["id": 11, "number_id": 7, "grp": api.group, "ts": 1000]]
+        await manager.reload()
+        XCTAssertEqual(app.journal.count, 1)
+        XCTAssertEqual(app.journal.first?.what, "#7")
+        XCTAssertEqual(app.journal.first?.who, "Гость: Переданный ключ")
+        XCTAssertEqual(app.journal.first?.date, Date(timeIntervalSince1970: 1000))
+        XCTAssertEqual(app.journal.first?.result, "", "Server records a request, not a confirmed opening")
+        XCTAssertEqual(api.creates, 0)
+        app.clearJournal()
+        let relaunched = AppModel(storage: storage), reload = PassManager(app: relaunched, api: api)
+        await reload.reload()
+        XCTAssertTrue(relaunched.journal.isEmpty)
+        api.journalEvents = [["id": 12, "number_id": 7, "grp": api.group, "ts": 1001]]
+        storage.fail = true
+        await reload.reload()
+        XCTAssertTrue(relaunched.journal.isEmpty)
+        storage.fail = false
+        await reload.reload()
+        XCTAssertEqual(relaunched.journal.count, 1)
+        XCTAssertEqual(storage.state?.delegatedJournalLedger?.hosts[invite.server], [11, 12])
+        let backup = IOSBackupPayload(state: try XCTUnwrap(storage.state))
+        try backup.validate()
+        XCTAssertEqual(backup.delegatedJournalLedger, storage.state?.delegatedJournalLedger)
+    }
+
     func testLostCreateReplyRecoversSameLinkAfterRelaunchWithoutSecondCreate() async throws {
         let invite = try invite(), api = PassAPIStub()
         let storage = PassMemoryStorage(invite)

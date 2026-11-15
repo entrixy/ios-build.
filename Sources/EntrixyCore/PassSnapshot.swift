@@ -28,6 +28,7 @@ public struct PassSnapshot {
     public let allowance: [Int: PassAllowance]
     public let invitations: [PassInvitation]
     public let children: [PassChild]
+    public let journal: [DelegatedJournalEvent]
     public static func decode(_ data: Data) throws -> Self {
         guard let root = try JSONSerialization.jsonObject(with: data) as? [String: Any],
               let objects = root["objects"] as? [[String: Any]],
@@ -74,6 +75,17 @@ public struct PassSnapshot {
                 signPublic: row["sign_pub"] as? String, guestPublic: row["guest_pub"] as? String, mac: row["pass_mac"] as? String,
                 vouched: try flag(row["vouched"]), ready: try flag(row["ready"])))
         }
-        return Self(allowance: allowed, invitations: parsedInvites, children: parsedChildren)
+        var events: [DelegatedJournalEvent] = [], eventIDs = Set<Int>()
+        if let raw = root["journal"] {
+            guard let rows = raw as? [[String: Any]], rows.count <= 500 else { throw GuestCrypto.Failure.invalidEnvelope }
+            for row in rows {
+                let id = try OwnerObject.replyID(row["id"])
+                let number = try OwnerObject.replyID(row["number_id"])
+                let epoch = try integer(row["ts"])
+                guard eventIDs.insert(id).inserted, epoch > 0, epoch <= 253402300799 else { throw GuestCrypto.Failure.invalidEnvelope }
+                events.append(DelegatedJournalEvent(id: id, numberID: number, group: try code(row["grp"]), epoch: Int64(epoch)))
+            }
+        }
+        return Self(allowance: allowed, invitations: parsedInvites, children: parsedChildren, journal: events)
     }
 }

@@ -51,6 +51,7 @@ final class AppModel: ObservableObject {
     var canManageGuestAccess: Bool { storageReady && foreground && pendingRestore == nil }
     @Published private(set) var delegations: [DelegationRedemption] = []
     private var usedOwnerPresses: [String: Date] = [:]
+    private var delegatedJournalLedger = DelegatedJournalLedger()
     lazy var ownerControl = OwnerControlModel(app: self)
     private var actionCode: LocalActionCode?
     private var authenticationBusy = false
@@ -88,6 +89,8 @@ final class AppModel: ObservableObject {
                 try? FileManager.default.removeItem(at: bootstrap)
                 #endif
             }
+            delegatedJournalLedger = state.delegatedJournalLedger ?? DelegatedJournalLedger()
+            try delegatedJournalLedger.validate()
             owners = state.owners ?? []
             usedOwnerPresses = state.usedOwnerPresses ?? [:]
             pendingRestore = state.pendingRestore
@@ -124,7 +127,7 @@ final class AppModel: ObservableObject {
     }
 
     private func save(_ updated: [SavedGuest]) throws {
-        try storage.save(SavedState(identity: identity, guests: updated, journal: journal, actionCode: actionCode, owners: owners, usedOwnerPresses: usedOwnerPresses, pendingRestore: pendingRestore, delegations: delegations, passedAccess: passedAccess, receivedDelegations: receivedDelegations, incomingMessages: incomingMessages, outgoingMessages: outgoingMessages))
+        try storage.save(SavedState(identity: identity, guests: updated, journal: journal, actionCode: actionCode, owners: owners, usedOwnerPresses: usedOwnerPresses, pendingRestore: pendingRestore, delegations: delegations, passedAccess: passedAccess, receivedDelegations: receivedDelegations, incomingMessages: incomingMessages, outgoingMessages: outgoingMessages, delegatedJournalLedger: delegatedJournalLedger))
         guests = updated
     }
 
@@ -335,6 +338,7 @@ final class AppModel: ObservableObject {
         let previousPassed = passedAccess
         let previousReceived = receivedDelegations
         let previousIncoming = incomingMessages, previousOutgoing = outgoingMessages
+        let previousLedger = delegatedJournalLedger
         let restoredIncoming = try mergedIncoming(plan.payload.incomingMessages ?? [])
         let existing = Set(journal.map(\.id))
         journal += plan.payload.journal.filter { $0.isAction && !existing.contains($0.id) }
@@ -358,17 +362,19 @@ final class AppModel: ObservableObject {
             incomingMessages = restoredIncoming
             for row in plan.payload.outgoingMessages ?? [] where !outgoingMessages.contains(where: { $0.id == row.id }) { outgoingMessages.append(row) }
             outgoingMessages.sort { $0.created > $1.created }; outgoingMessages = Array(outgoingMessages.prefix(100))
+            if let ledger = plan.payload.delegatedJournalLedger { try delegatedJournalLedger.merge(ledger) }
             pendingRestore = nil
             try save(guests)
         } catch {
             pendingRestore = previousPlan; journal = previousJournal; usedOwnerPresses = previousPresses
             passedAccess = previousPassed; receivedDelegations = previousReceived
-            incomingMessages = previousIncoming; outgoingMessages = previousOutgoing; throw error
+            incomingMessages = previousIncoming; outgoingMessages = previousOutgoing
+            delegatedJournalLedger = previousLedger; throw error
         }
     }
 
     private func saveOwners(_ updated: [OwnerAccount]) throws {
-        try storage.save(SavedState(identity: identity, guests: guests, journal: journal, actionCode: actionCode, owners: updated, usedOwnerPresses: usedOwnerPresses, pendingRestore: pendingRestore, delegations: delegations, passedAccess: passedAccess, receivedDelegations: receivedDelegations, incomingMessages: incomingMessages, outgoingMessages: outgoingMessages))
+        try storage.save(SavedState(identity: identity, guests: guests, journal: journal, actionCode: actionCode, owners: updated, usedOwnerPresses: usedOwnerPresses, pendingRestore: pendingRestore, delegations: delegations, passedAccess: passedAccess, receivedDelegations: receivedDelegations, incomingMessages: incomingMessages, outgoingMessages: outgoingMessages, delegatedJournalLedger: delegatedJournalLedger))
         owners = updated
     }
 
@@ -650,7 +656,7 @@ final class AppModel: ObservableObject {
         }
     }
 
-    func renameOwnerObject(server: String, objectID: UUID, label: String) async -> Bool {
+    func renameOwnerObject(server: String, objectID: UUID, label: String, preset: Int? = nil) async -> Bool {
         guard storageReady, !ownerBusy, let index = owners.firstIndex(where: { $0.server == server }),
               let offset = owners[index].objects?.firstIndex(where: { $0.id == objectID }) else { return false }
         ownerBusy = true
@@ -658,7 +664,7 @@ final class AppModel: ObservableObject {
         do {
             var updated = owners
             let masterKey = updated[index].masterKey
-            try updated[index].objects![offset].rename(label, masterKey: masterKey)
+            try updated[index].objects![offset].updatePresentation(label: label, preset: preset, masterKey: masterKey)
             try saveOwners(updated)
             return await sendOwnerObject(server: server, objectID: objectID)
         } catch { errorMessage = "Не удалось сохранить изменение. Сначала обновите данные сервера."; return false }
@@ -1799,3 +1805,54 @@ extension AppModel {
     }
 }
 #endif
+
+extension AppModel {
+    func importDelegatedJournal(_ events: [DelegatedJournalEvent], sourceID: String) throws {
+        guard canManageGuestAccess, let source = guests.first(where: { $0.id == sourceID }) else { throw BackupFailure.noAccess }
+        let previousJournal = journal, previousLedger = delegatedJournalLedger
+        do {
+            let fresh = try delegatedJournalLedger.accept(events, server: source.invite.server)
+            guard !fresh.isEmpty else { return }
+            for event in fresh {
+                let name = passedAccess.first(where: { $0.server == source.invite.server && $0.group == event.group })?.label ?? "Переданный ключ"
+                let label = source.objects.first(where: { $0.numberID == event.numberID && $0.kind != "ble" })?.label ?? "#\(event.numberID)"
+                journal.append(JournalEntry(who: "Гость: " + name, what: label,
+                    actionKey: "delegated:" + source.invite.server + ":" + String(event.id),
+                    date: Date(timeIntervalSince1970: TimeInterval(event.epoch))))
+            }
+            journal.sort { $0.date > $1.date }; journal = Array(journal.prefix(500))
+            try save(guests)
+        } catch {
+            journal = previousJournal; delegatedJournalLedger = previousLedger; throw error
+        }
+    }
+}
+
+extension AppModel {
+    func saveOwnerActionPolicy(server: String, objectID: UUID, expected: Data?, confirmation: Bool, authentication: String) -> Bool {
+        guard canManageGuestAccess, !ownerBusy, !busy,
+              ["none", "pin", "biometric", "either"].contains(authentication),
+              let index = owners.firstIndex(where: { $0.server == server }),
+              let offset = owners[index].objects?.firstIndex(where: { $0.id == objectID }),
+              let object = owners[index].objects?[offset], object.pending == nil,
+              object.available != false, object.localPolicy == expected else { return false }
+        do {
+            _ = try OwnerManualPolicy(object.localPolicy)
+            var policy: [String: Any] = [:]
+            if let bytes = object.localPolicy {
+                guard let decoded = try JSONSerialization.jsonObject(with: bytes) as? [String: Any] else { throw GuestCrypto.Failure.invalidEnvelope }
+                policy = decoded
+            }
+            policy["confirm_on"] = confirmation; policy["confirm"] = confirmation
+            policy["auth_on"] = authentication != "none"
+            if authentication != "none" { policy["auth"] = authentication }
+            let bytes = try JSONSerialization.data(withJSONObject: policy, options: .sortedKeys)
+            _ = try OwnerManualPolicy(bytes)
+            var updated = owners; updated[index].objects![offset].localPolicy = bytes
+            try saveOwners(updated)
+            ownerActionRejections.removeValue(forKey: objectID)
+            ownerObjectMessages.removeValue(forKey: objectID)
+            return true
+        } catch { ownerObjectMessages[objectID] = "Не удалось сохранить защиту объекта. Прежние правила сохранены."; return false }
+    }
+}

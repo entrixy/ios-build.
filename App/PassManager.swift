@@ -28,6 +28,7 @@ final class PassManager: ObservableObject {
         let fp = try app.backupFingerprint(server: guest.invite.server)
         let bytes = try await api.delegate(invite: guest.invite, fingerprint: fp, operation: .list, body: Data("{}".utf8))
         let snapshot = try PassSnapshot.decode(bytes)
+        try app.importDelegatedJournal(snapshot.journal, sourceID: guest.id)
         snapshots[guest.id] = snapshot
         for var record in app.passedAccess where record.parts.contains(where: { $0.sourceID == guest.id }) {
             try record.reconcile(snapshot, sourceID: guest.id)

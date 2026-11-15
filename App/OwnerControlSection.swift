@@ -37,14 +37,13 @@ struct OwnerControlSection: View {
                         else { Task { await app.execute(intent) } }
                     } label: {
                         HStack(spacing: 16) {
-                            Image("object-3").resizable().scaledToFit().frame(width: 56, height: 56)
+                            OwnerObjectAvatar(object: object, masterKey: owner.masterKey, size: 56)
                             VStack(alignment: .leading, spacing: 6) {
                                 Text(label).font(.headline).foregroundStyle(.primary)
-                                Text(object.kind == "ble" ? "Bluetooth · импульс / переключение" : object.kind == "call" ? "Звонок с подтверждением iPhone"
-                                     : (object.kind == "device" && object.wrappedSocketSecret == nil ? "Нужна защищённая настройка контроллера"
-                                        : (control.connections[owner.server] ?? .offline).title))
+                                Text(control.cardStatus(server: owner.server, object: object))
                                     .font(.subheadline).foregroundStyle(Brand.secondaryInk)
-                                if let rejection = app.ownerActionRejections[object.id] {
+                                if let rejection = app.ownerActionRejections[object.id],
+                                   rejection.message.trimmingCharacters(in: CharacterSet(charactersIn: ". ")) != control.cardStatus(server: owner.server, object: object) {
                                     Text(rejection.message).font(.subheadline).foregroundStyle(.red)
                                 }
                                 if let message = ble.messages[object.id] { Text(message).font(.subheadline).foregroundStyle(Brand.secondaryInk) }

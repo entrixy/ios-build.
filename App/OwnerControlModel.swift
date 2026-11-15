@@ -28,6 +28,17 @@ final class OwnerControlModel: ObservableObject {
 
     @Published private(set) var positions: [String: [Int: String]] = [:]
     @Published private(set) var onlineDevices: [String: Set<Int>] = [:]
+    func cardStatus(server: String, object: OwnerObject) -> String {
+        if object.kind == "ble" { return "Bluetooth" }
+        if object.kind == "call" { return "Звонок с подтверждением iPhone" }
+        if object.kind == "device" {
+            guard object.wrappedSocketSecret != nil else { return "Нужна защищённая настройка контроллера" }
+            guard connections[server] == .connected else { return (connections[server] ?? .offline).title }
+            let id = object.routing["device_id_ref"].flatMap(Int.init)
+            return id.map { onlineDevices[server]?.contains($0) == true } == true ? "Контроллер в сети" : "Контроллер не в сети"
+        }
+        return (connections[server] ?? .offline).title
+    }
     func readyForTap(server: String) -> Bool {
         active && links[server]?.authenticated == true && links[server]?.attempt == nil
     }

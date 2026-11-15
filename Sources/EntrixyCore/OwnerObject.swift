@@ -123,10 +123,15 @@ public struct OwnerObject: Codable, Identifiable, Equatable {
     }
 
     public mutating func rename(_ label: String, masterKey: Data) throws {
+        try updatePresentation(label: label, preset: nil, masterKey: masterKey)
+    }
+    public mutating func updatePresentation(label: String, preset: Int?, masterKey: Data) throws {
+        if let preset { guard (0...7).contains(preset) else { throw GuestCrypto.Failure.invalidEnvelope } }
         guard pending == nil, numberID != nil, revision != nil, available != false,
               !label.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty, label.utf8.count <= 512 else { throw GuestCrypto.Failure.invalidEnvelope }
         var contents = try metadata(masterKey: masterKey)
         contents["label"] = label.trimmingCharacters(in: .whitespacesAndNewlines)
+        if let preset { contents["avatar_type"] = "preset:" + String(preset) }
         let key = try GuestCrypto.decrypt(key: masterKey, envelope: wrappedKey)
         cipher = try GuestCrypto.encrypt(key: key, plaintext: JSONSerialization.data(withJSONObject: contents, options: .sortedKeys))
         pending = .update

@@ -45,7 +45,8 @@ struct ControlScreen: View {
                                                     .font(.subheadline).foregroundStyle(Brand.secondaryInk)
                                                     .fixedSize(horizontal: false, vertical: true)
                                             } else { ConnectionLabel(guestID: guest.id, paused: guest.paused) }
-                                            if let rejection = model.actionRejections[guest.id + "|" + object.id] {
+                                            if let rejection = model.actionRejections[guest.id + "|" + object.id],
+                                               object.kind == "ble" || rejection.message.trimmingCharacters(in: CharacterSet(charactersIn: ". ")) != model.objectConnectionTitle(guestID: guest.id, object: object) {
                                                 Text(rejection.message).font(.subheadline).foregroundStyle(.red)
                                                     .fixedSize(horizontal: false, vertical: true)
                                             }
@@ -111,6 +112,7 @@ struct ConnectionLabel: View {
 
 struct SettingsScreen: View {
     @EnvironmentObject private var model: AppModel
+    @AppStorage("entrixy.appearance") private var appearance = "system"
     @State private var showKey = false
     var body: some View {
         List {
@@ -128,6 +130,13 @@ struct SettingsScreen: View {
             }
             Section("Мои объекты") {
                 NavigationLink("Мои серверы") { OwnerServersScreen() }
+            }
+            Section("Оформление") {
+                Picker("Тема", selection: $appearance) {
+                    Text("Как в системе").tag("system")
+                    Text("Светлая").tag("light")
+                    Text("Тёмная").tag("dark")
+                }
             }
             Section("Система") {
                 KeyValueRow(title: "Приложение", value: "Entrixy для iOS")
@@ -245,6 +254,12 @@ struct JournalScreen: View {
                     .background(.regularMaterial, in: Capsule()).padding(.bottom, 16)
                     .allowsHitTesting(false).accessibilityAddTraits(.updatesFrequently)
             }
+        }
+        .task {
+            #if DEBUG && targetEnvironment(simulator)
+            guard ActionCaptureScenario.current == nil else { return }
+            #endif
+            await model.passManager.reload()
         }
         .task(id: copied) {
             guard copied else { return }

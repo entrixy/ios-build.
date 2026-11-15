@@ -69,6 +69,9 @@ struct ActionConfirmation: View {
                 #if DEBUG && targetEnvironment(simulator)
                 if ActionCaptureScenario.current == .codeEntry {
                     code = "1234"
+                    // Focus after the sheet has entered the window hierarchy.
+                    try? await Task.sleep(nanoseconds: 300_000_000)
+                    guard !Task.isCancelled else { return }
                     codeFocused = true
                 } else if ActionCaptureScenario.current == .codeRejected {
                     code = "0000"

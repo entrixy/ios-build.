@@ -101,7 +101,7 @@ struct OwnerObjectsScreen: View {
                     ForEach(owner.objects ?? []) { object in
                         NavigationLink { OwnerObjectEditor(server: server, objectID: object.id) } label: {
                             HStack(spacing: 14) {
-                                Image("object-3").resizable().scaledToFit().frame(width: 42, height: 42)
+                                OwnerObjectAvatar(object: object, masterKey: owner.masterKey, size: 42)
                                 VStack(alignment: .leading, spacing: 6) {
                                     Text((try? object.metadata(masterKey: owner.masterKey)["label"] as? String) ?? "Название недоступно").font(.headline)
                                     if object.pending != nil {
@@ -223,6 +223,10 @@ struct OwnerObjectEditor: View {
     let objectID: UUID
     @State private var label = ""
     @State private var deleting = false
+    @State private var preset: Int?
+    @State private var confirmation = false
+    @State private var authentication = "none"
+    @State private var originalPolicy: Data?
     var showDeleteOnLaunch = false
     private var owner: OwnerAccount? { model.owners.first { $0.server == server } }
     private var object: OwnerObject? { owner?.objects?.first { $0.id == objectID } }
@@ -252,9 +256,36 @@ struct OwnerObjectEditor: View {
                         Text("Для безопасного изменения сначала обновите данные. Сервер должен поддерживать проверку версии объекта.").font(.footnote).foregroundStyle(Brand.secondaryInk)
                     }
                 }
+                Section("Значок объекта") {
+                    LazyVGrid(columns: [GridItem(.adaptive(minimum: 56))], spacing: 12) {
+                        ForEach(0..<8) { index in
+                            Button { preset = index } label: {
+                                Image("object-\(index + 1)").resizable().scaledToFit().frame(width: 48, height: 48)
+                                    .padding(4).background(preset == index ? Brand.ink.opacity(0.12) : .clear, in: RoundedRectangle(cornerRadius: 12))
+                                    .overlay(RoundedRectangle(cornerRadius: 12).strokeBorder(preset == index ? Brand.ink : .clear, lineWidth: 2))
+                            }.buttonStyle(.plain).accessibilityLabel("Значок \(index + 1)")
+                                .accessibilityAddTraits(preset == index ? .isSelected : [])
+                        }
+                    }.disabled(object.pending != nil || object.available == false)
+                }
                 Section {
-                    Button("Сохранить название") {
-                        Task { if await model.renameOwnerObject(server: server, objectID: objectID, label: label) { dismiss() } }
+                    Toggle("Подтверждать нажатие", isOn: $confirmation)
+                    Picker("Подтверждение личности", selection: $authentication) {
+                        Text("Не требуется").tag("none")
+                        Text("PIN-код Entrixy").tag("pin")
+                        Text("Биометрия").tag("biometric")
+                        Text("PIN-код или биометрия").tag("either")
+                    }
+                    Button("Сохранить защиту") {
+                        if model.saveOwnerActionPolicy(server: server, objectID: objectID, expected: originalPolicy,
+                            confirmation: confirmation, authentication: authentication) { originalPolicy = self.object?.localPolicy }
+                    }.buttonStyle(SecondaryActionStyle())
+                } header: { Text("Моё ручное управление") } footer: {
+                    Text("Эти правила действуют на этом iPhone. Условия выданных гостям ключей настраиваются отдельно.")
+                }.disabled(model.ownerBusy || object.pending != nil || object.available == false)
+                Section {
+                    Button("Сохранить изменения") {
+                        Task { if await model.renameOwnerObject(server: server, objectID: objectID, label: label, preset: preset) { dismiss() } }
                     }.buttonStyle(PrimaryActionStyle()).disabled(model.ownerBusy || object.available == false || object.pending != nil || object.revision == nil || label.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
                     if let did = object.bleDeviceID {
                         NavigationLink("Bluetooth-доступ гостей") { BLEPermissionsScreen(server: server, deviceID: did) }
@@ -265,7 +296,15 @@ struct OwnerObjectEditor: View {
         }
         .navigationTitle("Настройка объекта").navigationBarTitleDisplayMode(.inline)
         .task {
-            if let owner, let object { label = (try? object.metadata(masterKey: owner.masterKey)["label"] as? String) ?? "" }
+            if let owner, let object {
+                let metadata = try? object.metadata(masterKey: owner.masterKey)
+                label = metadata?["label"] as? String ?? ""
+                if let value = metadata?["avatar_type"] as? String, value.hasPrefix("preset:") { preset = Int(value.dropFirst(7)) }
+                originalPolicy = object.localPolicy
+                if let policy = try? OwnerManualPolicy(object.localPolicy) {
+                    confirmation = policy.confirmation; authentication = policy.authentication ?? "none"
+                }
+            }
             if showDeleteOnLaunch { deleting = true }
         }
         .confirmationDialog("Удалить объект с сервера? Гости потеряют доступ к нему.", isPresented: $deleting, titleVisibility: .visible) {

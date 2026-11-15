@@ -11,6 +11,23 @@ final class OwnerObjectTests: XCTestCase {
         try OwnerSnapshot.decode(JSONSerialization.data(withJSONObject: ["numbers": rows, "keys": []]))
     }
 
+    func testPresentationEditKeepsObjectSecretsAndUnrelatedMetadata() throws {
+        var object = try draft()
+        object.numberID = 7; object.pending = nil; object.revision = 100; object.available = true
+        let wrapped = object.wrappedKey, phone = object.localPhone
+        try object.updatePresentation(label: "Калитка", preset: 6, masterKey: master)
+        let metadata = try object.metadata(masterKey: master)
+        XCTAssertEqual(metadata["label"] as? String, "Калитка")
+        XCTAssertEqual(metadata["avatar_type"] as? String, "preset:6")
+        XCTAssertEqual(object.wrappedKey, wrapped)
+        XCTAssertEqual(object.localPhone, phone)
+        XCTAssertEqual(object.pending, .update)
+        let body = try XCTUnwrap(JSONSerialization.jsonObject(with: object.request()) as? [String: Any])
+        XCTAssertEqual(Set(body.keys), ["id", "data_cipher", "data_cipher_ts_check"])
+        XCTAssertFalse(String(decoding: try object.request(), as: UTF8.self).contains("Калитка"))
+        XCTAssertThrowsError(try object.updatePresentation(label: "Снова", preset: 8, masterKey: master))
+    }
+
     func testPrivateMetadataEncryptedAndKeyWrappedBeforeRequest() throws {
         let object = try draft()
         let body = try JSONSerialization.jsonObject(with: object.request()) as! [String: Any]

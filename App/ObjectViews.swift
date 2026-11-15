@@ -23,3 +23,19 @@ struct ObjectAvatar: View {
         .clipShape(RoundedRectangle(cornerRadius: size * 0.25)).accessibilityHidden(true)
     }
 }
+
+struct OwnerObjectAvatar: View {
+    let object: OwnerObject
+    let masterKey: Data
+    let size: CGFloat
+    private var index: Int {
+        let value = (try? object.metadata(masterKey: masterKey)["avatar_type"] as? String) ?? ""
+        guard value.hasPrefix("preset:"), let index = Int(value.dropFirst(7)), (0...7).contains(index) else { return 0 }
+        return index
+    }
+    var body: some View {
+        Image("object-\(index + 1)").resizable().scaledToFill()
+            .frame(width: size, height: size)
+            .clipShape(RoundedRectangle(cornerRadius: size * 0.25)).accessibilityHidden(true)
+    }
+}

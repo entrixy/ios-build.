@@ -375,6 +375,33 @@ final class OwnerAccountTests: XCTestCase {
         XCTAssertNil(model.errorMessage)
     }
 
+    @MainActor func testOwnerSecurityEditPreservesExistingConditionsAndRollsBackOnStorageFailure() async throws {
+        let storage = OwnerMemoryStorage(), api = RecordingOwnerAPI()
+        let preparing = AppModel(storage: storage, ownerAPI: api)
+        _ = await preparing.addOwner(server: "owner.invalid", accessCode: "")
+        _ = await preparing.createOwnerObject(server: "owner.invalid", label: "Ворота", kind: "webhook", phone: "", url: "https://actuator.invalid/open", secret: "fixture", claimCode: "")
+        let original = Data(#"{"mode":"all","geo_on":true,"wifi_on":true,"geo_radius":42,"confirm":true}"#.utf8)
+        storage.state!.owners![0].objects![0].localPolicy = original
+        let model = AppModel(storage: storage, ownerAPI: api)
+        let object = try XCTUnwrap(model.owners[0].objects?.first)
+        let mutations = api.mutations
+        storage.failing = true
+        XCTAssertFalse(model.saveOwnerActionPolicy(server: "owner.invalid", objectID: object.id, expected: original, confirmation: false, authentication: "pin"))
+        XCTAssertEqual(model.owners[0].objects?.first?.localPolicy, original)
+        storage.failing = false
+        XCTAssertTrue(model.saveOwnerActionPolicy(server: "owner.invalid", objectID: object.id, expected: original, confirmation: false, authentication: "pin"))
+        let bytes = try XCTUnwrap(model.owners[0].objects?.first?.localPolicy)
+        let policy = try OwnerManualPolicy(bytes)
+        XCTAssertEqual(policy.authentication, "pin")
+        XCTAssertFalse(policy.confirmation)
+        XCTAssertNotNil(policy.blockedReason, "Unsupported combined rules must not disappear")
+        let json = try XCTUnwrap(JSONSerialization.jsonObject(with: bytes) as? [String: Any])
+        XCTAssertEqual(json["geo_radius"] as? Int, 42)
+        XCTAssertEqual(json["wifi_on"] as? Bool, true)
+        XCTAssertFalse(model.saveOwnerActionPolicy(server: "owner.invalid", objectID: object.id, expected: original, confirmation: true, authentication: "none"))
+        XCTAssertEqual(api.mutations, mutations)
+    }
+
     @MainActor func testOwnerPINUsesSharedLockoutAndOneAuthorizedPhysicalAttempt() async throws {
         let storage = OwnerMemoryStorage(), api = RecordingOwnerAPI()
         let preparing = AppModel(storage: storage, ownerAPI: api)

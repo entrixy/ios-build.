@@ -24,6 +24,7 @@ struct SavedState: Codable {
     var receivedDelegations: [ReceivedDelegation]? = nil
     var incomingMessages: [SavedMessage]? = nil
     var outgoingMessages: [OutgoingMessage]? = nil
+    var delegatedJournalLedger: DelegatedJournalLedger? = nil
 }
 
 /// One local, device-only Keychain item. Read/decode failures never mean “new installation”.

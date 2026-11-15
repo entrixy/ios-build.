@@ -59,7 +59,11 @@ def prepare_device(model, device_type, runtime):
 
 def expected_visible_text(screen):
     if screen == 'control': return ['Управление', 'Настройки', 'Гости', 'Журнал']
-    if screen == 'code-setup': return ['Создать', 'код']
+    if screen == 'code-setup': return ['Создать', 'Новый PIN-код', 'Повторите PIN-код', 'Отмена']
+    if screen == 'code-entry': return ['Подтвердить', 'Отмена', '2', '3', '5', '6', '7', '8', '0']
+    if screen == 'code-rejected': return ['Подтвердить', 'Код не принят', 'Отмена']
+    if screen == 'biometric': return ['Подтвердить биометрией', 'Отмена']
+    if screen == 'offline': return ['Управление', 'Контроллер не в сети']
     if screen in ['confirm-open', 'confirm-close', 'code-entry', 'code-rejected', 'biometric', 'ble-guest-confirm']:
         return ['Подтвердить']
     if screen in ['journal', 'owner-journal', 'ble-owner-journal', 'ble-guest-journal']: return ['Журнал', 'Копировать']

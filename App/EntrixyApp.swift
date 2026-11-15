@@ -3,8 +3,10 @@ import EntrixyCore
 
 @main
 struct EntrixyApp: App {
+    @AppStorage("entrixy.appearance") private var appearance = "system"
     var body: some Scene {
         WindowGroup {
+            Group {
             #if DEBUG && targetEnvironment(simulator)
             if let scenario = ActionCaptureScenario.current {
                 ActionCaptureRoot(scenario: scenario)
@@ -14,6 +16,8 @@ struct EntrixyApp: App {
             #else
             LiveAppRoot()
             #endif
+            }
+            .preferredColorScheme(appearance == "light" ? .light : appearance == "dark" ? .dark : nil)
         }
     }
 }
