@@ -49,8 +49,6 @@ struct ControlScreen: View {
                                             if let text = model.actionMessages[guest.id + "|" + object.id] {
                                                 Text(text).font(.subheadline).foregroundStyle(Brand.secondaryInk).fixedSize(horizontal: false, vertical: true)
                                             }
-                                            ActionCardAffordance(title: model.objectActionTitle(guestID: guest.id, object: object))
-                                                .padding(.top, 6)
                                         }.frame(maxWidth: .infinity, alignment: .leading)
                                     }.padding(16).background(.background, in: RoundedRectangle(cornerRadius: 22))
                                 }.buttonStyle(CardActionStyle())

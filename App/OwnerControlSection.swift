@@ -49,7 +49,6 @@ struct OwnerControlSection: View {
                                     .font(.subheadline).foregroundStyle(Brand.secondaryInk)
                                 if let message = ble.messages[object.id] { Text(message).font(.subheadline).foregroundStyle(Brand.secondaryInk) }
                                 if let message = control.messages[object.id] { Text(message).font(.subheadline).foregroundStyle(Brand.secondaryInk) }
-                                ActionCardAffordance(title: "Выбрать действие").padding(.top, 6)
                             }.frame(maxWidth: .infinity, alignment: .leading)
                         }.padding(16).background(.background, in: RoundedRectangle(cornerRadius: 22))
                     }.buttonStyle(CardActionStyle())

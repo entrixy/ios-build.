@@ -69,18 +69,6 @@ struct ActionButtonLabel: View {
     }
 }
 
-/// The enclosing object card owns the tap; this label is not a nested button.
-struct ActionCardAffordance: View {
-    let title: String
-    var body: some View {
-        Text(title).font(.subheadline.weight(.semibold))
-            .foregroundStyle(Color(uiColor: .systemBackground))
-            .padding(.horizontal, 16).frame(minHeight: 44)
-            .background(Brand.ink, in: RoundedRectangle(cornerRadius: DesignMetrics.actionRadius))
-            .accessibilityHidden(true)
-    }
-}
-
 private struct SheetDismissFooter: ViewModifier {
     let title: String
     let disabled: Bool
