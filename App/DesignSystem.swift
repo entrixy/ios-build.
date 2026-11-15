@@ -37,14 +37,15 @@ struct PrimaryActionStyle: ButtonStyle {
 }
 
 struct SecondaryActionStyle: ButtonStyle {
+    let surface: Color
+    init(surface: Color = Color(uiColor: .secondarySystemGroupedBackground)) { self.surface = surface }
     @Environment(\.isEnabled) private var isEnabled
     func makeBody(configuration: Configuration) -> some View {
         configuration.label.font(.body.weight(.semibold))
             .foregroundStyle(isEnabled ? (configuration.role == .destructive ? Color(uiColor: .systemRed) : Brand.ink) : Brand.secondaryInk)
             .padding(.horizontal, 14)
             .frame(maxWidth: .infinity, minHeight: DesignMetrics.secondaryHeight)
-            .background(Color(uiColor: .secondarySystemGroupedBackground),
-                        in: RoundedRectangle(cornerRadius: DesignMetrics.actionRadius))
+            .background(surface, in: RoundedRectangle(cornerRadius: DesignMetrics.actionRadius))
             .overlay(RoundedRectangle(cornerRadius: DesignMetrics.actionRadius)
                 .strokeBorder(isEnabled && configuration.role == .destructive ? Color(uiColor: .systemRed) : Brand.secondaryInk.opacity(0.45), lineWidth: 1))
             .opacity(configuration.isPressed ? 0.8 : 1)

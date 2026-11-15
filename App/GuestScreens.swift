@@ -200,9 +200,8 @@ struct JournalScreen: View {
                 }
                 Button(role: .destructive) { clearing = true } label: { JournalToolbarItem(symbol: "trash", title: "Очистить") }
             }
-            .buttonStyle(SecondaryActionStyle()).foregroundStyle(Brand.ink).disabled(model.journal.isEmpty)
-            .padding(.vertical, 6).background(Color(uiColor: .secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 16))
-            .padding(.horizontal, 20).padding(.top, 12)
+            .buttonStyle(SecondaryActionStyle(surface: .clear)).foregroundStyle(Brand.ink).disabled(model.journal.isEmpty)
+            .padding(.horizontal, DesignMetrics.pageInset).padding(.top, 12).padding(.bottom, 16)
             if model.journal.isEmpty {
                 Text("Журнал пуст. Здесь будут появляться вызовы.")
                     .font(.body).foregroundStyle(Brand.secondaryInk)
@@ -225,7 +224,9 @@ struct JournalScreen: View {
                                     .foregroundStyle(entry.level == "danger" ? Color(uiColor: .systemRed) : Brand.secondaryInk)
                             }
                         }
-                    }.padding(.vertical, 6)
+                    }
+                    .listRowInsets(EdgeInsets(top: 12, leading: DesignMetrics.pageInset, bottom: 12, trailing: DesignMetrics.pageInset))
+                    .listRowBackground(Color.clear)
                 }.listStyle(.plain).scrollContentBackground(.hidden)
             }
         }
