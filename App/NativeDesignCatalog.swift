@@ -17,6 +17,7 @@ struct NativeDesignCatalog: View {
     @State private var confirmation = true
     @State private var biometric = false
     @State private var choice = 1
+    @State private var mainTab = 1
     @State private var radius = 100.0
     @State private var date = Date(timeIntervalSince1970: 1_794_729_600)
     @State private var photo: PhotosPickerItem?
@@ -42,6 +43,30 @@ struct NativeDesignCatalog: View {
         }
     }
     var body: some View {
+        Group {
+            if page == "navigation" {
+                TabView(selection: $mainTab) {
+                    NavigationStack {
+                        VStack { objectCard(online: true); Spacer() }.padding(20)
+                            .background(Color(uiColor: .systemGroupedBackground))
+                            .navigationTitle("Управление")
+                    }.tabItem { Label("Управление", image: "tab-control") }.tag(0)
+                    catalogScreen.tabItem { Label("Настройки", image: "tab-settings") }.tag(1)
+                    NavigationStack {
+                        Text("Ключи, выданные гостям").navigationTitle("Гости")
+                    }.tabItem { Label("Гости", image: "tab-guests") }.tag(2)
+                    NavigationStack {
+                        VStack { journal; Spacer() }.padding(20)
+                            .background(Color(uiColor: .systemGroupedBackground))
+                            .navigationTitle("Журнал")
+                    }.tabItem { Label("Журнал", image: "tab-journal") }.tag(3)
+                }
+            } else {
+                catalogScreen
+            }
+        }.tint(ink).preferredColorScheme(.light)
+    }
+    private var catalogScreen: some View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: 20) {
@@ -196,12 +221,7 @@ struct NativeDesignCatalog: View {
             }.pickerStyle(.segmented)
             Text("Вкладки настроек повторяют Android.").font(.footnote).foregroundStyle(.secondary)
             panel { NavigationLink("Полученный ключ") { Text("Содержимое ключа").navigationTitle("Полученный ключ").navigationBarTitleDisplayMode(.inline) }.padding(.vertical, 18) }
-            Text("Главные разделы").font(.headline)
-            HStack {
-                ForEach(Array(zip(["square.grid.2x2", "gearshape", "person.2", "list.bullet"], ["Управление", "Настройки", "Гости", "Журнал"])), id: \.0) { symbol, label in
-                    VStack(spacing: 8) { Image(systemName: symbol); Text(label).font(.system(size: 9)) }.frame(maxWidth: .infinity).padding(.vertical, 14)
-                }
-            }.background(.background, in: RoundedRectangle(cornerRadius: 16))
+            Text("Основные разделы переключаются нижней панелью. Она остаётся у нижнего края экрана при прокрутке.").font(.footnote).foregroundStyle(.secondary)
         }
     }
     private var avatar: some View {
