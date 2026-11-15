@@ -185,7 +185,7 @@ struct NativeDesignCatalog: View {
     }
     private func journalAction(_ title: String, symbol: String, kind: Int) -> some View {
         Button { message = "Каталог: \(title.lowercased())" } label: {
-            VStack(spacing: 8) { Image(systemName: symbol).font(.title3); Text(title).font(.system(size: 10, weight: .medium)) }.frame(maxWidth: .infinity, minHeight: 64)
+            VStack(spacing: 8) { Image(systemName: symbol).font(.title3); Text(title).font(.system(size: 12, weight: .medium)) }.frame(maxWidth: .infinity, minHeight: 64)
         }.buttonStyle(CatalogButtonStyle(kind: kind))
     }
     private var navigation: some View {
@@ -216,8 +216,8 @@ struct NativeDesignCatalog: View {
             action("Удалить свою картинку", kind: 1) { imageData = nil; photo = nil }
             heading("Или выбрать готовый значок")
             LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 4), spacing: 16) {
-                ForEach(0..<8) { index in
-                    Button { message = "Выбран значок \(index + 1)" } label: { Image("object-\(index)").resizable().scaledToFit().frame(height: 54).padding(8) }.buttonStyle(.plain)
+                ForEach(1...8, id: \.self) { index in
+                    Button { message = "Выбран значок \(index)" } label: { Image("object-\(index)").resizable().scaledToFit().frame(height: 54).padding(8) }.buttonStyle(.plain)
                 }
             }
         }
