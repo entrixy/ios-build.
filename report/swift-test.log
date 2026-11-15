@@ -1,7 +1,7 @@
 Building for debugging...
 [0/8] /Users/runner/work/ios-build./ios-build./.build/x86_64-apple-macosx/debug/EntrixyPackageTests.derived/runner.swift
 [1/8] Write sources
-[4/8] Copying Fixtures
+[3/8] Copying Fixtures
 [5/8] Write swift-version-1977FEB4D2752686.txt
 [7/41] Compiling EntrixyCore GuestInvite.swift
 [8/41] Compiling EntrixyCore GuestLiveSession.swift
@@ -13,29 +13,29 @@ Building for debugging...
 [14/41] Compiling EntrixyCore OwnerAPI.swift
 [15/41] Compiling EntrixyCore OwnerAccount.swift
 [16/41] Compiling EntrixyCore OwnerAuthorizedGuest.swift
-[17/41] Emitting module EntrixyCore
-[18/41] Compiling EntrixyCore AndroidBackupDocument.swift
-[19/41] Compiling EntrixyCore AndroidKeyRecovery.swift
-[20/41] Compiling EntrixyCore AndroidOwnerAdapter.swift
-[21/41] Compiling EntrixyCore AndroidOwnerMaterial.swift
-[22/41] Compiling EntrixyCore AvatarRequestQueue.swift
-[23/41] Compiling EntrixyCore BLEBundle.swift
-[24/41] Compiling EntrixyCore BLECommandSession.swift
-[25/41] Compiling EntrixyCore BLECrypto.swift
-[26/41] Compiling EntrixyCore BLEGuestGrant.swift
-[27/41] Compiling EntrixyCore BLEPairingRecord.swift
-[28/41] Compiling EntrixyCore BLERevocation.swift
-[29/41] Compiling EntrixyCore BackupEnvelope.swift
-[30/41] Compiling EntrixyCore BundleKeySeal.swift
-[31/41] Compiling EntrixyCore ControlFrameValidation.swift
-[32/41] Compiling EntrixyCore DelegationProof.swift
-[33/41] Compiling EntrixyCore DelegationRedemption.swift
-[34/41] Compiling EntrixyCore GuestAPI.swift
-[35/41] Compiling EntrixyCore GuestAction.swift
-[36/41] Compiling EntrixyCore GuestActionPolicy.swift
-[37/41] Compiling EntrixyCore GuestBLECache.swift
-[38/41] Compiling EntrixyCore GuestCrypto.swift
-[39/41] Compiling EntrixyCore GuestEvent.swift
+[17/51] Compiling EntrixyCore AndroidBackupDocument.swift
+[18/51] Compiling EntrixyCore AndroidKeyRecovery.swift
+[19/51] Compiling EntrixyCore AndroidOwnerAdapter.swift
+[20/51] Compiling EntrixyCore AndroidOwnerMaterial.swift
+[21/51] Compiling EntrixyCore AvatarRequestQueue.swift
+[22/51] Compiling EntrixyCore BLEBundle.swift
+[23/51] Compiling EntrixyCore BLECommandSession.swift
+[24/51] Compiling EntrixyCore BLECrypto.swift
+[25/51] Compiling EntrixyCore BLEGuestGrant.swift
+[26/51] Compiling EntrixyCore BLEPairingRecord.swift
+[27/51] Compiling EntrixyCore BLERevocation.swift
+[28/51] Emitting module EntrixyCore
+[29/51] Compiling EntrixyCore BackupEnvelope.swift
+[30/51] Compiling EntrixyCore BundleKeySeal.swift
+[31/51] Compiling EntrixyCore ControlFrameValidation.swift
+[32/51] Compiling EntrixyCore DelegationProof.swift
+[33/51] Compiling EntrixyCore DelegationRedemption.swift
+[34/51] Compiling EntrixyCore GuestAPI.swift
+[35/51] Compiling EntrixyCore GuestAction.swift
+[36/51] Compiling EntrixyCore GuestActionPolicy.swift
+[37/51] Compiling EntrixyCore GuestBLECache.swift
+[38/51] Compiling EntrixyCore GuestCrypto.swift
+[39/51] Compiling EntrixyCore GuestEvent.swift
 [40/51] Compiling EntrixyCore OwnerBackupMerge.swift
 [41/51] Compiling EntrixyCore OwnerCommand.swift
 [42/51] Compiling EntrixyCore OwnerDelegatedKey.swift
@@ -55,24 +55,24 @@ Building for debugging...
 [56/78] Compiling EntrixyCoreTests GuestAPITests.swift
 [57/78] Compiling EntrixyCoreTests GuestActionTests.swift
 [58/78] Compiling EntrixyCoreTests GuestBLECacheTests.swift
-[59/78] Emitting module EntrixyCoreTests
-[60/78] Compiling EntrixyCoreTests GuestCryptoTests.swift
-[61/78] Compiling EntrixyCoreTests GuestEventTests.swift
-[62/78] Compiling EntrixyCoreTests GuestInviteTests.swift
-[63/78] Compiling EntrixyCoreTests GuestMessageCryptoTests.swift
-[64/78] Compiling EntrixyCoreTests GuestObjectsTests.swift
-[65/78] Compiling EntrixyCoreTests KeyObjectAccessTests.swift
-[66/78] Compiling EntrixyCoreTests OwnerAPITests.swift
-[67/78] Compiling EntrixyCoreTests OwnerBackupMergeTests.swift
-[68/78] Compiling EntrixyCoreTests AndroidBackupDocumentTests.swift
-[69/78] Compiling EntrixyCoreTests AndroidKeyRecoveryTests.swift
-[70/78] Compiling EntrixyCoreTests AndroidOwnerAdapterTests.swift
-[71/78] Compiling EntrixyCoreTests BLEBundleTests.swift
-[72/78] Compiling EntrixyCoreTests BLECommandSessionTests.swift
-[73/78] Compiling EntrixyCoreTests BLECryptoTests.swift
-[74/78] Compiling EntrixyCoreTests BLELifecycleTests.swift
-[75/78] Compiling EntrixyCoreTests BLEPairingRecordTests.swift
-[76/78] Compiling EntrixyCoreTests BLERevocationTests.swift
+[59/86] Compiling EntrixyCoreTests GuestCryptoTests.swift
+[60/86] Compiling EntrixyCoreTests GuestEventTests.swift
+[61/86] Compiling EntrixyCoreTests GuestInviteTests.swift
+[62/86] Compiling EntrixyCoreTests GuestMessageCryptoTests.swift
+[63/86] Compiling EntrixyCoreTests GuestObjectsTests.swift
+[64/86] Compiling EntrixyCoreTests KeyObjectAccessTests.swift
+[65/86] Compiling EntrixyCoreTests OwnerAPITests.swift
+[66/86] Compiling EntrixyCoreTests OwnerBackupMergeTests.swift
+[67/86] Emitting module EntrixyCoreTests
+[68/86] Compiling EntrixyCoreTests AndroidBackupDocumentTests.swift
+[69/86] Compiling EntrixyCoreTests AndroidKeyRecoveryTests.swift
+[70/86] Compiling EntrixyCoreTests AndroidOwnerAdapterTests.swift
+[71/86] Compiling EntrixyCoreTests BLEBundleTests.swift
+[72/86] Compiling EntrixyCoreTests BLECommandSessionTests.swift
+[73/86] Compiling EntrixyCoreTests BLECryptoTests.swift
+[74/86] Compiling EntrixyCoreTests BLELifecycleTests.swift
+[75/86] Compiling EntrixyCoreTests BLEPairingRecordTests.swift
+[76/86] Compiling EntrixyCoreTests BLERevocationTests.swift
 [77/86] Compiling EntrixyCoreTests OwnerCommandTests.swift
 [78/86] Compiling EntrixyCoreTests OwnerDelegatedKeyTests.swift
 [79/86] Compiling EntrixyCoreTests OwnerIssuedKeyTests.swift
@@ -81,48 +81,48 @@ Building for debugging...
 [82/86] Compiling EntrixyCoreTests PassedAccessTests.swift
 [83/86] Compiling EntrixyCoreTests ReceivedDelegationTests.swift
 [84/86] Compiling EntrixyCoreTests resource_bundle_accessor.swift
-[85/88] Compiling EntrixyPackageTests runner.swift
-[86/88] Emitting module EntrixyPackageTests
+[85/88] Emitting module EntrixyPackageTests
+[86/88] Compiling EntrixyPackageTests runner.swift
 [86/88] Write Objects.LinkFileList
 [87/88] Linking EntrixyPackageTests
-Build complete! (42.37s)
-Test Suite 'All tests' started at 2026-11-15 06:35:48.028.
-Test Suite 'EntrixyPackageTests.xctest' started at 2026-11-15 06:35:48.030.
-Test Suite 'AndroidBackupDocumentTests' started at 2026-11-15 06:35:48.030.
+Build complete! (56.90s)
+Test Suite 'All tests' started at 2026-11-15 07:15:03.861.
+Test Suite 'EntrixyPackageTests.xctest' started at 2026-11-15 07:15:03.864.
+Test Suite 'AndroidBackupDocumentTests' started at 2026-11-15 07:15:03.864.
 Test Case '-[EntrixyCoreTests.AndroidBackupDocumentTests testMalformedCountsTypesSecretsAndAliasesFailBeforeAnyMigration]' started.
-Test Case '-[EntrixyCoreTests.AndroidBackupDocumentTests testMalformedCountsTypesSecretsAndAliasesFailBeforeAnyMigration]' passed (0.008 seconds).
+Test Case '-[EntrixyCoreTests.AndroidBackupDocumentTests testMalformedCountsTypesSecretsAndAliasesFailBeforeAnyMigration]' passed (0.011 seconds).
 Test Case '-[EntrixyCoreTests.AndroidBackupDocumentTests testRecipientPrivateKeyIsRecoveredFromOriginalWrappedAndroidEntry]' started.
-Test Case '-[EntrixyCoreTests.AndroidBackupDocumentTests testRecipientPrivateKeyIsRecoveredFromOriginalWrappedAndroidEntry]' passed (0.003 seconds).
+Test Case '-[EntrixyCoreTests.AndroidBackupDocumentTests testRecipientPrivateKeyIsRecoveredFromOriginalWrappedAndroidEntry]' passed (0.006 seconds).
 Test Case '-[EntrixyCoreTests.AndroidBackupDocumentTests testTypedEntriesKeepOriginalAndNeverSubstituteIdentityOrSecrets]' started.
 Test Case '-[EntrixyCoreTests.AndroidBackupDocumentTests testTypedEntriesKeepOriginalAndNeverSubstituteIdentityOrSecrets]' passed (0.002 seconds).
-Test Suite 'AndroidBackupDocumentTests' passed at 2026-11-15 06:35:48.044.
-	 Executed 3 tests, with 0 failures (0 unexpected) in 0.013 (0.014) seconds
-Test Suite 'AndroidKeyRecoveryTests' started at 2026-11-15 06:35:48.044.
+Test Suite 'AndroidBackupDocumentTests' passed at 2026-11-15 07:15:03.884.
+	 Executed 3 tests, with 0 failures (0 unexpected) in 0.019 (0.020) seconds
+Test Suite 'AndroidKeyRecoveryTests' started at 2026-11-15 07:15:03.884.
 Test Case '-[EntrixyCoreTests.AndroidKeyRecoveryTests testForgedPublicKeyAndForeignExpandedScopeKeepOriginalMaterialWithoutReplacement]' started.
-Test Case '-[EntrixyCoreTests.AndroidKeyRecoveryTests testForgedPublicKeyAndForeignExpandedScopeKeepOriginalMaterialWithoutReplacement]' passed (0.003 seconds).
+Test Case '-[EntrixyCoreTests.AndroidKeyRecoveryTests testForgedPublicKeyAndForeignExpandedScopeKeepOriginalMaterialWithoutReplacement]' passed (0.006 seconds).
 Test Case '-[EntrixyCoreTests.AndroidKeyRecoveryTests testRecoveryUsesOriginalSigningAndBundleKeysButRequiresPermissionReview]' started.
-Test Case '-[EntrixyCoreTests.AndroidKeyRecoveryTests testRecoveryUsesOriginalSigningAndBundleKeysButRequiresPermissionReview]' passed (0.003 seconds).
+Test Case '-[EntrixyCoreTests.AndroidKeyRecoveryTests testRecoveryUsesOriginalSigningAndBundleKeysButRequiresPermissionReview]' passed (0.004 seconds).
 Test Case '-[EntrixyCoreTests.AndroidKeyRecoveryTests testReservedPhysicalGuestIDsCannotBeReissuedWhileImportedMaterialWaits]' started.
-Test Case '-[EntrixyCoreTests.AndroidKeyRecoveryTests testReservedPhysicalGuestIDsCannotBeReissuedWhileImportedMaterialWaits]' passed (0.047 seconds).
-Test Suite 'AndroidKeyRecoveryTests' passed at 2026-11-15 06:35:48.099.
-	 Executed 3 tests, with 0 failures (0 unexpected) in 0.054 (0.055) seconds
-Test Suite 'AndroidOwnerAdapterTests' started at 2026-11-15 06:35:48.099.
+Test Case '-[EntrixyCoreTests.AndroidKeyRecoveryTests testReservedPhysicalGuestIDsCannotBeReissuedWhileImportedMaterialWaits]' passed (0.049 seconds).
+Test Suite 'AndroidKeyRecoveryTests' passed at 2026-11-15 07:15:03.944.
+	 Executed 3 tests, with 0 failures (0 unexpected) in 0.059 (0.060) seconds
+Test Suite 'AndroidOwnerAdapterTests' started at 2026-11-15 07:15:03.944.
 Test Case '-[EntrixyCoreTests.AndroidOwnerAdapterTests testCorruptMasterOrObjectKeyNeverGetsAReplacementAndForeignAliasIsRefused]' started.
 Test Case '-[EntrixyCoreTests.AndroidOwnerAdapterTests testCorruptMasterOrObjectKeyNeverGetsAReplacementAndForeignAliasIsRefused]' passed (0.002 seconds).
 Test Case '-[EntrixyCoreTests.AndroidOwnerAdapterTests testMultiServerAliasesObjectKeysSocketBLESecretsAndSignedRevokesSurviveTranslation]' started.
 Test Case '-[EntrixyCoreTests.AndroidOwnerAdapterTests testMultiServerAliasesObjectKeysSocketBLESecretsAndSignedRevokesSurviveTranslation]' passed (0.008 seconds).
-Test Suite 'AndroidOwnerAdapterTests' passed at 2026-11-15 06:35:48.108.
-	 Executed 2 tests, with 0 failures (0 unexpected) in 0.009 (0.010) seconds
-Test Suite 'BLEBundleTests' started at 2026-11-15 06:35:48.108.
+Test Suite 'AndroidOwnerAdapterTests' passed at 2026-11-15 07:15:03.954.
+	 Executed 2 tests, with 0 failures (0 unexpected) in 0.010 (0.010) seconds
+Test Suite 'BLEBundleTests' started at 2026-11-15 07:15:03.954.
 Test Case '-[EntrixyCoreTests.BLEBundleTests testGrantMatchesOwnerAndEditKeepsExpiryWhileExplicitRenewExtends]' started.
-Test Case '-[EntrixyCoreTests.BLEBundleTests testGrantMatchesOwnerAndEditKeepsExpiryWhileExplicitRenewExtends]' passed (0.003 seconds).
+Test Case '-[EntrixyCoreTests.BLEBundleTests testGrantMatchesOwnerAndEditKeepsExpiryWhileExplicitRenewExtends]' passed (0.004 seconds).
 Test Case '-[EntrixyCoreTests.BLEBundleTests testIssuedBLEBundleContainsOneCardNoOwnerSecretAndReconcilesSplitIDs]' started.
 Test Case '-[EntrixyCoreTests.BLEBundleTests testIssuedBLEBundleContainsOneCardNoOwnerSecretAndReconcilesSplitIDs]' passed (0.003 seconds).
 Test Case '-[EntrixyCoreTests.BLEBundleTests testOfflinePolicyChecksExpiryAuthenticationAndCombinedRestrictions]' started.
 Test Case '-[EntrixyCoreTests.BLEBundleTests testOfflinePolicyChecksExpiryAuthenticationAndCombinedRestrictions]' passed (0.002 seconds).
-Test Suite 'BLEBundleTests' passed at 2026-11-15 06:35:48.116.
-	 Executed 3 tests, with 0 failures (0 unexpected) in 0.007 (0.008) seconds
-Test Suite 'BLECommandSessionTests' started at 2026-11-15 06:35:48.116.
+Test Suite 'BLEBundleTests' passed at 2026-11-15 07:15:03.964.
+	 Executed 3 tests, with 0 failures (0 unexpected) in 0.009 (0.009) seconds
+Test Suite 'BLECommandSessionTests' started at 2026-11-15 07:15:03.964.
 Test Case '-[EntrixyCoreTests.BLECommandSessionTests testBundleGrantRejectsMismatchedExpiryWrongPermissionsAndBooleanDeviceID]' started.
 Test Case '-[EntrixyCoreTests.BLECommandSessionTests testBundleGrantRejectsMismatchedExpiryWrongPermissionsAndBooleanDeviceID]' passed (0.000 seconds).
 Test Case '-[EntrixyCoreTests.BLECommandSessionTests testExpiryIsRecheckedAndClockRollbackCannotReviveAnExpiredPreparedCommand]' started.
@@ -131,149 +131,149 @@ Test Case '-[EntrixyCoreTests.BLECommandSessionTests testFreshChallengeDeadlineC
 Test Case '-[EntrixyCoreTests.BLECommandSessionTests testFreshChallengeDeadlineCancellationAndAllControllerFailureResults]' passed (0.001 seconds).
 Test Case '-[EntrixyCoreTests.BLECommandSessionTests testOneWriteOnlyAndGattWriteDoesNotBecomePhysicalSuccess]' started.
 Test Case '-[EntrixyCoreTests.BLECommandSessionTests testOneWriteOnlyAndGattWriteDoesNotBecomePhysicalSuccess]' passed (0.000 seconds).
-Test Suite 'BLECommandSessionTests' passed at 2026-11-15 06:35:48.120.
+Test Suite 'BLECommandSessionTests' passed at 2026-11-15 07:15:03.968.
 	 Executed 4 tests, with 0 failures (0 unexpected) in 0.003 (0.004) seconds
-Test Suite 'BLECryptoTests' started at 2026-11-15 06:35:48.120.
+Test Suite 'BLECryptoTests' started at 2026-11-15 07:15:03.968.
 Test Case '-[EntrixyCoreTests.BLECryptoTests testAdvertiseVersionsOptionalTelemetryAndSeparateStateMAC]' started.
 Test Case '-[EntrixyCoreTests.BLECryptoTests testAdvertiseVersionsOptionalTelemetryAndSeparateStateMAC]' passed (0.002 seconds).
 Test Case '-[EntrixyCoreTests.BLECryptoTests testIndependentX25519PairAndAllFirmwarePacketVectors]' started.
 Test Case '-[EntrixyCoreTests.BLECryptoTests testIndependentX25519PairAndAllFirmwarePacketVectors]' passed (0.001 seconds).
 Test Case '-[EntrixyCoreTests.BLECryptoTests testInvalidLengthsAndLowOrderPairPointCannotProduceCredentials]' started.
 Test Case '-[EntrixyCoreTests.BLECryptoTests testInvalidLengthsAndLowOrderPairPointCannotProduceCredentials]' passed (0.001 seconds).
-Test Suite 'BLECryptoTests' passed at 2026-11-15 06:35:48.124.
+Test Suite 'BLECryptoTests' passed at 2026-11-15 07:15:03.972.
 	 Executed 3 tests, with 0 failures (0 unexpected) in 0.004 (0.004) seconds
-Test Suite 'BLELifecycleTests' started at 2026-11-15 06:35:48.124.
+Test Suite 'BLELifecycleTests' started at 2026-11-15 07:15:03.972.
 Test Case '-[EntrixyCoreTests.BLELifecycleTests testDeletionRetainsWrappedSecretButRemovesActuationObject]' started.
 Test Case '-[EntrixyCoreTests.BLELifecycleTests testDeletionRetainsWrappedSecretButRemovesActuationObject]' passed (0.003 seconds).
 Test Case '-[EntrixyCoreTests.BLELifecycleTests testRenewalKeepsIdentityScopePolicyAndDoesNotAllowPausedKey]' started.
 Test Case '-[EntrixyCoreTests.BLELifecycleTests testRenewalKeepsIdentityScopePolicyAndDoesNotAllowPausedKey]' passed (0.005 seconds).
 Test Case '-[EntrixyCoreTests.BLELifecycleTests testScopedRestorationNeverAllowsOtherRevokedObjectsAndWaitsForFreshAck]' started.
-Test Case '-[EntrixyCoreTests.BLELifecycleTests testScopedRestorationNeverAllowsOtherRevokedObjectsAndWaitsForFreshAck]' passed (0.003 seconds).
-Test Suite 'BLELifecycleTests' passed at 2026-11-15 06:35:48.136.
-	 Executed 3 tests, with 0 failures (0 unexpected) in 0.011 (0.012) seconds
-Test Suite 'BLEPairingRecordTests' started at 2026-11-15 06:35:48.136.
+Test Case '-[EntrixyCoreTests.BLELifecycleTests testScopedRestorationNeverAllowsOtherRevokedObjectsAndWaitsForFreshAck]' passed (0.004 seconds).
+Test Suite 'BLELifecycleTests' passed at 2026-11-15 07:15:03.985.
+	 Executed 3 tests, with 0 failures (0 unexpected) in 0.012 (0.013) seconds
+Test Suite 'BLEPairingRecordTests' started at 2026-11-15 07:15:03.985.
 Test Case '-[EntrixyCoreTests.BLEPairingRecordTests testConfirmedObjectKeepsOwnerSecretOutOfSharedMetadataAndServerRequest]' started.
-Test Case '-[EntrixyCoreTests.BLEPairingRecordTests testConfirmedObjectKeepsOwnerSecretOutOfSharedMetadataAndServerRequest]' passed (0.001 seconds).
+Test Case '-[EntrixyCoreTests.BLEPairingRecordTests testConfirmedObjectKeepsOwnerSecretOutOfSharedMetadataAndServerRequest]' passed (0.002 seconds).
 Test Case '-[EntrixyCoreTests.BLEPairingRecordTests testDiscoveryRequiresSecretAndExpectedDeviceID]' started.
 Test Case '-[EntrixyCoreTests.BLEPairingRecordTests testDiscoveryRequiresSecretAndExpectedDeviceID]' passed (0.001 seconds).
 Test Case '-[EntrixyCoreTests.BLEPairingRecordTests testOwnerKeepsPairingSecretAndRejectsDuplicateDeviceIDs]' started.
-Test Case '-[EntrixyCoreTests.BLEPairingRecordTests testOwnerKeepsPairingSecretAndRejectsDuplicateDeviceIDs]' passed (0.001 seconds).
+Test Case '-[EntrixyCoreTests.BLEPairingRecordTests testOwnerKeepsPairingSecretAndRejectsDuplicateDeviceIDs]' passed (0.002 seconds).
 Test Case '-[EntrixyCoreTests.BLEPairingRecordTests testPairingSurvivesLostWriteReplyAndCannotResend]' started.
 Test Case '-[EntrixyCoreTests.BLEPairingRecordTests testPairingSurvivesLostWriteReplyAndCannotResend]' passed (0.001 seconds).
-Test Suite 'BLEPairingRecordTests' passed at 2026-11-15 06:35:48.141.
-	 Executed 4 tests, with 0 failures (0 unexpected) in 0.004 (0.005) seconds
-Test Suite 'BLERevocationTests' started at 2026-11-15 06:35:48.141.
+Test Suite 'BLEPairingRecordTests' passed at 2026-11-15 07:15:03.991.
+	 Executed 4 tests, with 0 failures (0 unexpected) in 0.005 (0.006) seconds
+Test Suite 'BLERevocationTests' started at 2026-11-15 07:15:03.992.
 Test Case '-[EntrixyCoreTests.BLERevocationTests testMergeDoesNotRollbackOrAcceptContradictorySameVersion]' started.
 Test Case '-[EntrixyCoreTests.BLERevocationTests testMergeDoesNotRollbackOrAcceptContradictorySameVersion]' passed (0.001 seconds).
 Test Case '-[EntrixyCoreTests.BLERevocationTests testQueueIncreasesVersionAndRefusesAllowBeforeFreshActiveAuthority]' started.
 Test Case '-[EntrixyCoreTests.BLERevocationTests testQueueIncreasesVersionAndRefusesAllowBeforeFreshActiveAuthority]' passed (0.002 seconds).
 Test Case '-[EntrixyCoreTests.BLERevocationTests testSignedDecisionWireAndControllerReceiptMeaning]' started.
 Test Case '-[EntrixyCoreTests.BLERevocationTests testSignedDecisionWireAndControllerReceiptMeaning]' passed (0.000 seconds).
-Test Suite 'BLERevocationTests' passed at 2026-11-15 06:35:48.145.
+Test Suite 'BLERevocationTests' passed at 2026-11-15 07:15:03.996.
 	 Executed 3 tests, with 0 failures (0 unexpected) in 0.003 (0.004) seconds
-Test Suite 'BackupEnvelopeTests' started at 2026-11-15 06:35:48.145.
+Test Suite 'BackupEnvelopeTests' started at 2026-11-15 07:15:03.996.
 Test Case '-[EntrixyCoreTests.BackupEnvelopeTests testExportUsesFreshSaltNonceAndAuthenticatesTheHeader]' started.
-Test Case '-[EntrixyCoreTests.BackupEnvelopeTests testExportUsesFreshSaltNonceAndAuthenticatesTheHeader]' passed (1.347 seconds).
+Test Case '-[EntrixyCoreTests.BackupEnvelopeTests testExportUsesFreshSaltNonceAndAuthenticatesTheHeader]' passed (1.461 seconds).
 Test Case '-[EntrixyCoreTests.BackupEnvelopeTests testIndependentAndroidFormatWithUnicodePassword]' started.
-Test Case '-[EntrixyCoreTests.BackupEnvelopeTests testIndependentAndroidFormatWithUnicodePassword]' passed (0.522 seconds).
+Test Case '-[EntrixyCoreTests.BackupEnvelopeTests testIndependentAndroidFormatWithUnicodePassword]' passed (0.549 seconds).
 Test Case '-[EntrixyCoreTests.BackupEnvelopeTests testMalformedAndUnboundedKDFInputsAreRejected]' started.
 Test Case '-[EntrixyCoreTests.BackupEnvelopeTests testMalformedAndUnboundedKDFInputsAreRejected]' passed (0.001 seconds).
-Test Suite 'BackupEnvelopeTests' passed at 2026-11-15 06:35:50.016.
-	 Executed 3 tests, with 0 failures (0 unexpected) in 1.870 (1.871) seconds
-Test Suite 'BundleKeySealTests' started at 2026-11-15 06:35:50.016.
+Test Suite 'BackupEnvelopeTests' passed at 2026-11-15 07:15:06.007.
+	 Executed 3 tests, with 0 failures (0 unexpected) in 2.011 (2.011) seconds
+Test Suite 'BundleKeySealTests' started at 2026-11-15 07:15:06.007.
 Test Case '-[EntrixyCoreTests.BundleKeySealTests testGeneratedRecipientRoundTripAndRandomization]' started.
-Test Case '-[EntrixyCoreTests.BundleKeySealTests testGeneratedRecipientRoundTripAndRandomization]' passed (0.005 seconds).
+Test Case '-[EntrixyCoreTests.BundleKeySealTests testGeneratedRecipientRoundTripAndRandomization]' passed (0.006 seconds).
 Test Case '-[EntrixyCoreTests.BundleKeySealTests testIndependentAndroidFormatEnvelope]' started.
 Test Case '-[EntrixyCoreTests.BundleKeySealTests testIndependentAndroidFormatEnvelope]' passed (0.002 seconds).
 Test Case '-[EntrixyCoreTests.BundleKeySealTests testRejectMalformedTamperedAndWrongLengthKeys]' started.
-Test Case '-[EntrixyCoreTests.BundleKeySealTests testRejectMalformedTamperedAndWrongLengthKeys]' passed (0.003 seconds).
-Test Suite 'BundleKeySealTests' passed at 2026-11-15 06:35:50.026.
-	 Executed 3 tests, with 0 failures (0 unexpected) in 0.010 (0.010) seconds
-Test Suite 'ControlFrameValidationTests' started at 2026-11-15 06:35:50.026.
+Test Case '-[EntrixyCoreTests.BundleKeySealTests testRejectMalformedTamperedAndWrongLengthKeys]' passed (0.004 seconds).
+Test Suite 'BundleKeySealTests' passed at 2026-11-15 07:15:06.019.
+	 Executed 3 tests, with 0 failures (0 unexpected) in 0.011 (0.012) seconds
+Test Suite 'ControlFrameValidationTests' started at 2026-11-15 07:15:06.019.
 Test Case '-[EntrixyCoreTests.ControlFrameValidationTests testBLEMaintenanceFramesRespectWebSocketRoleBoundary]' started.
 Test Case '-[EntrixyCoreTests.ControlFrameValidationTests testBLEMaintenanceFramesRespectWebSocketRoleBoundary]' passed (0.001 seconds).
-Test Suite 'ControlFrameValidationTests' passed at 2026-11-15 06:35:50.027.
+Test Suite 'ControlFrameValidationTests' passed at 2026-11-15 07:15:06.020.
 	 Executed 1 test, with 0 failures (0 unexpected) in 0.001 (0.001) seconds
-Test Suite 'DelegationEndToEndTests' started at 2026-11-15 06:35:50.027.
+Test Suite 'DelegationEndToEndTests' started at 2026-11-15 07:15:06.020.
 Test Case '-[EntrixyCoreTests.DelegationEndToEndTests testSenderRecipientAndOwnerCompleteTheProtocolWithoutSharingPrivateMaterial]' started.
-Test Case '-[EntrixyCoreTests.DelegationEndToEndTests testSenderRecipientAndOwnerCompleteTheProtocolWithoutSharingPrivateMaterial]' passed (0.008 seconds).
-Test Suite 'DelegationEndToEndTests' passed at 2026-11-15 06:35:50.036.
-	 Executed 1 test, with 0 failures (0 unexpected) in 0.008 (0.009) seconds
-Test Suite 'DelegationProofTests' started at 2026-11-15 06:35:50.036.
+Test Case '-[EntrixyCoreTests.DelegationEndToEndTests testSenderRecipientAndOwnerCompleteTheProtocolWithoutSharingPrivateMaterial]' passed (0.011 seconds).
+Test Suite 'DelegationEndToEndTests' passed at 2026-11-15 07:15:06.031.
+	 Executed 1 test, with 0 failures (0 unexpected) in 0.011 (0.011) seconds
+Test Suite 'DelegationProofTests' started at 2026-11-15 07:15:06.031.
 Test Case '-[EntrixyCoreTests.DelegationProofTests testIndependentMACAndVouchSignatures]' started.
-Test Case '-[EntrixyCoreTests.DelegationProofTests testIndependentMACAndVouchSignatures]' passed (0.002 seconds).
+Test Case '-[EntrixyCoreTests.DelegationProofTests testIndependentMACAndVouchSignatures]' passed (0.003 seconds).
 Test Case '-[EntrixyCoreTests.DelegationProofTests testStrictDelegationLinkAndPublicKeyValidation]' started.
 Test Case '-[EntrixyCoreTests.DelegationProofTests testStrictDelegationLinkAndPublicKeyValidation]' passed (0.001 seconds).
-Test Suite 'DelegationProofTests' passed at 2026-11-15 06:35:50.040.
+Test Suite 'DelegationProofTests' passed at 2026-11-15 07:15:06.035.
 	 Executed 2 tests, with 0 failures (0 unexpected) in 0.003 (0.004) seconds
-Test Suite 'DelegationRedemptionTests' started at 2026-11-15 06:35:50.040.
+Test Suite 'DelegationRedemptionTests' started at 2026-11-15 07:15:06.035.
 Test Case '-[EntrixyCoreTests.DelegationRedemptionTests testDurableRecipientUsesIdenticalKeysAndRequestAfterRelaunch]' started.
-Test Case '-[EntrixyCoreTests.DelegationRedemptionTests testDurableRecipientUsesIdenticalKeysAndRequestAfterRelaunch]' passed (0.006 seconds).
+Test Case '-[EntrixyCoreTests.DelegationRedemptionTests testDurableRecipientUsesIdenticalKeysAndRequestAfterRelaunch]' passed (0.007 seconds).
 Test Case '-[EntrixyCoreTests.DelegationRedemptionTests testInfoForOtherGroupOrDuplicatePartsIsRejected]' started.
 Test Case '-[EntrixyCoreTests.DelegationRedemptionTests testInfoForOtherGroupOrDuplicatePartsIsRejected]' passed (0.001 seconds).
-Test Suite 'DelegationRedemptionTests' passed at 2026-11-15 06:35:50.047.
-	 Executed 2 tests, with 0 failures (0 unexpected) in 0.007 (0.008) seconds
-Test Suite 'GuestAPITests' started at 2026-11-15 06:35:50.047.
+Test Suite 'DelegationRedemptionTests' passed at 2026-11-15 07:15:06.044.
+	 Executed 2 tests, with 0 failures (0 unexpected) in 0.008 (0.009) seconds
+Test Suite 'GuestAPITests' started at 2026-11-15 07:15:06.044.
 Test Case '-[EntrixyCoreTests.GuestAPITests testDelegatedBundleIsAcceptedOnlyForThePersistedRecipient]' started.
-Test Case '-[EntrixyCoreTests.GuestAPITests testDelegatedBundleIsAcceptedOnlyForThePersistedRecipient]' passed (0.018 seconds).
+Test Case '-[EntrixyCoreTests.GuestAPITests testDelegatedBundleIsAcceptedOnlyForThePersistedRecipient]' passed (0.025 seconds).
 Test Case '-[EntrixyCoreTests.GuestAPITests testDelegationQueryUsesCanonicalEndpointAndExactSignedBody]' started.
-Test Case '-[EntrixyCoreTests.GuestAPITests testDelegationQueryUsesCanonicalEndpointAndExactSignedBody]' passed (0.002 seconds).
+Test Case '-[EntrixyCoreTests.GuestAPITests testDelegationQueryUsesCanonicalEndpointAndExactSignedBody]' passed (0.003 seconds).
 Test Case '-[EntrixyCoreTests.GuestAPITests testDeviceBindingFallsBackOnlyForBadKey]' started.
 Test Case '-[EntrixyCoreTests.GuestAPITests testDeviceBindingFallsBackOnlyForBadKey]' passed (0.003 seconds).
 Test Case '-[EntrixyCoreTests.GuestAPITests testLostBindResponseIsNotAutomaticallyRepeated]' started.
-Test Case '-[EntrixyCoreTests.GuestAPITests testLostBindResponseIsNotAutomaticallyRepeated]' passed (0.002 seconds).
+Test Case '-[EntrixyCoreTests.GuestAPITests testLostBindResponseIsNotAutomaticallyRepeated]' passed (0.003 seconds).
 Test Case '-[EntrixyCoreTests.GuestAPITests testMessageAcknowledgementUsesTheExactCipherHashAndDoesNotFallBackOrRetry]' started.
 Test Case '-[EntrixyCoreTests.GuestAPITests testMessageAcknowledgementUsesTheExactCipherHashAndDoesNotFallBackOrRetry]' passed (0.002 seconds).
 Test Case '-[EntrixyCoreTests.GuestAPITests testMigrationRefusalIsNeverRetriedAsAnInvitation]' started.
 Test Case '-[EntrixyCoreTests.GuestAPITests testMigrationRefusalIsNeverRetriedAsAnInvitation]' passed (0.002 seconds).
 Test Case '-[EntrixyCoreTests.GuestAPITests testMigrationUsesNewPairForIdempotentRecoveryThenTheOldDeviceProof]' started.
-Test Case '-[EntrixyCoreTests.GuestAPITests testMigrationUsesNewPairForIdempotentRecoveryThenTheOldDeviceProof]' passed (0.004 seconds).
+Test Case '-[EntrixyCoreTests.GuestAPITests testMigrationUsesNewPairForIdempotentRecoveryThenTheOldDeviceProof]' passed (0.005 seconds).
 Test Case '-[EntrixyCoreTests.GuestAPITests testNativeOnlyBundleIsDecryptedWithoutAppSecret]' started.
 Test Case '-[EntrixyCoreTests.GuestAPITests testNativeOnlyBundleIsDecryptedWithoutAppSecret]' passed (0.002 seconds).
 Test Case '-[EntrixyCoreTests.GuestAPITests testOtherDeviceBindingIsNotRetriedAsInvitation]' started.
 Test Case '-[EntrixyCoreTests.GuestAPITests testOtherDeviceBindingIsNotRetriedAsInvitation]' passed (0.002 seconds).
 Test Case '-[EntrixyCoreTests.GuestAPITests testPublicRedemptionNeverTransmitsRecipientPrivateMaterialOrFragmentSecret]' started.
-Test Case '-[EntrixyCoreTests.GuestAPITests testPublicRedemptionNeverTransmitsRecipientPrivateMaterialOrFragmentSecret]' passed (0.002 seconds).
+Test Case '-[EntrixyCoreTests.GuestAPITests testPublicRedemptionNeverTransmitsRecipientPrivateMaterialOrFragmentSecret]' passed (0.003 seconds).
 Test Case '-[EntrixyCoreTests.GuestAPITests testRedirectDelegateNeverForwardsAuthenticatedRequest]' started.
-Test Case '-[EntrixyCoreTests.GuestAPITests testRedirectDelegateNeverForwardsAuthenticatedRequest]' passed (0.000 seconds).
+Test Case '-[EntrixyCoreTests.GuestAPITests testRedirectDelegateNeverForwardsAuthenticatedRequest]' passed (0.001 seconds).
 Test Case '-[EntrixyCoreTests.GuestAPITests testRedirectStatusDoesNotCountAsSuccess]' started.
 Test Case '-[EntrixyCoreTests.GuestAPITests testRedirectStatusDoesNotCountAsSuccess]' passed (0.002 seconds).
 Test Case '-[EntrixyCoreTests.GuestAPITests testSigningIdentityRejectsInvalidDecodedStateAndNeverRetriesMigrationCooldown]' started.
-Test Case '-[EntrixyCoreTests.GuestAPITests testSigningIdentityRejectsInvalidDecodedStateAndNeverRetriesMigrationCooldown]' passed (0.002 seconds).
+Test Case '-[EntrixyCoreTests.GuestAPITests testSigningIdentityRejectsInvalidDecodedStateAndNeverRetriesMigrationCooldown]' passed (0.003 seconds).
 Test Case '-[EntrixyCoreTests.GuestAPITests testSigningOnlyMigrationCanWaitForAndRecoverOwnerSealedBundle]' started.
-Test Case '-[EntrixyCoreTests.GuestAPITests testSigningOnlyMigrationCanWaitForAndRecoverOwnerSealedBundle]' passed (0.009 seconds).
+Test Case '-[EntrixyCoreTests.GuestAPITests testSigningOnlyMigrationCanWaitForAndRecoverOwnerSealedBundle]' passed (0.011 seconds).
 Test Case '-[EntrixyCoreTests.GuestAPITests testTransportSignsExactBodyAndDoesNotTransmitInvitationSecret]' started.
 Test Case '-[EntrixyCoreTests.GuestAPITests testTransportSignsExactBodyAndDoesNotTransmitInvitationSecret]' passed (0.002 seconds).
-Test Suite 'GuestAPITests' passed at 2026-11-15 06:35:50.102.
-	 Executed 15 tests, with 0 failures (0 unexpected) in 0.052 (0.055) seconds
-Test Suite 'GuestActionTests' started at 2026-11-15 06:35:50.103.
+Test Suite 'GuestAPITests' passed at 2026-11-15 07:15:06.116.
+	 Executed 15 tests, with 0 failures (0 unexpected) in 0.068 (0.072) seconds
+Test Suite 'GuestActionTests' started at 2026-11-15 07:15:06.116.
 Test Case '-[EntrixyCoreTests.GuestActionTests testExpiredIntentAndMissingCredentialNeverProduceFire]' started.
-Test Case '-[EntrixyCoreTests.GuestActionTests testExpiredIntentAndMissingCredentialNeverProduceFire]' passed (0.000 seconds).
+Test Case '-[EntrixyCoreTests.GuestActionTests testExpiredIntentAndMissingCredentialNeverProduceFire]' passed (0.001 seconds).
 Test Case '-[EntrixyCoreTests.GuestActionTests testFakeControllerAcceptsOnlyMatchingSingleUseIntentAndDirection]' started.
-Test Case '-[EntrixyCoreTests.GuestActionTests testFakeControllerAcceptsOnlyMatchingSingleUseIntentAndDirection]' passed (0.001 seconds).
+Test Case '-[EntrixyCoreTests.GuestActionTests testFakeControllerAcceptsOnlyMatchingSingleUseIntentAndDirection]' passed (0.002 seconds).
 Test Case '-[EntrixyCoreTests.GuestActionTests testManualOverrideMatchesAndroidAndUnsupportedHardGatesFailClosed]' started.
-Test Case '-[EntrixyCoreTests.GuestActionTests testManualOverrideMatchesAndroidAndUnsupportedHardGatesFailClosed]' passed (0.002 seconds).
+Test Case '-[EntrixyCoreTests.GuestActionTests testManualOverrideMatchesAndroidAndUnsupportedHardGatesFailClosed]' passed (0.004 seconds).
 Test Case '-[EntrixyCoreTests.GuestActionTests testPressSignsExactAndroidHostNumberAndWireActionWithBaseKey]' started.
 Test Case '-[EntrixyCoreTests.GuestActionTests testPressSignsExactAndroidHostNumberAndWireActionWithBaseKey]' passed (0.003 seconds).
 Test Case '-[EntrixyCoreTests.GuestActionTests testTargetDenialIsNotMisclassifiedAsKeyRevocation]' started.
 Test Case '-[EntrixyCoreTests.GuestActionTests testTargetDenialIsNotMisclassifiedAsKeyRevocation]' passed (0.000 seconds).
-Test Suite 'GuestActionTests' passed at 2026-11-15 06:35:50.110.
-	 Executed 5 tests, with 0 failures (0 unexpected) in 0.006 (0.008) seconds
-Test Suite 'GuestBLECacheTests' started at 2026-11-15 06:35:50.110.
+Test Suite 'GuestActionTests' passed at 2026-11-15 07:15:06.128.
+	 Executed 5 tests, with 0 failures (0 unexpected) in 0.010 (0.012) seconds
+Test Suite 'GuestBLECacheTests' started at 2026-11-15 07:15:06.128.
 Test Case '-[EntrixyCoreTests.GuestBLECacheTests testCacheBoundsAndPolicyFailuresNeverReplaceAuthenticatedMaterial]' started.
-Test Case '-[EntrixyCoreTests.GuestBLECacheTests testCacheBoundsAndPolicyFailuresNeverReplaceAuthenticatedMaterial]' passed (0.000 seconds).
+Test Case '-[EntrixyCoreTests.GuestBLECacheTests testCacheBoundsAndPolicyFailuresNeverReplaceAuthenticatedMaterial]' passed (0.001 seconds).
 Test Case '-[EntrixyCoreTests.GuestBLECacheTests testCacheIsAuthenticatedPreservesRevisionAndRejectsReplayAfterRelaunch]' started.
 Test Case '-[EntrixyCoreTests.GuestBLECacheTests testCacheIsAuthenticatedPreservesRevisionAndRejectsReplayAfterRelaunch]' passed (0.001 seconds).
-Test Suite 'GuestBLECacheTests' passed at 2026-11-15 06:35:50.112.
-	 Executed 2 tests, with 0 failures (0 unexpected) in 0.001 (0.002) seconds
-Test Suite 'GuestCryptoTests' started at 2026-11-15 06:35:50.112.
+Test Suite 'GuestBLECacheTests' passed at 2026-11-15 07:15:06.130.
+	 Executed 2 tests, with 0 failures (0 unexpected) in 0.002 (0.002) seconds
+Test Suite 'GuestCryptoTests' started at 2026-11-15 07:15:06.130.
 Test Case '-[EntrixyCoreTests.GuestCryptoTests testPublishedEncryptedEnvelopeAndWrongKeyRejection]' started.
 Test Case '-[EntrixyCoreTests.GuestCryptoTests testPublishedEncryptedEnvelopeAndWrongKeyRejection]' passed (0.001 seconds).
 Test Case '-[EntrixyCoreTests.GuestCryptoTests testPublishedSigningVectors]' started.
 Test Case '-[EntrixyCoreTests.GuestCryptoTests testPublishedSigningVectors]' passed (0.002 seconds).
-Test Suite 'GuestCryptoTests' passed at 2026-11-15 06:35:50.115.
-	 Executed 2 tests, with 0 failures (0 unexpected) in 0.002 (0.003) seconds
-Test Suite 'GuestEventTests' started at 2026-11-15 06:35:50.115.
+Test Suite 'GuestCryptoTests' passed at 2026-11-15 07:15:06.134.
+	 Executed 2 tests, with 0 failures (0 unexpected) in 0.003 (0.003) seconds
+Test Suite 'GuestEventTests' started at 2026-11-15 07:15:06.134.
 Test Case '-[EntrixyCoreTests.GuestEventTests testAvatarReadsAreSerializedAndMissingResponseCannotBlockRemainingImages]' started.
 Test Case '-[EntrixyCoreTests.GuestEventTests testAvatarReadsAreSerializedAndMissingResponseCannotBlockRemainingImages]' passed (0.001 seconds).
 Test Case '-[EntrixyCoreTests.GuestEventTests testIncomingAppLinkPreservesServerAndRejectsOtherRoutes]' started.
@@ -284,9 +284,9 @@ Test Case '-[EntrixyCoreTests.GuestEventTests testPauseResumeAndRevocationAreDis
 Test Case '-[EntrixyCoreTests.GuestEventTests testPauseResumeAndRevocationAreDistinctFromTransientErrors]' passed (0.000 seconds).
 Test Case '-[EntrixyCoreTests.GuestEventTests testPlainAvatarCannotReplaceOwnerCiphertext]' started.
 Test Case '-[EntrixyCoreTests.GuestEventTests testPlainAvatarCannotReplaceOwnerCiphertext]' passed (0.001 seconds).
-Test Suite 'GuestEventTests' passed at 2026-11-15 06:35:50.119.
-	 Executed 5 tests, with 0 failures (0 unexpected) in 0.002 (0.004) seconds
-Test Suite 'GuestInviteTests' started at 2026-11-15 06:35:50.119.
+Test Suite 'GuestEventTests' passed at 2026-11-15 07:15:06.138.
+	 Executed 5 tests, with 0 failures (0 unexpected) in 0.003 (0.004) seconds
+Test Suite 'GuestInviteTests' started at 2026-11-15 07:15:06.138.
 Test Case '-[EntrixyCoreTests.GuestInviteTests testBareKeyUsesExplicitDefaultServer]' started.
 Test Case '-[EntrixyCoreTests.GuestInviteTests testBareKeyUsesExplicitDefaultServer]' passed (0.000 seconds).
 Test Case '-[EntrixyCoreTests.GuestInviteTests testFullLinkPreservesExplicitServerAndKey]' started.
@@ -295,96 +295,98 @@ Test Case '-[EntrixyCoreTests.GuestInviteTests testMalformedOrPartialLinkIsRejec
 Test Case '-[EntrixyCoreTests.GuestInviteTests testMalformedOrPartialLinkIsRejected]' passed (0.000 seconds).
 Test Case '-[EntrixyCoreTests.GuestInviteTests testServerCannotCarryCredentialsPathOrQuery]' started.
 Test Case '-[EntrixyCoreTests.GuestInviteTests testServerCannotCarryCredentialsPathOrQuery]' passed (0.000 seconds).
-Test Suite 'GuestInviteTests' passed at 2026-11-15 06:35:50.121.
-	 Executed 4 tests, with 0 failures (0 unexpected) in 0.001 (0.002) seconds
-Test Suite 'GuestMessageCryptoTests' started at 2026-11-15 06:35:50.121.
+Test Suite 'GuestInviteTests' passed at 2026-11-15 07:15:06.140.
+	 Executed 4 tests, with 0 failures (0 unexpected) in 0.002 (0.003) seconds
+Test Suite 'GuestMessageCryptoTests' started at 2026-11-15 07:15:06.141.
 Test Case '-[EntrixyCoreTests.GuestMessageCryptoTests testAckHashMatchesAndroidSHA256PrefixAndMessageIsNotAnActionEvent]' started.
 Test Case '-[EntrixyCoreTests.GuestMessageCryptoTests testAckHashMatchesAndroidSHA256PrefixAndMessageIsNotAnActionEvent]' passed (0.000 seconds).
 Test Case '-[EntrixyCoreTests.GuestMessageCryptoTests testIndependentPythonRootAndSealedMessageVectors]' started.
 Test Case '-[EntrixyCoreTests.GuestMessageCryptoTests testIndependentPythonRootAndSealedMessageVectors]' passed (0.002 seconds).
 Test Case '-[EntrixyCoreTests.GuestMessageCryptoTests testRootAndPassedMessageEnvelopesRequireTheIntendedKey]' started.
 Test Case '-[EntrixyCoreTests.GuestMessageCryptoTests testRootAndPassedMessageEnvelopesRequireTheIntendedKey]' passed (0.005 seconds).
-Test Suite 'GuestMessageCryptoTests' passed at 2026-11-15 06:35:50.129.
-	 Executed 3 tests, with 0 failures (0 unexpected) in 0.007 (0.007) seconds
-Test Suite 'GuestObjectsTests' started at 2026-11-15 06:35:50.129.
+Test Suite 'GuestMessageCryptoTests' passed at 2026-11-15 07:15:06.149.
+	 Executed 3 tests, with 0 failures (0 unexpected) in 0.008 (0.009) seconds
+Test Suite 'GuestObjectsTests' started at 2026-11-15 07:15:06.149.
 Test Case '-[EntrixyCoreTests.GuestObjectsTests testOldObjectKeyStillDecryptsDuringRotation]' started.
 Test Case '-[EntrixyCoreTests.GuestObjectsTests testOldObjectKeyStillDecryptsDuringRotation]' passed (0.001 seconds).
 Test Case '-[EntrixyCoreTests.GuestObjectsTests testServerPlaintextLabelDoesNotReplaceEncryptedOwnerData]' started.
 Test Case '-[EntrixyCoreTests.GuestObjectsTests testServerPlaintextLabelDoesNotReplaceEncryptedOwnerData]' passed (0.000 seconds).
 Test Case '-[EntrixyCoreTests.GuestObjectsTests testUnsupportedNetworkRestrictionDoesNotSilentlyDisappear]' started.
 Test Case '-[EntrixyCoreTests.GuestObjectsTests testUnsupportedNetworkRestrictionDoesNotSilentlyDisappear]' passed (0.000 seconds).
-Test Suite 'GuestObjectsTests' passed at 2026-11-15 06:35:50.130.
+Test Suite 'GuestObjectsTests' passed at 2026-11-15 07:15:06.151.
 	 Executed 3 tests, with 0 failures (0 unexpected) in 0.001 (0.002) seconds
-Test Suite 'KeyObjectAccessTests' started at 2026-11-15 06:35:50.131.
+Test Suite 'KeyObjectAccessTests' started at 2026-11-15 07:15:06.151.
 Test Case '-[EntrixyCoreTests.KeyObjectAccessTests testBoundsAndStrictSnapshotTypes]' started.
 Test Case '-[EntrixyCoreTests.KeyObjectAccessTests testBoundsAndStrictSnapshotTypes]' passed (0.000 seconds).
 Test Case '-[EntrixyCoreTests.KeyObjectAccessTests testExplicitOwnerRightsAreConfirmedOnlyWithExactSettingsAndUnchangedLink]' started.
-Test Case '-[EntrixyCoreTests.KeyObjectAccessTests testExplicitOwnerRightsAreConfirmedOnlyWithExactSettingsAndUnchangedLink]' passed (0.003 seconds).
-Test Suite 'KeyObjectAccessTests' passed at 2026-11-15 06:35:50.134.
-	 Executed 2 tests, with 0 failures (0 unexpected) in 0.003 (0.004) seconds
-Test Suite 'OwnerAPITests' started at 2026-11-15 06:35:50.135.
+Test Case '-[EntrixyCoreTests.KeyObjectAccessTests testExplicitOwnerRightsAreConfirmedOnlyWithExactSettingsAndUnchangedLink]' passed (0.005 seconds).
+Test Suite 'KeyObjectAccessTests' passed at 2026-11-15 07:15:06.157.
+	 Executed 2 tests, with 0 failures (0 unexpected) in 0.005 (0.006) seconds
+Test Suite 'OwnerAPITests' started at 2026-11-15 07:15:06.157.
 Test Case '-[EntrixyCoreTests.OwnerAPITests testInvalidSnapshotsCannotBecomeEmptySuccessfulSync]' started.
-Test Case '-[EntrixyCoreTests.OwnerAPITests testInvalidSnapshotsCannotBecomeEmptySuccessfulSync]' passed (0.000 seconds).
+Test Case '-[EntrixyCoreTests.OwnerAPITests testInvalidSnapshotsCannotBecomeEmptySuccessfulSync]' passed (0.001 seconds).
 Test Case '-[EntrixyCoreTests.OwnerAPITests testLostRegistrationResponseIsNotRetried]' started.
-Test Case '-[EntrixyCoreTests.OwnerAPITests testLostRegistrationResponseIsNotRetried]' passed (0.001 seconds).
+Test Case '-[EntrixyCoreTests.OwnerAPITests testLostRegistrationResponseIsNotRetried]' passed (0.002 seconds).
 Test Case '-[EntrixyCoreTests.OwnerAPITests testMutationCannotOverrideInstallationAuthentication]' started.
 Test Case '-[EntrixyCoreTests.OwnerAPITests testMutationCannotOverrideInstallationAuthentication]' passed (0.001 seconds).
 Test Case '-[EntrixyCoreTests.OwnerAPITests testObjectMutationAuthenticatesWithoutLeakingWrappedKeys]' started.
-Test Case '-[EntrixyCoreTests.OwnerAPITests testObjectMutationAuthenticatesWithoutLeakingWrappedKeys]' passed (0.001 seconds).
+Test Case '-[EntrixyCoreTests.OwnerAPITests testObjectMutationAuthenticatesWithoutLeakingWrappedKeys]' passed (0.002 seconds).
 Test Case '-[EntrixyCoreTests.OwnerAPITests testPendingAccountRetainsMasterKeyAcrossSerialization]' started.
-Test Case '-[EntrixyCoreTests.OwnerAPITests testPendingAccountRetainsMasterKeyAcrossSerialization]' passed (0.000 seconds).
+Test Case '-[EntrixyCoreTests.OwnerAPITests testPendingAccountRetainsMasterKeyAcrossSerialization]' passed (0.001 seconds).
 Test Case '-[EntrixyCoreTests.OwnerAPITests testRedirectAndInvalidCredentialsAreRejected]' started.
-Test Case '-[EntrixyCoreTests.OwnerAPITests testRedirectAndInvalidCredentialsAreRejected]' passed (0.002 seconds).
+Test Case '-[EntrixyCoreTests.OwnerAPITests testRedirectAndInvalidCredentialsAreRejected]' passed (0.003 seconds).
 Test Case '-[EntrixyCoreTests.OwnerAPITests testRegistrationMatchesAndroidAndOmitsLocalSecrets]' started.
-Test Case '-[EntrixyCoreTests.OwnerAPITests testRegistrationMatchesAndroidAndOmitsLocalSecrets]' passed (0.001 seconds).
+Test Case '-[EntrixyCoreTests.OwnerAPITests testRegistrationMatchesAndroidAndOmitsLocalSecrets]' passed (0.002 seconds).
 Test Case '-[EntrixyCoreTests.OwnerAPITests testSyncSendsOwnerCredentialsAndFingerprintOnly]' started.
-Test Case '-[EntrixyCoreTests.OwnerAPITests testSyncSendsOwnerCredentialsAndFingerprintOnly]' passed (0.001 seconds).
-Test Suite 'OwnerAPITests' passed at 2026-11-15 06:35:50.144.
-	 Executed 8 tests, with 0 failures (0 unexpected) in 0.008 (0.010) seconds
-Test Suite 'OwnerBackupMergeTests' started at 2026-11-15 06:35:50.145.
+Test Case '-[EntrixyCoreTests.OwnerAPITests testSyncSendsOwnerCredentialsAndFingerprintOnly]' passed (0.002 seconds).
+Test Suite 'OwnerAPITests' passed at 2026-11-15 07:15:06.172.
+	 Executed 8 tests, with 0 failures (0 unexpected) in 0.012 (0.015) seconds
+Test Suite 'OwnerBackupMergeTests' started at 2026-11-15 07:15:06.172.
 Test Case '-[EntrixyCoreTests.OwnerBackupMergeTests testDifferentPrivateObjectKeyAndConflictingGuestScopeAreRefusedBeforeMigration]' started.
-Test Case '-[EntrixyCoreTests.OwnerBackupMergeTests testDifferentPrivateObjectKeyAndConflictingGuestScopeAreRefusedBeforeMigration]' passed (0.003 seconds).
+Test Case '-[EntrixyCoreTests.OwnerBackupMergeTests testDifferentPrivateObjectKeyAndConflictingGuestScopeAreRefusedBeforeMigration]' passed (0.004 seconds).
 Test Case '-[EntrixyCoreTests.OwnerBackupMergeTests testExistingOwnerReceivesMissingObjectsAndKeysWithoutReplacingPrivateIdentity]' started.
-Test Case '-[EntrixyCoreTests.OwnerBackupMergeTests testExistingOwnerReceivesMissingObjectsAndKeysWithoutReplacingPrivateIdentity]' passed (0.004 seconds).
+Test Case '-[EntrixyCoreTests.OwnerBackupMergeTests testExistingOwnerReceivesMissingObjectsAndKeysWithoutReplacingPrivateIdentity]' passed (0.005 seconds).
 Test Case '-[EntrixyCoreTests.OwnerBackupMergeTests testOlderPendingAllowCannotOverrideNewerPhysicalRevocation]' started.
-Test Case '-[EntrixyCoreTests.OwnerBackupMergeTests testOlderPendingAllowCannotOverrideNewerPhysicalRevocation]' passed (0.003 seconds).
+Test Case '-[EntrixyCoreTests.OwnerBackupMergeTests testOlderPendingAllowCannotOverrideNewerPhysicalRevocation]' passed (0.004 seconds).
 Test Case '-[EntrixyCoreTests.OwnerBackupMergeTests testUnknownSentMetadataAndPairingCannotBecomeUnsentAfterRestore]' started.
 Test Case '-[EntrixyCoreTests.OwnerBackupMergeTests testUnknownSentMetadataAndPairingCannotBecomeUnsentAfterRestore]' passed (0.002 seconds).
-Test Suite 'OwnerBackupMergeTests' passed at 2026-11-15 06:35:50.157.
-	 Executed 4 tests, with 0 failures (0 unexpected) in 0.012 (0.013) seconds
-Test Suite 'OwnerCommandTests' started at 2026-11-15 06:35:50.157.
+Test Suite 'OwnerBackupMergeTests' passed at 2026-11-15 07:15:06.188.
+	 Executed 4 tests, with 0 failures (0 unexpected) in 0.015 (0.016) seconds
+Test Suite 'OwnerCommandTests' started at 2026-11-15 07:15:06.188.
 Test Case '-[EntrixyCoreTests.OwnerCommandTests testExpiredWrongObjectAndUnprovisionedCommandsAreBlocked]' started.
-Test Case '-[EntrixyCoreTests.OwnerCommandTests testExpiredWrongObjectAndUnprovisionedCommandsAreBlocked]' passed (0.000 seconds).
+Test Case '-[EntrixyCoreTests.OwnerCommandTests testExpiredWrongObjectAndUnprovisionedCommandsAreBlocked]' passed (0.001 seconds).
 Test Case '-[EntrixyCoreTests.OwnerCommandTests testGuestPressMatchesAndroidInvitationSignatureAndRejectsChangedContext]' started.
-Test Case '-[EntrixyCoreTests.OwnerCommandTests testGuestPressMatchesAndroidInvitationSignatureAndRejectsChangedContext]' passed (0.001 seconds).
+Test Case '-[EntrixyCoreTests.OwnerCommandTests testGuestPressMatchesAndroidInvitationSignatureAndRejectsChangedContext]' passed (0.003 seconds).
 Test Case '-[EntrixyCoreTests.OwnerCommandTests testIndependentOwnerOpenCloseProofAndNoReplay]' started.
 Test Case '-[EntrixyCoreTests.OwnerCommandTests testIndependentOwnerOpenCloseProofAndNoReplay]' passed (0.001 seconds).
 Test Case '-[EntrixyCoreTests.OwnerCommandTests testServerWebhookRequestHasNoOwnerOnlySecret]' started.
 Test Case '-[EntrixyCoreTests.OwnerCommandTests testServerWebhookRequestHasNoOwnerOnlySecret]' passed (0.000 seconds).
-Test Suite 'OwnerCommandTests' passed at 2026-11-15 06:35:50.161.
-	 Executed 4 tests, with 0 failures (0 unexpected) in 0.003 (0.004) seconds
-Test Suite 'OwnerDelegatedKeyTests' started at 2026-11-15 06:35:50.161.
+Test Case '-[EntrixyCoreTests.OwnerCommandTests testServerWebhookToggleKeepsItsAndroidWireAction]' started.
+Test Case '-[EntrixyCoreTests.OwnerCommandTests testServerWebhookToggleKeepsItsAndroidWireAction]' passed (0.000 seconds).
+Test Suite 'OwnerCommandTests' passed at 2026-11-15 07:15:06.195.
+	 Executed 5 tests, with 0 failures (0 unexpected) in 0.005 (0.007) seconds
+Test Suite 'OwnerDelegatedKeyTests' started at 2026-11-15 07:15:06.195.
 Test Case '-[EntrixyCoreTests.OwnerDelegatedKeyTests testBLEDescendantKeepsParentExpiryAndSubtreePauseRestoreUsesDifferentDIDs]' started.
-Test Case '-[EntrixyCoreTests.OwnerDelegatedKeyTests testBLEDescendantKeepsParentExpiryAndSubtreePauseRestoreUsesDifferentDIDs]' passed (0.012 seconds).
+Test Case '-[EntrixyCoreTests.OwnerDelegatedKeyTests testBLEDescendantKeepsParentExpiryAndSubtreePauseRestoreUsesDifferentDIDs]' passed (0.015 seconds).
 Test Case '-[EntrixyCoreTests.OwnerDelegatedKeyTests testBundleIsPreparedDurablyAndOpensOnlyWithVouchedRecipient]' started.
-Test Case '-[EntrixyCoreTests.OwnerDelegatedKeyTests testBundleIsPreparedDurablyAndOpensOnlyWithVouchedRecipient]' passed (0.010 seconds).
+Test Case '-[EntrixyCoreTests.OwnerDelegatedKeyTests testBundleIsPreparedDurablyAndOpensOnlyWithVouchedRecipient]' passed (0.013 seconds).
 Test Case '-[EntrixyCoreTests.OwnerDelegatedKeyTests testDescendantWaitsForConfirmedParentAndWorksInReverseSnapshotOrder]' started.
-Test Case '-[EntrixyCoreTests.OwnerDelegatedKeyTests testDescendantWaitsForConfirmedParentAndWorksInReverseSnapshotOrder]' passed (0.007 seconds).
+Test Case '-[EntrixyCoreTests.OwnerDelegatedKeyTests testDescendantWaitsForConfirmedParentAndWorksInReverseSnapshotOrder]' passed (0.009 seconds).
 Test Case '-[EntrixyCoreTests.OwnerDelegatedKeyTests testForgedVouchForeignObjectAndElevatedDepthPoolCannotReleaseKeys]' started.
-Test Case '-[EntrixyCoreTests.OwnerDelegatedKeyTests testForgedVouchForeignObjectAndElevatedDepthPoolCannotReleaseKeys]' passed (0.014 seconds).
+Test Case '-[EntrixyCoreTests.OwnerDelegatedKeyTests testForgedVouchForeignObjectAndElevatedDepthPoolCannotReleaseKeys]' passed (0.016 seconds).
 Test Case '-[EntrixyCoreTests.OwnerDelegatedKeyTests testGuestPressUsesVouchedPublicKeyAndRechecksTheEntireChain]' started.
-Test Case '-[EntrixyCoreTests.OwnerDelegatedKeyTests testGuestPressUsesVouchedPublicKeyAndRechecksTheEntireChain]' passed (0.005 seconds).
+Test Case '-[EntrixyCoreTests.OwnerDelegatedKeyTests testGuestPressUsesVouchedPublicKeyAndRechecksTheEntireChain]' passed (0.006 seconds).
 Test Case '-[EntrixyCoreTests.OwnerDelegatedKeyTests testRevokedRecordCannotBeResurrectedAndMissingRecipientBecomesUnavailable]' started.
-Test Case '-[EntrixyCoreTests.OwnerDelegatedKeyTests testRevokedRecordCannotBeResurrectedAndMissingRecipientBecomesUnavailable]' passed (0.005 seconds).
-Test Suite 'OwnerDelegatedKeyTests' passed at 2026-11-15 06:35:50.215.
-	 Executed 6 tests, with 0 failures (0 unexpected) in 0.053 (0.054) seconds
-Test Suite 'OwnerIssuedKeyTests' started at 2026-11-15 06:35:50.215.
+Test Case '-[EntrixyCoreTests.OwnerDelegatedKeyTests testRevokedRecordCannotBeResurrectedAndMissingRecipientBecomesUnavailable]' passed (0.006 seconds).
+Test Suite 'OwnerDelegatedKeyTests' passed at 2026-11-15 07:15:06.262.
+	 Executed 6 tests, with 0 failures (0 unexpected) in 0.065 (0.067) seconds
+Test Suite 'OwnerIssuedKeyTests' started at 2026-11-15 07:15:06.262.
 Test Case '-[EntrixyCoreTests.OwnerIssuedKeyTests testAbsentOrMismatchedCreationEvidenceDoesNotConfirmAccess]' started.
-Test Case '-[EntrixyCoreTests.OwnerIssuedKeyTests testAbsentOrMismatchedCreationEvidenceDoesNotConfirmAccess]' passed (0.001 seconds).
+Test Case '-[EntrixyCoreTests.OwnerIssuedKeyTests testAbsentOrMismatchedCreationEvidenceDoesNotConfirmAccess]' passed (0.002 seconds).
 Test Case '-[EntrixyCoreTests.OwnerIssuedKeyTests testDeviceWithoutProvisioningLegacySecretsAndUnknownObjectAreRejected]' started.
 Test Case '-[EntrixyCoreTests.OwnerIssuedKeyTests testDeviceWithoutProvisioningLegacySecretsAndUnknownObjectAreRejected]' passed (0.001 seconds).
 Test Case '-[EntrixyCoreTests.OwnerIssuedKeyTests testEditPreservesInvitationIdentityAndUntouchedEncryptedRestrictions]' started.
-Test Case '-[EntrixyCoreTests.OwnerIssuedKeyTests testEditPreservesInvitationIdentityAndUntouchedEncryptedRestrictions]' passed (0.003 seconds).
+Test Case '-[EntrixyCoreTests.OwnerIssuedKeyTests testEditPreservesInvitationIdentityAndUntouchedEncryptedRestrictions]' passed (0.004 seconds).
 Test Case '-[EntrixyCoreTests.OwnerIssuedKeyTests testExplicitConfirmationChangeDoesNotDisableAuthentication]' started.
 Test Case '-[EntrixyCoreTests.OwnerIssuedKeyTests testExplicitConfirmationChangeDoesNotDisableAuthentication]' passed (0.002 seconds).
 Test Case '-[EntrixyCoreTests.OwnerIssuedKeyTests testGuestIdentifiersDoNotCollideWithPersistedOrRevokedKeys]' started.
@@ -392,29 +394,29 @@ Test Case '-[EntrixyCoreTests.OwnerIssuedKeyTests testGuestIdentifiersDoNotColli
 Test Case '-[EntrixyCoreTests.OwnerIssuedKeyTests testIndependentAndroidSocketGrantAndProofVector]' started.
 Test Case '-[EntrixyCoreTests.OwnerIssuedKeyTests testIndependentAndroidSocketGrantAndProofVector]' passed (0.001 seconds).
 Test Case '-[EntrixyCoreTests.OwnerIssuedKeyTests testIssuerBundleImportsWithExistingGuestProtocolAndNoOwnerOnlySecrets]' started.
-Test Case '-[EntrixyCoreTests.OwnerIssuedKeyTests testIssuerBundleImportsWithExistingGuestProtocolAndNoOwnerOnlySecrets]' passed (0.003 seconds).
+Test Case '-[EntrixyCoreTests.OwnerIssuedKeyTests testIssuerBundleImportsWithExistingGuestProtocolAndNoOwnerOnlySecrets]' passed (0.004 seconds).
 Test Case '-[EntrixyCoreTests.OwnerIssuedKeyTests testLostCreateReplyAndKnownCreateIDBothReconcileWithoutNewKeyMaterial]' started.
-Test Case '-[EntrixyCoreTests.OwnerIssuedKeyTests testLostCreateReplyAndKnownCreateIDBothReconcileWithoutNewKeyMaterial]' passed (0.002 seconds).
+Test Case '-[EntrixyCoreTests.OwnerIssuedKeyTests testLostCreateReplyAndKnownCreateIDBothReconcileWithoutNewKeyMaterial]' passed (0.003 seconds).
 Test Case '-[EntrixyCoreTests.OwnerIssuedKeyTests testNarrowingPrunesKeysTemplatesAndCamerasButKeepsUnconfirmedServerScope]' started.
 Test Case '-[EntrixyCoreTests.OwnerIssuedKeyTests testNarrowingPrunesKeysTemplatesAndCamerasButKeepsUnconfirmedServerScope]' passed (0.004 seconds).
 Test Case '-[EntrixyCoreTests.OwnerIssuedKeyTests testPauseResumeAndRevocationNeverExposeLinkDuringUnknownState]' started.
-Test Case '-[EntrixyCoreTests.OwnerIssuedKeyTests testPauseResumeAndRevocationNeverExposeLinkDuringUnknownState]' passed (0.003 seconds).
-Test Suite 'OwnerIssuedKeyTests' passed at 2026-11-15 06:35:50.239.
-	 Executed 10 tests, with 0 failures (0 unexpected) in 0.021 (0.023) seconds
-Test Suite 'OwnerManualPolicyTests' started at 2026-11-15 06:35:50.239.
+Test Case '-[EntrixyCoreTests.OwnerIssuedKeyTests testPauseResumeAndRevocationNeverExposeLinkDuringUnknownState]' passed (0.004 seconds).
+Test Suite 'OwnerIssuedKeyTests' passed at 2026-11-15 07:15:06.290.
+	 Executed 10 tests, with 0 failures (0 unexpected) in 0.025 (0.027) seconds
+Test Suite 'OwnerManualPolicyTests' started at 2026-11-15 07:15:06.290.
 Test Case '-[EntrixyCoreTests.OwnerManualPolicyTests testOriginalOwnerAuthenticationAndCombinedRulesRemainEnforced]' started.
 Test Case '-[EntrixyCoreTests.OwnerManualPolicyTests testOriginalOwnerAuthenticationAndCombinedRulesRemainEnforced]' passed (0.000 seconds).
-Test Suite 'OwnerManualPolicyTests' passed at 2026-11-15 06:35:50.239.
+Test Suite 'OwnerManualPolicyTests' passed at 2026-11-15 07:15:06.291.
 	 Executed 1 test, with 0 failures (0 unexpected) in 0.000 (0.001) seconds
-Test Suite 'OwnerObjectTests' started at 2026-11-15 06:35:50.239.
+Test Suite 'OwnerObjectTests' started at 2026-11-15 07:15:06.291.
 Test Case '-[EntrixyCoreTests.OwnerObjectTests testClaimAndCreateAreSeparateDurableSteps]' started.
-Test Case '-[EntrixyCoreTests.OwnerObjectTests testClaimAndCreateAreSeparateDurableSteps]' passed (0.000 seconds).
+Test Case '-[EntrixyCoreTests.OwnerObjectTests testClaimAndCreateAreSeparateDurableSteps]' passed (0.001 seconds).
 Test Case '-[EntrixyCoreTests.OwnerObjectTests testConfirmedDeleteAndUpdateReconcileWithoutNewRequests]' started.
 Test Case '-[EntrixyCoreTests.OwnerObjectTests testConfirmedDeleteAndUpdateReconcileWithoutNewRequests]' passed (0.001 seconds).
 Test Case '-[EntrixyCoreTests.OwnerObjectTests testDuplicateCipherReplyIsRejectedWithoutReplacingSavedDraft]' started.
 Test Case '-[EntrixyCoreTests.OwnerObjectTests testDuplicateCipherReplyIsRejectedWithoutReplacingSavedDraft]' passed (0.001 seconds).
 Test Case '-[EntrixyCoreTests.OwnerObjectTests testInvalidRevisionAndBooleanReplyIDAreRejected]' started.
-Test Case '-[EntrixyCoreTests.OwnerObjectTests testInvalidRevisionAndBooleanReplyIDAreRejected]' passed (0.000 seconds).
+Test Case '-[EntrixyCoreTests.OwnerObjectTests testInvalidRevisionAndBooleanReplyIDAreRejected]' passed (0.001 seconds).
 Test Case '-[EntrixyCoreTests.OwnerObjectTests testLostCreateReplyRecoveredOnlyByExactCipherWithoutReplay]' started.
 Test Case '-[EntrixyCoreTests.OwnerObjectTests testLostCreateReplyRecoveredOnlyByExactCipherWithoutReplay]' passed (0.001 seconds).
 Test Case '-[EntrixyCoreTests.OwnerObjectTests testPrivateMetadataEncryptedAndKeyWrappedBeforeRequest]' started.
@@ -423,34 +425,34 @@ Test Case '-[EntrixyCoreTests.OwnerObjectTests testRenameRetainsUnknownMetadataA
 Test Case '-[EntrixyCoreTests.OwnerObjectTests testRenameRetainsUnknownMetadataAndRequiresKnownRevision]' passed (0.001 seconds).
 Test Case '-[EntrixyCoreTests.OwnerObjectTests testWebhookRoutingIsExplicitAndOtherMetadataStaysEncrypted]' started.
 Test Case '-[EntrixyCoreTests.OwnerObjectTests testWebhookRoutingIsExplicitAndOtherMetadataStaysEncrypted]' passed (0.000 seconds).
-Test Suite 'OwnerObjectTests' passed at 2026-11-15 06:35:50.246.
-	 Executed 8 tests, with 0 failures (0 unexpected) in 0.005 (0.006) seconds
-Test Suite 'PassedAccessTests' started at 2026-11-15 06:35:50.246.
+Test Suite 'OwnerObjectTests' passed at 2026-11-15 07:15:06.299.
+	 Executed 8 tests, with 0 failures (0 unexpected) in 0.006 (0.008) seconds
+Test Suite 'PassedAccessTests' started at 2026-11-15 07:15:06.299.
 Test Case '-[EntrixyCoreTests.PassedAccessTests testAmbiguousInitialReplyNeverPicksAnArbitraryGroup]' started.
 Test Case '-[EntrixyCoreTests.PassedAccessTests testAmbiguousInitialReplyNeverPicksAnArbitraryGroup]' passed (0.001 seconds).
 Test Case '-[EntrixyCoreTests.PassedAccessTests testKnownGroupDoesNotTurnUnsentSecondPartIntoAnUnknownRequest]' started.
 Test Case '-[EntrixyCoreTests.PassedAccessTests testKnownGroupDoesNotTurnUnsentSecondPartIntoAnUnknownRequest]' passed (0.001 seconds).
 Test Case '-[EntrixyCoreTests.PassedAccessTests testLostCreateReplyRecoversOneNewMatchingInviteAndPreservesSecretAcrossRelaunch]' started.
-Test Case '-[EntrixyCoreTests.PassedAccessTests testLostCreateReplyRecoversOneNewMatchingInviteAndPreservesSecretAcrossRelaunch]' passed (0.002 seconds).
+Test Case '-[EntrixyCoreTests.PassedAccessTests testLostCreateReplyRecoversOneNewMatchingInviteAndPreservesSecretAcrossRelaunch]' passed (0.003 seconds).
 Test Case '-[EntrixyCoreTests.PassedAccessTests testObjectEditDoesNotEnableSharingOrVouchUntilExactScopeIsConfirmed]' started.
-Test Case '-[EntrixyCoreTests.PassedAccessTests testObjectEditDoesNotEnableSharingOrVouchUntilExactScopeIsConfirmed]' passed (0.003 seconds).
+Test Case '-[EntrixyCoreTests.PassedAccessTests testObjectEditDoesNotEnableSharingOrVouchUntilExactScopeIsConfirmed]' passed (0.004 seconds).
 Test Case '-[EntrixyCoreTests.PassedAccessTests testRecipientProofMustMatchBeforeParentVouchAndObjectMismatchBlocksIt]' started.
 Test Case '-[EntrixyCoreTests.PassedAccessTests testRecipientProofMustMatchBeforeParentVouchAndObjectMismatchBlocksIt]' passed (0.004 seconds).
 Test Case '-[EntrixyCoreTests.PassedAccessTests testSnapshotAndRequestedLimitsAreStrict]' started.
 Test Case '-[EntrixyCoreTests.PassedAccessTests testSnapshotAndRequestedLimitsAreStrict]' passed (0.001 seconds).
-Test Suite 'PassedAccessTests' passed at 2026-11-15 06:35:50.260.
+Test Suite 'PassedAccessTests' passed at 2026-11-15 07:15:06.314.
 	 Executed 6 tests, with 0 failures (0 unexpected) in 0.013 (0.015) seconds
-Test Suite 'ReceivedDelegationTests' started at 2026-11-15 06:35:50.260.
+Test Suite 'ReceivedDelegationTests' started at 2026-11-15 07:15:06.314.
 Test Case '-[EntrixyCoreTests.ReceivedDelegationTests testAvailablePartsRejectDuplicateInstalledCodesAndSkipClosedInvitations]' started.
 Test Case '-[EntrixyCoreTests.ReceivedDelegationTests testAvailablePartsRejectDuplicateInstalledCodesAndSkipClosedInvitations]' passed (0.000 seconds).
 Test Case '-[EntrixyCoreTests.ReceivedDelegationTests testCompletedRecipientPairSurvivesWithoutKeepingDuplicateSigningSecrets]' started.
-Test Case '-[EntrixyCoreTests.ReceivedDelegationTests testCompletedRecipientPairSurvivesWithoutKeepingDuplicateSigningSecrets]' passed (0.005 seconds).
-Test Suite 'ReceivedDelegationTests' passed at 2026-11-15 06:35:50.267.
+Test Case '-[EntrixyCoreTests.ReceivedDelegationTests testCompletedRecipientPairSurvivesWithoutKeepingDuplicateSigningSecrets]' passed (0.006 seconds).
+Test Suite 'ReceivedDelegationTests' passed at 2026-11-15 07:15:06.320.
 	 Executed 2 tests, with 0 failures (0 unexpected) in 0.006 (0.006) seconds
-Test Suite 'EntrixyPackageTests.xctest' passed at 2026-11-15 06:35:50.267.
-	 Executed 130 tests, with 0 failures (0 unexpected) in 2.205 (2.237) seconds
-Test Suite 'All tests' passed at 2026-11-15 06:35:50.267.
-	 Executed 130 tests, with 0 failures (0 unexpected) in 2.205 (2.239) seconds
+Test Suite 'EntrixyPackageTests.xctest' passed at 2026-11-15 07:15:06.320.
+	 Executed 131 tests, with 0 failures (0 unexpected) in 2.418 (2.457) seconds
+Test Suite 'All tests' passed at 2026-11-15 07:15:06.320.
+	 Executed 131 tests, with 0 failures (0 unexpected) in 2.418 (2.460) seconds
 ◇ Test run started.
 ↳ Testing Library Version: 1501
 ↳ Target Platform: x86_64-apple-macos14.0

@@ -1,13 +1,13 @@
 {
-  "SOURCE_SHA": "94acc1893571ed932d44f4d6710733c247eefe74",
-  "BUILD_RESULT": "success",
-  "BUILD_URL": "https://github.com/entrixy/ios-build./actions/runs/43686033740",
+  "SOURCE_SHA": "f60c817b28fa9666b1b5a287003303d4d2452400",
+  "BUILD_RESULT": "cancelled",
+  "BUILD_URL": "https://github.com/entrixy/ios-build./actions/runs/43688992509",
   "checks": {
     "core_tests": "success",
     "debug_build": "success",
     "release_build": "success",
     "native_tests": "success",
-    "captures": "success"
+    "captures": "cancelled"
   },
   "capture_mode": "isolated-software-controller",
   "visual_review": "pending"
