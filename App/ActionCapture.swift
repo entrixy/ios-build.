@@ -33,6 +33,9 @@ enum ActionCaptureScenario: String, CaseIterable {
     case bleOwnerConfirm = "ble-owner-confirm", bleOwnerResult = "ble-owner-result", bleOwnerUnknown = "ble-owner-unknown", bleOwnerJournal = "ble-owner-journal"
     case bleGuestConfirm = "ble-guest-confirm", bleGuestResult = "ble-guest-result", bleGuestExpired = "ble-guest-expired", bleGuestUnknown = "ble-guest-unknown", bleGuestJournal = "ble-guest-journal"
     case bleRevokePending = "ble-revoke-pending", bleRevokeApplied = "ble-revoke-applied", bleRevokeStale = "ble-revoke-stale", bleRenewed = "ble-renewed"
+    case appCodeSetup = "app-code-setup", appCodeSettings = "app-code-settings"
+    case appEntryLock = "app-entry-lock", appEntryRejected = "app-entry-rejected"
+    var isAppEntry: Bool { [.appCodeSetup, .appCodeSettings, .appEntryLock, .appEntryRejected].contains(self) }
     var isBLELifecycle: Bool { [.bleRevokePending, .bleRevokeApplied, .bleRevokeStale, .bleRenewed].contains(self) }
     var usesTaskFooter: Bool {
         [.addKey, .ownerForm, .objectForm, .issueForm, .issuedEditForm, .issuedAccessForm,
@@ -365,6 +368,18 @@ private final class ActionCaptureModel: ObservableObject {
     func prepare() async {
         guard !prepared else { return }; prepared = true
         do {
+            if scenario.isAppEntry {
+                if scenario != .appCodeSetup {
+                    try await model.setActionCode("1234")
+                    guard try await model.configureEntryLock(enabled: true, biometric: false, code: "") else { throw GuestCrypto.Failure.invalidEnvelope }
+                    if scenario == .appEntryLock || scenario == .appEntryRejected {
+                        model.entryDidBackground(now: 100); model.checkEntryLock(now: 161)
+                        guard model.appLocked else { throw GuestCrypto.Failure.invalidEnvelope }
+                    }
+                }
+                guard model.journal.isEmpty, controller.frames.isEmpty else { throw GuestCrypto.Failure.invalidEnvelope }
+                writeStatus(ready: true); return
+            }
             if scenario.isDelegation {
                 let manager = DelegationInbox(app: model, api: delegationServer, automaticUpdates: false)
                 delegationManager = manager
@@ -705,6 +720,8 @@ private final class ActionCaptureModel: ObservableObject {
                  .issueForm, .issuedKey, .issuedList, .issuedPaused, .issuedRevoked, .issuedUncertain, .issuedRevokeConfirm, .issuedEditForm, .issuedEditResult, .issuedAccessForm,
                  .objectForm, .objectCreated, .objectEdit, .objectRenamed, .objectDelete, .objectDeleted, .objectUncertain:
                 throw GuestCrypto.Failure.invalidEnvelope
+            case .appCodeSetup, .appCodeSettings, .appEntryLock, .appEntryRejected:
+                throw GuestCrypto.Failure.invalidEnvelope
             case .confirmOpen, .confirmClose, .codeSetup, .codeEntry, .codeRejected, .biometric:
                 intent = action
             case .offline:
@@ -733,6 +750,7 @@ private final class ActionCaptureModel: ObservableObject {
         let data: [String: Any] = ["ready": ready, "software_controller": true, "scenario": scenario.rawValue,
             "command_frames": controller.frames.count, "journal_count": model.journal.count,
             "live_connections": model.connections.values.filter { $0 == .connected }.count,
+            "app_locked": model.appLocked, "app_lock_enabled": model.appLockEnabled, "local_code_set": model.hasActionCode,
             "registration_requests": ownerServer.registrations, "sync_requests": ownerServer.syncs,
             "owner_count": model.owners.count, "owner_pending": model.owners.first?.registrationPending ?? false,
             "owned_object_count": model.owners.first?.objects?.count ?? 0, "mutation_requests": ownerServer.mutations,
@@ -822,6 +840,10 @@ struct ActionCaptureRoot: View {
         case .backupForm, .backupExport, .backupPreview, .backupRestored, .backupRejected, .backupInterrupted:
             if let manager = capture.backupManager { NavigationStack { BackupScreen(manager: manager) } }
             else { ProgressView() }
+        case .appCodeSetup, .appCodeSettings:
+            if capture.ready { RootView(initialTab: .settings) } else { ProgressView() }
+        case .appEntryLock, .appEntryRejected:
+            if capture.ready { AppEntryLockScreen() } else { ProgressView() }
         case .ownerConfirm, .ownerSending, .ownerResult, .ownerGuestRequest: RootView(initialTab: .control)
         case .ownerJournal: RootView(initialTab: .journal)
         case .issueForm: IssueOwnerKeyScreen()

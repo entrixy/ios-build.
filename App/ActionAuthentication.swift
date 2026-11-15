@@ -43,6 +43,7 @@ struct LocalActionCode: Codable {
 
 /// Enrollment changes invalidate this item; device passcode cannot satisfy its ACL.
 enum ActionBiometrics {
+    static var available: Bool { LAContext().canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: nil) }
     private static let query: [String: Any] = [kSecClass as String: kSecClassGenericPassword,
         kSecAttrService as String: "com.entrixy.ios.action-biometry", kSecAttrAccount as String: "current-set"]
     static func enroll() throws {
@@ -56,8 +57,13 @@ enum ActionBiometrics {
         var item = query
         item[kSecValueData as String] = Data(UUID().uuidString.utf8)
         item[kSecAttrAccessControl as String] = access
+        // Enrollment is called after setting a new PIN or verifying the current
+        // one. Rebuild an invalidated current-set ACL rather than keeping a
+        // permanently unusable duplicate after biometric enrollment changes.
+        let deletion = SecItemDelete(query as CFDictionary)
+        guard deletion == errSecSuccess || deletion == errSecItemNotFound else { throw KeychainStore.Failure(status: deletion) }
         let status = SecItemAdd(item as CFDictionary, nil)
-        guard status == errSecSuccess || status == errSecDuplicateItem else { throw KeychainStore.Failure(status: status) }
+        guard status == errSecSuccess else { throw KeychainStore.Failure(status: status) }
     }
     static func authenticate() throws {
         let context = LAContext()

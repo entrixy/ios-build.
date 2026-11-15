@@ -114,6 +114,7 @@ struct SettingsScreen: View {
     @EnvironmentObject private var model: AppModel
     @AppStorage("entrixy.appearance") private var appearance = "system"
     @State private var showKey = false
+    @State private var showCodeSettings = false
     var body: some View {
         List {
             Section("Полученные ключи") {
@@ -141,6 +142,7 @@ struct SettingsScreen: View {
             Section("Система") {
                 KeyValueRow(title: "Приложение", value: "Entrixy для iOS")
                 KeyValueRow(title: "Версия", value: "0.1.0")
+                NavigationLink("Код и вход") { AppEntryLockSettings() }
                 NavigationLink("Сообщения") { MessagesScreen() }
                 NavigationLink("Ожидаемые ключи") { DelegationInboxScreen() }
                 NavigationLink("Резервная копия") { BackupScreen(manager: model.backups) }
@@ -148,10 +150,14 @@ struct SettingsScreen: View {
             }
         }.navigationTitle("Настройки")
             .refreshable { await model.refresh() }
+            .navigationDestination(isPresented: $showCodeSettings) { AppEntryLockSettings() }
             .navigationDestination(isPresented: $showKey) {
                 if let guest = model.guests.first { KeyDetailScreen(guestID: guest.id) }
             }
             .task {
+                #if DEBUG && targetEnvironment(simulator)
+                if let scenario = ActionCaptureScenario.current, [ActionCaptureScenario.appCodeSetup, .appCodeSettings].contains(scenario) { showCodeSettings = true }
+                #endif
                 if PreviewRouting.keyDetail && !model.guests.isEmpty {
                     try? await Task.sleep(nanoseconds: 400_000_000)
                     showKey = true

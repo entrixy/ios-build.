@@ -58,9 +58,13 @@ def prepare_device(model, device_type, runtime):
 
 
 def expected_visible_text(screen):
+    if screen == 'app-code-setup': return ['Код и вход', 'Новый код Entrixy', 'Повторите новый код']
+    if screen == 'app-code-settings': return ['Код и вход', 'Запрашивать код при входе']
+    if screen == 'app-entry-lock': return ['Вход в Entrixy', 'Введите код Entrixy']
+    if screen == 'app-entry-rejected': return ['Вход в Entrixy', 'Код не принят']
     if screen == 'control': return ['Управление', 'Настройки', 'Гости', 'Журнал']
     if screen == 'code-setup': return ['Создать', 'Новый PIN-код', 'Повторите PIN-код', 'Отмена']
-    if screen == 'code-entry': return ['Подтвердить', 'Отмена', '2', '3', '5', '6', '7', '8', '0']
+    if screen == 'code-entry': return ['Подтвердить', 'Отмена', '2', '3', '5', '6', '7', '8']
     if screen == 'code-rejected': return ['Подтвердить', 'Код не принят', 'Отмена']
     if screen == 'biometric': return ['Подтвердить биометрией', 'Отмена']
     if screen == 'offline': return ['Управление', 'Контроллер не в сети']
@@ -114,6 +118,9 @@ def capture_visible_screen(device, path, screen):
         if result.returncode != 1:
             raise RuntimeError('Could not verify visible UI: ' + result.stderr[-500:])
         if time.monotonic() >= deadline:
+            # Preserve the actual rejected PNG for inspection; it is never in the
+            # accepted manifest, and a failed run cannot replace the gallery.
+            shutil.copyfile(pending, OUTPUT / ('failed-' + screen + '.png'))
             raise RuntimeError('Expected app screen never became visible: ' + screen + ' ' + result.stdout[-300:])
         print('Waiting for visible app UI: ' + screen + ' ' + result.stdout.strip(), flush=True)
         time.sleep(1)
@@ -167,7 +174,7 @@ def main():
                                 'delegation-preview', 'delegation-waiting', 'delegation-ready', 'delegation-rejected',
                                 'delegated-awaiting', 'delegated-ready', 'delegated-uncertain', 'delegated-revoked', 'delegated-untrusted',
                                 'sender-form', 'sender-link', 'sender-uncertain', 'sender-vouched', 'sender-revoked', 'sender-edit-form', 'sender-edited',
-                                'message-inbox', 'message-read', 'message-corrupt', 'message-compose', 'message-sent', 'additional-parts', 'ble-scan', 'ble-uncertain', 'ble-paired', 'ble-registered', 'ble-owner-confirm', 'ble-owner-result', 'ble-owner-unknown', 'ble-owner-journal', 'ble-guest-confirm', 'ble-guest-result', 'ble-guest-expired', 'ble-guest-unknown', 'ble-guest-journal', 'ble-revoke-pending', 'ble-revoke-applied', 'ble-revoke-stale', 'ble-renewed']
+                                'message-inbox', 'message-read', 'message-corrupt', 'message-compose', 'message-sent', 'additional-parts', 'ble-scan', 'ble-uncertain', 'ble-paired', 'ble-registered', 'ble-owner-confirm', 'ble-owner-result', 'ble-owner-unknown', 'ble-owner-journal', 'ble-guest-confirm', 'ble-guest-result', 'ble-guest-expired', 'ble-guest-unknown', 'ble-guest-journal', 'ble-revoke-pending', 'ble-revoke-applied', 'ble-revoke-stale', 'ble-renewed', 'app-code-setup', 'app-code-settings', 'app-entry-lock', 'app-entry-rejected']
                 # Check the complete root navigation before spending time on 85 more states.
                 screens = list(dict.fromkeys((['control'] if options.all_flows else []) + screens))
                 for screen in screens:
@@ -203,6 +210,9 @@ def main():
                         if actions:
                             if not state.get('ready') or not state.get('software_controller') or state.get('scenario') != screen:
                                 raise RuntimeError('Software-controller scenario did not prepare: ' + screen)
+                            if screen.startswith('app-'):
+                                if state.get('app_locked') != (screen in ['app-entry-lock', 'app-entry-rejected']) or state.get('app_lock_enabled') != (screen != 'app-code-setup') or state.get('local_code_set') != (screen != 'app-code-setup'):
+                                    raise RuntimeError('Incorrect application entry protection state: ' + screen)
                             expected_frames = 1 if screen == 'request-sent' else (2 if screen in ['result', 'journal'] else 0)
                             expected_journal = 1 if screen in ['request-sent', 'result', 'journal', 'owner-sending', 'owner-result', 'owner-journal', 'ble-owner-result', 'ble-owner-unknown', 'ble-owner-journal', 'ble-guest-result', 'ble-guest-unknown', 'ble-guest-journal'] else 0
                             if state.get('command_frames') != expected_frames or state.get('journal_count') != expected_journal:
@@ -307,7 +317,7 @@ def main():
                         raise RuntimeError('Not a PNG screenshot: ' + path.name)
                     manifest.append({'device': model, 'appearance': appearance, 'screen': screen, 'file': path.name,
                                      'source_sha': os.environ.get('GITHUB_SHA'), 'runtime': runtime,
-                                     'software_controller': actions, 'visible_text_verified': True, 'command_frames': state.get('command_frames'),
+                                     'software_controller': actions, 'visible_text_verified': True, 'app_locked': state.get('app_locked'), 'app_lock_enabled': state.get('app_lock_enabled'), 'command_frames': state.get('command_frames'),
                                      'objects': state.get('objects'), 'journal_count': state.get('journal_count'),
                                      'live_connections': state.get('live_connections'),
                                      'registration_requests': state.get('registration_requests'),

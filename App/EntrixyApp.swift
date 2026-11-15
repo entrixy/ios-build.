@@ -25,14 +25,20 @@ struct EntrixyApp: App {
 private struct LiveAppRoot: View {
     @StateObject private var model = AppModel()
     @Environment(\.scenePhase) private var phase
+    @State private var pendingURL: URL?
     var body: some View {
-        RootView(initialTab: PreviewRouting.tab, showAddKey: PreviewRouting.addKey)
-            .environmentObject(model)
-            .task { await model.resume() }
-            .onChange(of: phase) { value in
-                if value == .active { Task { await model.resume() } }
-                else if value == .background { model.suspend() }
-            }
+        Group {
+            if model.appLocked || model.entryRequiresUnlock() { AppEntryLockScreen() }
+            else { RootView(initialTab: PreviewRouting.tab, showAddKey: PreviewRouting.addKey, pendingURL: $pendingURL) }
+        }
+        .environmentObject(model)
+        .background(AppPrivacyShield(enabled: model.appLockEnabled, covered: phase != .active).frame(width: 0, height: 0))
+        .task { model.checkEntryLock(); await model.resume() }
+        .onOpenURL { pendingURL = $0 }
+        .onChange(of: phase) { value in
+            if value == .active { model.checkEntryLock(); Task { await model.resume() } }
+            else if value == .background { model.entryDidBackground(); model.suspend() }
+        }
     }
 }
 
@@ -42,10 +48,12 @@ struct RootView: View {
     @State private var adding = false
     @State private var input = ""
     private let showAddKeyOnLaunch: Bool
+    @Binding private var pendingURL: URL?
 
-    init(initialTab: AppTab = .control, showAddKey: Bool = false) {
+    init(initialTab: AppTab = .control, showAddKey: Bool = false, pendingURL: Binding<URL?> = .constant(nil)) {
         _selectedTab = State(initialValue: initialTab)
         showAddKeyOnLaunch = showAddKey
+        _pendingURL = pendingURL
     }
 
     var body: some View {
@@ -60,21 +68,23 @@ struct RootView: View {
         }
         .tint(Brand.primary)
         .task {
+            if let url = pendingURL { pendingURL = nil; receiveURL(url) }
             if showAddKeyOnLaunch {
                 try? await Task.sleep(nanoseconds: 400_000_000)
                 adding = true
             }
         }
-        .onOpenURL { url in
-            do {
-                input = try AccessLink.incomingText(url.absoluteString)
-                adding = true
-            } catch { model.errorMessage = "В этой ссылке не найден поддерживаемый ключ Entrixy." }
+        .onChange(of: pendingURL) { url in
+            if let url { pendingURL = nil; receiveURL(url) }
         }
         .sheet(isPresented: $adding) { KeyImportScreen(input: $input) }
         .alert("Entrixy", isPresented: Binding(get: { model.errorMessage != nil && !adding }, set: { if !$0 && !adding { model.errorMessage = nil } })) {
             Button("Понятно") { model.errorMessage = nil }
         } message: { Text(model.errorMessage ?? "") }
+    }
+    private func receiveURL(_ url: URL) {
+        do { input = try AccessLink.incomingText(url.absoluteString); adding = true }
+        catch { model.errorMessage = "В этой ссылке не найден поддерживаемый ключ Entrixy." }
     }
 }
 

@@ -52,6 +52,10 @@ final class AppModel: ObservableObject {
     @Published private(set) var delegations: [DelegationRedemption] = []
     private var usedOwnerPresses: [String: Date] = [:]
     private var delegatedJournalLedger = DelegatedJournalLedger()
+    private var entryLockPolicy = AppEntryLockPolicy()
+    @Published private(set) var appLockEnabled = false
+    @Published private(set) var appEntryBiometricEnabled = false
+    @Published private(set) var appLocked = false
     lazy var ownerControl = OwnerControlModel(app: self)
     private var actionCode: LocalActionCode?
     private var authenticationBusy = false
@@ -100,6 +104,11 @@ final class AppModel: ObservableObject {
             incomingMessages = state.incomingMessages ?? []
             outgoingMessages = state.outgoingMessages ?? []
             actionCode = state.actionCode
+            appLockEnabled = state.appLockEnabled ?? false
+            appEntryBiometricEnabled = state.appEntryBiometricEnabled ?? false
+            appLocked = appLockEnabled
+            guard !(appLockEnabled || appEntryBiometricEnabled) || actionCode != nil else { throw KeychainStore.Failure(status: -1) }
+            appLocked = entryLockPolicy.requiresUnlock(enabled: appLockEnabled, hasCode: actionCode != nil, now: ProcessInfo.processInfo.systemUptime)
             identity = state.identity
             guests = state.guests
             journal = (state.journal ?? []).filter(\.isAction)
@@ -127,7 +136,7 @@ final class AppModel: ObservableObject {
     }
 
     private func save(_ updated: [SavedGuest]) throws {
-        try storage.save(SavedState(identity: identity, guests: updated, journal: journal, actionCode: actionCode, owners: owners, usedOwnerPresses: usedOwnerPresses, pendingRestore: pendingRestore, delegations: delegations, passedAccess: passedAccess, receivedDelegations: receivedDelegations, incomingMessages: incomingMessages, outgoingMessages: outgoingMessages, delegatedJournalLedger: delegatedJournalLedger))
+        try storage.save(SavedState(identity: identity, guests: updated, journal: journal, actionCode: actionCode, owners: owners, usedOwnerPresses: usedOwnerPresses, pendingRestore: pendingRestore, delegations: delegations, passedAccess: passedAccess, receivedDelegations: receivedDelegations, incomingMessages: incomingMessages, outgoingMessages: outgoingMessages, delegatedJournalLedger: delegatedJournalLedger, appLockEnabled: appLockEnabled, appEntryBiometricEnabled: appEntryBiometricEnabled))
         guests = updated
     }
 
@@ -374,7 +383,7 @@ final class AppModel: ObservableObject {
     }
 
     private func saveOwners(_ updated: [OwnerAccount]) throws {
-        try storage.save(SavedState(identity: identity, guests: guests, journal: journal, actionCode: actionCode, owners: updated, usedOwnerPresses: usedOwnerPresses, pendingRestore: pendingRestore, delegations: delegations, passedAccess: passedAccess, receivedDelegations: receivedDelegations, incomingMessages: incomingMessages, outgoingMessages: outgoingMessages, delegatedJournalLedger: delegatedJournalLedger))
+        try storage.save(SavedState(identity: identity, guests: guests, journal: journal, actionCode: actionCode, owners: updated, usedOwnerPresses: usedOwnerPresses, pendingRestore: pendingRestore, delegations: delegations, passedAccess: passedAccess, receivedDelegations: receivedDelegations, incomingMessages: incomingMessages, outgoingMessages: outgoingMessages, delegatedJournalLedger: delegatedJournalLedger, appLockEnabled: appLockEnabled, appEntryBiometricEnabled: appEntryBiometricEnabled))
         owners = updated
     }
 
@@ -1671,7 +1680,7 @@ extension AppModel {
     func authorizeCode(_ code: String, intent: ActionIntent) async throws -> Bool {
         try await authorizeCode(code, authentication: intent.policy.authentication, requestID: intent.id)
     }
-    private func authorizeCode(_ code: String, authentication: String?, requestID: UUID) async throws -> Bool {
+    private func authorizeCode(_ code: String, authentication: String?, requestID: UUID?) async throws -> Bool {
         guard !authenticationBusy else { return false }
         authenticationBusy = true
         defer { authenticationBusy = false }
@@ -1689,7 +1698,7 @@ extension AppModel {
     func authorizeBiometric(_ intent: ActionIntent) async throws {
         try await authorizeBiometric(authentication: intent.policy.authentication, requestID: intent.id)
     }
-    private func authorizeBiometric(authentication: String?, requestID: UUID) async throws {
+    private func authorizeBiometric(authentication: String?, requestID: UUID?) async throws {
         guard !authenticationBusy else { throw KeychainStore.Failure(status: -1) }
         authenticationBusy = true
         defer { authenticationBusy = false }
@@ -1854,5 +1863,60 @@ extension AppModel {
             ownerObjectMessages.removeValue(forKey: objectID)
             return true
         } catch { ownerObjectMessages[objectID] = "Не удалось сохранить защиту объекта. Прежние правила сохранены."; return false }
+    }
+}
+
+extension AppModel {
+    func entryDidBackground(now: TimeInterval = ProcessInfo.processInfo.systemUptime) {
+        entryLockPolicy.background(now: now)
+    }
+    func entryRequiresUnlock(now: TimeInterval = ProcessInfo.processInfo.systemUptime) -> Bool {
+        entryLockPolicy.requiresUnlock(enabled: appLockEnabled, hasCode: hasActionCode, now: now)
+    }
+    func checkEntryLock(now: TimeInterval = ProcessInfo.processInfo.systemUptime) {
+        appLocked = entryRequiresUnlock(now: now)
+        if appLocked { authorizedIntent = nil }
+    }
+    func unlockApplication(code: String) async throws -> Bool {
+        guard appLocked else { return true }
+        guard try await authorizeCode(code, authentication: "pin", requestID: nil) else { return false }
+        entryLockPolicy.unlocked(); appLocked = false
+        return true
+    }
+    func unlockApplicationWithBiometrics() async throws {
+        guard appLocked, appEntryBiometricEnabled else { throw KeychainStore.Failure(status: -1) }
+        try await authorizeBiometric(authentication: "biometric", requestID: nil)
+        entryLockPolicy.unlocked(); appLocked = false
+    }
+    func configureEntryLock(enabled: Bool, biometric: Bool, code: String) async throws -> Bool {
+        guard !appLocked, foreground, storageReady, hasActionCode else { return false }
+        let requiresCode = (appLockEnabled && !enabled) || (!appEntryBiometricEnabled && biometric)
+        if requiresCode {
+            guard try await authorizeCode(code, authentication: "pin", requestID: nil) else { return false }
+        }
+        if biometric && !appEntryBiometricEnabled {
+            guard ActionBiometrics.available else { throw KeychainStore.Failure(status: -1) }
+            try ActionBiometrics.enroll()
+        }
+        guard foreground, !appLocked else { return false }
+        let previousEnabled = appLockEnabled, previousBio = appEntryBiometricEnabled
+        appLockEnabled = enabled; appEntryBiometricEnabled = biometric
+        do { try save(guests) }
+        catch { appLockEnabled = previousEnabled; appEntryBiometricEnabled = previousBio; throw error }
+        entryLockPolicy.unlocked()
+        return true
+    }
+    func changeActionCode(current: String, replacement: String) async throws -> Bool {
+        guard !appLocked, foreground, try await authorizeCode(current, authentication: "pin", requestID: nil),
+              let saved = actionCode, !authenticationBusy else { return false }
+        authenticationBusy = true
+        defer { authenticationBusy = false }
+        let salt = GuestCrypto.randomBytes(count: 16)
+        let verifier = try await Task.detached { try LocalActionCode.derive(replacement, salt: salt) }.value
+        guard foreground, actionCode?.salt == saved.salt, actionCode?.verifier == saved.verifier else { return false }
+        actionCode = LocalActionCode(salt: salt, verifier: verifier)
+        do { try save(guests) } catch { actionCode = saved; throw error }
+        authorizedIntent = nil
+        return true
     }
 }

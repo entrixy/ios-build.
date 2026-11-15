@@ -25,6 +25,8 @@ struct SavedState: Codable {
     var incomingMessages: [SavedMessage]? = nil
     var outgoingMessages: [OutgoingMessage]? = nil
     var delegatedJournalLedger: DelegatedJournalLedger? = nil
+    var appLockEnabled: Bool? = nil
+    var appEntryBiometricEnabled: Bool? = nil
 }
 
 /// One local, device-only Keychain item. Read/decode failures never mean “new installation”.

@@ -8,6 +8,8 @@ import re
 from pathlib import Path
 
 TITLES = {
+    'app-code-setup': 'Создание кода приложения', 'app-code-settings': 'Настройки входа',
+    'app-entry-lock': 'Вход в приложение по коду', 'app-entry-rejected': 'Неверный код входа',
     'control': 'Управление', 'settings': 'Настройки', 'key-detail': 'Полученный ключ',
     'add-key': 'Добавить ключ', 'guests': 'Гости',
     'confirm-open': 'Подтверждение открытия', 'confirm-close': 'Подтверждение закрытия',
@@ -16,7 +18,7 @@ TITLES = {
     'journal': 'Журнал выполненной тестовой попытки', 'offline': 'Контроллер недоступен',
     'owner-form': 'Добавить свой сервер', 'owner-ready': 'Сервер зарегистрирован',
     'owner-uncertain': 'Потерян ответ регистрации', 'owner-offline': 'Ошибка синхронизации',
-    'object-form': 'Добавить объект', 'object-created': 'Объект создан', 'object-edit': 'Изменить название',
+    'object-form': 'Добавить объект', 'object-created': 'Объект создан', 'object-edit': 'Настройка объекта',
     'object-renamed': 'Название изменено', 'object-delete-confirm': 'Подтверждение удаления',
     'object-deleted': 'Объект удалён', 'object-uncertain': 'Потерян ответ создания объекта',
     'issue-form': 'Выдать гостевой ключ', 'issued-key': 'Ключ выдан — QR и ссылка', 'issued-list': 'Выданные ключи',
