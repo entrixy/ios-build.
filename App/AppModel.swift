@@ -64,6 +64,7 @@ final class AppModel: ObservableObject {
     @Published private(set) var ownerActionRejections: [UUID: ActionTapRejection] = [:]
     var hasActionCode: Bool { actionCode != nil }
     private let storage: StateStorage
+    private let biometricService: String
     private let api = GuestAPI()
     private var watchers: [String: Task<Void, Never>] = [:]
     private var generations: [String: UUID] = [:]
@@ -73,6 +74,7 @@ final class AppModel: ObservableObject {
 
     init(storage: StateStorage = KeychainStore(), ownerAPI: OwnerTransport = OwnerAPI()) {
         self.storage = storage
+        biometricService = (storage as? KeychainStore)?.biometricService ?? "com.entrixy.ios.fixture-biometry." + UUID().uuidString
         self.ownerAPI = ownerAPI
         var startupStatus: Int32 = 0
         do {
@@ -1675,7 +1677,7 @@ extension AppModel {
         actionCode = LocalActionCode(salt: salt, verifier: verifier)
         do { try save(guests) } catch { actionCode = nil; throw error }
         // Enrollment is optional; a failure must not roll back the persisted PIN.
-        try? ActionBiometrics.enroll()
+        try? ActionBiometrics.enroll(service: biometricService)
     }
     func authorizeCode(_ code: String, intent: ActionIntent) async throws -> Bool {
         try await authorizeCode(code, authentication: intent.policy.authentication, requestID: intent.id)
@@ -1703,7 +1705,8 @@ extension AppModel {
         authenticationBusy = true
         defer { authenticationBusy = false }
         guard actionCode != nil, foreground, authentication != "pin" else { throw KeychainStore.Failure(status: -1) }
-        try await Task.detached { try ActionBiometrics.authenticate() }.value
+        let service = biometricService
+        try await Task.detached { try ActionBiometrics.authenticate(service: service) }.value
         guard foreground else { throw KeychainStore.Failure(status: -1) }
         authorizedIntent = requestID
     }
@@ -1896,7 +1899,7 @@ extension AppModel {
         }
         if biometric && !appEntryBiometricEnabled {
             guard ActionBiometrics.available else { throw KeychainStore.Failure(status: -1) }
-            try ActionBiometrics.enroll()
+            try ActionBiometrics.enroll(service: biometricService)
         }
         guard foreground, !appLocked else { return false }
         let previousEnabled = appLockEnabled, previousBio = appEntryBiometricEnabled

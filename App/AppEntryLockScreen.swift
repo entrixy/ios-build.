@@ -7,6 +7,7 @@ struct AppEntryLockScreen: View {
     @State private var message: String?
     var body: some View {
         NavigationStack {
+            ScrollView {
             VStack(alignment: .leading, spacing: 20) {
                 Image(systemName: "lock.fill").font(.system(size: 36)).foregroundStyle(Brand.ink).accessibilityHidden(true)
                 Text("Введите код Entrixy").font(.title2.bold()).foregroundStyle(Brand.ink)
@@ -24,8 +25,9 @@ struct AppEntryLockScreen: View {
                 }
                 if let message { Text(message).foregroundStyle(.red).fixedSize(horizontal: false, vertical: true) }
                 if !model.storageReady, let error = model.errorMessage { Text(error).foregroundStyle(.red) }
-                Spacer()
-            }.padding(DesignMetrics.pageInset)
+            }.frame(maxWidth: .infinity, alignment: .leading).padding(DesignMetrics.pageInset)
+            }
+                .scrollDismissesKeyboard(.interactively)
                 .background(Color(uiColor: .systemGroupedBackground))
                 .navigationTitle("Вход в Entrixy").navigationBarTitleDisplayMode(.inline)
         }

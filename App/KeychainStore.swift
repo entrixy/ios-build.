@@ -39,6 +39,9 @@ struct KeychainStore: StateStorage {
     struct Failure: Error { let status: OSStatus }
     private let service: String
     init(service: String = "com.entrixy.ios.local-state") { self.service = service }
+    var biometricService: String {
+        service == "com.entrixy.ios.local-state" ? "com.entrixy.ios.action-biometry" : service + ".action-biometry"
+    }
     private var query: [String: Any] {
         [kSecClass as String: kSecClassGenericPassword,
          kSecAttrService as String: service,

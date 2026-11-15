@@ -44,9 +44,11 @@ struct LocalActionCode: Codable {
 /// Enrollment changes invalidate this item; device passcode cannot satisfy its ACL.
 enum ActionBiometrics {
     static var available: Bool { LAContext().canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: nil) }
-    private static let query: [String: Any] = [kSecClass as String: kSecClassGenericPassword,
-        kSecAttrService as String: "com.entrixy.ios.action-biometry", kSecAttrAccount as String: "current-set"]
-    static func enroll() throws {
+    private static func query(service: String) -> [String: Any] {
+        [kSecClass as String: kSecClassGenericPassword, kSecAttrService as String: service, kSecAttrAccount as String: "current-set"]
+    }
+    static func enroll(service: String) throws {
+        let query = query(service: service)
         let context = LAContext()
         guard context.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: nil) else { return }
         var error: Unmanaged<CFError>?
@@ -65,7 +67,8 @@ enum ActionBiometrics {
         let status = SecItemAdd(item as CFDictionary, nil)
         guard status == errSecSuccess else { throw KeychainStore.Failure(status: status) }
     }
-    static func authenticate() throws {
+    static func authenticate(service: String) throws {
+        let query = query(service: service)
         let context = LAContext()
         context.localizedFallbackTitle = ""
         var item = query
