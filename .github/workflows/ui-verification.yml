@@ -1,0 +1,39 @@
+name: Isolated iOS UI verification
+"on":
+  push:
+    branches: [ci/ui-verification]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: isolated-ui-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  verify-ui:
+    runs-on: macos-15
+    timeout-minutes: 30
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.3.app/Contents/Developer
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - name: Prepare logs and show toolchain
+        run: |
+          mkdir -p .local-checks/ci
+          xcodebuild -version
+          uname -m
+      - name: Install project generator
+        run: brew install xcodegen
+      - name: Generate native application project
+        run: xcodegen generate
+      - name: Run unchanged UI tests on an isolated simulator
+        run: python3 scripts/test_simulator.py --only-ui 2>&1 | tee .local-checks/ci/ui-tests.log
+      - name: Retain test evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: isolated-ui-evidence
+          path: .local-checks/ci/
+          retention-days: 3
