@@ -1,25 +1,34 @@
 import SwiftUI
 import EntrixyCore
 
-struct OwnerPhoneRequestRows: View {
+/// MainActivity.ConfirmDialog: one compact request over the current tab.
+struct OwnerPhoneRequestDialog: View {
     @EnvironmentObject private var app: AppModel
     @ObservedObject var control: OwnerControlModel
+    @State private var approving = false
     var body: some View {
-        ForEach(control.phoneRequests) { request in
-            if let owner = app.owners.first(where: { $0.server == request.server }),
-               let object = owner.objects?.first(where: { $0.id == request.objectID }),
-               let key = owner.issuedKeys?.first(where: { $0.id == request.keyID }) {
-                VStack(alignment: .leading, spacing: 12) {
-                    Text("Запрос гостя").font(.subheadline).foregroundStyle(Brand.secondaryInk)
-                    Text(key.label).font(.headline)
-                    Text((try? object.metadata(masterKey: owner.masterKey)["label"] as? String) ?? "Объект")
-                    Text("iPhone запросит подтверждение телефонного звонка.").font(.subheadline).foregroundStyle(Brand.secondaryInk)
-                    HStack {
-                        Button("Позвонить") { Task { await control.dial(server: request.server, objectID: object.id, request: request) } }
-                            .buttonStyle(PrimaryActionStyle())
-                        Button("Отказать", role: .destructive) { Task { await control.decline(request) } }.buttonStyle(SecondaryActionStyle())
+        if let request = control.phoneRequests.first,
+           let owner = app.owners.first(where: { $0.server == request.server }),
+           let object = owner.objects?.first(where: { $0.id == request.objectID }),
+           let key = try? owner.authorizedGuest(localID: request.keyID, numberID: object.numberID ?? 0) {
+            AppDialogSurface {
+                VStack(alignment: .leading, spacing: 18) {
+                    Text(ProductText.string("confirm_title")).font(.title3.bold()).accessibilityAddTraits(.isHeader)
+                    Text(ProductText.string("confirm_text_intro", key.label))
+                    Text((try? object.metadata(masterKey: owner.masterKey)["label"] as? String) ?? "Объект").font(.headline)
+                    if object.kind == "call" {
+                        Text("iPhone запросит подтверждение телефонного звонка.").font(.footnote).foregroundStyle(Brand.secondaryInk)
                     }
-                }.padding(16).background(.background, in: RoundedRectangle(cornerRadius: 22))
+                    HStack(spacing: 12) {
+                        Button(ProductText.string("confirm_decline"), role: .destructive) { Task { await control.decline(request) } }
+                            .buttonStyle(SecondaryActionStyle())
+                        Button {
+                            approving = true
+                            Task { await control.approve(request); approving = false }
+                        } label: { ActionButtonLabel(title: ProductText.string("confirm_allow"), busy: approving) }
+                            .buttonStyle(PrimaryActionStyle())
+                    }.disabled(approving)
+                }
             }
         }
     }

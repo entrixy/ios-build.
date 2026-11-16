@@ -37,12 +37,23 @@ made for this checkpoint. The public 19-frame gallery is the previous catalogue.
   localization completion. iOS has no Wi-Fi scan or public call hangup API;
   those limits are explicit, while imported configuration remains intact.
 
+- HostService.postWebhook/fireOwnWebhook/do_webhook: owner phone-mode POST works
+  independently of the owner WSS connection; signed guest requests are verified
+  against the current authorized key, exact signed direction and persisted replay
+  ledger. One in-flight POST per object, journal before send, generic receiver
+  failures without leaking local URLs. Response level/message/position/close_in
+  follow Android; redirects and application retries are disabled. Request approval
+  uses MainActivity.ConfirmDialog's compact global dialog rather than a control
+  list card. New hosted tests cover storage-before-POST, no replay and double tap,
+  but have not been run on an Apple simulator yet.
+
 ## Actual verification
 
-Linux Swift6.0.3 + swift-crypto: 169 core tests, zero failures, including immutable
+Linux Swift6.0.3 + swift-crypto: 173 core tests, zero failures, including immutable
 in-flight bundle requests, scoped templates, force bounds, overnight windows,
 private camera material, stale edit rejection, durable device registration,
-avatar rollback and per-key local override isolation. App and hosted-test Swift
+avatar rollback, per-key local override isolation and the Android phone-webhook
+HMAC format/response/state-expiry rules. App and hosted-test Swift
 sources passed frontend syntax parsing. Imported strings, YAML/plists and
 whitespace checks passed.
 
@@ -60,7 +71,7 @@ screenshots or actuating anything. Its exact-source result is recorded afterward
   background/permission behavior and passive authenticated BLE observations.
 - BLE cross-server move transaction and exact object editor/guest transfer UI;
   preserve physical secrets, existing guest identity, order and local settings.
-- Owner-phone webhook execution, guest relay handling, live camera presentation,
+- Live camera presentation,
   complete per-guest permissions/TTL and corresponding Android product routes.
 - Remaining 62-node gaps documented in IOS_STRUCTURE/ANDROID_IOS_PARITY: company,
   global settings/help/language/sounds, restore and device/release integration.

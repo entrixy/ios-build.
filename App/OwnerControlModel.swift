@@ -17,9 +17,17 @@ struct OwnerPhoneRequest: Identifiable {
 final class OwnerControlModel: ObservableObject {
     @Published private(set) var connections: [String: GuestConnection] = [:]
     @Published private(set) var messages: [UUID: String] = [:]
-    @Published private(set) var phoneRequests: [OwnerPhoneRequest] = []
+    @Published private(set) var phoneRequests: [OwnerPhoneRequest] = [] {
+        didSet { app.ownerGuestRequestPending = !phoneRequests.isEmpty }
+    }
     private unowned let app: AppModel
     private let dialer: @MainActor (URL) async -> Bool
+    private let webhook: any PhoneWebhookSending
+    private var webhookInFlight = Set<ObjectReference>()
+    private var webhookTasks: [ObjectReference: Task<PhoneWebhookReply, Error>] = [:]
+    private var webhookPositionTasks: [ObjectReference: Task<Void, Never>] = [:]
+    private var webhookPositionGeneration: [ObjectReference: UUID] = [:]
+    private var acceptedWebhookRequests = Set<String>()
     private var active = false
     private var ownerChanges: AnyCancellable?
     private var workers: [String: Task<Void, Never>] = [:]
@@ -63,8 +71,8 @@ final class OwnerControlModel: ObservableObject {
         }
     }
 
-    init(app: AppModel, dialer: (@MainActor (URL) async -> Bool)? = nil) {
-        self.app = app
+    init(app: AppModel, dialer: (@MainActor (URL) async -> Bool)? = nil, webhook: any PhoneWebhookSending = PhoneWebhookTransport()) {
+        self.app = app; self.webhook = webhook
         self.dialer = dialer ?? { url in
             await withCheckedContinuation { continuation in
                 UIApplication.shared.open(url, options: [:]) { continuation.resume(returning: $0) }
@@ -73,6 +81,7 @@ final class OwnerControlModel: ObservableObject {
         ownerChanges = app.$owners.sink { [weak self] _ in
             Task { @MainActor [weak self] in
                 self?.startMissing()
+                self?.prunePhoneRequests()
                 await self?.flushBLEDecisions()
             }
         }
@@ -80,6 +89,9 @@ final class OwnerControlModel: ObservableObject {
     func resume() { active = true; startMissing() }
     func suspend() {
         active = false
+        webhookTasks.values.forEach { $0.cancel() }
+        webhookPositionTasks.values.forEach { $0.cancel() }; webhookPositionTasks.removeAll(); webhookPositionGeneration.removeAll()
+        acceptedWebhookRequests.removeAll()
         workers.values.forEach { $0.cancel() }; workers.removeAll(); generations.removeAll()
         for link in links.values {
             if let attempt = link.attempt { messages[attempt.objectID] = "Результат не получен. Автоматического повтора не будет." }
@@ -201,6 +213,16 @@ final class OwnerControlModel: ObservableObject {
             try await link.live.sendAction(JSONSerialization.data(withJSONObject: reply, options: .sortedKeys))
             return
         }
+        if type == "confirm_expired", let callID = json["call_id"] as? String {
+            phoneRequests.removeAll { $0.server == server && $0.callID == callID }; return
+        }
+        if type == "do_webhook" {
+            if let request = try? verifiedPhoneRequest(json, server: server, webhookOnly: true) {
+                acceptedWebhookRequests.insert(request.id)
+                Task { [weak self] in await self?.phoneWebhook(server: server, objectID: request.objectID, request: request) }
+            }
+            return
+        }
         if ["do_call", "confirm_request"].contains(type) {
             // An invalid guest request does not tear down the owner's command channel.
             try? receivePhoneRequest(json, server: server)
@@ -211,6 +233,10 @@ final class OwnerControlModel: ObservableObject {
         }
         if type == "obj_state_update", let number = json["num_id"] as? Int,
            let position = json["position"] as? String, ["open", "closed", "opening", "closing", "unknown"].contains(position) {
+            if let id = app.owners.first(where: { $0.server == server })?.objects?.first(where: { $0.numberID == number })?.id {
+                let target = ObjectReference.owned(server: server, objectID: id)
+                webhookPositionGeneration[target] = UUID(); webhookPositionTasks.removeValue(forKey: target)?.cancel()
+            }
             positions[server, default: [:]][number] = position
             return
         }
@@ -267,19 +293,43 @@ final class OwnerControlModel: ObservableObject {
         }
     }
 
-    private func receivePhoneRequest(_ json: [String: Any], server: String) throws {
-        guard app.canManageGuestAccess, phoneRequests.count < 4, app.ownerMessages[server] == nil,
+    private func verifiedPhoneRequest(_ json: [String: Any], server: String, webhookOnly: Bool = false) throws -> OwnerPhoneRequest? {
+        guard app.canManageGuestAccess, app.ownerMessages[server] == nil,
               let owner = app.owners.first(where: { $0.server == server }),
               let synced = owner.lastSynced, Date().timeIntervalSince(synced) < 120,
               let number = json["number_id"] as? Int,
-              let object = owner.objects?.first(where: { $0.numberID == number && $0.kind == "call" && $0.pending == nil && $0.available != false }),
+              let object = owner.objects?.first(where: { $0.numberID == number && $0.pending == nil && $0.available != false }),
+              webhookOnly ? (object.kind == "webhook" && object.routing["webhook_mode"] == "phone") :
+                (object.kind == "call" || (json["type"] as? String == "confirm_request" && object.kind == "webhook" && object.routing["webhook_mode"] == "phone")),
               let keyID = json["user_key_id"] as? Int,
               let key = try owner.authorizedGuest(keyID: keyID, numberID: number),
               let press = json["press"] as? [String: Any],
-              let callID = json["call_id"] as? String, !callID.isEmpty, callID.utf8.count <= 256 else { return }
+              let callID = json["call_id"] as? String, !callID.isEmpty, callID.utf8.count <= 256 else { return nil }
+        if webhookOnly {
+            guard press["action"] as? String == (json["action"] as? String ?? "") else { return nil }
+        }
         let nonce = try OwnerGuestPress.verify(press, publicKey: key.publicKey, server: server, numberID: number)
         try app.consumeOwnerPress(server + ":" + key.id.uuidString + ":" + nonce)
-        phoneRequests.append(OwnerPhoneRequest(server: server, callID: callID, objectID: object.id, keyID: key.id, press: press, needsConfirmation: json["type"] as? String == "confirm_request"))
+        return OwnerPhoneRequest(server: server, callID: callID, objectID: object.id, keyID: key.id,
+            press: press, needsConfirmation: json["type"] as? String == "confirm_request")
+    }
+    private func prunePhoneRequests() {
+        phoneRequests = phoneRequests.filter { request in
+            guard let owner = app.owners.first(where: { $0.server == request.server }),
+                  let object = owner.objects?.first(where: { $0.id == request.objectID && $0.pending == nil && $0.available != false }),
+                  let number = object.numberID,
+                  (try? owner.authorizedGuest(localID: request.keyID, numberID: number)) != nil else { return false }
+            return object.kind == "call" || (object.kind == "webhook" && object.routing["webhook_mode"] == "phone")
+        }
+    }
+    private func receivePhoneRequest(_ json: [String: Any], server: String) throws {
+        guard phoneRequests.count < 4, let request = try verifiedPhoneRequest(json, server: server) else { return }
+        phoneRequests.append(request)
+    }
+    func approve(_ request: OwnerPhoneRequest) async {
+        guard let object = app.owners.first(where: { $0.server == request.server })?.objects?.first(where: { $0.id == request.objectID }) else { return }
+        if object.kind == "webhook" { await phoneWebhook(server: request.server, objectID: request.objectID, request: request) }
+        else { await dial(server: request.server, objectID: request.objectID, request: request) }
     }
 
     func decline(_ request: OwnerPhoneRequest) async {
@@ -328,4 +378,87 @@ final class OwnerControlModel: ObservableObject {
             }
         }
     }
+    func phoneWebhookReady(server: String, objectID: UUID) -> Bool {
+        active && !webhookInFlight.contains(.owned(server: server, objectID: objectID))
+    }
+    func phoneWebhook(server: String, objectID: UUID, action requested: GuestAction = .open, request: OwnerPhoneRequest? = nil) async {
+        let target = ObjectReference.owned(server: server, objectID: objectID)
+        guard active, app.canManageGuestAccess, !webhookInFlight.contains(target),
+              let owner = app.owners.first(where: { $0.server == server }),
+              let object = owner.objects?.first(where: { $0.id == objectID && $0.kind == "webhook" && $0.pending == nil && $0.available != false }),
+              object.routing["webhook_mode"] == "phone", let number = object.numberID,
+              let url = object.routing["webhook_url"], let secret = object.routing["webhook_secret"] else { return }
+        if request == nil, !app.ownerManualActionAllowed(object, server: server, action: requested) { return }
+        var who = "Я", direction: GuestAction? = requested
+        if let request {
+            guard request.server == server, request.objectID == objectID,
+                  let key = try? owner.authorizedGuest(localID: request.keyID, numberID: number) else { return }
+            do { _ = try OwnerGuestPress.verify(request.press, publicKey: key.publicKey, server: server, numberID: number) }
+            catch { await decline(request); return }
+            if request.needsConfirmation {
+                guard phoneRequests.contains(where: { $0.id == request.id }), let link = links[server], link.authenticated else { return }
+                phoneRequests.removeAll { $0.id == request.id }
+                do { try await link.live.sendAction(JSONSerialization.data(withJSONObject: ["type": "confirm_response", "call_id": request.callID, "accept": true])) }
+                catch { return }
+            } else { guard acceptedWebhookRequests.remove(request.id) != nil else { return } }
+            who = key.label
+            let signed = request.press["action"] as? String ?? ""
+            direction = signed.isEmpty ? nil : GuestAction(rawValue: signed)
+        }
+        let metadata = try? object.metadata(masterKey: owner.masterKey)
+        let toggles = metadata?["wh_toggle"] as? Int == 1
+        let action = PhoneWebhook.action(requested: direction, toggles: toggles, position: positions[server]?[number])
+        guard let body = try? PhoneWebhook.request(numberID: number, action: action, secret: secret),
+              active, app.canManageGuestAccess, !webhookInFlight.contains(target),
+              app.owners.first(where: { $0.server == server })?.objects?.first(where: { $0.id == objectID }) == object else { return }
+        webhookInFlight.insert(target)
+        defer { webhookInFlight.remove(target); webhookTasks.removeValue(forKey: target) }
+        let actionKey = "owner-webhook:" + UUID().uuidString
+        let entry = JournalEntry(who: who, what: metadata?["label"] as? String ?? "Объект", actionKey: actionKey,
+            result: "Результат запроса не получен", level: "warning")
+        app.recordAction(entry)
+        guard app.journal.contains(where: { $0.id == entry.id }) else { return }
+        let task = Task { try await webhook.send(url: url, body: body) }
+        webhookTasks[target] = task
+        do {
+            let result = try await task.value
+            let message = result.message ?? ProductText.string(result.level == "success" ? "ble_st_opened" : "webhook_failed")
+            messages[objectID] = message
+            app.actionResult(actionKey: actionKey, result: message, level: result.level, replace: true)
+            let position = result.positionAfter(action: action, toggles: toggles)
+            if let position, active {
+                let generation = UUID(); webhookPositionGeneration[target] = generation
+                webhookPositionTasks[target]?.cancel()
+                await setWebhookPosition(server: server, number: number, objectID: objectID, position: position, push: request == nil)
+                let forget = result.forgetting(position: position)
+                if webhookPositionGeneration[target] == generation { webhookPositionTasks[target] = Task { [weak self] in
+                    do { try await Task.sleep(nanoseconds: UInt64(forget.after * 1_000_000_000)) } catch { return }
+                    guard let self, self.active, self.webhookPositionGeneration[target] == generation else { return }
+                    await self.setWebhookPosition(server: server, number: number, objectID: objectID, position: forget.position, push: true)
+                    if self.webhookPositionGeneration[target] == generation { self.webhookPositionTasks.removeValue(forKey: target) }
+                } }
+            }
+            if let request { await sendWebhookReply(request, level: result.level, message: message, position: position) }
+        } catch {
+            let message = ProductText.string("webhook_failed")
+            messages[objectID] = message
+            app.actionResult(actionKey: actionKey, result: message, level: "danger", replace: true)
+            if let request { await sendWebhookReply(request, level: "danger", message: message, position: nil) }
+        }
+    }
+    private func setWebhookPosition(server: String, number: Int, objectID: UUID, position: String, push: Bool) async {
+        guard active, app.owners.first(where: { $0.server == server })?.objects?.contains(where: { $0.id == objectID && $0.numberID == number && $0.pending != .delete }) == true else { return }
+        positions[server, default: [:]][number] = position
+        if push, let link = links[server], link.authenticated,
+           let data = try? JSONSerialization.data(withJSONObject: ["type": "obj_state_push", "num_id": number, "position": position]) {
+            try? await link.live.sendAction(data)
+        }
+    }
+    private func sendWebhookReply(_ request: OwnerPhoneRequest, level: String, message: String, position: String?) async {
+        guard active, let link = links[request.server], link.authenticated else { return }
+        var frame: [String: Any] = ["type": "webhook_result", "call_id": request.callID, "level": level, "message": message]
+        if let position { frame["position"] = position }
+        if let data = try? JSONSerialization.data(withJSONObject: frame) { try? await link.live.sendAction(data) }
+    }
+
 }

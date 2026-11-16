@@ -30,6 +30,7 @@ final class AppModel: ObservableObject {
     @Published private(set) var guests: [SavedGuest] = []
     @Published var objectRemovalTarget: ObjectReference?
     @Published var objectAvatarTarget: ObjectReference?
+    @Published var ownerGuestRequestPending = false
     lazy var automationSensors = AutomationSensors()
     @Published private(set) var objectPreferences = ObjectCatalogPreferences()
     @Published private(set) var bleVisibleUntil: [ObjectReference: TimeInterval] = [:]
@@ -1917,6 +1918,10 @@ extension AppModel {
             if let reason = policy.blockedReason { throw ActionDenied.message(reason) }
             if object.kind == "ble" {
                 guard !bleControl.busy else { throw ActionDenied.message("Предыдущая Bluetooth-команда ещё не завершена.") }
+            } else if object.kind == "webhook" && object.routing["webhook_mode"] == "phone" {
+                guard ownerControl.phoneWebhookReady(server: server, objectID: objectID) else {
+                    throw ActionDenied.message("Предыдущий запрос ещё не завершён.")
+                }
             } else if object.kind != "call" {
                 guard ownerControl.readyForTap(server: server) else { throw ActionDenied.message("Нет готового соединения или предыдущий запрос ещё не завершён.") }
                 if object.kind == "device" {
@@ -1964,7 +1969,9 @@ extension AppModel {
         defer { activeOwnerAction = nil }
         if intent.object.kind == "ble" { await bleControl.execute(server: intent.server, objectID: intent.object.id) }
         else if intent.object.kind == "call" { await ownerControl.dial(server: intent.server, objectID: intent.object.id) }
-        else { await ownerControl.execute(server: intent.server, objectID: intent.object.id, action: intent.action) }
+        else if intent.object.kind == "webhook" && intent.object.routing["webhook_mode"] == "phone" {
+            await ownerControl.phoneWebhook(server: intent.server, objectID: intent.object.id, action: intent.action)
+        } else { await ownerControl.execute(server: intent.server, objectID: intent.object.id, action: intent.action) }
     }
 }
 

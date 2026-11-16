@@ -15,7 +15,6 @@ struct ControlScreen: View {
             } else {
                 ScrollView {
                     LazyVStack(alignment: .leading, spacing: 16) {
-                        OwnerPhoneRequestRows(control: model.ownerControl)
                         ForEach(entries) { entry in
                             switch entry {
                             case let .owned(owner, object):

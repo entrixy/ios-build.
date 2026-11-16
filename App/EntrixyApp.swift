@@ -77,10 +77,11 @@ struct RootView: View {
             // NavigationStack can cover an outer safeAreaInset's hit targets.
             AppBottomNavigation(selection: $selectedTab, tabs: model.navigationState.tabs) { userPickedTab = true }
         }
-        .accessibilityHidden(model.objectRemovalTarget != nil || model.objectAvatarTarget != nil)
+        .accessibilityHidden(model.objectRemovalTarget != nil || model.objectAvatarTarget != nil || model.ownerGuestRequestPending)
         .overlay {
             if let target = model.objectRemovalTarget { ObjectRemovalConfirmation(target: target) }
             else if let target = model.objectAvatarTarget { ObjectAvatarPicker(target: target) }
+            else { OwnerPhoneRequestDialog(control: model.ownerControl) }
         }
         .background(Color(uiColor: .systemGroupedBackground).ignoresSafeArea())
         .onChange(of: model.navigationState) { value in
