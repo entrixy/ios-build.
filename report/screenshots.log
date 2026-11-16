@@ -8,32 +8,830 @@
 
 [#DeprecatedDeclaration]: <https://docs.swift.org/compiler/documentation/diagnostics/deprecated-declaration>
 26.2
-010F5380-1CCE-4BAD-9D6B-C952ADA23F04
-Optional simulator command timed out: xcrun simctl shutdown 010F5380-1CCE-4BAD-9D6B-C952ADA23F04
-Optional simulator command timed out: xcrun simctl delete 010F5380-1CCE-4BAD-9D6B-C952ADA23F04
-Cold simulator preparation stalled; preparing one replacement before scenarios
-Traceback (most recent call last):
-  File "/Users/runner/work/ios-build./ios-build./scripts/capture_stage_two.py", line 83, in <module>
-    if __name__=='__main__':main()
-                            ~~~~^^
-  File "/Users/runner/work/ios-build./ios-build./scripts/capture_stage_two.py", line 53, in main
-    device,container=prepare_device('stage-two-product-routes','com.apple.CoreSimulator.SimDeviceType.iPhone-16',runtime)
-                     ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/runner/work/ios-build./ios-build./scripts/capture_simulator.py", line 41, in prepare_device
-    created = run('xcrun', 'simctl', 'create', 'Entrixy preview ' + model, device_type, runtime)
-  File "/Users/runner/work/ios-build./ios-build./scripts/capture_simulator.py", line 20, in run
-    result = subprocess.run(args, text=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, timeout=timeout)
-  File "/usr/local/Cellar/python@3.14/3.14.7/Frameworks/Python.framework/Versions/3.14/lib/python3.14/subprocess.py", line 557, in run
-    stdout, stderr = process.communicate(input, timeout=timeout)
-                     ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/usr/local/Cellar/python@3.14/3.14.7/Frameworks/Python.framework/Versions/3.14/lib/python3.14/subprocess.py", line 1221, in communicate
-    stdout, stderr = self._communicate(input, endtime, timeout)
-                     ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/usr/local/Cellar/python@3.14/3.14.7/Frameworks/Python.framework/Versions/3.14/lib/python3.14/subprocess.py", line 2154, in _communicate
-    self._check_timeout(endtime, orig_timeout, stdout, stderr)
-    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/usr/local/Cellar/python@3.14/3.14.7/Frameworks/Python.framework/Versions/3.14/lib/python3.14/subprocess.py", line 1268, in _check_timeout
-    raise TimeoutExpired(
-    ...<2 lines>...
-            stderr=b''.join(stderr_seq) if stderr_seq else None)
-subprocess.TimeoutExpired: Command '('xcrun', 'simctl', 'create', 'Entrixy preview stage-two-product-routes', 'com.apple.CoreSimulator.SimDeviceType.iPhone-16', 'com.apple.CoreSimulator.SimRuntime.iOS-26-2')' timed out after 90 seconds
+362C83A9-0E34-447E-9307-3D19B5B1D6BB
+Monitoring boot status for Entrixy preview stage-two-product-routes (362C83A9-0E34-447E-9307-3D19B5B1D6BB).
+[2026-11-16 19:02:18 +0000] Status=1, isTerminal=NO, Elapsed=00:07.
+	Waiting on BackBoard
+
+[2026-11-16 19:02:33 +0000] Status=2, isTerminal=NO, Elapsed=00:23.
+	Waiting on Data Migration
+		Reason:(null)
+		Migration Elapsed:00:08 seconds
+
+[2026-11-16 19:02:34 +0000] Status=2, isTerminal=NO, Elapsed=00:24.
+	Waiting on Data Migration
+		Reason:Gathering plugins
+		Migration Elapsed:00:08 seconds
+
+[2026-11-16 19:02:53 +0000] Status=2, isTerminal=NO, Elapsed=00:28.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.MobileContainerManager.ContainerMigrator (ContainerMigrator.migrator, user-agnostic)
+		Migration Elapsed:00:09 seconds
+
+[2026-11-16 19:02:53 +0000] Status=2, isTerminal=NO, Elapsed=00:30.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
+		Migration Elapsed:00:12 seconds
+
+[2026-11-16 19:02:53 +0000] Status=2, isTerminal=NO, Elapsed=00:34.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
+		Migration Elapsed:00:14 seconds
+
+[2026-11-16 19:02:53 +0000] Status=2, isTerminal=NO, Elapsed=00:37.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
+		Migration Elapsed:00:18 seconds
+
+[2026-11-16 19:02:53 +0000] Status=2, isTerminal=NO, Elapsed=00:39.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
+		Migration Elapsed:00:21 seconds
+
+[2026-11-16 19:02:53 +0000] Status=2, isTerminal=NO, Elapsed=00:41.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
+		Migration Elapsed:00:24 seconds
+
+[2026-11-16 19:02:53 +0000] Status=2, isTerminal=NO, Elapsed=00:42.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
+		Migration Elapsed:00:25 seconds
+
+[2026-11-16 19:02:53 +0000] Status=2, isTerminal=NO, Elapsed=00:43.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
+		Migration Elapsed:00:26 seconds
+
+[2026-11-16 19:02:54 +0000] Status=2, isTerminal=NO, Elapsed=00:44.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
+		Migration Elapsed:00:27 seconds
+
+[2026-11-16 19:02:55 +0000] Status=2, isTerminal=NO, Elapsed=00:45.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
+		Migration Elapsed:00:28 seconds
+
+[2026-11-16 19:02:56 +0000] Status=2, isTerminal=NO, Elapsed=00:46.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
+		Migration Elapsed:00:29 seconds
+
+[2026-11-16 19:02:57 +0000] Status=2, isTerminal=NO, Elapsed=00:47.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
+		Migration Elapsed:00:30 seconds
+
+[2026-11-16 19:02:58 +0000] Status=2, isTerminal=NO, Elapsed=00:48.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
+		Migration Elapsed:00:31 seconds
+
+[2026-11-16 19:02:59 +0000] Status=2, isTerminal=NO, Elapsed=00:49.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
+		Migration Elapsed:00:32 seconds
+
+[2026-11-16 19:03:00 +0000] Status=2, isTerminal=NO, Elapsed=00:50.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
+		Migration Elapsed:00:33 seconds
+
+[2026-11-16 19:03:01 +0000] Status=2, isTerminal=NO, Elapsed=00:51.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
+		Migration Elapsed:00:34 seconds
+
+[2026-11-16 19:03:02 +0000] Status=2, isTerminal=NO, Elapsed=00:52.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
+		Migration Elapsed:00:35 seconds
+
+[2026-11-16 19:03:02 +0000] Status=2, isTerminal=NO, Elapsed=00:52.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
+		Migration Elapsed:00:36 seconds
+
+[2026-11-16 19:03:03 +0000] Status=2, isTerminal=NO, Elapsed=00:53.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
+		Migration Elapsed:00:37 seconds
+
+[2026-11-16 19:03:04 +0000] Status=2, isTerminal=NO, Elapsed=00:55.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
+		Migration Elapsed:00:38 seconds
+
+[2026-11-16 19:03:05 +0000] Status=2, isTerminal=NO, Elapsed=00:56.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
+		Migration Elapsed:00:39 seconds
+
+[2026-11-16 19:03:06 +0000] Status=2, isTerminal=NO, Elapsed=00:56.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
+		Migration Elapsed:00:40 seconds
+
+[2026-11-16 19:03:08 +0000] Status=2, isTerminal=NO, Elapsed=00:58.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
+		Migration Elapsed:00:41 seconds
+
+[2026-11-16 19:03:08 +0000] Status=2, isTerminal=NO, Elapsed=00:58.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
+		Migration Elapsed:00:42 seconds
+
+[2026-11-16 19:03:09 +0000] Status=2, isTerminal=NO, Elapsed=00:59.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
+		Migration Elapsed:00:43 seconds
+
+[2026-11-16 19:03:10 +0000] Status=2, isTerminal=NO, Elapsed=01:00.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
+		Migration Elapsed:00:44 seconds
+
+[2026-11-16 19:03:11 +0000] Status=2, isTerminal=NO, Elapsed=01:01.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
+		Migration Elapsed:00:45 seconds
+
+[2026-11-16 19:03:12 +0000] Status=2, isTerminal=NO, Elapsed=01:02.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
+		Migration Elapsed:00:46 seconds
+
+[2026-11-16 19:03:13 +0000] Status=2, isTerminal=NO, Elapsed=01:03.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
+		Migration Elapsed:00:47 seconds
+
+[2026-11-16 19:03:14 +0000] Status=2, isTerminal=NO, Elapsed=01:04.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
+		Migration Elapsed:00:48 seconds
+
+[2026-11-16 19:03:15 +0000] Status=2, isTerminal=NO, Elapsed=01:05.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
+		Migration Elapsed:00:49 seconds
+
+[2026-11-16 19:03:16 +0000] Status=2, isTerminal=NO, Elapsed=01:06.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
+		Migration Elapsed:00:50 seconds
+
+[2026-11-16 19:03:17 +0000] Status=2, isTerminal=NO, Elapsed=01:07.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
+		Migration Elapsed:00:51 seconds
+
+[2026-11-16 19:03:18 +0000] Status=2, isTerminal=NO, Elapsed=01:08.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
+		Migration Elapsed:00:52 seconds
+
+[2026-11-16 19:03:19 +0000] Status=2, isTerminal=NO, Elapsed=01:09.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
+		Migration Elapsed:00:53 seconds
+
+[2026-11-16 19:03:20 +0000] Status=2, isTerminal=NO, Elapsed=01:10.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
+		Migration Elapsed:00:54 seconds
+
+[2026-11-16 19:03:21 +0000] Status=2, isTerminal=NO, Elapsed=01:11.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
+		Migration Elapsed:00:55 seconds
+
+[2026-11-16 19:03:22 +0000] Status=2, isTerminal=NO, Elapsed=01:12.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
+		Migration Elapsed:00:56 seconds
+
+[2026-11-16 19:03:23 +0000] Status=2, isTerminal=NO, Elapsed=01:13.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
+		Migration Elapsed:00:57 seconds
+
+[2026-11-16 19:03:24 +0000] Status=2, isTerminal=NO, Elapsed=01:14.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
+		Migration Elapsed:00:58 seconds
+
+[2026-11-16 19:03:25 +0000] Status=2, isTerminal=NO, Elapsed=01:16.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
+		Migration Elapsed:00:59 seconds
+
+[2026-11-16 19:03:26 +0000] Status=2, isTerminal=NO, Elapsed=01:16.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
+		Migration Elapsed:01:00 seconds
+
+[2026-11-16 19:03:27 +0000] Status=2, isTerminal=NO, Elapsed=01:17.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
+		Migration Elapsed:01:01 seconds
+
+[2026-11-16 19:03:28 +0000] Status=2, isTerminal=NO, Elapsed=01:18.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
+		Migration Elapsed:01:02 seconds
+
+[2026-11-16 19:03:29 +0000] Status=2, isTerminal=NO, Elapsed=01:19.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
+		Migration Elapsed:01:03 seconds
+
+[2026-11-16 19:03:30 +0000] Status=2, isTerminal=NO, Elapsed=01:20.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
+		Migration Elapsed:01:04 seconds
+
+[2026-11-16 19:03:31 +0000] Status=2, isTerminal=NO, Elapsed=01:21.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
+		Migration Elapsed:01:05 seconds
+
+[2026-11-16 19:03:32 +0000] Status=2, isTerminal=NO, Elapsed=01:22.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
+		Migration Elapsed:01:06 seconds
+
+[2026-11-16 19:03:33 +0000] Status=2, isTerminal=NO, Elapsed=01:23.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
+		Migration Elapsed:01:07 seconds
+
+[2026-11-16 19:03:34 +0000] Status=2, isTerminal=NO, Elapsed=01:24.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
+		Migration Elapsed:01:08 seconds
+
+[2026-11-16 19:03:35 +0000] Status=2, isTerminal=NO, Elapsed=01:25.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
+		Migration Elapsed:01:09 seconds
+
+[2026-11-16 19:03:36 +0000] Status=2, isTerminal=NO, Elapsed=01:26.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
+		Migration Elapsed:01:10 seconds
+
+[2026-11-16 19:03:37 +0000] Status=2, isTerminal=NO, Elapsed=01:27.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
+		Migration Elapsed:01:11 seconds
+
+[2026-11-16 19:03:38 +0000] Status=2, isTerminal=NO, Elapsed=01:28.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
+		Migration Elapsed:01:12 seconds
+
+[2026-11-16 19:03:39 +0000] Status=2, isTerminal=NO, Elapsed=01:29.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
+		Migration Elapsed:01:13 seconds
+
+[2026-11-16 19:03:40 +0000] Status=2, isTerminal=NO, Elapsed=01:30.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
+		Migration Elapsed:01:14 seconds
+
+[2026-11-16 19:03:41 +0000] Status=2, isTerminal=NO, Elapsed=01:31.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
+		Migration Elapsed:01:15 seconds
+
+[2026-11-16 19:03:42 +0000] Status=2, isTerminal=NO, Elapsed=01:32.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
+		Migration Elapsed:01:16 seconds
+
+[2026-11-16 19:03:43 +0000] Status=2, isTerminal=NO, Elapsed=01:33.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
+		Migration Elapsed:01:17 seconds
+
+[2026-11-16 19:03:44 +0000] Status=2, isTerminal=NO, Elapsed=01:34.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
+		Migration Elapsed:01:18 seconds
+
+[2026-11-16 19:03:45 +0000] Status=2, isTerminal=NO, Elapsed=01:35.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
+		Migration Elapsed:01:19 seconds
+
+[2026-11-16 19:03:46 +0000] Status=2, isTerminal=NO, Elapsed=01:36.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
+		Migration Elapsed:01:20 seconds
+
+[2026-11-16 19:03:47 +0000] Status=2, isTerminal=NO, Elapsed=01:37.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
+		Migration Elapsed:01:21 seconds
+
+[2026-11-16 19:03:48 +0000] Status=2, isTerminal=NO, Elapsed=01:38.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
+		Migration Elapsed:01:22 seconds
+
+[2026-11-16 19:03:49 +0000] Status=2, isTerminal=NO, Elapsed=01:39.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
+		Migration Elapsed:01:23 seconds
+
+[2026-11-16 19:03:50 +0000] Status=2, isTerminal=NO, Elapsed=01:40.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
+		Migration Elapsed:01:24 seconds
+
+[2026-11-16 19:03:51 +0000] Status=2, isTerminal=NO, Elapsed=01:41.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
+		Migration Elapsed:01:25 seconds
+
+[2026-11-16 19:03:52 +0000] Status=2, isTerminal=NO, Elapsed=01:42.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
+		Migration Elapsed:01:26 seconds
+
+[2026-11-16 19:03:53 +0000] Status=2, isTerminal=NO, Elapsed=01:43.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
+		Migration Elapsed:01:27 seconds
+
+[2026-11-16 19:03:54 +0000] Status=2, isTerminal=NO, Elapsed=01:44.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
+		Migration Elapsed:01:28 seconds
+
+[2026-11-16 19:03:55 +0000] Status=2, isTerminal=NO, Elapsed=01:45.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
+		Migration Elapsed:01:29 seconds
+
+[2026-11-16 19:03:56 +0000] Status=2, isTerminal=NO, Elapsed=01:46.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
+		Migration Elapsed:01:30 seconds
+
+[2026-11-16 19:03:57 +0000] Status=2, isTerminal=NO, Elapsed=01:47.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
+		Migration Elapsed:01:31 seconds
+
+[2026-11-16 19:03:58 +0000] Status=2, isTerminal=NO, Elapsed=01:48.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
+		Migration Elapsed:01:32 seconds
+
+[2026-11-16 19:03:59 +0000] Status=2, isTerminal=NO, Elapsed=01:49.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
+		Migration Elapsed:01:33 seconds
+
+[2026-11-16 19:04:00 +0000] Status=2, isTerminal=NO, Elapsed=01:50.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
+		Migration Elapsed:01:34 seconds
+
+[2026-11-16 19:04:01 +0000] Status=2, isTerminal=NO, Elapsed=01:51.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
+		Migration Elapsed:01:35 seconds
+
+[2026-11-16 19:04:02 +0000] Status=2, isTerminal=NO, Elapsed=01:52.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
+		Migration Elapsed:01:36 seconds
+
+[2026-11-16 19:04:03 +0000] Status=2, isTerminal=NO, Elapsed=01:53.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
+		Migration Elapsed:01:37 seconds
+
+[2026-11-16 19:04:04 +0000] Status=2, isTerminal=NO, Elapsed=01:54.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
+		Migration Elapsed:01:38 seconds
+
+[2026-11-16 19:04:05 +0000] Status=2, isTerminal=NO, Elapsed=01:55.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
+		Migration Elapsed:01:39 seconds
+
+[2026-11-16 19:04:06 +0000] Status=2, isTerminal=NO, Elapsed=01:56.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
+		Migration Elapsed:01:40 seconds
+
+[2026-11-16 19:04:07 +0000] Status=2, isTerminal=NO, Elapsed=01:57.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
+		Migration Elapsed:01:41 seconds
+
+[2026-11-16 19:04:08 +0000] Status=2, isTerminal=NO, Elapsed=01:58.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
+		Migration Elapsed:01:42 seconds
+
+[2026-11-16 19:04:09 +0000] Status=2, isTerminal=NO, Elapsed=01:59.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
+		Migration Elapsed:01:43 seconds
+
+[2026-11-16 19:04:11 +0000] Status=2, isTerminal=NO, Elapsed=02:01.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
+		Migration Elapsed:01:44 seconds
+
+[2026-11-16 19:04:11 +0000] Status=2, isTerminal=NO, Elapsed=02:01.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
+		Migration Elapsed:01:45 seconds
+
+[2026-11-16 19:04:12 +0000] Status=2, isTerminal=NO, Elapsed=02:02.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
+		Migration Elapsed:01:46 seconds
+
+[2026-11-16 19:04:13 +0000] Status=2, isTerminal=NO, Elapsed=02:03.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
+		Migration Elapsed:01:47 seconds
+
+[2026-11-16 19:04:14 +0000] Status=2, isTerminal=NO, Elapsed=02:04.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
+		Migration Elapsed:01:48 seconds
+
+[2026-11-16 19:04:15 +0000] Status=2, isTerminal=NO, Elapsed=02:05.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
+		Migration Elapsed:01:49 seconds
+
+[2026-11-16 19:04:16 +0000] Status=2, isTerminal=NO, Elapsed=02:06.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
+		Migration Elapsed:01:50 seconds
+
+[2026-11-16 19:04:17 +0000] Status=2, isTerminal=NO, Elapsed=02:07.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
+		Migration Elapsed:01:51 seconds
+
+[2026-11-16 19:04:18 +0000] Status=2, isTerminal=NO, Elapsed=02:08.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
+		Migration Elapsed:01:52 seconds
+
+[2026-11-16 19:04:19 +0000] Status=2, isTerminal=NO, Elapsed=02:09.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
+		Migration Elapsed:01:53 seconds
+
+[2026-11-16 19:04:20 +0000] Status=2, isTerminal=NO, Elapsed=02:10.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
+		Migration Elapsed:01:54 seconds
+
+[2026-11-16 19:04:21 +0000] Status=2, isTerminal=NO, Elapsed=02:11.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
+		Migration Elapsed:01:55 seconds
+
+[2026-11-16 19:04:24 +0000] Status=2, isTerminal=NO, Elapsed=02:14.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.-0LaunchServicesMigrator (00LaunchServicesMigrator.migrator, user-agnostic)
+		Migration Elapsed:01:56 seconds
+
+[2026-11-16 19:04:26 +0000] Status=2, isTerminal=NO, Elapsed=02:16.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.securityd.KeychainMigrator (KeychainMigrator.migrator, user-agnostic)
+		Migration Elapsed:01:59 seconds
+
+[2026-11-16 19:04:27 +0000] Status=2, isTerminal=NO, Elapsed=02:17.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.securityd.KeychainMigrator (KeychainMigrator.migrator, user-agnostic)
+		Migration Elapsed:02:00 seconds
+
+[2026-11-16 19:04:28 +0000] Status=2, isTerminal=NO, Elapsed=02:18.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.securityd.KeychainMigrator (KeychainMigrator.migrator, user-agnostic)
+		Migration Elapsed:02:01 seconds
+
+[2026-11-16 19:04:29 +0000] Status=2, isTerminal=NO, Elapsed=02:19.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.securityd.KeychainMigrator (KeychainMigrator.migrator, user-agnostic)
+		Migration Elapsed:02:02 seconds
+
+[2026-11-16 19:04:30 +0000] Status=2, isTerminal=NO, Elapsed=02:20.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.securityd.KeychainMigrator (KeychainMigrator.migrator, user-agnostic)
+		Migration Elapsed:02:03 seconds
+
+[2026-11-16 19:04:31 +0000] Status=2, isTerminal=NO, Elapsed=02:21.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.managedconfiguration.migrator (MCProfile.migrator, user-agnostic)
+		Migration Elapsed:02:04 seconds
+
+[2026-11-16 19:04:32 +0000] Status=2, isTerminal=NO, Elapsed=02:22.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.managedconfiguration.migrator (MCProfile.migrator, user-agnostic)
+		Migration Elapsed:02:05 seconds
+
+[2026-11-16 19:04:33 +0000] Status=2, isTerminal=NO, Elapsed=02:23.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.managedconfiguration.migrator (MCProfile.migrator, user-agnostic)
+		Migration Elapsed:02:06 seconds
+
+[2026-11-16 19:04:36 +0000] Status=2, isTerminal=NO, Elapsed=02:25.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.managedconfiguration.migrator (MCProfile.migrator, user-agnostic)
+		Migration Elapsed:02:07 seconds
+
+[2026-11-16 19:04:36 +0000] Status=2, isTerminal=NO, Elapsed=02:25.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.managedconfiguration.migrator (MCProfile.migrator, user-agnostic)
+		Migration Elapsed:02:09 seconds
+
+[2026-11-16 19:04:49 +0000] Status=2, isTerminal=NO, Elapsed=02:29.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.managedconfiguration.migrator (MCProfile.migrator, user-agnostic)
+		Migration Elapsed:02:10 seconds
+
+[2026-11-16 19:04:49 +0000] Status=2, isTerminal=NO, Elapsed=02:32.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.managedconfiguration.migrator (MCProfile.migrator, user-agnostic)
+		Migration Elapsed:02:13 seconds
+
+[2026-11-16 19:04:49 +0000] Status=2, isTerminal=NO, Elapsed=02:34.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.MobileGestalt.MobileGestaltMigrator (MobileGestaltMigrator.migrator, user-agnostic)
+		Migration Elapsed:02:16 seconds
+
+[2026-11-16 19:04:49 +0000] Status=2, isTerminal=NO, Elapsed=02:36.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.WebBookmarks.migrator (WebBookmarks.migrator)
+		Migration Elapsed:02:19 seconds
+
+[2026-11-16 19:04:49 +0000] Status=2, isTerminal=NO, Elapsed=02:37.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.MobileSafari.migrator (MobileSafari.migrator)
+		Migration Elapsed:02:20 seconds
+
+[2026-11-16 19:04:49 +0000] Status=2, isTerminal=NO, Elapsed=02:37.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.MobileSafari.migrator (MobileSafari.migrator)
+		Migration Elapsed:02:21 seconds
+
+[2026-11-16 19:04:49 +0000] Status=2, isTerminal=NO, Elapsed=02:38.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.MobileSafari.migrator (MobileSafari.migrator)
+		Migration Elapsed:02:22 seconds
+
+[2026-11-16 19:04:49 +0000] Status=2, isTerminal=NO, Elapsed=02:38.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.MobileSafari.migrator (MobileSafari.migrator)
+		Migration Elapsed:02:22 seconds
+
+[2026-11-16 19:04:49 +0000] Status=2, isTerminal=NO, Elapsed=02:39.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.MobileSafari.migrator (MobileSafari.migrator)
+		Migration Elapsed:02:23 seconds
+
+[2026-11-16 19:04:52 +0000] Status=2, isTerminal=NO, Elapsed=02:40.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.MobileSafari.migrator (MobileSafari.migrator)
+		Migration Elapsed:02:24 seconds
+
+[2026-11-16 19:04:52 +0000] Status=2, isTerminal=NO, Elapsed=02:42.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.accounts.migrator (Accounts.migrator)
+		Migration Elapsed:02:25 seconds
+
+[2026-11-16 19:04:52 +0000] Status=2, isTerminal=NO, Elapsed=02:42.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.keyboards.migrator (KeyboardMigrator.migrator)
+		Migration Elapsed:02:26 seconds
+
+[2026-11-16 19:04:56 +0000] Status=2, isTerminal=NO, Elapsed=02:44.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.PreferencesMigrator (PreferencesMigrator.migrator)
+		Migration Elapsed:02:27 seconds
+
+[2026-11-16 19:04:56 +0000] Status=2, isTerminal=NO, Elapsed=02:44.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.managedconfiguration.cleanup.migrator (MCCleanup.migrator)
+		Migration Elapsed:02:28 seconds
+
+[2026-11-16 19:04:56 +0000] Status=2, isTerminal=NO, Elapsed=02:46.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.managedconfiguration.cleanup.migrator (MCCleanup.migrator)
+		Migration Elapsed:02:29 seconds
+
+[2026-11-16 19:04:57 +0000] Status=2, isTerminal=NO, Elapsed=02:46.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.managedconfiguration.cleanup.migrator (MCCleanup.migrator)
+		Migration Elapsed:02:30 seconds
+
+[2026-11-16 19:04:58 +0000] Status=2, isTerminal=NO, Elapsed=02:47.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.coreaudio.HAENDataMigrator (HAENDataMigrator.migrator)
+		Migration Elapsed:02:31 seconds
+
+[2026-11-16 19:04:59 +0000] Status=2, isTerminal=NO, Elapsed=02:48.
+	Waiting on Data Migration
+		Reason:Running plugin com.apple.coreaudio.HAENDataMigrator (HAENDataMigrator.migrator)
+		Migration Elapsed:02:32 seconds
+
+[2026-11-16 19:04:59 +0000] Status=4, isTerminal=NO, Elapsed=02:49.
+	Waiting on System App
+
+[2026-11-16 19:05:01 +0000] Status=4, isTerminal=NO, Elapsed=02:51.
+	Waiting on System App
+
+[2026-11-16 19:05:02 +0000] Status=4, isTerminal=NO, Elapsed=02:52.
+	Waiting on System App
+
+[2026-11-16 19:05:03 +0000] Status=4, isTerminal=NO, Elapsed=02:53.
+	Waiting on System App
+
+[2026-11-16 19:05:04 +0000] Status=4, isTerminal=NO, Elapsed=02:54.
+	Waiting on System App
+
+[2026-11-16 19:05:05 +0000] Status=4, isTerminal=NO, Elapsed=02:55.
+	Waiting on System App
+
+[2026-11-16 19:05:05 +0000] Status=4, isTerminal=NO, Elapsed=02:55.
+	Waiting on System App
+
+[2026-11-16 19:05:07 +0000] Status=4, isTerminal=NO, Elapsed=02:57.
+	Waiting on System App
+
+[2026-11-16 19:05:08 +0000] Status=4, isTerminal=NO, Elapsed=02:57.
+	Waiting on System App
+
+[2026-11-16 19:05:08 +0000] Status=4, isTerminal=NO, Elapsed=02:58.
+	Waiting on System App
+
+[2026-11-16 19:05:11 +0000] Status=4, isTerminal=NO, Elapsed=03:00.
+	Waiting on System App
+
+[2026-11-16 19:05:11 +0000] Status=4, isTerminal=NO, Elapsed=03:00.
+	Waiting on System App
+
+[2026-11-16 19:05:11 +0000] Status=4, isTerminal=NO, Elapsed=03:01.
+	Waiting on System App
+
+[2026-11-16 19:05:15 +0000] Status=4, isTerminal=NO, Elapsed=03:03.
+	Waiting on System App
+
+[2026-11-16 19:05:15 +0000] Status=4, isTerminal=NO, Elapsed=03:05.
+	Waiting on System App
+
+[2026-11-16 19:05:16 +0000] Status=4, isTerminal=NO, Elapsed=03:06.
+	Waiting on System App
+
+[2026-11-16 19:05:16 +0000] Status=4, isTerminal=NO, Elapsed=03:06.
+	Waiting on System App
+
+[2026-11-16 19:05:17 +0000] Status=4, isTerminal=NO, Elapsed=03:07.
+	Waiting on System App
+
+[2026-11-16 19:05:17 +0000] Status=4, isTerminal=NO, Elapsed=03:07.
+	Waiting on System App
+
+[2026-11-16 19:05:19 +0000] Status=4, isTerminal=NO, Elapsed=03:09.
+	Waiting on System App
+
+[2026-11-16 19:05:23 +0000] Status=4, isTerminal=NO, Elapsed=03:10.
+	Waiting on System App
+
+[2026-11-16 19:05:23 +0000] Status=4, isTerminal=NO, Elapsed=03:10.
+	Waiting on System App
+
+[2026-11-16 19:05:23 +0000] Status=4, isTerminal=NO, Elapsed=03:11.
+	Waiting on System App
+
+[2026-11-16 19:05:23 +0000] Status=4, isTerminal=NO, Elapsed=03:12.
+	Waiting on System App
+
+[2026-11-16 19:05:41 +0000] Status=4, isTerminal=NO, Elapsed=03:13.
+	Waiting on System App
+
+[2026-11-16 19:05:41 +0000] Status=4, isTerminal=NO, Elapsed=03:15.
+	Waiting on System App
+
+[2026-11-16 19:05:41 +0000] Status=4, isTerminal=NO, Elapsed=03:17.
+	Waiting on System App
+
+[2026-11-16 19:05:41 +0000] Status=4, isTerminal=NO, Elapsed=03:19.
+	Waiting on System App
+
+[2026-11-16 19:05:41 +0000] Status=4, isTerminal=NO, Elapsed=03:21.
+	Waiting on System App
+
+[2026-11-16 19:05:41 +0000] Status=4, isTerminal=NO, Elapsed=03:24.
+	Waiting on System App
+
+[2026-11-16 19:05:41 +0000] Status=4294967295, isTerminal=YES, Elapsed=03:26.
+	Finished
+
+/Users/runner/Library/Developer/CoreSimulator/Devices/362C83A9-0E34-447E-9307-3D19B5B1D6BB/data/Containers/Data/Application/73AD1ABE-628B-40F1-8D0C-8A400628CB53
+com.entrixy.ios: 20879
+Detected file type 'PNG' from extension
+Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-stage2-empty.png
+Production SwiftUI route captured: empty
+com.entrixy.ios: 23633
+Detected file type 'PNG' from extension
+Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-stage2-guest-control.png
+Production SwiftUI route captured: guest-control
+com.entrixy.ios: 25593
+Detected file type 'PNG' from extension
+Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-stage2-owner-control.png
+Production SwiftUI route captured: owner-control
+com.entrixy.ios: 26131
+Detected file type 'PNG' from extension
+Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-stage2-mixed-objects.png
+Production SwiftUI route captured: mixed-objects
+com.entrixy.ios: 26942
+Detected file type 'PNG' from extension
+Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-stage2-guest-keys.png
+Waiting for product route: guest-keys {"matched":false,"missing":["controller.invalid","Добавить ключ"]}
+Detected file type 'PNG' from extension
+Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-stage2-guest-keys.png
+Production SwiftUI route captured: guest-keys
+com.entrixy.ios: 28378
+Detected file type 'PNG' from extension
+Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-stage2-key-detail.png
+Waiting for product route: key-detail {"matched":false,"missing":["Полученный ключ","Обновить данные","Удалить ключ с iPhone"]}
+Detected file type 'PNG' from extension
+Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-stage2-key-detail.png
+Production SwiftUI route captured: key-detail
+com.entrixy.ios: 29420
+Detected file type 'PNG' from extension
+Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-stage2-owner-objects.png
+Production SwiftUI route captured: owner-objects
+com.entrixy.ios: 29824
+Detected file type 'PNG' from extension
+Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-stage2-owner-expanded.png
+Production SwiftUI route captured: owner-expanded
+com.entrixy.ios: 30351
+Detected file type 'PNG' from extension
+Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-stage2-guest-expanded.png
+Production SwiftUI route captured: guest-expanded
+com.entrixy.ios: 30480
+Detected file type 'PNG' from extension
+Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-stage2-add-object.png
+Waiting for product route: add-object {"matched":false,"missing":["Bluetooth","Продолжить привязку"]}
+Detected file type 'PNG' from extension
+Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-stage2-add-object.png
+Production SwiftUI route captured: add-object
+com.entrixy.ios: 31128
+Detected file type 'PNG' from extension
+Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-stage2-object-delete.png
+Production SwiftUI route captured: object-delete
+com.entrixy.ios: 31920
+Detected file type 'PNG' from extension
+Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-stage2-owner-guests.png
+Production SwiftUI route captured: owner-guests
+com.entrixy.ios: 32530
+Detected file type 'PNG' from extension
+Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-stage2-delegating-guests.png
+Production SwiftUI route captured: delegating-guests
+com.entrixy.ios: 32899
+Detected file type 'PNG' from extension
+Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-stage2-system.png
+Production SwiftUI route captured: system
+com.entrixy.ios: 33499
+Detected file type 'PNG' from extension
+Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-stage2-code-settings.png
+Waiting for product route: code-settings {"matched":false,"missing":["Код и вход","Новый код Entrixy","Повторите новый код"]}
+Detected file type 'PNG' from extension
+Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-stage2-code-settings.png
+Production SwiftUI route captured: code-settings
+com.entrixy.ios: 34129
+Detected file type 'PNG' from extension
+Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-stage2-sounds.png
+Production SwiftUI route captured: sounds
+com.entrixy.ios: 34666
+Detected file type 'PNG' from extension
+Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-stage2-add-key.png
+Production SwiftUI route captured: add-key
+com.entrixy.ios: 34897
+Detected file type 'PNG' from extension
+Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-stage2-add-server.png
+Production SwiftUI route captured: add-server
+com.entrixy.ios: 35994
+Detected file type 'PNG' from extension
+Wrote screenshot to: /Users/runner/work/ios-build./ios-build./.local-checks/ci/screenshots/iphone16-light-stage2-journal.png
+Production SwiftUI route captured: journal
