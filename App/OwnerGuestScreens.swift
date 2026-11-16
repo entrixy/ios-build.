@@ -156,7 +156,7 @@ struct IssueOwnerKeyScreen: View {
                             if result || pendingEdit || !after.subtracting(before).isEmpty { dismiss() }
                         }
                     } label: { ActionButtonLabel(title: editingKeyID == nil ? "Выдать ключ" : "Сохранить изменения", busy: model.ownerBusy) }
-                        .buttonStyle(PrimaryActionStyle()).listRowInsets(EdgeInsets()).listRowBackground(Color.clear)
+                        .buttonStyle(PrimaryActionStyle()).actionListRow()
                         .disabled(model.ownerBusy || selected.isEmpty || label.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
                 } footer: { Text("Ссылка даст выбранному гостю доступ только к отмеченным объектам. Передавайте её лично получателю.") }
             }

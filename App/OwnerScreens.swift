@@ -213,7 +213,7 @@ struct AddOwnerObjectScreen: View {
                         }
                     } label: {
                         ActionButtonLabel(title: "Добавить объект", busy: model.ownerBusy)
-                    }.buttonStyle(PrimaryActionStyle()).listRowInsets(EdgeInsets()).listRowBackground(Color.clear)
+                    }.buttonStyle(PrimaryActionStyle()).actionListRow()
                         .disabled(!complete || model.ownerBusy)
                 }
             }
