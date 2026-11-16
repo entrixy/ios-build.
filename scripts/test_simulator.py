@@ -3,13 +3,14 @@
 import json
 from pathlib import Path
 import subprocess
+from capture_simulator import create_booted_device, cleanup_device
 
 
 def main():
     sdk = subprocess.check_output(['xcrun', '--sdk', 'iphonesimulator', '--show-sdk-version'], text=True).strip()
     runtimes = json.loads(subprocess.check_output(['xcrun', 'simctl', 'list', 'runtimes', '--json']))['runtimes']
     runtime = next(r['identifier'] for r in runtimes if r.get('isAvailable') and '.iOS-' in r['identifier'] and (r['version'] == sdk or r['version'].startswith(sdk + '.')))
-    device = subprocess.check_output(['xcrun', 'simctl', 'create', 'Entrixy isolated unit tests', 'com.apple.CoreSimulator.SimDeviceType.iPhone-16', runtime], text=True).strip()
+    device = create_booted_device('isolated unit tests', 'com.apple.CoreSimulator.SimDeviceType.iPhone-16', runtime)
     try:
         subprocess.run(['xcodebuild', '-project', 'Entrixy.xcodeproj', '-scheme', 'EntrixyTests',
             '-configuration', 'Debug', '-destination', 'id=' + device,
@@ -30,8 +31,7 @@ def main():
                 print('Could not export failure attachments:', diagnostic_error, flush=True)
         raise
     finally:
-        subprocess.run(['xcrun', 'simctl', 'shutdown', device], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=30)
-        subprocess.run(['xcrun', 'simctl', 'delete', device], check=True, timeout=30)
+        cleanup_device(device)
 
 
 if __name__ == '__main__':

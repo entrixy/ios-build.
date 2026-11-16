@@ -34,27 +34,44 @@ def cleanup_device(device):
     run('xcrun', 'simctl', 'delete', device, timeout=30, optional=True)
 
 
-def prepare_device(model, device_type, runtime):
+def create_booted_device(model, device_type, runtime):
     # Recovery is allowed only before any app scenario or command has started.
-    # A fresh simulator replaces a stalled cold boot; actions are never replayed.
+    # A stuck CoreSimulator service cannot be repaired by creating another device.
     for attempt in range(2):
-        created = run('xcrun', 'simctl', 'create', 'Entrixy preview ' + model, device_type, runtime)
-        device = created.splitlines()[-1].strip()
+        device = None
         try:
+            created = run('xcrun', 'simctl', 'create', 'Entrixy preview ' + model, device_type, runtime)
+            device = created.splitlines()[-1].strip()
             run('xcrun', 'simctl', 'boot', device)
             run('xcrun', 'simctl', 'bootstatus', device, '-b', timeout=300)
-            run('xcrun', 'simctl', 'install', device, str(APP), timeout=240)
-            container = Path(run('xcrun', 'simctl', 'get_app_container', device, BUNDLE, 'data', timeout=120))
-            # Cosmetic status setup must not run ahead of the app installation.
-            run('xcrun', 'simctl', 'status_bar', device, 'override', '--time', '9:41',
-                '--dataNetwork', 'wifi', '--wifiMode', 'active', '--wifiBars', '3',
-                '--batteryState', 'charged', '--batteryLevel', '100', timeout=15, optional=True)
-            return device, container
+            return device
         except (RuntimeError, subprocess.TimeoutExpired):
-            cleanup_device(device)
+            if device:
+                cleanup_device(device)
             if attempt == 1:
                 raise
-            print('Cold simulator preparation stalled; preparing one replacement before scenarios', flush=True)
+            if os.environ.get('GITHUB_ACTIONS') == 'true':
+                # The hosted runner is disposable and exclusively owns this job.
+                # Never restart a developer's simulator service on their Mac.
+                print('Cold boot stalled; restarting hosted CoreSimulator service before scenarios', flush=True)
+                run('killall', '-9', 'com.apple.CoreSimulator.CoreSimulatorService', timeout=15, optional=True)
+            else:
+                print('Cold simulator preparation stalled; preparing one replacement before scenarios', flush=True)
+
+
+def prepare_device(model, device_type, runtime):
+    device = create_booted_device(model, device_type, runtime)
+    try:
+        run('xcrun', 'simctl', 'install', device, str(APP), timeout=240)
+        container = Path(run('xcrun', 'simctl', 'get_app_container', device, BUNDLE, 'data', timeout=120))
+        # Cosmetic status setup must not run ahead of the app installation.
+        run('xcrun', 'simctl', 'status_bar', device, 'override', '--time', '9:41',
+            '--dataNetwork', 'wifi', '--wifiMode', 'active', '--wifiBars', '3',
+            '--batteryState', 'charged', '--batteryLevel', '100', timeout=15, optional=True)
+        return device, container
+    except (RuntimeError, subprocess.TimeoutExpired):
+        cleanup_device(device)
+        raise
 
 
 def expected_visible_text(screen):
