@@ -62,19 +62,22 @@ struct RootView: View {
     }
 
     var body: some View {
-        NavigationStack {
-            Group {
-                switch model.navigationState.resolve(selectedTab) {
-                case .control: ControlScreen { input = ""; adding = true }.modifier(BrandNavigationHeader())
-                case .settings: SettingsScreen().modifier(BrandNavigationHeader())
-                case .guests: OwnerGuestsScreen().modifier(BrandNavigationHeader())
-                case .journal: JournalScreen().modifier(BrandNavigationHeader())
+        VStack(spacing: 0) {
+            NavigationStack {
+                Group {
+                    switch model.navigationState.resolve(selectedTab) {
+                    case .control: ControlScreen { input = ""; adding = true }.modifier(BrandNavigationHeader())
+                    case .settings: SettingsScreen().modifier(BrandNavigationHeader())
+                    case .guests: OwnerGuestsScreen().modifier(BrandNavigationHeader())
+                    case .journal: JournalScreen().modifier(BrandNavigationHeader())
+                    }
                 }
-            }
-        }.id(selectedTab)
-        .safeAreaInset(edge: .bottom, spacing: 0) {
+            }.id(selectedTab)
+            // Reserve a real sibling layout region. UIKit lists inside a
+            // NavigationStack can cover an outer safeAreaInset's hit targets.
             AppBottomNavigation(selection: $selectedTab, tabs: model.navigationState.tabs) { userPickedTab = true }
         }
+        .background(Color(uiColor: .systemGroupedBackground).ignoresSafeArea())
         .onChange(of: model.navigationState) { value in
             if !userPickedTab && value.hasActions && selectedTab == .settings { selectedTab = .control }
             else { selectedTab = value.resolve(selectedTab) }
