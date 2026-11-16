@@ -51,7 +51,10 @@ struct NativeDesignCatalog: View {
     var body: some View {
         catalogScreen
             .safeAreaInset(edge: .bottom, spacing: 0) {
-                CatalogBottomNavigation(selection: $mainTab) { showingCatalog = false }
+                CatalogBottomNavigation(selection: $mainTab) {
+                    showingCatalog = false
+                    showingKeyPage = false
+                }
             }
             .overlay { if let dialog { dialogOverlay(dialog) } }
             .tint(ink).preferredColorScheme(.light)
