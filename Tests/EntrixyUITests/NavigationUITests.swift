@@ -74,7 +74,8 @@ final class NavigationUITests: XCTestCase {
         XCTAssertTrue(guest.buttons["Передать полученный доступ"].exists)
         XCTAssertFalse(guest.buttons["Выдать ключ"].exists)
         guest.buttons["main-tab-control"].tap()
-        XCTAssertTrue(guest.staticTexts["Ворота во двор"].waitForExistence(timeout: 15))
+        let card = guest.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", "Ворота во двор.")).firstMatch
+        XCTAssertTrue(card.waitForExistence(timeout: 15))
         guest.buttons["main-tab-guests"].tap()
         XCTAssertTrue(guest.buttons["Передать полученный доступ"].waitForExistence(timeout: 15))
     }
