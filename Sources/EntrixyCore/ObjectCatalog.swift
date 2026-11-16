@@ -70,7 +70,9 @@ public struct ObjectCatalogPreferences: Codable, Equatable {
     public mutating func hide(_ target: ObjectReference) throws {
         guard case .received = target else { throw GuestCrypto.Failure.invalidEnvelope }
         try target.validate()
-        var value = presentation(for: target); value.hidden = true
+        // Android Settings removes this object's local label when hiding it.
+        // Re-import reveals the owner's original name, not an abandoned alias.
+        var value = presentation(for: target); value.hidden = true; value.label = nil
         received[target.id] = value
         try validate()
     }

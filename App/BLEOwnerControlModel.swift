@@ -44,11 +44,11 @@ import EntrixyCore
                 return verified.deviceID == deviceID
             }.sorted { $0.rssi > $1.rssi }
             guard let discovery = matching.first else {
-            let advertisement = discovery.manufacturerPayload.flatMap { try? BLECrypto.verifyAdvertisement($0, ownerSecret: secret) }
-            app.noteBLESighting(.owned(server: server, objectID: objectID), sleepSeconds: advertisement?.sleepSeconds)
                 messages[objectID] = "Свой контроллер с подтверждённой подписью не найден. Поднесите iPhone ближе и разбудите контроллер."
                 return
             }
+            let advertisement = discovery.manufacturerPayload.flatMap { try? BLECrypto.verifyAdvertisement($0, ownerSecret: secret) }
+            app.noteBLESighting(.owned(server: server, objectID: objectID), sleepSeconds: advertisement?.sleepSeconds)
             messages[objectID] = "Подключение Bluetooth…"
             let connection = try await transport.connect(discovery.id, pairing: false); channel = connection
             let hasResults = try await connection.enableResults()
