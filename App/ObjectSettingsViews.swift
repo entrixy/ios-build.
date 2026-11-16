@@ -6,8 +6,9 @@ import EntrixyCore
 enum ObjectSettingsTask: Identifiable {
     case edit(ObjectReference)
     case rename(ObjectReference)
-    var target: ObjectReference { switch self { case .edit(let target), .rename(let target): return target } }
-    var id: String { switch self { case .edit: return "edit:" + target.id; case .rename: return "rename:" + target.id } }
+    case automation(ObjectReference)
+    var target: ObjectReference { switch self { case .edit(let target), .rename(let target), .automation(let target): return target } }
+    var id: String { switch self { case .edit: return "edit:" + target.id; case .rename: return "rename:" + target.id; case .automation: return "automation:" + target.id } }
 }
 
 struct CatalogAvatar: View {
@@ -69,14 +70,16 @@ struct ObjectSettingsRows: View {
     var body: some View {
         ForEach(entries) { entry in
             VStack(alignment: .leading, spacing: 14) {
-                Button {
+                HStack(spacing: 12) {
+                    Button { model.objectAvatarTarget = entry.target } label: { CatalogAvatar(entry: entry, size: 56) }
+                        .buttonStyle(.plain).accessibilityLabel(ProductText.string("avatar_picker_title"))
+                    Button {
                     withAnimation(.easeInOut(duration: 0.2)) {
                         if expanded.contains(entry.target) { expanded.remove(entry.target) }
                         else { expanded.insert(entry.target) }
                     }
                 } label: {
                     HStack(spacing: 12) {
-                        CatalogAvatar(entry: entry, size: 44)
                         VStack(alignment: .leading, spacing: 6) {
                             Text(model.objectLabel(entry)).font(.headline).foregroundStyle(Brand.ink)
                             ObjectSourceLabel(entry: entry)
@@ -91,15 +94,21 @@ struct ObjectSettingsRows: View {
                 }.buttonStyle(.plain)
                     .accessibilityIdentifier("object-settings-" + entry.target.id)
                     .accessibilityValue(expanded.contains(entry.target) ? "Развёрнут" : "Свёрнут")
+                }
                 if expanded.contains(entry.target) {
                     Divider()
                     HStack(spacing: 10) {
                         Button { task = entry.kindTask } label: {
-                            Label(entry.isOwned ? "Настройки" : "Название", systemImage: "pencil")
+                            Image(systemName: entry.isOwned ? "gearshape" : "pencil").font(.title3).frame(maxWidth: .infinity)
                         }.buttonStyle(SecondaryActionStyle())
+                            .accessibilityLabel(entry.isOwned ? "Настройки" : "Название")
+                        Button { task = .automation(entry.target) } label: {
+                            Image(systemName: "arrow.triangle.2.circlepath").font(.title3).frame(maxWidth: .infinity)
+                        }.buttonStyle(SecondaryActionStyle()).accessibilityLabel(ProductText.string("automation_icon_desc"))
                         Button(role: .destructive) { model.objectRemovalTarget = entry.target } label: {
-                            Label(entry.isOwned ? "Удалить" : "Скрыть", systemImage: "trash")
+                            Image(systemName: "trash").font(.title3).frame(maxWidth: .infinity)
                         }.buttonStyle(SecondaryActionStyle())
+                            .accessibilityLabel(entry.isOwned ? "Удалить" : "Скрыть")
                             .disabled(model.ownerBusy || model.busy || entry.deletionPending)
                     }
                     if case let .owned(_, object) = entry, let message = model.ownerObjectMessages[object.id] {
@@ -121,6 +130,7 @@ struct ObjectSettingsRows: View {
                         .sheetDismissFooter(disabled: model.ownerBusy) { self.task = nil }
                 }
             case .rename(let target): ReceivedObjectNameScreen(target: target)
+            case .automation(let target): AutomationEditor(destination: .object(target))
             }
         }
         .task {
@@ -168,15 +178,17 @@ private struct ReceivedObjectNameScreen: View {
 struct AddCatalogObjectScreen: View {
     @EnvironmentObject private var model: AppModel
     @Environment(\.dismiss) private var dismiss
+    var completion: ((ObjectReference?) -> Void)? = nil
+    private func finish(_ target: ObjectReference?) { completion?(target); dismiss() }
     var body: some View {
         if model.owners.filter({ !$0.registrationPending }).isEmpty {
-            AddOwnerObjectScreen(server: model.owners.first?.server ?? "entrixy.com")
+            AddOwnerObjectScreen(server: model.owners.first?.server ?? "entrixy.com", completion: finish)
         } else if let owner = model.owners.first(where: { !$0.registrationPending }), model.owners.filter({ !$0.registrationPending }).count == 1 {
-            AddOwnerObjectScreen(server: owner.server)
+            AddOwnerObjectScreen(server: owner.server, completion: finish)
         } else {
             NavigationStack {
                 List(model.owners.filter { !$0.registrationPending }) { owner in
-                    NavigationLink(owner.server) { AddOwnerObjectScreen(server: owner.server, embedded: true) }
+                    NavigationLink(owner.server) { AddOwnerObjectScreen(server: owner.server, embedded: true, completion: finish) }
                 }.navigationTitle("Сервер объекта").navigationBarTitleDisplayMode(.inline)
                     .sheetDismissFooter(disabled: model.ownerBusy) { dismiss() }
             }

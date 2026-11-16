@@ -10,7 +10,22 @@ struct SavedGuest: Codable, Identifiable {
     var bleCache: GuestBLECache? = nil
     // Display/navigation hint only; actual delegation is checked against live allowance.
     var incomingDepth: Int? = nil
+    var automation: [String: IncomingAutomationConfiguration]? = nil
+    var cameras: [String: ObjectCameraConfiguration]? = nil
     var id: String { invite.id }
+    func validateObjectSettings() throws {
+        guard (automation ?? [:]).count <= 1000, (cameras ?? [:]).count <= 1000 else {
+            throw GuestCrypto.Failure.invalidEnvelope
+        }
+        for (id, rule) in automation ?? [:] {
+            guard !id.isEmpty, id.utf8.count <= 512 else { throw GuestCrypto.Failure.invalidEnvelope }
+            try rule.owner.validate(); try rule.effective.validate()
+        }
+        for (id, camera) in cameras ?? [:] {
+            guard !id.isEmpty, id.utf8.count <= 512 else { throw GuestCrypto.Failure.invalidEnvelope }
+            try camera.validate()
+        }
+    }
 }
 
 struct SavedState: Codable {
@@ -70,7 +85,10 @@ struct KeychainStore: StateStorage {
         try state.pendingRestore?.validate()
         let received = state.receivedDelegations ?? []
         guard received.count <= 1000, Set(received.map(\.id)).count == received.count else { throw Failure(status: errSecDecode) }
-        for guest in state.guests { _ = try guest.bleCache?.open(key: guest.invite.bundleKey) }
+        for guest in state.guests {
+            _ = try guest.bleCache?.open(key: guest.invite.bundleKey)
+            try guest.validateObjectSettings()
+        }
         let guestIDs = Set(state.guests.map(\.id))
         let incoming = state.incomingMessages ?? [], outgoing = state.outgoingMessages ?? []
         guard incoming.count <= 200, outgoing.count <= 100,

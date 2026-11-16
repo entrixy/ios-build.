@@ -57,6 +57,7 @@ struct IOSBackupPayload: Codable {
         for record in passed { try record.validate() }
         for owner in owners { try owner.validate() }
         for guest in guests {
+            try guest.validateObjectSettings()
             _ = try guest.bleCache?.open(key: guest.invite.bundleKey)
             let link = "https://\(guest.invite.server)/key#\(guest.invite.userKey)\(GuestCrypto.base64URL(guest.invite.bundleKey))"
             guard try GuestInvite.parse(link) == guest.invite else { throw BackupFailure.invalidPayload }

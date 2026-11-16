@@ -1,0 +1,55 @@
+name: iOS functional port compilation
+"on":
+  push:
+    branches: [ci/functional-port]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: functional-port-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  compile:
+    runs-on: macos-15
+    timeout-minutes: 25
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.3.app/Contents/Developer
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - name: Prepare evidence
+        run: |
+          mkdir -p .local-checks/ci
+          xcodebuild -version | tee .local-checks/ci/toolchain.log
+      - name: Test protocol core with Apple CryptoKit
+        run: swift test 2>&1 | tee .local-checks/ci/core.log
+      - name: Install project generator
+        run: brew install xcodegen
+      - name: Generate project
+        run: xcodegen generate
+      - name: Compile application and test bundles without launching scenarios
+        run: |
+          xcodebuild -project Entrixy.xcodeproj -scheme EntrixyTests \
+            -configuration Debug -sdk iphonesimulator \
+            -destination 'generic/platform=iOS Simulator' \
+            -derivedDataPath .local-checks/DerivedData \
+            CODE_SIGNING_ALLOWED=YES CODE_SIGN_IDENTITY=- build-for-testing 2>&1 | tee .local-checks/ci/debug-build.log
+      - name: Compile Release and verify fixture isolation
+        run: |
+          xcodebuild -project Entrixy.xcodeproj -scheme Entrixy \
+            -configuration Release -sdk iphonesimulator \
+            -destination 'generic/platform=iOS Simulator' \
+            -derivedDataPath .local-checks/ReleaseDerivedData \
+            CODE_SIGNING_ALLOWED=YES CODE_SIGN_IDENTITY=- build 2>&1 | tee .local-checks/ci/release-build.log
+          python3 scripts/verify_release_isolation.py \
+            .local-checks/DerivedData/Build/Products/Debug-iphonesimulator/Entrixy.app \
+            .local-checks/ReleaseDerivedData/Build/Products/Release-iphonesimulator/Entrixy.app
+      - name: Retain compilation evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: functional-port-build-evidence
+          path: .local-checks/ci/
+          retention-days: 3

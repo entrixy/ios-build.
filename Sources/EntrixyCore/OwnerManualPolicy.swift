@@ -3,12 +3,14 @@ import CoreFoundation
 
 /// Owner's local rules are distinct from the template issued to a guest.
 public struct OwnerManualPolicy {
+    public let template: AutomationTemplate
     public let authentication: String?
     public let confirmation: Bool
     public let blockedReason: String?
     public init(_ bytes: Data?) throws {
+        template = try AutomationTemplate(data: bytes)
         guard let bytes else { authentication = nil; confirmation = false; blockedReason = nil; return }
-        guard bytes.count <= 65536, let template = try JSONSerialization.jsonObject(with: bytes) as? [String: Any] else { throw GuestCrypto.Failure.invalidEnvelope }
+        guard bytes.count <= 1_048_576, let template = try JSONSerialization.jsonObject(with: bytes) as? [String: Any] else { throw GuestCrypto.Failure.invalidEnvelope }
         func flag(_ field: String) throws -> Bool {
             guard let value = template[field] else { return false }
             guard let n = value as? NSNumber, CFGetTypeID(n) == CFBooleanGetTypeID() else { throw GuestCrypto.Failure.invalidEnvelope }

@@ -28,6 +28,8 @@ public enum ObjectReference: Codable, Hashable, Identifiable {
 public struct ReceivedObjectPresentation: Codable, Equatable {
     public var label: String?
     public var hidden: Bool
+    public var avatarPreset: Int?
+    public var avatarCipher: String?
     public init(label: String? = nil, hidden: Bool = false) { self.label = label; self.hidden = hidden }
 }
 
@@ -43,6 +45,8 @@ public struct ObjectCatalogPreferences: Codable, Equatable {
         guard order.count <= 4000, Set(order).count == order.count, received.count <= 4000,
               received.allSatisfy({ key, value in
                   key.hasPrefix("guest:") && key.utf8.count <= 512 &&
+                  (value.avatarPreset.map { (0...7).contains($0) } ?? true) &&
+                  (value.avatarCipher.map { $0.utf8.count <= 1_048_576 && value.avatarPreset == nil } ?? true) &&
                   (value.label == nil || (value.label!.utf8.count <= 512 && !value.label!.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty))
               }) else { throw GuestCrypto.Failure.invalidEnvelope }
         for target in order { try target.validate() }

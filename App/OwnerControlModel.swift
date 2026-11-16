@@ -190,6 +190,17 @@ final class OwnerControlModel: ObservableObject {
             connections[server] = .unavailable; link.live.close(); return
         }
         guard link.authenticated else { return }
+        if type == "avatar_request", let number = json["number_id"] as? Int, number > 0,
+           let guestOID = json["guest_oid"] as? Int, guestOID > 0,
+           let owner = app.owners.first(where: { $0.server == server }),
+           let object = owner.objects?.first(where: { $0.numberID == number && $0.pending != .delete }) {
+            var reply: [String: Any] = ["type": "avatar_data", "number_id": number, "guest_oid": guestOID]
+            if try object.metadata(masterKey: owner.masterKey)["avatar_type"] as? String == "file", let cipher = object.avatarCipher {
+                reply["avatar_cipher"] = cipher
+            } else { reply["data"] = "" }
+            try await link.live.sendAction(JSONSerialization.data(withJSONObject: reply, options: .sortedKeys))
+            return
+        }
         if ["do_call", "confirm_request"].contains(type) {
             // An invalid guest request does not tear down the owner's command channel.
             try? receivePhoneRequest(json, server: server)

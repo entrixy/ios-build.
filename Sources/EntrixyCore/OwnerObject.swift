@@ -5,6 +5,7 @@ public enum OwnerOperation: String, Codable {
     case create = "number_add", update = "number_update", delete = "number_delete", claim = "device_claim"
     case keyCreate = "key_create", keyEdit = "key_edit", keyMode = "key_set_mode", keyRevoke = "key_revoke"
     case hostClaim = "host_claim", messageSend = "message_send"
+    case deviceRegister = "device_register"
 }
 
 /// Stored only inside the device-only Keychain. Object keys are wrapped by K_master.
@@ -22,9 +23,15 @@ public struct OwnerObject: Codable, Identifiable, Equatable {
     public var claimCode: String?
     public var localPhone: String?
     public var wrappedSocketSecret: String?
+    public var wrappedDeviceCredentials: String?
     public var wrappedBLESecret: String?
     public var bleDeviceID: UInt32?
     public var localPolicy: Data?
+    public var avatarCipher: String?
+    public var pendingHasAvatar: Bool?
+    public var localConfiguration: OwnerObjectLocalConfiguration?
+    public var editBaseline: OwnerObjectEditBaseline?
+    public var pendingRouting: [String: String]?
     public var bleProofs: [String]?
     /// Physical BLE ownership is proved by the paired secret, independently of
     /// the server registration/metadata acknowledgement. Delete intent hides it.
@@ -33,7 +40,8 @@ public struct OwnerObject: Codable, Identifiable, Equatable {
         return numberID != nil && pending == nil && available != false
     }
 
-    public init(masterKey: Data, label: String, kind: String, phone: String = "", url: String = "", secret: String = "", claimCode: String = "") throws {
+    public init(masterKey: Data, label: String, kind: String, phone: String = "", url: String = "", secret: String = "", claimCode: String = "", registerDevice: Bool = false,
+                webhookMode: String = "server", webhookToggle: Bool = false) throws {
         guard ["call", "webhook", "device"].contains(kind), !label.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty,
               label.utf8.count <= 512 else { throw GuestCrypto.Failure.invalidEnvelope }
         let normalizedPhone = phone.filter { !" -()".contains($0) }
@@ -43,22 +51,23 @@ public struct OwnerObject: Codable, Identifiable, Equatable {
                   digits.allSatisfy({ $0.isASCII && $0.isNumber }) else { throw GuestCrypto.Failure.invalidEnvelope }
         }
         if kind == "webhook" {
-            guard let u = URLComponents(string: url), u.scheme == "https", u.host != nil,
+            guard ["phone", "server"].contains(webhookMode), let u = URLComponents(string: url), ["https", "http"].contains(u.scheme?.lowercased() ?? ""), u.host != nil,
                   u.user == nil, u.password == nil, u.fragment == nil, !secret.isEmpty, secret.utf8.count <= 1024 else { throw GuestCrypto.Failure.invalidEnvelope }
         }
         let code = claimCode.trimmingCharacters(in: .whitespacesAndNewlines).uppercased()
-        if kind == "device" { guard !code.isEmpty, code.utf8.count <= 128 else { throw GuestCrypto.Failure.invalidEnvelope } }
+        if kind == "device" { guard (registerDevice || !code.isEmpty), code.utf8.count <= 128 else { throw GuestCrypto.Failure.invalidEnvelope } }
         let key = GuestCrypto.randomBytes(count: 32)
         // K_obj is shared with guests. Phone numbers and webhook secrets must stay owner-only.
         localPhone = kind == "call" ? normalizedPhone : nil
-        let metadata: [String: Any] = ["label": label.trimmingCharacters(in: .whitespacesAndNewlines), "avatar_type": "preset:3"]
+        var metadata: [String: Any] = ["label": label.trimmingCharacters(in: .whitespacesAndNewlines), "avatar_type": "preset:3"]
+        if kind == "webhook" && webhookToggle { metadata["wh_toggle"] = 1 }
         id = UUID()
         self.kind = kind
         wrappedKey = try GuestCrypto.encrypt(key: masterKey, plaintext: key)
         cipher = try GuestCrypto.encrypt(key: key, plaintext: JSONSerialization.data(withJSONObject: metadata, options: .sortedKeys))
-        routing = kind == "webhook" ? ["webhook_mode": "server", "webhook_url": url, "webhook_secret": secret] : [:]
-        pending = kind == "device" ? .claim : .create
-        self.claimCode = kind == "device" ? code : nil
+        routing = kind == "webhook" ? ["webhook_mode": webhookMode, "webhook_url": url, "webhook_secret": secret] : [:]
+        pending = kind == "device" ? (registerDevice ? .deviceRegister : .claim) : .create
+        self.claimCode = kind == "device" && !registerDevice ? code : nil
         sent = false
     }
 
@@ -96,9 +105,22 @@ public struct OwnerObject: Codable, Identifiable, Equatable {
               revision == nil || revision! >= 0,
               Set(routing.keys).isSubset(of: ["webhook_mode", "webhook_url", "webhook_secret", "device_id_ref"]) else { throw GuestCrypto.Failure.invalidEnvelope }
         if pending == .claim { guard claimCode?.isEmpty == false, numberID == nil else { throw GuestCrypto.Failure.invalidEnvelope } }
+        if pending == .deviceRegister { guard kind == "device", numberID == nil, wrappedDeviceCredentials == nil else { throw GuestCrypto.Failure.invalidEnvelope } }
         if pending == .create { guard numberID == nil else { throw GuestCrypto.Failure.invalidEnvelope } }
         if pending == .update || pending == .delete { guard numberID != nil else { throw GuestCrypto.Failure.invalidEnvelope } }
+        if let pending { guard [.create, .update, .delete, .claim, .deviceRegister].contains(pending) else { throw GuestCrypto.Failure.invalidEnvelope } }
         _ = try OwnerManualPolicy(localPolicy)
+        try localConfiguration?.validate()
+        try editBaseline?.local?.validate()
+        if let pendingRouting {
+            guard kind == "webhook", pending == .update,
+                  Set(pendingRouting.keys).isSubset(of: ["webhook_mode", "webhook_url", "webhook_secret"]),
+                  ["phone", "server"].contains(pendingRouting["webhook_mode"] ?? ""),
+                  pendingRouting["webhook_mode"] != "phone" || pendingRouting.count == 1 else {
+                throw GuestCrypto.Failure.invalidEnvelope
+            }
+        }
+        if editBaseline != nil { guard pending == .update else { throw GuestCrypto.Failure.invalidEnvelope } }
         let proofs = bleProofs ?? []
         guard proofs.count <= 64, Set(proofs).count == proofs.count,
               proofs.allSatisfy({ $0.utf8.count == 64 && $0.utf8.allSatisfy { (48...57).contains($0) || (97...102).contains($0) } }) else { throw GuestCrypto.Failure.invalidEnvelope }
@@ -106,7 +128,13 @@ public struct OwnerObject: Codable, Identifiable, Equatable {
             guard let wrappedBLESecret, let bleDeviceID, bleDeviceID != 0,
                   try GuestCrypto.decrypt(key: masterKey, envelope: wrappedBLESecret).count == 32 else { throw GuestCrypto.Failure.invalidKey }
         } else if wrappedBLESecret != nil || bleDeviceID != nil { throw GuestCrypto.Failure.invalidEnvelope }
+        if pendingHasAvatar != nil { guard pending == .update else { throw GuestCrypto.Failure.invalidEnvelope } }
+        if let avatarCipher {
+            let key = try GuestCrypto.decrypt(key: masterKey, envelope: wrappedKey)
+            guard avatarCipher.utf8.count <= 1_048_576, try GuestCrypto.decrypt(key: key, envelope: avatarCipher).count <= 524_288 else { throw GuestCrypto.Failure.invalidEnvelope }
+        }
         _ = try metadata(masterKey: masterKey)
+        _ = try deviceCredentials(masterKey: masterKey)
     }
 
     public static func replyID(_ value: Any?) throws -> Int {
@@ -143,6 +171,7 @@ public struct OwnerObject: Codable, Identifiable, Equatable {
         guard let pending else { throw GuestCrypto.Failure.invalidEnvelope }
         var body: [String: Any] = [:]
         switch pending {
+        case .deviceRegister: break
         case .claim:
             guard let claimCode else { throw GuestCrypto.Failure.invalidEnvelope }
             body["claim_code"] = claimCode
@@ -150,6 +179,7 @@ public struct OwnerObject: Codable, Identifiable, Equatable {
             body["type"] = kind
             body["data_cipher"] = cipher
             for (name, value) in routing {
+                if kind == "webhook" && routing["webhook_mode"] == "phone" && ["webhook_url", "webhook_secret"].contains(name) { continue }
                 if name == "device_id_ref" {
                     guard let id = Int(value), id > 0 else { throw GuestCrypto.Failure.invalidEnvelope }
                     body[name] = id
@@ -158,6 +188,8 @@ public struct OwnerObject: Codable, Identifiable, Equatable {
         case .update:
             guard let numberID, let revision else { throw GuestCrypto.Failure.invalidEnvelope }
             body = ["id": numberID, "data_cipher": cipher, "data_cipher_ts_check": revision]
+            for (name, value) in pendingRouting ?? [:] { body[name] = value }
+            if let pendingHasAvatar { body["has_avatar"] = pendingHasAvatar }
         case .keyCreate, .keyEdit, .keyMode, .keyRevoke, .hostClaim, .messageSend: throw GuestCrypto.Failure.invalidEnvelope
         case .delete:
             guard let numberID else { throw GuestCrypto.Failure.invalidEnvelope }
@@ -199,7 +231,9 @@ public extension OwnerAccount {
                     continue
                 }
                 if let row, let cipher = row["data_cipher"] as? String {
-                    if object.pending == .update && object.sent && object.cipher == cipher { object.pending = nil; object.sent = false }
+                    if object.pending == .update && object.sent && object.cipher == cipher {
+                        object.pending = nil; object.sent = false; object.editBaseline = nil; object.pendingRouting = nil; object.pendingHasAvatar = nil
+                    }
                     if object.pending == nil {
                         // Never accept a plaintext label or replace the key after decryption failure.
                         let key = try GuestCrypto.decrypt(key: masterKey, envelope: object.wrappedKey)

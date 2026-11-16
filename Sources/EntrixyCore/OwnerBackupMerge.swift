@@ -20,19 +20,27 @@ public extension OwnerAccount {
             try sameSecret(current.wrappedKey, incoming.wrappedKey)
             try sameSecret(current.wrappedBLESecret, incoming.wrappedBLESecret)
             try sameSecret(current.wrappedSocketSecret, incoming.wrappedSocketSecret)
+            try sameSecret(current.wrappedDeviceCredentials, incoming.wrappedDeviceCredentials)
             if incoming.pending != nil && (current.pending != incoming.pending || current.cipher != incoming.cipher) {
                 guard incoming.pending == .create, incoming.sent, current.numberID != nil,
                       incoming.cipher == current.cipher, current.pending == nil else { throw GuestCrypto.Failure.invalidEnvelope }
             }
             if let first = current.localPolicy, let second = incoming.localPolicy, first != second { throw GuestCrypto.Failure.invalidEnvelope }
+            if let first = current.localConfiguration, let second = incoming.localConfiguration, first != second { throw GuestCrypto.Failure.invalidEnvelope }
+            if current.pending != nil && (current.pendingRouting != incoming.pendingRouting || current.editBaseline != incoming.editBaseline || current.pendingHasAvatar != incoming.pendingHasAvatar) {
+                throw GuestCrypto.Failure.invalidEnvelope
+            }
             var result = current
             if current.pending == .create, incoming.pending == nil, let numberID = incoming.numberID, current.cipher == incoming.cipher {
                 result.numberID = numberID; result.pending = nil; result.sent = false; result.revision = incoming.revision
             } else if result.pending != nil { result.sent = current.sent || incoming.sent }
             result.wrappedBLESecret = current.wrappedBLESecret ?? incoming.wrappedBLESecret
             result.wrappedSocketSecret = current.wrappedSocketSecret ?? incoming.wrappedSocketSecret
+            result.wrappedDeviceCredentials = current.wrappedDeviceCredentials ?? incoming.wrappedDeviceCredentials
             result.localPhone = current.localPhone ?? incoming.localPhone
             result.localPolicy = current.localPolicy ?? incoming.localPolicy
+            result.localConfiguration = current.localConfiguration ?? incoming.localConfiguration
+            result.avatarCipher = current.avatarCipher ?? (current.cipher == incoming.cipher ? incoming.avatarCipher : nil)
             var proofs: [String] = []
             for proof in (incoming.bleProofs ?? []) + (current.bleProofs ?? []) {
                 proofs.removeAll { $0 == proof }; proofs.append(proof)
@@ -163,6 +171,9 @@ public extension OwnerAccount {
             } else { android.append(incoming) }
         }
         merged.androidKeys = android
+        var refreshes = source.bundleRefreshQueue ?? [:]
+        for (key, token) in bundleRefreshQueue ?? [:] { refreshes[key] = token }
+        merged.bundleRefreshQueue = refreshes
         try merged.validate()
         return merged
     }

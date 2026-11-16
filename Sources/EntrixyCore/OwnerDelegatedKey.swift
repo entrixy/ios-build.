@@ -157,7 +157,7 @@ public extension OwnerAccount {
                 // Parent restrictions are copied intact; only this descendant's
                 // object keys/socket grants and scope are regenerated.
                 let bundle = try OwnerIssuedKey.makeBundle(owner: self, numberIDs: ids, guestID: record.guestID,
-                    welcome: "", confirmation: nil, existing: parent.bundle)
+                    welcome: "", confirmation: nil, existing: parent.bundle, inheritRestrictions: true)
                 let expected = try JSONSerialization.jsonObject(with: bundle) as! [String: Any]
                 let old = record.bundleCipher.isEmpty ? nil : try record.bundle(masterKey: masterKey)
                 let sameContent = old.map { NSDictionary(dictionary: $0).isEqual(to: expected) } ?? false

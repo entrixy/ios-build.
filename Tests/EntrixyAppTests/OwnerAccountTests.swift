@@ -79,6 +79,7 @@ private final class RecordingOwnerAPI: OwnerTransport {
             if let cipher = json["key_cipher"] { keyRows[index]["key_cipher"] = cipher; keyRows[index]["needs_bundle"] = 0 }
             if loseKeyEditReply { throw URLError(.networkConnectionLost) }
         case .claim: return Data(#"{"device_id":9}"#.utf8)
+        case .deviceRegister: throw GuestCrypto.Failure.invalidEnvelope
         case .create:
             rows = [["id": 7, "type": json["type"]!, "data_cipher": json["data_cipher"]!, "data_cipher_revision": 100]]
             if loseCreateReply { throw URLError(.networkConnectionLost) }

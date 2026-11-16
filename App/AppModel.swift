@@ -22,9 +22,15 @@ final class AppModel: ObservableObject {
     @Published private(set) var unverifiedOwnerDelegations: [String: Int] = [:]
     private var unsavedOwnerKeys: [UUID: OwnerIssuedKey] = [:]
     private var unsavedOwnerObjects: [UUID: OwnerObject] = [:]
+    private var ownerBundleRetryAfter: [String: Date] = [:]
+    private var ownerBundleRetryAttempts: [String: Int] = [:]
+    private var ownerSettingsTask: Task<Void, Never>?
+    private var ownerSettingsTaskGeneration: UUID?
     private var unsavedOwnerCredentials: [String: OwnerCredentials] = [:]
     @Published private(set) var guests: [SavedGuest] = []
     @Published var objectRemovalTarget: ObjectReference?
+    @Published var objectAvatarTarget: ObjectReference?
+    lazy var automationSensors = AutomationSensors()
     @Published private(set) var objectPreferences = ObjectCatalogPreferences()
     @Published private(set) var bleVisibleUntil: [ObjectReference: TimeInterval] = [:]
     @Published private(set) var busy = false
@@ -403,6 +409,34 @@ final class AppModel: ObservableObject {
     private func saveOwners(_ updated: [OwnerAccount]) throws {
         try storage.save(SavedState(identity: identity, guests: guests, journal: journal, actionCode: actionCode, owners: updated, usedOwnerPresses: usedOwnerPresses, pendingRestore: pendingRestore, delegations: delegations, passedAccess: passedAccess, receivedDelegations: receivedDelegations, incomingMessages: incomingMessages, outgoingMessages: outgoingMessages, delegatedJournalLedger: delegatedJournalLedger, appLockEnabled: appLockEnabled, appEntryBiometricEnabled: appEntryBiometricEnabled, objectPreferences: objectPreferences))
         owners = updated
+        scheduleOwnerSettingsRefresh()
+    }
+
+    private func updateGuestMaterial(_ guest: inout SavedGuest, objects: [GuestObject], bundle: Data, snapshot: Data) throws {
+        guard let contents = try JSONSerialization.jsonObject(with: bundle) as? [String: Any] else { throw GuestCrypto.Failure.invalidEnvelope }
+        let templates = contents["templates"] as? [String: [String: Any]] ?? [:]
+        let ble = contents["ble"] as? [[String: Any]] ?? []
+        guard contents["templates"] == nil || contents["templates"] is [String: [String: Any]],
+              contents["ble"] == nil || contents["ble"] is [[String: Any]],
+              contents["streams"] == nil || contents["streams"] is [Int],
+              contents["cams"] == nil || contents["cams"] is [String: [String: Any]] else {
+            throw GuestCrypto.Failure.invalidEnvelope
+        }
+        var rules: [String: IncomingAutomationConfiguration] = [:]
+        var cameras: [String: ObjectCameraConfiguration] = [:]
+        let streamIDs = Set(contents["streams"] as? [Int] ?? [])
+        let cameraRows = contents["cams"] as? [String: [String: Any]] ?? [:]
+        for object in objects {
+            let raw = object.kind == "ble" ? (ble.first { ($0["id"] as? Int) == object.numberID }?["tpl"] as? [String: Any] ?? [:]) : (templates[String(object.numberID)] ?? [:])
+            let fresh = try AutomationTemplate(data: JSONSerialization.data(withJSONObject: raw))
+            if var previous = guest.automation?[object.id] { previous.receive(fresh); rules[object.id] = previous }
+            else { rules[object.id] = IncomingAutomationConfiguration(owner: fresh) }
+            if object.kind != "ble", streamIDs.contains(object.numberID), let row = cameraRows[String(object.numberID)] {
+                cameras[object.id] = try ObjectCameraConfiguration(wire: row)
+            }
+        }
+        guest.automation = rules; guest.cameras = cameras
+        try updateBLECache(&guest, bundle: bundle, snapshot: snapshot)
     }
 
     private func updateBLECache(_ guest: inout SavedGuest, bundle: Data, snapshot: Data) throws {
@@ -665,15 +699,20 @@ final class AppModel: ObservableObject {
         guard storageReady, foreground, !ownerBusy else { return }
         ownerBusy = true
         defer { ownerBusy = false }
-        for owner in owners where !owner.registrationPending { await syncOwner(owner.server) }
+        for owner in owners where !owner.registrationPending {
+            await syncOwner(owner.server)
+            await flushOwnerObjectSettings(server: owner.server)
+        }
     }
 
-    func createOwnerObject(server: String, label: String, kind: String, phone: String, url: String, secret: String, claimCode: String) async -> Bool {
+    func createOwnerObject(server: String, label: String, kind: String, phone: String, url: String, secret: String, claimCode: String, registerDevice: Bool = false,
+                           webhookMode: String = "server", webhookToggle: Bool = false) async -> Bool {
         guard storageReady, !ownerBusy, let index = owners.firstIndex(where: { $0.server == server && $0.credentials != nil }) else { return false }
         ownerBusy = true
         defer { ownerBusy = false }
         do {
-            let draft = try OwnerObject(masterKey: owners[index].masterKey, label: label, kind: kind, phone: phone, url: url, secret: secret, claimCode: claimCode)
+            let draft = try OwnerObject(masterKey: owners[index].masterKey, label: label, kind: kind, phone: phone, url: url, secret: secret, claimCode: claimCode, registerDevice: registerDevice,
+                webhookMode: webhookMode, webhookToggle: webhookToggle)
             var updated = owners
             updated[index].objects = (updated[index].objects ?? []) + [draft]
             try saveOwners(updated)
@@ -696,6 +735,92 @@ final class AppModel: ObservableObject {
             try saveOwners(updated)
             return await sendOwnerObject(server: server, objectID: objectID)
         } catch { errorMessage = "Не удалось сохранить изменение. Сначала обновите данные сервера."; return false }
+    }
+
+    func updateOwnerObject(server: String, objectID: UUID, draft: OwnerObjectEdit) async -> Bool {
+        guard storageReady, !ownerBusy, let index = owners.firstIndex(where: { $0.server == server }),
+              let offset = owners[index].objects?.firstIndex(where: { $0.id == objectID }) else { return false }
+        ownerBusy = true
+        defer { ownerBusy = false }
+        do {
+            var updated = owners
+            let masterKey = updated[index].masterKey
+            try updated[index].objects![offset].updateConfiguration(draft, masterKey: masterKey)
+            if let numberID = updated[index].objects![offset].numberID { updated[index].queueObjectSettings(numberID: numberID) }
+            try saveOwners(updated)
+            let saved = await sendOwnerObject(server: server, objectID: objectID)
+            if saved { await flushOwnerObjectSettings(server: server) }
+            return saved
+        } catch {
+            ownerObjectMessages[objectID] = "Не удалось сохранить настройки. Объект мог измениться; обновите данные и откройте настройки снова."
+            return false
+        }
+    }
+
+    /// Metadata/template publication is idempotent. Each queue token survives a
+    /// restart and distinguishes an in-flight old version from a newer edit.
+    /// This queue never sends an actuator command or creates a guest identity.
+    private func flushOwnerObjectSettings(server: String) async {
+        guard foreground, pendingRestore == nil,
+              let start = owners.first(where: { $0.server == server }) else { return }
+        for keyID in (start.bundleRefreshQueue ?? [:]).keys.sorted() {
+            guard let index = owners.firstIndex(where: { $0.server == server }),
+                  let token = owners[index].bundleRefreshQueue?[keyID],
+                  let offset = owners[index].issuedKeys?.firstIndex(where: { $0.id.uuidString == keyID }) else { continue }
+            let retryID = server + "|" + keyID
+            if let next = ownerBundleRetryAfter[retryID], next > Date() { continue }
+            let key = owners[index].issuedKeys![offset]
+            do {
+                var updated = owners
+                if key.state == .revoked || (key.pending == nil && key.objectSettingsToken == token) {
+                    updated[index].bundleRefreshQueue?.removeValue(forKey: keyID)
+                    try saveOwners(updated); ownerBundleRetryAfter.removeValue(forKey: retryID)
+                    ownerBundleRetryAttempts.removeValue(forKey: retryID)
+                    continue
+                }
+                if key.pending == nil {
+                    let owner = updated[index]
+                    try updated[index].issuedKeys![offset].refreshObjectSettings(owner: owner)
+                    updated[index].issuedKeys![offset].objectSettingsToken = token
+                    try saveOwners(updated)
+                } else if key.pending != .keyEdit || key.objectSettingsToken == nil { continue }
+                if owners[index].issuedKeys![offset].sent { continue }
+                deferOwnerSettingsRetry(retryID)
+                _ = await sendOwnerKey(server: server, keyID: key.id)
+            } catch {
+                deferOwnerSettingsRetry(retryID)
+                ownerKeyMessages[key.id] = "Настройки сохранены на iPhone. Обновление гостевого ключа ожидает синхронизации."
+            }
+        }
+    }
+
+    private func deferOwnerSettingsRetry(_ id: String) {
+        let attempt = min(6, ownerBundleRetryAttempts[id] ?? 0)
+        ownerBundleRetryAfter[id] = Date().addingTimeInterval(min(1800, 30 * pow(2, Double(attempt))))
+        ownerBundleRetryAttempts[id] = attempt + 1
+    }
+
+    private func scheduleOwnerSettingsRefresh() {
+        guard ownerSettingsTask == nil, foreground, owners.contains(where: { !($0.bundleRefreshQueue ?? [:]).isEmpty }) else { return }
+        let generation = UUID()
+        ownerSettingsTaskGeneration = generation
+        ownerSettingsTask = Task { [weak self] in
+            while !Task.isCancelled {
+                do { try await Task.sleep(nanoseconds: 30_000_000_000) } catch { break }
+                guard let self, self.foreground else { break }
+                guard self.owners.contains(where: { !($0.bundleRefreshQueue ?? [:]).isEmpty }) else { break }
+                guard !self.ownerBusy, !self.busy, self.pendingRestore == nil else { continue }
+                self.ownerBusy = true
+                for server in self.owners.map(\.server) {
+                    await self.syncOwner(server)
+                    await self.flushOwnerObjectSettings(server: server)
+                }
+                self.ownerBusy = false
+            }
+            if self?.ownerSettingsTaskGeneration == generation {
+                self?.ownerSettingsTask = nil; self?.ownerSettingsTaskGeneration = nil
+            }
+        }
     }
 
     func deleteOwnerObject(server: String, objectID: UUID) async {
@@ -765,6 +890,12 @@ final class AppModel: ObservableObject {
                 }
             }
             else if object.pending == .update {
+                if object.editBaseline != nil {
+                    try updated[index].objects![offset].cancelConfigurationUpdate()
+                    try saveOwners(updated)
+                    ownerObjectMessages.removeValue(forKey: objectID)
+                    return
+                }
                 guard let row = ownerSnapshots[server]?.rows.first(where: { ($0["id"] as? Int) == object.numberID }),
                       let cipher = row["data_cipher"] as? String else { return }
                 updated[index].objects![offset].cipher = cipher
@@ -794,6 +925,10 @@ final class AppModel: ObservableObject {
                   let latestOffset = owners[latestIndex].objects?.firstIndex(where: { $0.id == objectID }) else { throw GuestCrypto.Failure.invalidEnvelope }
             updated = owners
             switch operation {
+            case .deviceRegister:
+                guard let key = json["device_key"] as? String, let secret = json["device_secret"] as? String else { throw GuestCrypto.Failure.invalidEnvelope }
+                try updated[latestIndex].objects![latestOffset].acceptDeviceRegistration(id: OwnerObject.replyID(json["device_id"]),
+                    key: key, secret: secret, masterKey: owners[latestIndex].masterKey)
             case .keyCreate, .keyEdit, .keyMode, .keyRevoke, .hostClaim, .messageSend: throw GuestCrypto.Failure.invalidEnvelope
             case .claim:
                 let id = try OwnerObject.replyID(json["device_id"])
@@ -811,7 +946,7 @@ final class AppModel: ObservableObject {
             try saveOwners(updated)
             unsavedOwnerObjects.removeValue(forKey: objectID)
             ownerObjectMessages.removeValue(forKey: objectID)
-            if operation == .claim { return await sendOwnerObject(server: server, objectID: objectID) }
+            if operation == .claim || operation == .deviceRegister { return await sendOwnerObject(server: server, objectID: objectID) }
             await syncOwner(server)
             return true
         } catch {
@@ -1125,7 +1260,7 @@ final class AppModel: ObservableObject {
                 let message = try JSONSerialization.jsonObject(with: snapshot) as? [String: Any]
                 var updated = guests
                 if let index = updated.firstIndex(where: { $0.id == entry.id }) {
-                    try updateBLECache(&updated[index], bundle: bundle, snapshot: snapshot)
+                    try updateGuestMaterial(&updated[index], objects: objects, bundle: bundle, snapshot: snapshot)
                     updated[index].objects = objects
                     updated[index].incomingDepth = bundleReply.depth
                     updated[index].paused = message?["mode"] as? String == "off"
@@ -1158,6 +1293,7 @@ final class AppModel: ObservableObject {
 
     func resume() async {
         foreground = true
+        scheduleOwnerSettingsRefresh()
         if ownerBusy && busy { return }
         ownerControl.resume()
         if busy { resumeRequested = true; return }
@@ -1170,6 +1306,7 @@ final class AppModel: ObservableObject {
     }
 
     func suspend() {
+        ownerSettingsTask?.cancel(); ownerSettingsTask = nil; ownerSettingsTaskGeneration = nil
         delegationInbox.suspend()
         ownerControl.suspend()
         pauseGuestSessions()
@@ -1440,7 +1577,7 @@ final class AppModel: ObservableObject {
             avatars.removeValue(forKey: key)
             avatarCache.remove(key)
         }
-        try updateBLECache(&updated[index], bundle: bundle, snapshot: data)
+        try updateGuestMaterial(&updated[index], objects: objects, bundle: bundle, snapshot: data)
         updated[index].objects = objects
         if let paused { updated[index].paused = paused }
         updated[index].checkedAt = Date()
@@ -1986,6 +2123,114 @@ extension AppModel {
                   let policy = try? GuestActionPolicy.decode(bundle: bundle, snapshot: snapshot, numberID: object.numberID) else { return .unknown }
             if policy.kind == "device" { return policy.deviceID.map { link.devices.contains($0) } == true ? .ready : .offline }
             return link.hostOnline ? .ready : .offline
+        }
+    }
+}
+
+extension AppModel {
+    /// Android's editor saves rule changes locally as they are made. Network
+    /// publication is a separate durable queue, scoped to the issued key.
+    @discardableResult
+    func saveAutomation(_ context: AutomationSettingsContext, template: AutomationTemplate, allowStream: Bool? = nil) -> Bool {
+        guard canManageGuestAccess, !busy, pendingRestore == nil, context.canEdit else { return false }
+        do {
+            let current = try automationContext(context.destination)
+            guard current.canEdit, try current.template.data() == context.template.data() else { throw GuestCrypto.Failure.invalidEnvelope }
+            let bytes = try template.data()
+            switch context.destination {
+            case .object(.owned(let server, let id)):
+                guard let index = owners.firstIndex(where: { $0.server == server }),
+                      let offset = owners[index].objects?.firstIndex(where: { $0.id == id }) else { return false }
+                _ = try OwnerManualPolicy(bytes)
+                var updated = owners; updated[index].objects![offset].localPolicy = bytes
+                if let number = updated[index].objects![offset].numberID { updated[index].queueObjectSettings(numberID: number) }
+                try saveOwners(updated)
+                ownerObjectMessages.removeValue(forKey: id); ownerActionRejections.removeValue(forKey: id)
+            case .object(.received(let guestID, let objectID)):
+                guard let index = guests.firstIndex(where: { $0.id == guestID }) else { return false }
+                var updated = guests
+                var record = updated[index].automation?[objectID] ?? IncomingAutomationConfiguration(owner: AutomationTemplate())
+                try record.edit(template)
+                var values = updated[index].automation ?? [:]; values[objectID] = record
+                updated[index].automation = values
+                try save(updated)
+            case .issued(let server, let keyID, let objectID):
+                guard let index = owners.firstIndex(where: { $0.server == server }),
+                      let offset = owners[index].issuedKeys?.firstIndex(where: { $0.id == keyID }),
+                      let object = owners[index].objects?.first(where: { $0.id == objectID }), let number = object.numberID else { return false }
+                var updated = owners
+                let masterKey = updated[index].masterKey
+                try updated[index].issuedKeys![offset].configureObjectSettings(numberID: number, template: template,
+                    allowStream: allowStream ?? current.allowStream, masterKey: masterKey)
+                updated[index].queueKeySettings(keyID)
+                try saveOwners(updated)
+            }
+            return true
+        } catch {
+            errorMessage = "Не удалось сохранить автонастройки. Прежние правила сохранены; откройте актуальные настройки объекта."
+            return false
+        }
+    }
+}
+
+extension AppModel {
+    func ownerDeviceCredentials(server: String, objectID: UUID) throws -> DeviceConfigurationCredentials? {
+        guard canManageGuestAccess, let owner = owners.first(where: { $0.server == server }),
+              let object = owner.objects?.first(where: { $0.id == objectID }) else { throw GuestCrypto.Failure.invalidEnvelope }
+        return try object.deviceCredentials(masterKey: owner.masterKey)
+    }
+    func ownerSocketBindingCode(server: String, objectID: UUID) throws -> String {
+        guard canManageGuestAccess, !busy, !ownerBusy,
+              let index = owners.firstIndex(where: { $0.server == server }),
+              let offset = owners[index].objects?.firstIndex(where: { $0.id == objectID }) else { throw GuestCrypto.Failure.invalidEnvelope }
+        var updated = owners
+        let masterKey = updated[index].masterKey
+        let code = try updated[index].objects![offset].prepareSocketBinding(masterKey: masterKey)
+        if let number = updated[index].objects![offset].numberID { updated[index].queueObjectSettings(numberID: number) }
+        try saveOwners(updated)
+        return code
+    }
+}
+
+extension AppModel {
+    func avatarPreset(_ target: ObjectReference) -> Int? {
+        if case .received = target, let preset = objectPreferences.presentation(for: target).avatarPreset { return preset }
+        guard let entry = catalogObject(target) else { return nil }
+        let value: String?
+        switch entry {
+        case let .owned(owner, object): value = try? object.metadata(masterKey: owner.masterKey)["avatar_type"] as? String
+        case let .received(_, object): value = object.avatarType
+        }
+        guard let value, value.hasPrefix("preset:"), let index = Int(value.dropFirst(7)), (0...7).contains(index) else { return nil }
+        return index
+    }
+    func localAvatar(_ target: ObjectReference) -> Data? {
+        try? objectPreferences.avatar(target, localKey: identity)
+    }
+    func saveObjectAvatar(_ target: ObjectReference, preset: Int?, jpeg: Data?) async -> Bool {
+        guard canManageGuestAccess, !busy, !ownerBusy, catalogObject(target) != nil,
+              jpeg.map(AvatarCache.isImage) ?? true else { return false }
+        do {
+            switch target {
+            case .received:
+                var preferences = objectPreferences
+                try preferences.setAvatar(target, preset: preset, jpeg: jpeg, localKey: identity)
+                try save(guests, preferences: preferences)
+                return true
+            case let .owned(server, id):
+                guard let index = owners.firstIndex(where: { $0.server == server }),
+                      let offset = owners[index].objects?.firstIndex(where: { $0.id == id }) else { return false }
+                ownerBusy = true; defer { ownerBusy = false }
+                var updated = owners
+                let master = updated[index].masterKey
+                try updated[index].objects![offset].updateAvatar(preset: preset, jpeg: jpeg, masterKey: master)
+                if let number = updated[index].objects![offset].numberID { updated[index].queueObjectSettings(numberID: number) }
+                try saveOwners(updated)
+                return await sendOwnerObject(server: server, objectID: id)
+            }
+        } catch {
+            errorMessage = "Не удалось сохранить иконку объекта. Прежняя иконка сохранена."
+            return false
         }
     }
 }

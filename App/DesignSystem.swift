@@ -134,6 +134,26 @@ struct ActionRejectionFeedback: ViewModifier {
 }
 
 
+/// Common centered Android dialog surface; task forms retain their own sheets.
+struct AppDialogSurface<Content: View>: View {
+    @ViewBuilder let content: () -> Content
+    var body: some View {
+        GeometryReader { proxy in
+            ZStack {
+                Color.black.opacity(0.35).ignoresSafeArea().contentShape(Rectangle()).onTapGesture { }
+                    .accessibilityHidden(true)
+                ViewThatFits(in: .vertical) {
+                    content()
+                    ScrollView { content() }
+                }.padding(24).frame(width: min(max(0, proxy.size.width - 32), 420))
+                    .background(Color(uiColor: .secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 20))
+                    .padding(.vertical, 20)
+                    .accessibilityElement(children: .contain).accessibilityAddTraits(.isModal)
+            }.frame(width: proxy.size.width, height: proxy.size.height)
+        }
+    }
+}
+
 /// Shared compact confirmation. Buttons use the same filled styles as forms.
 struct AppConfirmationDialog: View {
     let title: String
@@ -143,22 +163,16 @@ struct AppConfirmationDialog: View {
     let cancel: () -> Void
     let confirm: () -> Void
     var body: some View {
-        GeometryReader { proxy in
-            ZStack {
-                Color.black.opacity(0.35).ignoresSafeArea().contentShape(Rectangle()).onTapGesture { }
-                    .accessibilityHidden(true)
-                VStack(alignment: .leading, spacing: 18) {
-                    Text(title).font(.title3.bold()).accessibilityAddTraits(.isHeader)
-                    Text(message).font(.body).fixedSize(horizontal: false, vertical: true)
-                    HStack(spacing: 12) {
-                        Button("Отмена", action: cancel).buttonStyle(SecondaryActionStyle())
-                        Button(role: destructive ? .destructive : nil, action: confirm) { Text(actionTitle) }
-                            .buttonStyle(PrimaryActionStyle())
-                    }
-                }.padding(24).frame(width: min(max(0, proxy.size.width - 32), 420))
-                    .background(Color(uiColor: .secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 20))
-                    .accessibilityElement(children: .contain).accessibilityAddTraits(.isModal)
-            }.frame(width: proxy.size.width, height: proxy.size.height)
+        AppDialogSurface {
+            VStack(alignment: .leading, spacing: 18) {
+                Text(title).font(.title3.bold()).accessibilityAddTraits(.isHeader)
+                Text(message).font(.body).fixedSize(horizontal: false, vertical: true)
+                HStack(spacing: 12) {
+                    Button("Отмена", action: cancel).buttonStyle(SecondaryActionStyle())
+                    Button(role: destructive ? .destructive : nil, action: confirm) { Text(actionTitle) }
+                        .buttonStyle(PrimaryActionStyle())
+                }
+            }
         }
     }
 }

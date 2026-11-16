@@ -6,14 +6,18 @@ struct ObjectAvatar: View {
     let object: GuestObject
     let guestID: String
     let size: CGFloat
+    private var target: ObjectReference { .received(guestID: guestID, objectID: object.id) }
     private var index: Int {
+        if let preset = model.objectPreferences.presentation(for: target).avatarPreset { return preset }
         guard let value = object.avatarType, value.hasPrefix("preset:"),
               let index = Int(value.dropFirst(7)), (0...7).contains(index) else { return 0 }
         return index
     }
     var body: some View {
         Group {
-            if object.avatarType == "file",
+            if let bytes = model.localAvatar(target), let image = UIImage(data: bytes) {
+                Image(uiImage: image).resizable().scaledToFill()
+            } else if model.objectPreferences.presentation(for: target).avatarPreset == nil, object.avatarType == "file",
                let bytes = model.avatars[AvatarCache.key(guestID: guestID, objectID: object.id)],
                let image = UIImage(data: bytes) {
                 Image(uiImage: image).resizable().scaledToFill()
@@ -34,8 +38,11 @@ struct OwnerObjectAvatar: View {
         return index
     }
     var body: some View {
-        Image("object-\(index + 1)").resizable().scaledToFill()
-            .frame(width: size, height: size)
+        Group {
+            if let bytes = try? object.avatar(masterKey: masterKey), let image = UIImage(data: bytes) {
+                Image(uiImage: image).resizable().scaledToFill()
+            } else { Image("object-\(index + 1)").resizable().scaledToFill() }
+        }.frame(width: size, height: size)
             .clipShape(RoundedRectangle(cornerRadius: size * 0.25)).accessibilityHidden(true)
     }
 }

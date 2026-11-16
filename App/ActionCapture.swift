@@ -178,6 +178,7 @@ private final class CaptureOwnerServer: OwnerTransport {
             if let cipher = request["key_cipher"] { keyRows[index]["key_cipher"] = cipher; keyRows[index]["needs_bundle"] = 0 }
             if loseKeyEditReply { throw URLError(.networkConnectionLost) }
         case .claim: return Data(#"{"device_id":9}"#.utf8)
+        case .deviceRegister: throw GuestCrypto.Failure.invalidEnvelope
         case .create:
             guard rows.isEmpty, let cipher = request["data_cipher"] as? String, let kind = request["type"] as? String else { throw GuestCrypto.Failure.invalidEnvelope }
             rows.append(["id": 7, "type": kind, "data_cipher": cipher, "data_cipher_revision": 100])

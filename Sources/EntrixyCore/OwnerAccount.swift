@@ -18,6 +18,7 @@ public struct OwnerAccount: Codable, Identifiable, Equatable {
     public var bleRestorePending: [UUID]?
     public var blePairings: [BLEPairingRecord]?
     public var lastSynced: Date?
+    public var bundleRefreshQueue: [String: String]?
     public var id: String { server }
     public var registrationPending: Bool { credentials == nil }
 
@@ -67,6 +68,9 @@ public struct OwnerAccount: Codable, Identifiable, Equatable {
         guard Set(numberIDs).count == numberIDs.count else { throw GuestCrypto.Failure.invalidEnvelope }
         for object in objects { try object.validate(masterKey: masterKey) }
         let keys = issuedKeys ?? []
+        let refreshes = bundleRefreshQueue ?? [:]
+        guard refreshes.count <= 1000, Set(refreshes.keys).isSubset(of: Set(keys.map { $0.id.uuidString })),
+              refreshes.values.allSatisfy({ UUID(uuidString: $0) != nil }) else { throw GuestCrypto.Failure.invalidEnvelope }
         guard Set(keys.map(\.id)).count == keys.count, Set(keys.map(\.guestID)).count == keys.count else { throw GuestCrypto.Failure.invalidEnvelope }
         for key in keys { try key.validate(masterKey: masterKey) }
         let delegated = delegatedKeys ?? []

@@ -6,7 +6,8 @@ struct BLEPairingScreen: View {
     let server: String
     var initialLabel = ""
     var manager: BLEPairingModel? = nil
-    var body: some View { BLEPairingContent(model: manager ?? app.blePairing, server: server, label: initialLabel).environmentObject(app) }
+    var completion: ((ObjectReference?) -> Void)? = nil
+    var body: some View { BLEPairingContent(model: manager ?? app.blePairing, server: server, label: initialLabel, completion: completion).environmentObject(app) }
 }
 
 private struct BLEPairingContent: View {
@@ -14,8 +15,9 @@ private struct BLEPairingContent: View {
     @ObservedObject var model: BLEPairingModel
     let server: String
     @State private var label: String
-    init(model: BLEPairingModel, server: String, label: String = "") {
-        self.model = model; self.server = server; _label = State(initialValue: label)
+    let completion: ((ObjectReference?) -> Void)?
+    init(model: BLEPairingModel, server: String, label: String = "", completion: ((ObjectReference?) -> Void)? = nil) {
+        self.model = model; self.server = server; self.completion = completion; _label = State(initialValue: label)
     }
     @State private var selected: BLEDiscovery?
     private var records: [BLEPairingRecord] { app.owners.first(where: { $0.server == server })?.blePairings ?? [] }
@@ -54,7 +56,16 @@ private struct BLEPairingContent: View {
                         Button("Проверить привязку") { Task { await model.check(pairingID: record.id, server: server) } }.buttonStyle(SecondaryActionStyle()).disabled(model.busy || app.ownerBusy)
                     }
                     if record.phase == .confirmed, record.objectID == nil {
-                        Button("Добавить на сервер") { Task { _ = await app.registerPairedBLE(server: server, pairingID: record.id) } }.buttonStyle(PrimaryActionStyle())
+                        Button("Добавить на сервер") {
+                            Task {
+                                _ = await app.registerPairedBLE(server: server, pairingID: record.id)
+                                // Complete only this pairing's durable object, including an
+                                // uncertain registration; never select an unrelated saved peer.
+                                if let id = records.first(where: { $0.id == record.id })?.objectID {
+                                    completion?(.owned(server: server, objectID: id))
+                                }
+                            }
+                        }.buttonStyle(PrimaryActionStyle())
                             .disabled(model.busy || app.ownerBusy)
                     }
                 } header: { Text("Сохранённая привязка") }

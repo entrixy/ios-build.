@@ -38,6 +38,6 @@ jobs:
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
-          name: isolated-ui-evidence
+          name: isolated-ui-evidence-${{ matrix.runner }}
           path: .local-checks/ci/
           retention-days: 3

@@ -31,6 +31,7 @@ targets:
       base:
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         PRODUCT_BUNDLE_IDENTIFIER: com.entrixy.ios
+        'CODE_SIGN_ENTITLEMENTS[sdk=iphoneos*]': scripts/device.entitlements
         'CODE_SIGN_ENTITLEMENTS[sdk=iphonesimulator*]': scripts/simulator.entitlements
         'CODE_SIGN_IDENTITY[sdk=iphonesimulator*]': '-'
         TARGETED_DEVICE_FAMILY: '1'
@@ -51,10 +52,17 @@ targets:
             UTTypeTagSpecification:
               public.filename-extension: [eib]
         CFBundleDisplayName: Entrixy
-        CFBundleLocalizations: [ru]
+        CFBundleLocalizations: [en, ru, de, es, fr, pt, zh]
         NSCameraUsageDescription: Сканирование QR-кода гостевого ключа Entrixy
         NSBluetoothAlwaysUsageDescription: Поиск, привязка и управление вашими контроллерами Entrixy поблизости
         NSFaceIDUsageDescription: Подтверждение действий с объектами Entrixy
+        NSLocationWhenInUseUsageDescription: Координаты объекта, маршруты подхода и условия автоматического управления
+        NSLocationAlwaysAndWhenInUseUsageDescription: Выполнение настроенных вами правил приближения к объекту, когда приложение свёрнуто
+        UIBackgroundModes: [location, bluetooth-central]
+        NSLocalNetworkUsageDescription: Соединение с вашими контроллерами, вебхуками и камерами в локальной сети
+        NSAppTransportSecurity:
+          NSAllowsArbitraryLoads: true
+
   EntrixyAppTests:
     type: bundle.unit-test
     platform: iOS

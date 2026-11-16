@@ -24,6 +24,9 @@ public struct OwnerIssuedKey: Codable, Identifiable, Equatable {
     public var access: [String: KeyObjectAccess]?
     public var requestedAccess: [String: KeyObjectAccess]?
     public var accessNeedsReview: Bool?
+    public var automationTemplates: [String: Data]?
+    public var streamAllowed: [Int]?
+    public var objectSettingsToken: String?
     public var sent: Bool
 
     public init(owner: OwnerAccount, label: String, numberIDs: [Int], welcome: String, nativeOnly: Bool, confirmation: Bool, access: [Int: KeyObjectAccess]? = nil) throws {
@@ -60,12 +63,16 @@ public struct OwnerIssuedKey: Codable, Identifiable, Equatable {
               !label.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty, label.utf8.count <= 512 else { throw GuestCrypto.Failure.invalidEnvelope }
         let pair = try secrets(masterKey: owner.masterKey)
         let existing = try bundle(masterKey: owner.masterKey)
-        let bytes = try Self.makeBundle(owner: owner, numberIDs: numberIDs, guestID: guestID, welcome: welcome, confirmation: confirmation, existing: existing)
+        let chosenTemplates = automationTemplates?.filter { numberIDs.contains(Int($0.key) ?? -1) }
+        let chosenStreams = streamAllowed?.filter { numberIDs.contains($0) }
+        let bytes = try Self.makeBundle(owner: owner, numberIDs: numberIDs, guestID: guestID, welcome: welcome, confirmation: confirmation, existing: existing,
+            automation: chosenTemplates, streamAllowed: chosenStreams)
         let cipher = try GuestCrypto.encrypt(key: pair.bundleKey, plaintext: bytes)
         if let access { requestedAccess = try Self.checkedAccess(access, numberIDs: numberIDs) }
         self.label = label.trimmingCharacters(in: .whitespacesAndNewlines)
         self.numberIDs = numberIDs.sorted()
         bundleCipher = cipher
+        automationTemplates = chosenTemplates; streamAllowed = chosenStreams
         pending = .keyEdit; sent = false
     }
 
@@ -75,7 +82,8 @@ public struct OwnerIssuedKey: Codable, Identifiable, Equatable {
         guard let rows = existing["ble"] as? [[String: Any]], !rows.isEmpty else { throw GuestCrypto.Failure.invalidEnvelope }
         let pair = try secrets(masterKey: owner.masterKey)
         let bytes = try Self.makeBundle(owner: owner, numberIDs: numberIDs, guestID: guestID,
-            welcome: existing["welcome"] as? String ?? "", confirmation: nil, existing: existing, renewBLE: true)
+            welcome: existing["welcome"] as? String ?? "", confirmation: nil, existing: existing, renewBLE: true,
+            automation: automationTemplates, streamAllowed: streamAllowed)
         bundleCipher = try GuestCrypto.encrypt(key: pair.bundleKey, plaintext: bytes)
         pending = .keyEdit; sent = false
     }
@@ -86,7 +94,8 @@ public struct OwnerIssuedKey: Codable, Identifiable, Equatable {
         return Dictionary(uniqueKeysWithValues: access.map { (String($0.key), $0.value) })
     }
 
-    static func makeBundle(owner: OwnerAccount, numberIDs: [Int], guestID: Int, welcome: String, confirmation: Bool?, existing: [String: Any] = [:], renewBLE: Bool = false) throws -> Data {
+    static func makeBundle(owner: OwnerAccount, numberIDs: [Int], guestID: Int, welcome: String, confirmation: Bool?, existing: [String: Any] = [:], renewBLE: Bool = false,
+                           automation: [String: Data]? = nil, streamAllowed: [Int]? = nil, inheritRestrictions: Bool = false) throws -> Data {
         guard !numberIDs.isEmpty, Set(numberIDs).count == numberIDs.count, welcome.utf8.count <= 4096 else { throw GuestCrypto.Failure.invalidEnvelope }
         let selected = (owner.objects ?? []).filter { numberIDs.contains($0.numberID ?? -1) }
         guard selected.count == numberIDs.count, selected.allSatisfy({ $0.pending == nil && $0.available != false }) else { throw GuestCrypto.Failure.invalidEnvelope }
@@ -101,12 +110,28 @@ public struct OwnerIssuedKey: Codable, Identifiable, Equatable {
         let oldPrevious = existing["obj_keys_prev"] as? [String: String] ?? [:]
         var keys: [String: String] = [:], previous: [String: String] = [:], epochs: [String: Int] = [:]
         var templates: [String: [String: Any]] = [:], sockets: [String: [String: Any]] = [:]
+        func objectTemplate(_ object: OwnerObject, fallback: [String: Any]) throws -> [String: Any] {
+            guard let id = object.numberID else { throw GuestCrypto.Failure.invalidEnvelope }
+            var json = fallback
+            if let data = automation?[String(id)] {
+                let raw = try AutomationTemplate(data: data)
+                let resolved = raw.resolvingGeo(from: try AutomationTemplate(data: object.localPolicy))
+                guard let decoded = try JSONSerialization.jsonObject(with: resolved.data()) as? [String: Any] else { throw GuestCrypto.Failure.invalidEnvelope }
+                json = decoded
+            }
+            if object.kind == "ble" {
+                let own = try AutomationTemplate(data: object.localPolicy)
+                let maximum = own.bleEnabled ? max(1, own.bleRadiusM) : 30
+                json["ble_rad_o"] = inheritRestrictions ? min(fallback["ble_rad_o"] as? Int ?? maximum, maximum) : maximum
+            }
+            return json
+        }
         for object in selected {
             guard let number = object.numberID else { throw GuestCrypto.Failure.invalidEnvelope }
             let id = String(number), metadata = try object.metadata(masterKey: owner.masterKey)
             if object.kind == "ble" {
                 let old = oldBLE.first { ($0["id"] as? Int) == number }
-                var template = old?["tpl"] as? [String: Any] ?? oldTemplates[String(number)] ?? ["mode": "any", "confirm_on": true]
+                var template = try objectTemplate(object, fallback: old?["tpl"] as? [String: Any] ?? oldTemplates[String(number)] ?? ["mode": "any", "confirm_on": true])
                 if old?["tpl"] != nil && old?["tpl"] as? [String: Any] == nil { throw GuestCrypto.Failure.invalidEnvelope }
                 if let confirmation { template["confirm_on"] = confirmation; template.removeValue(forKey: "confirm") }
                 ble.append(try BLEBundle.row(object: object, masterKey: owner.masterKey, guestID: guestID,
@@ -120,7 +145,7 @@ public struct OwnerIssuedKey: Codable, Identifiable, Equatable {
                 guard try GuestCrypto.decodeBase64URL(old).count == 32 else { throw GuestCrypto.Failure.invalidKey }
                 previous[id] = old
             }
-            var template = oldTemplates[id] ?? ["mode": "any", "confirm_on": true]
+            var template = try objectTemplate(object, fallback: oldTemplates[id] ?? ["mode": "any", "confirm_on": true])
             if let confirmation { template["confirm_on"] = confirmation; template.removeValue(forKey: "confirm") }
             template["server_webhook"] = object.kind == "webhook" && object.routing["webhook_mode"] == "server"
             templates[id] = template
@@ -134,14 +159,21 @@ public struct OwnerIssuedKey: Codable, Identifiable, Equatable {
         bundle["templates"] = templates; bundle["sock"] = sockets; bundle["welcome"] = welcome
         if bundle["host_label"] == nil { bundle["host_label"] = "" }
         if bundle["net_block"] == nil { bundle["net_block"] = [String]() }
-        if let streams = bundle["streams"] {
-            guard let ids = streams as? [Int] else { throw GuestCrypto.Failure.invalidEnvelope }
-            bundle["streams"] = ids.filter { numberIDs.contains($0) }
+        let oldStreams = existing["streams"] as? [Int]
+        if existing["streams"] != nil && oldStreams == nil { throw GuestCrypto.Failure.invalidEnvelope }
+        if let streamAllowed { guard Set(streamAllowed).isSubset(of: Set(numberIDs)) else { throw GuestCrypto.Failure.invalidEnvelope } }
+        let defaultStreams = inheritRestrictions ? [] : selected.filter { $0.kind != "ble" }.compactMap(\.numberID)
+        let allowedStreams = Set((streamAllowed ?? oldStreams ?? defaultStreams).filter { numberIDs.contains($0) })
+        let oldCameras = existing["cams"] as? [String: Any] ?? [:]
+        if existing["cams"] != nil && existing["cams"] as? [String: Any] == nil { throw GuestCrypto.Failure.invalidEnvelope }
+        var cameras: [String: Any] = [:]
+        for object in selected where object.kind != "ble" {
+            guard let id = object.numberID, allowedStreams.contains(id) else { continue }
+            if let camera = object.localConfiguration?.camera {
+                if !camera.url.isEmpty { cameras[String(id)] = try camera.wire() }
+            } else if let old = oldCameras[String(id)] { cameras[String(id)] = old }
         }
-        if let cams = bundle["cams"] {
-            guard let map = cams as? [String: Any] else { throw GuestCrypto.Failure.invalidEnvelope }
-            bundle["cams"] = map.filter { numberIDs.contains(Int($0.key) ?? -1) }
-        }
+        bundle["streams"] = allowedStreams.sorted(); bundle["cams"] = cameras
         return try JSONSerialization.data(withJSONObject: bundle, options: .sortedKeys)
     }
 
@@ -165,6 +197,12 @@ public struct OwnerIssuedKey: Codable, Identifiable, Equatable {
             guard Set(map.keys).isSubset(of: Set(numberIDs.map(String.init))) || pending == .keyEdit else { throw GuestCrypto.Failure.invalidEnvelope }
             for item in map.values { try item.validate() }
         }
+        guard (automationTemplates ?? [:]).count <= 1000,
+              Set((automationTemplates ?? [:]).keys).isSubset(of: Set(numberIDs.map(String.init))),
+              Set(streamAllowed ?? []).isSubset(of: Set(numberIDs)),
+              Set(streamAllowed ?? []).count == (streamAllowed ?? []).count else { throw GuestCrypto.Failure.invalidEnvelope }
+        if let objectSettingsToken { guard UUID(uuidString: objectSettingsToken) != nil else { throw GuestCrypto.Failure.invalidEnvelope } }
+        for data in (automationTemplates ?? [:]).values { _ = try AutomationTemplate(data: data) }
         let keys = try secrets(masterKey: masterKey)
         _ = try GuestCrypto.decrypt(key: keys.bundleKey, envelope: bundleCipher)
     }

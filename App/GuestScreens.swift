@@ -110,6 +110,8 @@ struct SettingsScreen: View {
     @State private var addingKey = false
     @State private var addingServer = false
     @State private var addingObject = false
+    @State private var createdDevice: ObjectReference?
+    @State private var showingCreatedDevice = false
     @State private var keyInput = ""
     var body: some View {
         VStack(spacing: 0) {
@@ -170,7 +172,16 @@ struct SettingsScreen: View {
             }
             .sheet(isPresented: $addingKey) { KeyImportScreen(input: $keyInput) }
             .sheet(isPresented: $addingServer) { AddOwnerServerScreen() }
-            .sheet(isPresented: $addingObject) { AddCatalogObjectScreen() }
+            .sheet(isPresented: $addingObject, onDismiss: {
+                if case let .owned(server, id) = createdDevice,
+                   (try? model.ownerDeviceCredentials(server: server, objectID: id)) != nil { showingCreatedDevice = true }
+            }) { AddCatalogObjectScreen(completion: { createdDevice = $0 }) }
+            .sheet(isPresented: $showingCreatedDevice, onDismiss: { createdDevice = nil }) {
+                if case let .owned(server, id) = createdDevice,
+                   let credentials = try? model.ownerDeviceCredentials(server: server, objectID: id) {
+                    DeviceCredentialsSheet(credentials: credentials, server: server)
+                }
+            }
             .task {
                 #if DEBUG && targetEnvironment(simulator)
                 if let scenario = ActionCaptureScenario.current, [ActionCaptureScenario.appCodeSetup, .appCodeSettings].contains(scenario) { selected = .system; showCodeSettings = true }

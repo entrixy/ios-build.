@@ -106,7 +106,10 @@ final class OwnerObjectTests: XCTestCase {
         XCTAssertEqual(body["webhook_mode"] as? String, "server")
         XCTAssertEqual(body["webhook_secret"] as? String, "public-fixture")
         XCTAssertNil(body["label"])
-        XCTAssertThrowsError(try OwnerObject(masterKey: master, label: "Запрос", kind: "webhook", url: "http://controller.invalid", secret: "secret"))
+        // Android's phone/server modes and number_update.php both accept HTTP.
+        // Owner authentication still uses HTTPS; the actuator command is signed.
+        XCTAssertNoThrow(try OwnerObject(masterKey: master, label: "Запрос", kind: "webhook", url: "http://controller.invalid", secret: "secret"))
+        XCTAssertThrowsError(try OwnerObject(masterKey: master, label: "Запрос", kind: "webhook", url: "ftp://controller.invalid", secret: "secret"))
         XCTAssertThrowsError(try OwnerObject(masterKey: master, label: "Ворота", kind: "device"))
     }
 

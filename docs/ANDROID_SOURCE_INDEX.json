@@ -1,0 +1,7922 @@
+{
+  "schema": 1,
+  "android_commit": "56155352b0e9f36ef3685aa071a6aafdb2ef6622",
+  "scope": [
+    "app/src/main",
+    "app/build.gradle.kts",
+    "build.gradle.kts",
+    "settings.gradle.kts"
+  ],
+  "tracked_file_count": 207,
+  "source_tree_sha256": "270b4d5e5ce1c37defebf2c35f64836b45dd8c6aeba038c2769f0eaeace6e43d",
+  "extension_counts": {
+    ".html": 1,
+    ".json": 1,
+    ".kt": 83,
+    ".kts": 3,
+    ".mp3": 11,
+    ".png": 63,
+    ".txt": 1,
+    ".xml": 44
+  },
+  "kotlin_file_count": 83,
+  "kotlin_line_count": 37381,
+  "resource_value_directories": [
+    "values",
+    "values-de",
+    "values-es",
+    "values-fr",
+    "values-pt",
+    "values-ru",
+    "values-zh"
+  ],
+  "manifest_components": [
+    {
+      "type": "activity",
+      "name": ".MainActivity",
+      "exported": "true",
+      "actions": [
+        "android.intent.action.MAIN",
+        "android.intent.action.VIEW"
+      ],
+      "links": [
+        {
+          "scheme": "entrixy"
+        },
+        {
+          "scheme": "https",
+          "host": "entrixy.com",
+          "pathPrefix": "/key"
+        },
+        {
+          "scheme": "https",
+          "host": "entrixy.com",
+          "pathPrefix": "/claim"
+        },
+        {
+          "scheme": "https",
+          "host": "entrixy.com",
+          "pathPrefix": "/c/"
+        },
+        {
+          "scheme": "https",
+          "host": "entrixy.com",
+          "pathPrefix": "/o/"
+        },
+        {
+          "scheme": "https",
+          "host": "entrixy.com",
+          "pathPrefix": "/i/"
+        }
+      ]
+    },
+    {
+      "type": "service",
+      "name": ".host.HostService",
+      "exported": "false",
+      "actions": [],
+      "links": []
+    },
+    {
+      "type": "service",
+      "name": ".fcm.FcmService",
+      "exported": "false",
+      "actions": [
+        "com.google.firebase.MESSAGING_EVENT"
+      ],
+      "links": []
+    },
+    {
+      "type": "receiver",
+      "name": ".geo.GeofenceReceiver",
+      "exported": "false",
+      "actions": [],
+      "links": []
+    },
+    {
+      "type": "receiver",
+      "name": ".geo.ActivityReceiver",
+      "exported": "false",
+      "actions": [],
+      "links": []
+    },
+    {
+      "type": "receiver",
+      "name": ".host.ConfirmReceiver",
+      "exported": "false",
+      "actions": [],
+      "links": []
+    },
+    {
+      "type": "receiver",
+      "name": ".host.BootReceiver",
+      "exported": "true",
+      "actions": [
+        "android.intent.action.BOOT_COMPLETED",
+        "android.intent.action.MY_PACKAGE_REPLACED",
+        "android.intent.action.QUICKBOOT_POWERON",
+        "com.htc.intent.action.QUICKBOOT_POWERON"
+      ],
+      "links": []
+    },
+    {
+      "type": "receiver",
+      "name": ".widget.KeyWidgetProvider",
+      "exported": "true",
+      "actions": [
+        "android.appwidget.action.APPWIDGET_UPDATE"
+      ],
+      "links": []
+    },
+    {
+      "type": "provider",
+      "name": "androidx.core.content.FileProvider",
+      "exported": "false",
+      "actions": [],
+      "links": []
+    },
+    {
+      "type": "receiver",
+      "name": ".widget.KeyWidgetActionReceiver",
+      "exported": "false",
+      "actions": [
+        "com.entrixy.app.WIDGET_TAP"
+      ],
+      "links": []
+    },
+    {
+      "type": "receiver",
+      "name": ".ble.BleScanReceiver",
+      "exported": "false",
+      "actions": [],
+      "links": []
+    },
+    {
+      "type": "receiver",
+      "name": ".host.BleScanWatchdogReceiver",
+      "exported": "false",
+      "actions": [
+        "com.entrixy.app.BLE_SCAN_WATCHDOG"
+      ],
+      "links": []
+    },
+    {
+      "type": "activity",
+      "name": ".widget.KeyWidgetConfigActivity",
+      "exported": "true",
+      "actions": [
+        "android.appwidget.action.APPWIDGET_CONFIGURE"
+      ],
+      "links": []
+    }
+  ],
+  "kotlin_files": [
+    {
+      "path": "app/src/main/java/com/entrixy/app/App.kt",
+      "sha256": "a7e914cb95aa5fed0b35261b7120ac7119ea3b56f44d3f41f3e298522b0ac125",
+      "lines": 335,
+      "declarations": [
+        {
+          "kind": "class",
+          "name": "App",
+          "line": 13
+        },
+        {
+          "kind": "fun",
+          "name": "newImageLoader",
+          "line": 21
+        },
+        {
+          "kind": "fun",
+          "name": "log",
+          "line": 43
+        },
+        {
+          "kind": "fun",
+          "name": "attachBaseContext",
+          "line": 69
+        },
+        {
+          "kind": "fun",
+          "name": "onCreate",
+          "line": 85
+        },
+        {
+          "kind": "fun",
+          "name": "noteExit",
+          "line": 136
+        },
+        {
+          "kind": "fun",
+          "name": "reportLastExit",
+          "line": 145
+        },
+        {
+          "kind": "fun",
+          "name": "watchOverridesForWidgets",
+          "line": 198
+        },
+        {
+          "kind": "fun",
+          "name": "checkVersionAsync",
+          "line": 204
+        },
+        {
+          "kind": "fun",
+          "name": "normalizeCrashForHash",
+          "line": 230
+        },
+        {
+          "kind": "fun",
+          "name": "sha1Hex",
+          "line": 251
+        },
+        {
+          "kind": "fun",
+          "name": "autoUploadLog",
+          "line": 275
+        },
+        {
+          "kind": "fun",
+          "name": "installCrashHandler",
+          "line": 320
+        }
+      ],
+      "surface_calls": []
+    },
+    {
+      "path": "app/src/main/java/com/entrixy/app/MainActivity.kt",
+      "sha256": "68d2f37469b567626637c36c468336697a6463cdb5cc82098e95af7c781dd675",
+      "lines": 1766,
+      "declarations": [
+        {
+          "kind": "class",
+          "name": "MainActivity",
+          "line": 62
+        },
+        {
+          "kind": "fun",
+          "name": "attachBaseContext",
+          "line": 69
+        },
+        {
+          "kind": "fun",
+          "name": "onCreate",
+          "line": 84
+        },
+        {
+          "kind": "fun",
+          "name": "onNewIntent",
+          "line": 132
+        },
+        {
+          "kind": "fun",
+          "name": "handleWidgetIntent",
+          "line": 138
+        },
+        {
+          "kind": "fun",
+          "name": "onWindowFocusChanged",
+          "line": 175
+        },
+        {
+          "kind": "fun",
+          "name": "onStop",
+          "line": 180
+        },
+        {
+          "kind": "fun",
+          "name": "onResume",
+          "line": 185
+        },
+        {
+          "kind": "fun",
+          "name": "onPause",
+          "line": 247
+        },
+        {
+          "kind": "fun",
+          "name": "handleInviteIntent",
+          "line": 252
+        },
+        {
+          "kind": "fun",
+          "name": "handleClipboardKey",
+          "line": 365
+        },
+        {
+          "kind": "fun",
+          "name": "note",
+          "line": 366
+        },
+        {
+          "kind": "fun",
+          "name": "processParsedKey",
+          "line": 416
+        },
+        {
+          "kind": "fun",
+          "name": "redeemInvite",
+          "line": 531
+        },
+        {
+          "kind": "fun",
+          "name": "requestNeededPermissions",
+          "line": 555
+        },
+        {
+          "kind": "fun",
+          "name": "dismissIncomingMessage",
+          "line": 573
+        },
+        {
+          "kind": "fun",
+          "name": "DialerApp",
+          "line": 597
+        },
+        {
+          "kind": "fun",
+          "name": "later",
+          "line": 1298
+        },
+        {
+          "kind": "fun",
+          "name": "ReadyCheckLine",
+          "line": 1439
+        },
+        {
+          "kind": "fun",
+          "name": "rememberLedColor",
+          "line": 1494
+        },
+        {
+          "kind": "fun",
+          "name": "AppLoader",
+          "line": 1511
+        },
+        {
+          "kind": "fun",
+          "name": "GeoCallCountdownDialog",
+          "line": 1585
+        },
+        {
+          "kind": "fun",
+          "name": "ConfirmGeoDialog",
+          "line": 1620
+        },
+        {
+          "kind": "class",
+          "name": "LangItem",
+          "line": 1643
+        },
+        {
+          "kind": "fun",
+          "name": "flagFor",
+          "line": 1655
+        },
+        {
+          "kind": "fun",
+          "name": "ConfirmDialog",
+          "line": 1659
+        },
+        {
+          "kind": "fun",
+          "name": "ForceUpdateScreen",
+          "line": 1682
+        },
+        {
+          "kind": "fun",
+          "name": "open",
+          "line": 1702
+        },
+        {
+          "kind": "fun",
+          "name": "update",
+          "line": 1709
+        }
+      ],
+      "surface_calls": [
+        {
+          "call": "AlertDialog",
+          "line": 636
+        },
+        {
+          "call": "AlertDialog",
+          "line": 657
+        },
+        {
+          "call": "DropdownMenu",
+          "line": 807
+        },
+        {
+          "call": "AlertDialog",
+          "line": 923
+        },
+        {
+          "call": "AlertDialog",
+          "line": 957
+        },
+        {
+          "call": "AlertDialog",
+          "line": 975
+        },
+        {
+          "call": "AlertDialog",
+          "line": 1015
+        },
+        {
+          "call": "AlertDialog",
+          "line": 1034
+        },
+        {
+          "call": "CodeGateDialog",
+          "line": 1148
+        },
+        {
+          "call": "AlertDialog",
+          "line": 1164
+        },
+        {
+          "call": "AlertDialog",
+          "line": 1299
+        },
+        {
+          "call": "AlertDialog",
+          "line": 1314
+        },
+        {
+          "call": "AlertDialog",
+          "line": 1327
+        },
+        {
+          "call": "AlertDialog",
+          "line": 1342
+        },
+        {
+          "call": "AlertDialog",
+          "line": 1381
+        },
+        {
+          "call": "AlertDialog",
+          "line": 1592
+        },
+        {
+          "call": "AlertDialog",
+          "line": 1626
+        },
+        {
+          "call": "AlertDialog",
+          "line": 1663
+        }
+      ]
+    },
+    {
+      "path": "app/src/main/java/com/entrixy/app/ble/BleActiveScanner.kt",
+      "sha256": "48e1c27e10159e1ea0e87b28906496c74244518f46ea89bb1c82d3e2554babe0",
+      "lines": 183,
+      "declarations": [
+        {
+          "kind": "object",
+          "name": "BleActiveScanner",
+          "line": 28
+        },
+        {
+          "kind": "fun",
+          "name": "noteMotion",
+          "line": 43
+        },
+        {
+          "kind": "fun",
+          "name": "gateOpen",
+          "line": 45
+        },
+        {
+          "kind": "fun",
+          "name": "ensure",
+          "line": 56
+        },
+        {
+          "kind": "fun",
+          "name": "farAway",
+          "line": 74
+        },
+        {
+          "kind": "fun",
+          "name": "farRestartDue",
+          "line": 75
+        },
+        {
+          "kind": "fun",
+          "name": "restart",
+          "line": 78
+        },
+        {
+          "kind": "fun",
+          "name": "stop",
+          "line": 89
+        },
+        {
+          "kind": "fun",
+          "name": "isRunning",
+          "line": 96
+        },
+        {
+          "kind": "fun",
+          "name": "startInternal",
+          "line": 99
+        },
+        {
+          "kind": "fun",
+          "name": "onScanResult",
+          "line": 146
+        },
+        {
+          "kind": "fun",
+          "name": "onBatchScanResults",
+          "line": 149
+        },
+        {
+          "kind": "fun",
+          "name": "onScanFailed",
+          "line": 152
+        },
+        {
+          "kind": "fun",
+          "name": "dispatch",
+          "line": 173
+        }
+      ],
+      "surface_calls": []
+    },
+    {
+      "path": "app/src/main/java/com/entrixy/app/ble/BleCrypto.kt",
+      "sha256": "231f461cf11320f929ff596cb366581309b00eec49fbef3ad8d46c889bd7b0dd",
+      "lines": 356,
+      "declarations": [
+        {
+          "kind": "object",
+          "name": "BleCrypto",
+          "line": 16
+        },
+        {
+          "kind": "fun",
+          "name": "hmacSha256",
+          "line": 21
+        },
+        {
+          "kind": "fun",
+          "name": "hkdfSha256",
+          "line": 32
+        },
+        {
+          "kind": "fun",
+          "name": "newX25519Private",
+          "line": 63
+        },
+        {
+          "kind": "fun",
+          "name": "x25519Public",
+          "line": 73
+        },
+        {
+          "kind": "fun",
+          "name": "x25519Shared",
+          "line": 84
+        },
+        {
+          "kind": "fun",
+          "name": "derivePairSecret",
+          "line": 95
+        },
+        {
+          "kind": "fun",
+          "name": "deriveStateKey",
+          "line": 109
+        },
+        {
+          "kind": "fun",
+          "name": "deriveBatteryKey",
+          "line": 118
+        },
+        {
+          "kind": "fun",
+          "name": "decodeStateByte",
+          "line": 135
+        },
+        {
+          "kind": "fun",
+          "name": "deriveGuestKey",
+          "line": 158
+        },
+        {
+          "kind": "class",
+          "name": "AdvData",
+          "line": 174
+        },
+        {
+          "kind": "fun",
+          "name": "verifyAdvertise",
+          "line": 200
+        },
+        {
+          "kind": "fun",
+          "name": "extractNonceFromAdvertise",
+          "line": 263
+        },
+        {
+          "kind": "fun",
+          "name": "parseAdvertiseDid",
+          "line": 272
+        },
+        {
+          "kind": "fun",
+          "name": "buildOwnerFire",
+          "line": 284
+        },
+        {
+          "kind": "fun",
+          "name": "buildGuestFire",
+          "line": 295
+        },
+        {
+          "kind": "fun",
+          "name": "le64",
+          "line": 315
+        },
+        {
+          "kind": "fun",
+          "name": "buildOwnerTime",
+          "line": 322
+        },
+        {
+          "kind": "fun",
+          "name": "buildGuestTime",
+          "line": 334
+        },
+        {
+          "kind": "fun",
+          "name": "revokeBody",
+          "line": 347
+        },
+        {
+          "kind": "fun",
+          "name": "revokeSig",
+          "line": 353
+        }
+      ],
+      "surface_calls": []
+    },
+    {
+      "path": "app/src/main/java/com/entrixy/app/ble/BleEvents.kt",
+      "sha256": "ab9292e290cda7d87c74e81168713d27379224668ae6fadf370b8280175e4328",
+      "lines": 194,
+      "declarations": [
+        {
+          "kind": "object",
+          "name": "BleEvents",
+          "line": 19
+        },
+        {
+          "kind": "fun",
+          "name": "seqOf",
+          "line": 21
+        },
+        {
+          "kind": "fun",
+          "name": "typeOf",
+          "line": 22
+        },
+        {
+          "kind": "fun",
+          "name": "stateOf",
+          "line": 23
+        },
+        {
+          "kind": "fun",
+          "name": "positionOf",
+          "line": 30
+        },
+        {
+          "kind": "fun",
+          "name": "logForOwner",
+          "line": 40
+        },
+        {
+          "kind": "fun",
+          "name": "finishMovingRow",
+          "line": 88
+        },
+        {
+          "kind": "class",
+          "name": "Press",
+          "line": 103
+        },
+        {
+          "kind": "class",
+          "name": "Shown",
+          "line": 110
+        },
+        {
+          "kind": "fun",
+          "name": "startPress",
+          "line": 114
+        },
+        {
+          "kind": "fun",
+          "name": "onBits",
+          "line": 122
+        },
+        {
+          "kind": "fun",
+          "name": "forwardFromGuest",
+          "line": 182
+        }
+      ],
+      "surface_calls": []
+    },
+    {
+      "path": "app/src/main/java/com/entrixy/app/ble/BleFire.kt",
+      "sha256": "59a7d3c530ec5807c8332e1126334a59799f6e48bc1f3c6f9d3ffd4874ac79a3",
+      "lines": 1292,
+      "declarations": [
+        {
+          "kind": "object",
+          "name": "BleFire",
+          "line": 37
+        },
+        {
+          "kind": "fun",
+          "name": "mapFireResult",
+          "line": 75
+        },
+        {
+          "kind": "class",
+          "name": "Outcome",
+          "line": 96
+        },
+        {
+          "kind": "fun",
+          "name": "hasBlePermissions",
+          "line": 132
+        },
+        {
+          "kind": "fun",
+          "name": "run",
+          "line": 143
+        },
+        {
+          "kind": "fun",
+          "name": "runGuest",
+          "line": 292
+        },
+        {
+          "kind": "class",
+          "name": "ScanHit",
+          "line": 437
+        },
+        {
+          "kind": "fun",
+          "name": "scanForGuestObject",
+          "line": 440
+        },
+        {
+          "kind": "fun",
+          "name": "onScanResult",
+          "line": 444
+        },
+        {
+          "kind": "fun",
+          "name": "onScanFailed",
+          "line": 454
+        },
+        {
+          "kind": "fun",
+          "name": "doGuestFire",
+          "line": 471
+        },
+        {
+          "kind": "fun",
+          "name": "dt",
+          "line": 482
+        },
+        {
+          "kind": "fun",
+          "name": "enableResultNotifyThenWriteFire",
+          "line": 492
+        },
+        {
+          "kind": "fun",
+          "name": "onDescriptorWrite",
+          "line": 518
+        },
+        {
+          "kind": "fun",
+          "name": "writeFireWithNonce",
+          "line": 526
+        },
+        {
+          "kind": "fun",
+          "name": "onConnectionStateChange",
+          "line": 549
+        },
+        {
+          "kind": "fun",
+          "name": "onMtuChanged",
+          "line": 571
+        },
+        {
+          "kind": "fun",
+          "name": "onServicesDiscovered",
+          "line": 575
+        },
+        {
+          "kind": "fun",
+          "name": "onCharacteristicRead",
+          "line": 592
+        },
+        {
+          "kind": "fun",
+          "name": "onCharacteristicWrite",
+          "line": 598
+        },
+        {
+          "kind": "fun",
+          "name": "onCharacteristicChanged",
+          "line": 629
+        },
+        {
+          "kind": "fun",
+          "name": "onCharacteristicChanged",
+          "line": 641
+        },
+        {
+          "kind": "fun",
+          "name": "finish",
+          "line": 652
+        },
+        {
+          "kind": "fun",
+          "name": "scanForObject",
+          "line": 695
+        },
+        {
+          "kind": "fun",
+          "name": "onScanResult",
+          "line": 707
+        },
+        {
+          "kind": "fun",
+          "name": "onScanFailed",
+          "line": 732
+        },
+        {
+          "kind": "fun",
+          "name": "doFire",
+          "line": 761
+        },
+        {
+          "kind": "fun",
+          "name": "enableResultNotifyThen",
+          "line": 782
+        },
+        {
+          "kind": "fun",
+          "name": "writeFireWithCachedNonce",
+          "line": 803
+        },
+        {
+          "kind": "fun",
+          "name": "onDescriptorWrite",
+          "line": 810
+        },
+        {
+          "kind": "fun",
+          "name": "onCharacteristicChanged",
+          "line": 823
+        },
+        {
+          "kind": "fun",
+          "name": "onCharacteristicChanged",
+          "line": 828
+        },
+        {
+          "kind": "fun",
+          "name": "onResultCode",
+          "line": 832
+        },
+        {
+          "kind": "fun",
+          "name": "onConnectionStateChange",
+          "line": 845
+        },
+        {
+          "kind": "fun",
+          "name": "onMtuChanged",
+          "line": 869
+        },
+        {
+          "kind": "fun",
+          "name": "onServicesDiscovered",
+          "line": 877
+        },
+        {
+          "kind": "fun",
+          "name": "onCharacteristicRead",
+          "line": 908
+        },
+        {
+          "kind": "fun",
+          "name": "onCharacteristicWrite",
+          "line": 921
+        },
+        {
+          "kind": "fun",
+          "name": "writeChar",
+          "line": 963
+        },
+        {
+          "kind": "fun",
+          "name": "finish",
+          "line": 984
+        },
+        {
+          "kind": "fun",
+          "name": "failedRetryAt",
+          "line": 1034
+        },
+        {
+          "kind": "fun",
+          "name": "maybeSyncTime",
+          "line": 1037
+        },
+        {
+          "kind": "fun",
+          "name": "maybeSyncTimeGuest",
+          "line": 1073
+        },
+        {
+          "kind": "fun",
+          "name": "abortMaintenance",
+          "line": 1109
+        },
+        {
+          "kind": "fun",
+          "name": "maintain",
+          "line": 1120
+        },
+        {
+          "kind": "fun",
+          "name": "onConnectionStateChange",
+          "line": 1144
+        },
+        {
+          "kind": "fun",
+          "name": "onMtuChanged",
+          "line": 1154
+        },
+        {
+          "kind": "fun",
+          "name": "onServicesDiscovered",
+          "line": 1157
+        },
+        {
+          "kind": "fun",
+          "name": "onDescriptorWrite",
+          "line": 1178
+        },
+        {
+          "kind": "fun",
+          "name": "startSteps",
+          "line": 1183
+        },
+        {
+          "kind": "fun",
+          "name": "onCharacteristicRead",
+          "line": 1191
+        },
+        {
+          "kind": "fun",
+          "name": "onCharacteristicRead",
+          "line": 1194
+        },
+        {
+          "kind": "fun",
+          "name": "onRead",
+          "line": 1197
+        },
+        {
+          "kind": "fun",
+          "name": "onCharacteristicWrite",
+          "line": 1207
+        },
+        {
+          "kind": "fun",
+          "name": "onCharacteristicChanged",
+          "line": 1222
+        },
+        {
+          "kind": "fun",
+          "name": "onCharacteristicChanged",
+          "line": 1227
+        },
+        {
+          "kind": "fun",
+          "name": "onCode",
+          "line": 1232
+        },
+        {
+          "kind": "fun",
+          "name": "nextRevoke",
+          "line": 1251
+        },
+        {
+          "kind": "fun",
+          "name": "write",
+          "line": 1257
+        },
+        {
+          "kind": "fun",
+          "name": "finish",
+          "line": 1268
+        }
+      ],
+      "surface_calls": []
+    },
+    {
+      "path": "app/src/main/java/com/entrixy/app/ble/BlePair.kt",
+      "sha256": "afa0663a61f5f55218c1d655b1ffaf10b6ac30b473e3e3b020be8fa68f11f36c",
+      "lines": 497,
+      "declarations": [
+        {
+          "kind": "object",
+          "name": "BlePair",
+          "line": 49
+        },
+        {
+          "kind": "class",
+          "name": "Result",
+          "line": 57
+        },
+        {
+          "kind": "class",
+          "name": "State",
+          "line": 63
+        },
+        {
+          "kind": "object",
+          "name": "Scanning",
+          "line": 64
+        },
+        {
+          "kind": "class",
+          "name": "Found",
+          "line": 65
+        },
+        {
+          "kind": "object",
+          "name": "Connecting",
+          "line": 66
+        },
+        {
+          "kind": "object",
+          "name": "Handshake",
+          "line": 67
+        },
+        {
+          "kind": "class",
+          "name": "Done",
+          "line": 68
+        },
+        {
+          "kind": "class",
+          "name": "Error",
+          "line": 69
+        },
+        {
+          "kind": "fun",
+          "name": "run",
+          "line": 80
+        },
+        {
+          "kind": "class",
+          "name": "ScanHit",
+          "line": 211
+        },
+        {
+          "kind": "fun",
+          "name": "scanForEsp",
+          "line": 215
+        },
+        {
+          "kind": "fun",
+          "name": "onScanResult",
+          "line": 220
+        },
+        {
+          "kind": "fun",
+          "name": "onScanFailed",
+          "line": 234
+        },
+        {
+          "kind": "fun",
+          "name": "handshakeSimple",
+          "line": 278
+        },
+        {
+          "kind": "fun",
+          "name": "onConnectionStateChange",
+          "line": 287
+        },
+        {
+          "kind": "fun",
+          "name": "onServicesDiscovered",
+          "line": 295
+        },
+        {
+          "kind": "fun",
+          "name": "onCharacteristicWrite",
+          "line": 311
+        },
+        {
+          "kind": "fun",
+          "name": "finish",
+          "line": 316
+        },
+        {
+          "kind": "fun",
+          "name": "scanForFreshAdvertise",
+          "line": 341
+        },
+        {
+          "kind": "fun",
+          "name": "onScanResult",
+          "line": 347
+        },
+        {
+          "kind": "fun",
+          "name": "onScanFailed",
+          "line": 353
+        },
+        {
+          "kind": "fun",
+          "name": "handshake",
+          "line": 371
+        },
+        {
+          "kind": "fun",
+          "name": "log",
+          "line": 379
+        },
+        {
+          "kind": "fun",
+          "name": "handshakeOnce",
+          "line": 393
+        },
+        {
+          "kind": "fun",
+          "name": "onConnectionStateChange",
+          "line": 400
+        },
+        {
+          "kind": "fun",
+          "name": "onServicesDiscovered",
+          "line": 411
+        },
+        {
+          "kind": "fun",
+          "name": "onCharacteristicRead",
+          "line": 422
+        },
+        {
+          "kind": "fun",
+          "name": "onCharacteristicWrite",
+          "line": 459
+        },
+        {
+          "kind": "fun",
+          "name": "finish",
+          "line": 467
+        }
+      ],
+      "surface_calls": []
+    },
+    {
+      "path": "app/src/main/java/com/entrixy/app/ble/BleScanReceiver.kt",
+      "sha256": "93f5c4162de7769674877577eae6ee246b704068451dc73053d6f27935e03f6a",
+      "lines": 516,
+      "declarations": [
+        {
+          "kind": "class",
+          "name": "BleScanReceiver",
+          "line": 29
+        },
+        {
+          "kind": "fun",
+          "name": "rearmGapMs",
+          "line": 47
+        },
+        {
+          "kind": "fun",
+          "name": "onReceive",
+          "line": 58
+        }
+      ],
+      "surface_calls": []
+    },
+    {
+      "path": "app/src/main/java/com/entrixy/app/ble/BleScanRegistrar.kt",
+      "sha256": "7a58d0962f8f9f625433456bb420b561f72f99998d9acc6e93f53aa7c06311d9",
+      "lines": 75,
+      "declarations": [
+        {
+          "kind": "object",
+          "name": "BleScanRegistrar",
+          "line": 23
+        },
+        {
+          "kind": "fun",
+          "name": "ensure",
+          "line": 30
+        },
+        {
+          "kind": "fun",
+          "name": "cancel",
+          "line": 60
+        },
+        {
+          "kind": "fun",
+          "name": "buildPendingIntent",
+          "line": 67
+        }
+      ],
+      "surface_calls": []
+    },
+    {
+      "path": "app/src/main/java/com/entrixy/app/ble/BleSound.kt",
+      "sha256": "362c50e37782b94debfa4dcecb47eaba133f80dfa6bf8700c023d45d5cdfa4ed",
+      "lines": 56,
+      "declarations": [
+        {
+          "kind": "object",
+          "name": "BleSound",
+          "line": 17
+        },
+        {
+          "kind": "fun",
+          "name": "playSuccess",
+          "line": 25
+        },
+        {
+          "kind": "fun",
+          "name": "playError",
+          "line": 35
+        },
+        {
+          "kind": "fun",
+          "name": "playTone",
+          "line": 43
+        }
+      ],
+      "surface_calls": []
+    },
+    {
+      "path": "app/src/main/java/com/entrixy/app/ble/BleTexts.kt",
+      "sha256": "5c43392b32819c8ec74af64563bbaa9808bde47cefe870507166d28ae7ba85fe",
+      "lines": 42,
+      "declarations": [
+        {
+          "kind": "object",
+          "name": "BleTexts",
+          "line": 11
+        },
+        {
+          "kind": "fun",
+          "name": "isMoving",
+          "line": 20
+        },
+        {
+          "kind": "fun",
+          "name": "forCode",
+          "line": 23
+        }
+      ],
+      "surface_calls": []
+    },
+    {
+      "path": "app/src/main/java/com/entrixy/app/data/Action.kt",
+      "sha256": "904a51cc390622cbf06a5de9937decadd0432d74c71a9f2e9a7c2a4bfbbd7c81",
+      "lines": 17,
+      "declarations": [
+        {
+          "kind": "class",
+          "name": "ActionSource",
+          "line": 3
+        },
+        {
+          "kind": "class",
+          "name": "ActionState",
+          "line": 4
+        },
+        {
+          "kind": "class",
+          "name": "Action",
+          "line": 6
+        }
+      ],
+      "surface_calls": []
+    },
+    {
+      "path": "app/src/main/java/com/entrixy/app/data/AppState.kt",
+      "sha256": "e8671e1d7d913a9674b1561851e10523e2ceb87f629b13943ba6a7fd66b4b36a",
+      "lines": 713,
+      "declarations": [
+        {
+          "kind": "class",
+          "name": "PendingConfirm",
+          "line": 9
+        },
+        {
+          "kind": "class",
+          "name": "PendingGeoCall",
+          "line": 15
+        },
+        {
+          "kind": "class",
+          "name": "PromoData",
+          "line": 27
+        },
+        {
+          "kind": "class",
+          "name": "InlineStatus",
+          "line": 45
+        },
+        {
+          "kind": "class",
+          "name": "IncomingMessage",
+          "line": 48
+        },
+        {
+          "kind": "class",
+          "name": "ForceUpdateInfo",
+          "line": 60
+        },
+        {
+          "kind": "class",
+          "name": "JournalEntry",
+          "line": 67
+        },
+        {
+          "kind": "class",
+          "name": "HostNumberInfo",
+          "line": 78
+        },
+        {
+          "kind": "class",
+          "name": "ObjAccess",
+          "line": 106
+        },
+        {
+          "kind": "fun",
+          "name": "toJson",
+          "line": 107
+        },
+        {
+          "kind": "fun",
+          "name": "fromJson",
+          "line": 110
+        },
+        {
+          "kind": "class",
+          "name": "HostKeyInfo",
+          "line": 116
+        },
+        {
+          "kind": "class",
+          "name": "GuestNumberInfo",
+          "line": 149
+        },
+        {
+          "kind": "class",
+          "name": "GuestState",
+          "line": 165
+        },
+        {
+          "kind": "class",
+          "name": "ObjectPosition",
+          "line": 177
+        },
+        {
+          "kind": "fun",
+          "name": "parse",
+          "line": 185
+        },
+        {
+          "kind": "class",
+          "name": "ObjectState",
+          "line": 195
+        },
+        {
+          "kind": "class",
+          "name": "Source",
+          "line": 200
+        },
+        {
+          "kind": "object",
+          "name": "AppState",
+          "line": 203
+        },
+        {
+          "kind": "fun",
+          "name": "clearAll",
+          "line": 209
+        },
+        {
+          "kind": "class",
+          "name": "BleAdvCache",
+          "line": 315
+        },
+        {
+          "kind": "class",
+          "name": "BleAdvInfo",
+          "line": 330
+        },
+        {
+          "kind": "fun",
+          "name": "releaseHeldMoving",
+          "line": 390
+        },
+        {
+          "kind": "fun",
+          "name": "setInlineStatus",
+          "line": 401
+        },
+        {
+          "kind": "fun",
+          "name": "markOpenOnly",
+          "line": 512
+        },
+        {
+          "kind": "fun",
+          "name": "takeOpenOnly",
+          "line": 514
+        },
+        {
+          "kind": "fun",
+          "name": "isOpenOnly",
+          "line": 518
+        },
+        {
+          "kind": "fun",
+          "name": "maxNumbersOn",
+          "line": 527
+        },
+        {
+          "kind": "fun",
+          "name": "maxKeysOn",
+          "line": 528
+        },
+        {
+          "kind": "fun",
+          "name": "numbersOn",
+          "line": 530
+        },
+        {
+          "kind": "fun",
+          "name": "keysOn",
+          "line": 531
+        },
+        {
+          "kind": "class",
+          "name": "KnownOrg",
+          "line": 568
+        },
+        {
+          "kind": "fun",
+          "name": "computeActions",
+          "line": 596
+        },
+        {
+          "kind": "fun",
+          "name": "needsServer",
+          "line": 692
+        },
+        {
+          "kind": "fun",
+          "name": "upsertGuest",
+          "line": 699
+        },
+        {
+          "kind": "fun",
+          "name": "removeGuest",
+          "line": 704
+        }
+      ],
+      "surface_calls": []
+    },
+    {
+      "path": "app/src/main/java/com/entrixy/app/data/BleObject.kt",
+      "sha256": "8f52027e8a27647c7323a23f22b20c505f8b21d7b75d5a6fecd64b8bf7a1b3a8",
+      "lines": 50,
+      "declarations": [
+        {
+          "kind": "class",
+          "name": "BleObject",
+          "line": 15
+        },
+        {
+          "kind": "fun",
+          "name": "equals",
+          "line": 26
+        },
+        {
+          "kind": "fun",
+          "name": "hashCode",
+          "line": 39
+        }
+      ],
+      "surface_calls": []
+    },
+    {
+      "path": "app/src/main/java/com/entrixy/app/data/GuestBleObject.kt",
+      "sha256": "14625ba5ecae7ca5338d7e9ad78c2320250ad9a580171ce63a2a9276b086cf6f",
+      "lines": 60,
+      "declarations": [
+        {
+          "kind": "class",
+          "name": "GuestBleObject",
+          "line": 17
+        },
+        {
+          "kind": "fun",
+          "name": "equals",
+          "line": 34
+        },
+        {
+          "kind": "fun",
+          "name": "hashCode",
+          "line": 45
+        }
+      ],
+      "surface_calls": []
+    },
+    {
+      "path": "app/src/main/java/com/entrixy/app/data/Journal.kt",
+      "sha256": "16ed50b323a8db3d15efe5b29a99b16dba9d9388e6cf12484414af8eab1fcfa5",
+      "lines": 109,
+      "declarations": [
+        {
+          "kind": "object",
+          "name": "Journal",
+          "line": 14
+        },
+        {
+          "kind": "fun",
+          "name": "loadFromPrefs",
+          "line": 17
+        },
+        {
+          "kind": "fun",
+          "name": "log",
+          "line": 27
+        },
+        {
+          "kind": "fun",
+          "name": "resolveWhat",
+          "line": 70
+        },
+        {
+          "kind": "fun",
+          "name": "setResult",
+          "line": 85
+        },
+        {
+          "kind": "fun",
+          "name": "clear",
+          "line": 103
+        }
+      ],
+      "surface_calls": []
+    },
+    {
+      "path": "app/src/main/java/com/entrixy/app/data/PassJournal.kt",
+      "sha256": "d8dbe3bf5e04ad541dc9b0f7be93b76d40c94df91ec8760a058166c3846710ab",
+      "lines": 62,
+      "declarations": [
+        {
+          "kind": "object",
+          "name": "PassJournal",
+          "line": 15
+        },
+        {
+          "kind": "fun",
+          "name": "import",
+          "line": 17
+        },
+        {
+          "kind": "fun",
+          "name": "pullKey",
+          "line": 44
+        },
+        {
+          "kind": "fun",
+          "name": "pull",
+          "line": 55
+        },
+        {
+          "kind": "fun",
+          "name": "log",
+          "line": 59
+        }
+      ],
+      "surface_calls": []
+    },
+    {
+      "path": "app/src/main/java/com/entrixy/app/fcm/FcmService.kt",
+      "sha256": "0581ab3c99baeed47abf914aa2352f9c9dce5612a413b37e3857e2cc3cd14811",
+      "lines": 152,
+      "declarations": [
+        {
+          "kind": "class",
+          "name": "FcmService",
+          "line": 22
+        },
+        {
+          "kind": "fun",
+          "name": "onNewToken",
+          "line": 24
+        },
+        {
+          "kind": "fun",
+          "name": "onMessageReceived",
+          "line": 30
+        },
+        {
+          "kind": "fun",
+          "name": "fcmLog",
+          "line": 49
+        },
+        {
+          "kind": "fun",
+          "name": "handleIncomingMessage",
+          "line": 62
+        },
+        {
+          "kind": "fun",
+          "name": "showLocalMessageNotification",
+          "line": 118
+        }
+      ],
+      "surface_calls": []
+    },
+    {
+      "path": "app/src/main/java/com/entrixy/app/fcm/FcmTopics.kt",
+      "sha256": "50f1dd1cc82755d49b304ac2c9df386c70abd62b9a02d6d76c779015f438fa7b",
+      "lines": 55,
+      "declarations": [
+        {
+          "kind": "object",
+          "name": "FcmTopics",
+          "line": 18
+        },
+        {
+          "kind": "fun",
+          "name": "topicName",
+          "line": 20
+        },
+        {
+          "kind": "fun",
+          "name": "subscribe",
+          "line": 22
+        },
+        {
+          "kind": "fun",
+          "name": "unsubscribe",
+          "line": 28
+        },
+        {
+          "kind": "fun",
+          "name": "resubscribeAll",
+          "line": 37
+        },
+        {
+          "kind": "fun",
+          "name": "sha256Hex",
+          "line": 46
+        }
+      ],
+      "surface_calls": []
+    },
+    {
+      "path": "app/src/main/java/com/entrixy/app/geo/ActivityManager.kt",
+      "sha256": "a69a481da1ffaf8851100dbe08bc4fbc711be1cbdd91aa66ce11e4332415fa60",
+      "lines": 55,
+      "declarations": [
+        {
+          "kind": "object",
+          "name": "ActivityManager",
+          "line": 20
+        },
+        {
+          "kind": "fun",
+          "name": "pendingIntent",
+          "line": 25
+        },
+        {
+          "kind": "fun",
+          "name": "hasPermission",
+          "line": 34
+        },
+        {
+          "kind": "fun",
+          "name": "start",
+          "line": 41
+        },
+        {
+          "kind": "fun",
+          "name": "stop",
+          "line": 49
+        }
+      ],
+      "surface_calls": []
+    },
+    {
+      "path": "app/src/main/java/com/entrixy/app/geo/ActivityReceiver.kt",
+      "sha256": "9a1781208556ce66b522fb6c526986270ce3147b5da0d0441416a2b8199b6b1f",
+      "lines": 51,
+      "declarations": [
+        {
+          "kind": "class",
+          "name": "ActivityReceiver",
+          "line": 15
+        },
+        {
+          "kind": "fun",
+          "name": "onReceive",
+          "line": 17
+        }
+      ],
+      "surface_calls": []
+    },
+    {
+      "path": "app/src/main/java/com/entrixy/app/geo/GeofenceManager.kt",
+      "sha256": "5cb9b0d3e6afd9d094b5f40680a0f24c2c38c4b8f7d8e56629afd8c50e49791c",
+      "lines": 142,
+      "declarations": [
+        {
+          "kind": "object",
+          "name": "GeofenceManager",
+          "line": 16
+        },
+        {
+          "kind": "fun",
+          "name": "client",
+          "line": 25
+        },
+        {
+          "kind": "fun",
+          "name": "pendingIntent",
+          "line": 28
+        },
+        {
+          "kind": "fun",
+          "name": "hasFineLocation",
+          "line": 37
+        },
+        {
+          "kind": "fun",
+          "name": "hasBackgroundLocation",
+          "line": 41
+        },
+        {
+          "kind": "fun",
+          "name": "add",
+          "line": 48
+        },
+        {
+          "kind": "fun",
+          "name": "remove",
+          "line": 63
+        },
+        {
+          "kind": "fun",
+          "name": "resyncAll",
+          "line": 68
+        }
+      ],
+      "surface_calls": []
+    },
+    {
+      "path": "app/src/main/java/com/entrixy/app/geo/GeofenceReceiver.kt",
+      "sha256": "5fd56f31db0799633aa423701bfee5957a2534babfa18a489494f886b9a58564",
+      "lines": 41,
+      "declarations": [
+        {
+          "kind": "class",
+          "name": "GeofenceReceiver",
+          "line": 19
+        },
+        {
+          "kind": "fun",
+          "name": "onReceive",
+          "line": 21
+        }
+      ],
+      "surface_calls": []
+    },
+    {
+      "path": "app/src/main/java/com/entrixy/app/host/AutoCombine.kt",
+      "sha256": "7ef9654ebbb68314f1d9626b9cc1b4e53e69774a34ed873358007e2eb3012333",
+      "lines": 114,
+      "declarations": [
+        {
+          "kind": "object",
+          "name": "AutoCombine",
+          "line": 21
+        },
+        {
+          "kind": "fun",
+          "name": "outsideEntry",
+          "line": 26
+        },
+        {
+          "kind": "fun",
+          "name": "geoReady",
+          "line": 35
+        },
+        {
+          "kind": "fun",
+          "name": "wifiReady",
+          "line": 41
+        },
+        {
+          "kind": "fun",
+          "name": "dayIn",
+          "line": 56
+        },
+        {
+          "kind": "fun",
+          "name": "secondsLeftInWindow",
+          "line": 59
+        },
+        {
+          "kind": "fun",
+          "name": "timeReady",
+          "line": 73
+        },
+        {
+          "kind": "fun",
+          "name": "matched",
+          "line": 103
+        }
+      ],
+      "surface_calls": []
+    },
+    {
+      "path": "app/src/main/java/com/entrixy/app/host/BleScanWatchdogReceiver.kt",
+      "sha256": "72d3ec6695aefdf612b9f1be9e49f5e900402e758ee24f266caff6950df1bd86",
+      "lines": 71,
+      "declarations": [
+        {
+          "kind": "class",
+          "name": "BleScanWatchdogReceiver",
+          "line": 23
+        },
+        {
+          "kind": "fun",
+          "name": "onReceive",
+          "line": 24
+        }
+      ],
+      "surface_calls": []
+    },
+    {
+      "path": "app/src/main/java/com/entrixy/app/host/BootReceiver.kt",
+      "sha256": "bfcf8d65433eb79755a08eaa516eb7481677030bf9050cea156a6620f367ef18",
+      "lines": 68,
+      "declarations": [
+        {
+          "kind": "class",
+          "name": "BootReceiver",
+          "line": 17
+        },
+        {
+          "kind": "fun",
+          "name": "log",
+          "line": 18
+        },
+        {
+          "kind": "fun",
+          "name": "onReceive",
+          "line": 26
+        }
+      ],
+      "surface_calls": []
+    },
+    {
+      "path": "app/src/main/java/com/entrixy/app/host/Calls.kt",
+      "sha256": "9e5f34386724bec227cb4837bed1fcd60fad97d42557f20d1928b6cf97a84cf0",
+      "lines": 134,
+      "declarations": [
+        {
+          "kind": "object",
+          "name": "Calls",
+          "line": 18
+        },
+        {
+          "kind": "fun",
+          "name": "isRepeat",
+          "line": 26
+        },
+        {
+          "kind": "fun",
+          "name": "place",
+          "line": 30
+        },
+        {
+          "kind": "fun",
+          "name": "armHangupOnConnectPublic",
+          "line": 55
+        },
+        {
+          "kind": "fun",
+          "name": "armHangupOnConnect",
+          "line": 61
+        },
+        {
+          "kind": "fun",
+          "name": "onCallStateChanged",
+          "line": 76
+        },
+        {
+          "kind": "fun",
+          "name": "finish",
+          "line": 110
+        },
+        {
+          "kind": "fun",
+          "name": "unregister",
+          "line": 116
+        },
+        {
+          "kind": "fun",
+          "name": "hangup",
+          "line": 126
+        }
+      ],
+      "surface_calls": []
+    },
+    {
+      "path": "app/src/main/java/com/entrixy/app/host/ConfirmReceiver.kt",
+      "sha256": "cb741ed28b4182d14c3fc1f453edf10aba0e4d090ab3288a56aba0fa166ec429",
+      "lines": 30,
+      "declarations": [
+        {
+          "kind": "class",
+          "name": "ConfirmReceiver",
+          "line": 8
+        },
+        {
+          "kind": "fun",
+          "name": "onReceive",
+          "line": 9
+        }
+      ],
+      "surface_calls": []
+    },
+    {
+      "path": "app/src/main/java/com/entrixy/app/host/FpMove.kt",
+      "sha256": "48864d2f42d86b2641eb50f94993d5b9c0577f98077cfed889d50a8c4ef85982",
+      "lines": 88,
+      "declarations": [
+        {
+          "kind": "object",
+          "name": "FpMove",
+          "line": 17
+        },
+        {
+          "kind": "fun",
+          "name": "begin",
+          "line": 22
+        },
+        {
+          "kind": "fun",
+          "name": "log",
+          "line": 24
+        },
+        {
+          "kind": "fun",
+          "name": "needed",
+          "line": 27
+        },
+        {
+          "kind": "fun",
+          "name": "run",
+          "line": 29
+        }
+      ],
+      "surface_calls": []
+    },
+    {
+      "path": "app/src/main/java/com/entrixy/app/host/GeoCorridorMatcher.kt",
+      "sha256": "e61557c54846d08f8dc11c62222b93a4a51b8f6092bc63834d4769f5a9d3ced5",
+      "lines": 498,
+      "declarations": [
+        {
+          "kind": "class",
+          "name": "GeoCorridorMatcher",
+          "line": 85
+        },
+        {
+          "kind": "class",
+          "name": "Fix",
+          "line": 194
+        },
+        {
+          "kind": "class",
+          "name": "NearPt",
+          "line": 201
+        },
+        {
+          "kind": "fun",
+          "name": "reset",
+          "line": 212
+        },
+        {
+          "kind": "fun",
+          "name": "onManualOpen",
+          "line": 222
+        },
+        {
+          "kind": "fun",
+          "name": "update",
+          "line": 232
+        },
+        {
+          "kind": "fun",
+          "name": "f6",
+          "line": 266
+        },
+        {
+          "kind": "fun",
+          "name": "toX",
+          "line": 285
+        },
+        {
+          "kind": "fun",
+          "name": "toY",
+          "line": 286
+        }
+      ],
+      "surface_calls": []
+    },
+    {
+      "path": "app/src/main/java/com/entrixy/app/host/GeoTracker.kt",
+      "sha256": "1f24c39a518fab95515af3967843c71a72e4899ef66a7d3cfa78742138d4d127",
+      "lines": 1630,
+      "declarations": [
+        {
+          "kind": "class",
+          "name": "GeoTracker",
+          "line": 41
+        },
+        {
+          "kind": "fun",
+          "name": "onLocationChanged",
+          "line": 72
+        },
+        {
+          "kind": "fun",
+          "name": "onStatusChanged",
+          "line": 74
+        },
+        {
+          "kind": "fun",
+          "name": "onProviderEnabled",
+          "line": 75
+        },
+        {
+          "kind": "fun",
+          "name": "onProviderDisabled",
+          "line": 76
+        },
+        {
+          "kind": "fun",
+          "name": "locationUnreliable",
+          "line": 119
+        },
+        {
+          "kind": "fun",
+          "name": "activityName",
+          "line": 128
+        },
+        {
+          "kind": "fun",
+          "name": "onTrigger",
+          "line": 181
+        },
+        {
+          "kind": "fun",
+          "name": "onSensorChanged",
+          "line": 205
+        },
+        {
+          "kind": "fun",
+          "name": "onAccuracyChanged",
+          "line": 243
+        },
+        {
+          "kind": "fun",
+          "name": "vehicleGateOk",
+          "line": 269
+        },
+        {
+          "kind": "class",
+          "name": "GpsSample",
+          "line": 281
+        },
+        {
+          "kind": "fun",
+          "name": "pushFix",
+          "line": 296
+        },
+        {
+          "kind": "fun",
+          "name": "smoothedLocation",
+          "line": 328
+        },
+        {
+          "kind": "fun",
+          "name": "glog",
+          "line": 369
+        },
+        {
+          "kind": "fun",
+          "name": "onLocationResult",
+          "line": 379
+        },
+        {
+          "kind": "fun",
+          "name": "startCorridorPoll",
+          "line": 410
+        },
+        {
+          "kind": "fun",
+          "name": "stopCorridorPoll",
+          "line": 418
+        },
+        {
+          "kind": "fun",
+          "name": "armSigMotion",
+          "line": 428
+        },
+        {
+          "kind": "fun",
+          "name": "disarmSigMotion",
+          "line": 439
+        },
+        {
+          "kind": "fun",
+          "name": "pollCorridorLocation",
+          "line": 446
+        },
+        {
+          "kind": "fun",
+          "name": "onCallStateChanged",
+          "line": 485
+        },
+        {
+          "kind": "fun",
+          "name": "start",
+          "line": 502
+        },
+        {
+          "kind": "fun",
+          "name": "onGeosChanged",
+          "line": 554
+        },
+        {
+          "kind": "fun",
+          "name": "onManualOpen",
+          "line": 614
+        },
+        {
+          "kind": "fun",
+          "name": "stop",
+          "line": 619
+        },
+        {
+          "kind": "fun",
+          "name": "hasFineLocation",
+          "line": 639
+        },
+        {
+          "kind": "fun",
+          "name": "scheduleTick",
+          "line": 649
+        },
+        {
+          "kind": "fun",
+          "name": "cancelTick",
+          "line": 653
+        },
+        {
+          "kind": "fun",
+          "name": "stopGps",
+          "line": 655
+        },
+        {
+          "kind": "fun",
+          "name": "requestUpdates",
+          "line": 665
+        },
+        {
+          "kind": "fun",
+          "name": "processLocation",
+          "line": 705
+        },
+        {
+          "kind": "class",
+          "name": "NextTrig",
+          "line": 1129
+        },
+        {
+          "kind": "fun",
+          "name": "nextTimeTrig",
+          "line": 1131
+        },
+        {
+          "kind": "fun",
+          "name": "adjustInterval",
+          "line": 1161
+        },
+        {
+          "kind": "fun",
+          "name": "adjustAccelRate",
+          "line": 1310
+        },
+        {
+          "kind": "fun",
+          "name": "cancelCountdown",
+          "line": 1332
+        },
+        {
+          "kind": "fun",
+          "name": "maybeTriggerAuto",
+          "line": 1340
+        },
+        {
+          "kind": "fun",
+          "name": "playTriggerSound",
+          "line": 1497
+        },
+        {
+          "kind": "fun",
+          "name": "confirmPending",
+          "line": 1502
+        },
+        {
+          "kind": "fun",
+          "name": "getSecurityLevel",
+          "line": 1535
+        },
+        {
+          "kind": "fun",
+          "name": "templateFor",
+          "line": 1542
+        },
+        {
+          "kind": "fun",
+          "name": "showTriggerNotification",
+          "line": 1578
+        },
+        {
+          "kind": "fun",
+          "name": "cancelPending",
+          "line": 1619
+        }
+      ],
+      "surface_calls": []
+    },
+    {
+      "path": "app/src/main/java/com/entrixy/app/host/GuestConn.kt",
+      "sha256": "d8e1d2a27701c2fc70610b2afb46fa7fc55532fee4d6d778bcba03858576c41e",
+      "lines": 916,
+      "declarations": [
+        {
+          "kind": "class",
+          "name": "GuestConn",
+          "line": 13
+        },
+        {
+          "kind": "fun",
+          "name": "bumpOverridesIfNumbersChanged",
+          "line": 37
+        },
+        {
+          "kind": "fun",
+          "name": "computeState",
+          "line": 45
+        },
+        {
+          "kind": "fun",
+          "name": "start",
+          "line": 54
+        },
+        {
+          "kind": "fun",
+          "name": "ensureWsAlive",
+          "line": 93
+        },
+        {
+          "kind": "fun",
+          "name": "stop",
+          "line": 127
+        },
+        {
+          "kind": "fun",
+          "name": "sendCall",
+          "line": 145
+        },
+        {
+          "kind": "fun",
+          "name": "takeSockAction",
+          "line": 182
+        },
+        {
+          "kind": "fun",
+          "name": "requestBleTokenRenew",
+          "line": 200
+        },
+        {
+          "kind": "fun",
+          "name": "flushPendingBleFireEvents",
+          "line": 219
+        },
+        {
+          "kind": "fun",
+          "name": "passJournal",
+          "line": 249
+        },
+        {
+          "kind": "fun",
+          "name": "handle",
+          "line": 258
+        },
+        {
+          "kind": "fun",
+          "name": "b64",
+          "line": 486
+        },
+        {
+          "kind": "class",
+          "name": "S",
+          "line": 500
+        },
+        {
+          "kind": "fun",
+          "name": "requestMissingAvatars",
+          "line": 757
+        },
+        {
+          "kind": "fun",
+          "name": "parseNumbers",
+          "line": 775
+        },
+        {
+          "kind": "fun",
+          "name": "deleteAvatarFile",
+          "line": 840
+        },
+        {
+          "kind": "fun",
+          "name": "publish",
+          "line": 891
+        }
+      ],
+      "surface_calls": []
+    },
+    {
+      "path": "app/src/main/java/com/entrixy/app/host/HostService.kt",
+      "sha256": "9a05dea7a87406f6af6c8a14309f7ed5e7b7122ed71a25a0a2daa89e3d4b73af",
+      "lines": 3645,
+      "declarations": [
+        {
+          "kind": "class",
+          "name": "HostService",
+          "line": 22
+        },
+        {
+          "kind": "fun",
+          "name": "hostOf",
+          "line": 30
+        },
+        {
+          "kind": "fun",
+          "name": "sendTo",
+          "line": 35
+        },
+        {
+          "kind": "fun",
+          "name": "dropHostWs",
+          "line": 51
+        },
+        {
+          "kind": "fun",
+          "name": "onReceive",
+          "line": 69
+        },
+        {
+          "kind": "fun",
+          "name": "onReceive",
+          "line": 84
+        },
+        {
+          "kind": "fun",
+          "name": "onReceive",
+          "line": 106
+        },
+        {
+          "kind": "fun",
+          "name": "scheduleLogUpload",
+          "line": 110
+        },
+        {
+          "kind": "fun",
+          "name": "scheduleBleScanWatchdog",
+          "line": 140
+        },
+        {
+          "kind": "fun",
+          "name": "cancelBleScanWatchdog",
+          "line": 156
+        },
+        {
+          "kind": "fun",
+          "name": "log",
+          "line": 168
+        },
+        {
+          "kind": "fun",
+          "name": "onBind",
+          "line": 184
+        },
+        {
+          "kind": "fun",
+          "name": "ensureForeground",
+          "line": 201
+        },
+        {
+          "kind": "fun",
+          "name": "onCreate",
+          "line": 234
+        },
+        {
+          "kind": "fun",
+          "name": "startAllGuestConnections",
+          "line": 400
+        },
+        {
+          "kind": "fun",
+          "name": "rootKeyOf",
+          "line": 421
+        },
+        {
+          "kind": "fun",
+          "name": "pressOk",
+          "line": 445
+        },
+        {
+          "kind": "fun",
+          "name": "rememberVerified",
+          "line": 517
+        },
+        {
+          "kind": "fun",
+          "name": "guestLabelOf",
+          "line": 523
+        },
+        {
+          "kind": "fun",
+          "name": "addGuestRuntime",
+          "line": 537
+        },
+        {
+          "kind": "fun",
+          "name": "removeGuestRuntime",
+          "line": 544
+        },
+        {
+          "kind": "fun",
+          "name": "callGuestNumber",
+          "line": 548
+        },
+        {
+          "kind": "fun",
+          "name": "flushPendingBleFireEvents",
+          "line": 556
+        },
+        {
+          "kind": "fun",
+          "name": "run",
+          "line": 563
+        },
+        {
+          "kind": "fun",
+          "name": "pruneGhostBleEntries",
+          "line": 581
+        },
+        {
+          "kind": "fun",
+          "name": "startInlineStatusCleaner",
+          "line": 605
+        },
+        {
+          "kind": "fun",
+          "name": "run",
+          "line": 613
+        },
+        {
+          "kind": "fun",
+          "name": "startWidgetTicker",
+          "line": 800
+        },
+        {
+          "kind": "fun",
+          "name": "callOwnNumber",
+          "line": 813
+        },
+        {
+          "kind": "fun",
+          "name": "sendBleRevoke",
+          "line": 847
+        },
+        {
+          "kind": "fun",
+          "name": "bleRevokeMsg",
+          "line": 857
+        },
+        {
+          "kind": "fun",
+          "name": "resendBleRevokes",
+          "line": 866
+        },
+        {
+          "kind": "fun",
+          "name": "sendSocketRevoke",
+          "line": 877
+        },
+        {
+          "kind": "fun",
+          "name": "resendSocketRevokes",
+          "line": 903
+        },
+        {
+          "kind": "class",
+          "name": "WhReply",
+          "line": 916
+        },
+        {
+          "kind": "fun",
+          "name": "whActionFor",
+          "line": 925
+        },
+        {
+          "kind": "fun",
+          "name": "postWebhook",
+          "line": 939
+        },
+        {
+          "kind": "fun",
+          "name": "whPositionAfter",
+          "line": 981
+        },
+        {
+          "kind": "fun",
+          "name": "setObjectPosition",
+          "line": 990
+        },
+        {
+          "kind": "fun",
+          "name": "scheduleWhForget",
+          "line": 1009
+        },
+        {
+          "kind": "fun",
+          "name": "tapAllowed",
+          "line": 1021
+        },
+        {
+          "kind": "fun",
+          "name": "ownJournalResult",
+          "line": 1031
+        },
+        {
+          "kind": "fun",
+          "name": "fireOwnWebhook",
+          "line": 1037
+        },
+        {
+          "kind": "fun",
+          "name": "reloadHost",
+          "line": 1103
+        },
+        {
+          "kind": "fun",
+          "name": "fireFromWidget",
+          "line": 1106
+        },
+        {
+          "kind": "fun",
+          "name": "onStartCommand",
+          "line": 1164
+        },
+        {
+          "kind": "fun",
+          "name": "connect",
+          "line": 1237
+        },
+        {
+          "kind": "fun",
+          "name": "connectTo",
+          "line": 1251
+        },
+        {
+          "kind": "fun",
+          "name": "ensureAllWsAlive",
+          "line": 1336
+        },
+        {
+          "kind": "fun",
+          "name": "ensureWsAlive",
+          "line": 1344
+        },
+        {
+          "kind": "fun",
+          "name": "checkWs",
+          "line": 1352
+        },
+        {
+          "kind": "fun",
+          "name": "syncPendingHostKeys",
+          "line": 1381
+        },
+        {
+          "kind": "fun",
+          "name": "repairSocketGuestCreds",
+          "line": 1630
+        },
+        {
+          "kind": "fun",
+          "name": "restartApp",
+          "line": 1648
+        },
+        {
+          "kind": "class",
+          "name": "HostData",
+          "line": 1668
+        },
+        {
+          "kind": "fun",
+          "name": "syncHostData",
+          "line": 1682
+        },
+        {
+          "kind": "fun",
+          "name": "offerRestore",
+          "line": 1760
+        },
+        {
+          "kind": "fun",
+          "name": "reRegisterOn",
+          "line": 1776
+        },
+        {
+          "kind": "fun",
+          "name": "adoptLegacyKeyData",
+          "line": 1803
+        },
+        {
+          "kind": "fun",
+          "name": "fetchHostRaw",
+          "line": 1818
+        },
+        {
+          "kind": "fun",
+          "name": "fetchHostData",
+          "line": 1836
+        },
+        {
+          "kind": "fun",
+          "name": "pickStr",
+          "line": 1896
+        },
+        {
+          "kind": "fun",
+          "name": "pickNullableStr",
+          "line": 1899
+        },
+        {
+          "kind": "fun",
+          "name": "vouchOk",
+          "line": 1975
+        },
+        {
+          "kind": "fun",
+          "name": "reconcileBlePairs",
+          "line": 2150
+        },
+        {
+          "kind": "fun",
+          "name": "live",
+          "line": 2152
+        },
+        {
+          "kind": "fun",
+          "name": "mergeHostData",
+          "line": 2187
+        },
+        {
+          "kind": "fun",
+          "name": "handle",
+          "line": 2351
+        },
+        {
+          "kind": "fun",
+          "name": "notifyRestoreNeeded",
+          "line": 2922
+        },
+        {
+          "kind": "fun",
+          "name": "showMessageNotification",
+          "line": 2948
+        },
+        {
+          "kind": "fun",
+          "name": "scheduleNotifyCall",
+          "line": 2972
+        },
+        {
+          "kind": "fun",
+          "name": "expireConfirm",
+          "line": 3041
+        },
+        {
+          "kind": "fun",
+          "name": "showConfirmNotification",
+          "line": 3057
+        },
+        {
+          "kind": "fun",
+          "name": "playBuzzer",
+          "line": 3117
+        },
+        {
+          "kind": "fun",
+          "name": "run",
+          "line": 3124
+        },
+        {
+          "kind": "fun",
+          "name": "stopBuzzer",
+          "line": 3147
+        },
+        {
+          "kind": "fun",
+          "name": "ensureChannel",
+          "line": 3155
+        },
+        {
+          "kind": "fun",
+          "name": "maskPhone",
+          "line": 3166
+        },
+        {
+          "kind": "fun",
+          "name": "placeCall",
+          "line": 3171
+        },
+        {
+          "kind": "fun",
+          "name": "onDestroy",
+          "line": 3202
+        },
+        {
+          "kind": "fun",
+          "name": "run",
+          "line": 3242
+        },
+        {
+          "kind": "fun",
+          "name": "startBleRenewScheduler",
+          "line": 3260
+        },
+        {
+          "kind": "fun",
+          "name": "run",
+          "line": 3271
+        },
+        {
+          "kind": "fun",
+          "name": "startPendingKeysScheduler",
+          "line": 3280
+        },
+        {
+          "kind": "fun",
+          "name": "handleBleTokenRenew",
+          "line": 3285
+        },
+        {
+          "kind": "fun",
+          "name": "ensureGeoTracker",
+          "line": 3375
+        },
+        {
+          "kind": "fun",
+          "name": "upgradeForegroundToLocation",
+          "line": 3446
+        },
+        {
+          "kind": "fun",
+          "name": "reloadPromo",
+          "line": 3460
+        },
+        {
+          "kind": "fun",
+          "name": "handlePromoMessage",
+          "line": 3465
+        },
+        {
+          "kind": "fun",
+          "name": "parsePromo",
+          "line": 3475
+        },
+        {
+          "kind": "fun",
+          "name": "String.clean",
+          "line": 3476
+        },
+        {
+          "kind": "fun",
+          "name": "loadPromo",
+          "line": 3489
+        },
+        {
+          "kind": "fun",
+          "name": "isPhoneBusy",
+          "line": 3531
+        },
+        {
+          "kind": "fun",
+          "name": "triggerHostCall",
+          "line": 3539
+        },
+        {
+          "kind": "fun",
+          "name": "buildNotification",
+          "line": 3544
+        },
+        {
+          "kind": "fun",
+          "name": "refreshHostNotification",
+          "line": 3579
+        },
+        {
+          "kind": "fun",
+          "name": "sendConfirmResponse",
+          "line": 3594
+        },
+        {
+          "kind": "fun",
+          "name": "start",
+          "line": 3618
+        },
+        {
+          "kind": "fun",
+          "name": "stop",
+          "line": 3643
+        }
+      ],
+      "surface_calls": []
+    },
+    {
+      "path": "app/src/main/java/com/entrixy/app/host/ServerRestore.kt",
+      "sha256": "c0bebf862a4c1caa11e166a21ef26a300ed875657cb724f58c01aa81c03a526e",
+      "lines": 202,
+      "declarations": [
+        {
+          "kind": "object",
+          "name": "ServerRestore",
+          "line": 25
+        },
+        {
+          "kind": "class",
+          "name": "Result",
+          "line": 27
+        },
+        {
+          "kind": "fun",
+          "name": "isRunning",
+          "line": 42
+        },
+        {
+          "kind": "fun",
+          "name": "run",
+          "line": 44
+        }
+      ],
+      "surface_calls": []
+    },
+    {
+      "path": "app/src/main/java/com/entrixy/app/host/WifiChecker.kt",
+      "sha256": "3372ae7f7218c3eabfab2a4ca1c5a50283333b56b3b26a6f429070df67370b2f",
+      "lines": 150,
+      "declarations": [
+        {
+          "kind": "class",
+          "name": "WifiChecker",
+          "line": 29
+        },
+        {
+          "kind": "fun",
+          "name": "start",
+          "line": 40
+        },
+        {
+          "kind": "fun",
+          "name": "onCapabilitiesChanged",
+          "line": 62
+        },
+        {
+          "kind": "fun",
+          "name": "onLost",
+          "line": 63
+        },
+        {
+          "kind": "fun",
+          "name": "onCapabilitiesChanged",
+          "line": 65
+        },
+        {
+          "kind": "fun",
+          "name": "onLost",
+          "line": 66
+        },
+        {
+          "kind": "fun",
+          "name": "stop",
+          "line": 80
+        },
+        {
+          "kind": "fun",
+          "name": "updateConnectedBssid",
+          "line": 88
+        },
+        {
+          "kind": "fun",
+          "name": "check",
+          "line": 101
+        },
+        {
+          "kind": "class",
+          "name": "WifiMatchResult",
+          "line": 145
+        }
+      ],
+      "surface_calls": []
+    },
+    {
+      "path": "app/src/main/java/com/entrixy/app/net/Api.kt",
+      "sha256": "44124e43f5a7ef018f4171c4e8ab926bbb5a552085d9b5304c154b467eafca78",
+      "lines": 790,
+      "declarations": [
+        {
+          "kind": "object",
+          "name": "Api",
+          "line": 10
+        },
+        {
+          "kind": "fun",
+          "name": "hostOfNumber",
+          "line": 32
+        },
+        {
+          "kind": "fun",
+          "name": "hostOfKey",
+          "line": 47
+        },
+        {
+          "kind": "fun",
+          "name": "hostOfNumbersOrNull",
+          "line": 58
+        },
+        {
+          "kind": "fun",
+          "name": "hostOfNumbers",
+          "line": 65
+        },
+        {
+          "kind": "fun",
+          "name": "hostOfBle",
+          "line": 78
+        },
+        {
+          "kind": "fun",
+          "name": "numberUpdateOwned",
+          "line": 82
+        },
+        {
+          "kind": "fun",
+          "name": "numberDeleteOwned",
+          "line": 94
+        },
+        {
+          "kind": "fun",
+          "name": "serverIds",
+          "line": 101
+        },
+        {
+          "kind": "fun",
+          "name": "accessJson",
+          "line": 104
+        },
+        {
+          "kind": "fun",
+          "name": "keyRevokeOwned",
+          "line": 109
+        },
+        {
+          "kind": "fun",
+          "name": "messageSendOwned",
+          "line": 115
+        },
+        {
+          "kind": "fun",
+          "name": "guestCall",
+          "line": 121
+        },
+        {
+          "kind": "fun",
+          "name": "postRaw",
+          "line": 136
+        },
+        {
+          "kind": "fun",
+          "name": "postRawCode",
+          "line": 139
+        },
+        {
+          "kind": "fun",
+          "name": "noteOffline",
+          "line": 168
+        },
+        {
+          "kind": "fun",
+          "name": "notSent",
+          "line": 191
+        },
+        {
+          "kind": "fun",
+          "name": "send",
+          "line": 206
+        },
+        {
+          "kind": "fun",
+          "name": "once",
+          "line": 207
+        },
+        {
+          "kind": "fun",
+          "name": "logFail",
+          "line": 210
+        },
+        {
+          "kind": "fun",
+          "name": "post",
+          "line": 237
+        },
+        {
+          "kind": "fun",
+          "name": "postSigned",
+          "line": 261
+        },
+        {
+          "kind": "fun",
+          "name": "hostClaim",
+          "line": 305
+        },
+        {
+          "kind": "fun",
+          "name": "registerHost",
+          "line": 320
+        },
+        {
+          "kind": "fun",
+          "name": "registerHostRaw",
+          "line": 329
+        },
+        {
+          "kind": "fun",
+          "name": "accountLogin",
+          "line": 343
+        },
+        {
+          "kind": "fun",
+          "name": "hostAccount",
+          "line": 348
+        },
+        {
+          "kind": "fun",
+          "name": "hostSync",
+          "line": 357
+        },
+        {
+          "kind": "fun",
+          "name": "numberAdd",
+          "line": 364
+        },
+        {
+          "kind": "fun",
+          "name": "numberUpdate",
+          "line": 388
+        },
+        {
+          "kind": "fun",
+          "name": "deviceRegister",
+          "line": 397
+        },
+        {
+          "kind": "fun",
+          "name": "deviceClaim",
+          "line": 402
+        },
+        {
+          "kind": "fun",
+          "name": "deviceClaimEx",
+          "line": 409
+        },
+        {
+          "kind": "fun",
+          "name": "numberDelete",
+          "line": 424
+        },
+        {
+          "kind": "fun",
+          "name": "messageSend",
+          "line": 430
+        },
+        {
+          "kind": "fun",
+          "name": "messageAck",
+          "line": 443
+        },
+        {
+          "kind": "fun",
+          "name": "keyBind",
+          "line": 460
+        },
+        {
+          "kind": "fun",
+          "name": "keyMove",
+          "line": 478
+        },
+        {
+          "kind": "fun",
+          "name": "meta",
+          "line": 496
+        },
+        {
+          "kind": "fun",
+          "name": "agreedSuite",
+          "line": 502
+        },
+        {
+          "kind": "fun",
+          "name": "keyCreate",
+          "line": 512
+        },
+        {
+          "kind": "fun",
+          "name": "orgInvite",
+          "line": 566
+        },
+        {
+          "kind": "fun",
+          "name": "orgClaim",
+          "line": 570
+        },
+        {
+          "kind": "fun",
+          "name": "keyResolve",
+          "line": 576
+        },
+        {
+          "kind": "fun",
+          "name": "promo",
+          "line": 582
+        },
+        {
+          "kind": "fun",
+          "name": "crashReport",
+          "line": 599
+        },
+        {
+          "kind": "fun",
+          "name": "versionCheck",
+          "line": 616
+        },
+        {
+          "kind": "fun",
+          "name": "keySetMode",
+          "line": 619
+        },
+        {
+          "kind": "fun",
+          "name": "keyEdit",
+          "line": 625
+        },
+        {
+          "kind": "fun",
+          "name": "keyRevoke",
+          "line": 664
+        },
+        {
+          "kind": "fun",
+          "name": "keyCheck",
+          "line": 669
+        },
+        {
+          "kind": "fun",
+          "name": "keyBundle",
+          "line": 676
+        },
+        {
+          "kind": "fun",
+          "name": "resolveKeyHost",
+          "line": 689
+        },
+        {
+          "kind": "fun",
+          "name": "keyDelegateCreate",
+          "line": 712
+        },
+        {
+          "kind": "fun",
+          "name": "keyInviteInfo",
+          "line": 725
+        },
+        {
+          "kind": "fun",
+          "name": "keyInviteRedeem",
+          "line": 733
+        },
+        {
+          "kind": "fun",
+          "name": "keyDelegateVouch",
+          "line": 755
+        },
+        {
+          "kind": "fun",
+          "name": "keyDelegateList",
+          "line": 763
+        },
+        {
+          "kind": "fun",
+          "name": "keyDelegateEdit",
+          "line": 770
+        },
+        {
+          "kind": "fun",
+          "name": "keyDelegateRevoke",
+          "line": 778
+        },
+        {
+          "kind": "fun",
+          "name": "keyDelegateMessage",
+          "line": 785
+        }
+      ],
+      "surface_calls": []
+    },
+    {
+      "path": "app/src/main/java/com/entrixy/app/net/Net.kt",
+      "sha256": "45e6e99fd8bf860a8288f04b890fbccc2be57bc3223ac59b099b90f2c72d7b55",
+      "lines": 132,
+      "declarations": [
+        {
+          "kind": "object",
+          "name": "Net",
+          "line": 34
+        },
+        {
+          "kind": "fun",
+          "name": "lookup",
+          "line": 48
+        }
+      ],
+      "surface_calls": []
+    },
+    {
+      "path": "app/src/main/java/com/entrixy/app/net/NetRoute.kt",
+      "sha256": "a6cd8a900dd0c41d81b9c38e5d66f6f517e717f516fbc93afc331220923afedd",
+      "lines": 382,
+      "declarations": [
+        {
+          "kind": "object",
+          "name": "NetRoute",
+          "line": 29
+        },
+        {
+          "kind": "fun",
+          "name": "init",
+          "line": 39
+        },
+        {
+          "kind": "fun",
+          "name": "ensureCellular",
+          "line": 48
+        },
+        {
+          "kind": "fun",
+          "name": "onAvailable",
+          "line": 60
+        },
+        {
+          "kind": "fun",
+          "name": "onLost",
+          "line": 65
+        },
+        {
+          "kind": "fun",
+          "name": "publishWaiting",
+          "line": 92
+        },
+        {
+          "kind": "fun",
+          "name": "onNetworkUp",
+          "line": 101
+        },
+        {
+          "kind": "fun",
+          "name": "describe",
+          "line": 103
+        },
+        {
+          "kind": "fun",
+          "name": "activeDescription",
+          "line": 117
+        },
+        {
+          "kind": "fun",
+          "name": "watchNetworkChanges",
+          "line": 125
+        },
+        {
+          "kind": "fun",
+          "name": "onAvailable",
+          "line": 132
+        },
+        {
+          "kind": "fun",
+          "name": "onLost",
+          "line": 138
+        },
+        {
+          "kind": "fun",
+          "name": "onCapabilitiesChanged",
+          "line": 148
+        },
+        {
+          "kind": "fun",
+          "name": "onBlockedStatusChanged",
+          "line": 159
+        },
+        {
+          "kind": "fun",
+          "name": "currentWifi",
+          "line": 178
+        },
+        {
+          "kind": "class",
+          "name": "Kind",
+          "line": 192
+        },
+        {
+          "kind": "class",
+          "name": "Decision",
+          "line": 199
+        },
+        {
+          "kind": "fun",
+          "name": "decide",
+          "line": 208
+        },
+        {
+          "kind": "fun",
+          "name": "hit",
+          "line": 213
+        },
+        {
+          "kind": "fun",
+          "name": "current",
+          "line": 233
+        },
+        {
+          "kind": "fun",
+          "name": "recheck",
+          "line": 261
+        },
+        {
+          "kind": "class",
+          "name": "Banned",
+          "line": 264
+        },
+        {
+          "kind": "fun",
+          "name": "client",
+          "line": 273
+        },
+        {
+          "kind": "fun",
+          "name": "lookup",
+          "line": 283
+        },
+        {
+          "kind": "fun",
+          "name": "target",
+          "line": 300
+        },
+        {
+          "kind": "fun",
+          "name": "cellularAlive",
+          "line": 313
+        },
+        {
+          "kind": "fun",
+          "name": "onBindFailed",
+          "line": 326
+        },
+        {
+          "kind": "class",
+          "name": "DynamicSocketFactory",
+          "line": 338
+        },
+        {
+          "kind": "fun",
+          "name": "base",
+          "line": 339
+        },
+        {
+          "kind": "fun",
+          "name": "viaCell",
+          "line": 345
+        },
+        {
+          "kind": "fun",
+          "name": "createSocket",
+          "line": 351
+        },
+        {
+          "kind": "fun",
+          "name": "createSocket",
+          "line": 352
+        },
+        {
+          "kind": "fun",
+          "name": "createSocket",
+          "line": 354
+        },
+        {
+          "kind": "fun",
+          "name": "createSocket",
+          "line": 356
+        },
+        {
+          "kind": "fun",
+          "name": "createSocket",
+          "line": 358
+        },
+        {
+          "kind": "fun",
+          "name": "dropPooled",
+          "line": 367
+        },
+        {
+          "kind": "fun",
+          "name": "roaming",
+          "line": 374
+        },
+        {
+          "kind": "fun",
+          "name": "cellularReady",
+          "line": 381
+        }
+      ],
+      "surface_calls": []
+    },
+    {
+      "path": "app/src/main/java/com/entrixy/app/net/WsClient.kt",
+      "sha256": "f0e4315c310e6714e0460fbf9a989cc236e9628cf11710a6f7cdaf302572b4b6",
+      "lines": 269,
+      "declarations": [
+        {
+          "kind": "class",
+          "name": "WsClient",
+          "line": 29
+        },
+        {
+          "kind": "fun",
+          "name": "onNetworkUp",
+          "line": 74
+        },
+        {
+          "kind": "fun",
+          "name": "connect",
+          "line": 87
+        },
+        {
+          "kind": "fun",
+          "name": "connectNow",
+          "line": 98
+        },
+        {
+          "kind": "fun",
+          "name": "onOpen",
+          "line": 111
+        },
+        {
+          "kind": "fun",
+          "name": "onMessage",
+          "line": 125
+        },
+        {
+          "kind": "fun",
+          "name": "onClosing",
+          "line": 136
+        },
+        {
+          "kind": "fun",
+          "name": "onClosed",
+          "line": 143
+        },
+        {
+          "kind": "fun",
+          "name": "onFailure",
+          "line": 152
+        },
+        {
+          "kind": "fun",
+          "name": "scheduleReconnect",
+          "line": 195
+        },
+        {
+          "kind": "fun",
+          "name": "send",
+          "line": 221
+        },
+        {
+          "kind": "fun",
+          "name": "close",
+          "line": 223
+        },
+        {
+          "kind": "fun",
+          "name": "forceReconnect",
+          "line": 235
+        },
+        {
+          "kind": "fun",
+          "name": "appState",
+          "line": 251
+        },
+        {
+          "kind": "fun",
+          "name": "reconnectAll",
+          "line": 266
+        }
+      ],
+      "surface_calls": []
+    },
+    {
+      "path": "app/src/main/java/com/entrixy/app/store/AppCode.kt",
+      "sha256": "86eab72764e6ba081a98da49cf912a366db1192d53269acb6e14daf0f11f88f5",
+      "lines": 139,
+      "declarations": [
+        {
+          "kind": "object",
+          "name": "AppCode",
+          "line": 27
+        },
+        {
+          "kind": "fun",
+          "name": "isSet",
+          "line": 34
+        },
+        {
+          "kind": "fun",
+          "name": "derive",
+          "line": 36
+        },
+        {
+          "kind": "fun",
+          "name": "set",
+          "line": 44
+        },
+        {
+          "kind": "fun",
+          "name": "lockedForMs",
+          "line": 53
+        },
+        {
+          "kind": "class",
+          "name": "Check",
+          "line": 55
+        },
+        {
+          "kind": "object",
+          "name": "Ok",
+          "line": 56
+        },
+        {
+          "kind": "class",
+          "name": "Wrong",
+          "line": 57
+        },
+        {
+          "kind": "class",
+          "name": "Locked",
+          "line": 58
+        },
+        {
+          "kind": "fun",
+          "name": "check",
+          "line": 62
+        },
+        {
+          "kind": "fun",
+          "name": "pauseFor",
+          "line": 80
+        },
+        {
+          "kind": "fun",
+          "name": "bioAvailable",
+          "line": 91
+        },
+        {
+          "kind": "fun",
+          "name": "keyStore",
+          "line": 96
+        },
+        {
+          "kind": "fun",
+          "name": "enableBio",
+          "line": 99
+        },
+        {
+          "kind": "fun",
+          "name": "disableBio",
+          "line": 112
+        },
+        {
+          "kind": "fun",
+          "name": "bioCipher",
+          "line": 122
+        },
+        {
+          "kind": "fun",
+          "name": "bioConfirmed",
+          "line": 133
+        }
+      ],
+      "surface_calls": []
+    },
+    {
+      "path": "app/src/main/java/com/entrixy/app/store/Backup.kt",
+      "sha256": "5573de13a28dd2821828464f8cb803823e69b4bad1b432c4c743e32084c67c65",
+      "lines": 364,
+      "declarations": [
+        {
+          "kind": "object",
+          "name": "Backup",
+          "line": 24
+        },
+        {
+          "kind": "class",
+          "name": "BadPassword",
+          "line": 77
+        },
+        {
+          "kind": "class",
+          "name": "BadFormat",
+          "line": 78
+        },
+        {
+          "kind": "fun",
+          "name": "export",
+          "line": 82
+        },
+        {
+          "kind": "class",
+          "name": "Info",
+          "line": 141
+        },
+        {
+          "kind": "class",
+          "name": "Parsed",
+          "line": 144
+        },
+        {
+          "kind": "fun",
+          "name": "parse",
+          "line": 192
+        },
+        {
+          "kind": "fun",
+          "name": "apply",
+          "line": 198
+        },
+        {
+          "kind": "class",
+          "name": "MoveResult",
+          "line": 212
+        },
+        {
+          "kind": "fun",
+          "name": "moveGuestKeys",
+          "line": 214
+        },
+        {
+          "kind": "fun",
+          "name": "retryPendingMoves",
+          "line": 238
+        },
+        {
+          "kind": "fun",
+          "name": "import",
+          "line": 256
+        },
+        {
+          "kind": "fun",
+          "name": "decode",
+          "line": 262
+        },
+        {
+          "kind": "fun",
+          "name": "shareIntent",
+          "line": 323
+        },
+        {
+          "kind": "fun",
+          "name": "looksLikeBackup",
+          "line": 344
+        },
+        {
+          "kind": "fun",
+          "name": "buildHeader",
+          "line": 349
+        },
+        {
+          "kind": "fun",
+          "name": "deriveKey",
+          "line": 360
+        }
+      ],
+      "surface_calls": []
+    },
+    {
+      "path": "app/src/main/java/com/entrixy/app/store/Crypto.kt",
+      "sha256": "f67b710a45758171bbc4c19d91dbeb084e0629db65bdc576509a8b698bc2579e",
+      "lines": 185,
+      "declarations": [
+        {
+          "kind": "object",
+          "name": "Crypto",
+          "line": 29
+        },
+        {
+          "kind": "fun",
+          "name": "generateKey",
+          "line": 41
+        },
+        {
+          "kind": "fun",
+          "name": "encrypt",
+          "line": 48
+        },
+        {
+          "kind": "fun",
+          "name": "decrypt",
+          "line": 67
+        },
+        {
+          "kind": "fun",
+          "name": "encryptString",
+          "line": 85
+        },
+        {
+          "kind": "fun",
+          "name": "decryptStringAny",
+          "line": 93
+        },
+        {
+          "kind": "fun",
+          "name": "decryptBytesAny",
+          "line": 101
+        },
+        {
+          "kind": "fun",
+          "name": "decryptString",
+          "line": 109
+        },
+        {
+          "kind": "fun",
+          "name": "newSealKeyPair",
+          "line": 127
+        },
+        {
+          "kind": "fun",
+          "name": "ecPublic",
+          "line": 134
+        },
+        {
+          "kind": "fun",
+          "name": "ecPrivate",
+          "line": 138
+        },
+        {
+          "kind": "fun",
+          "name": "wrapKey",
+          "line": 143
+        },
+        {
+          "kind": "fun",
+          "name": "agree",
+          "line": 153
+        },
+        {
+          "kind": "fun",
+          "name": "sealKey",
+          "line": 159
+        },
+        {
+          "kind": "fun",
+          "name": "openKey",
+          "line": 170
+        },
+        {
+          "kind": "fun",
+          "name": "base64UrlEncode",
+          "line": 180
+        },
+        {
+          "kind": "fun",
+          "name": "base64UrlDecode",
+          "line": 183
+        }
+      ],
+      "surface_calls": []
+    },
+    {
+      "path": "app/src/main/java/com/entrixy/app/store/GuestSign.kt",
+      "sha256": "487f96b534eee101a9280031b7e7862c2c68fda1f4bcd69d04f08054dfd26fe6",
+      "lines": 233,
+      "declarations": [
+        {
+          "kind": "object",
+          "name": "GuestSign",
+          "line": 26
+        },
+        {
+          "kind": "fun",
+          "name": "agree",
+          "line": 40
+        },
+        {
+          "kind": "fun",
+          "name": "seed",
+          "line": 56
+        },
+        {
+          "kind": "fun",
+          "name": "seed",
+          "line": 58
+        },
+        {
+          "kind": "fun",
+          "name": "deviceSeed",
+          "line": 68
+        },
+        {
+          "kind": "fun",
+          "name": "devicePublicKeyB64",
+          "line": 72
+        },
+        {
+          "kind": "fun",
+          "name": "signingSeed",
+          "line": 80
+        },
+        {
+          "kind": "fun",
+          "name": "pressJson",
+          "line": 99
+        },
+        {
+          "kind": "fun",
+          "name": "verifyPress",
+          "line": 111
+        },
+        {
+          "kind": "fun",
+          "name": "passMac",
+          "line": 128
+        },
+        {
+          "kind": "fun",
+          "name": "vouchMaterial",
+          "line": 134
+        },
+        {
+          "kind": "fun",
+          "name": "signVouch",
+          "line": 137
+        },
+        {
+          "kind": "fun",
+          "name": "verifyVouch",
+          "line": 145
+        },
+        {
+          "kind": "fun",
+          "name": "verifyEd25519",
+          "line": 150
+        },
+        {
+          "kind": "fun",
+          "name": "publicKey",
+          "line": 158
+        },
+        {
+          "kind": "fun",
+          "name": "publicKeyB64",
+          "line": 162
+        },
+        {
+          "kind": "fun",
+          "name": "keyHash",
+          "line": 165
+        },
+        {
+          "kind": "fun",
+          "name": "helloFields",
+          "line": 177
+        },
+        {
+          "kind": "fun",
+          "name": "headers",
+          "line": 198
+        },
+        {
+          "kind": "fun",
+          "name": "headersAs",
+          "line": 206
+        },
+        {
+          "kind": "fun",
+          "name": "headersWithSeed",
+          "line": 209
+        }
+      ],
+      "surface_calls": []
+    },
+    {
+      "path": "app/src/main/java/com/entrixy/app/store/ObjectMove.kt",
+      "sha256": "e609ab758f01366e0097458c52d9b418fecc3656cb36724338de68cdd24ac9e9",
+      "lines": 83,
+      "declarations": [
+        {
+          "kind": "object",
+          "name": "ObjectMove",
+          "line": 22
+        },
+        {
+          "kind": "fun",
+          "name": "log",
+          "line": 24
+        },
+        {
+          "kind": "class",
+          "name": "Result",
+          "line": 26
+        },
+        {
+          "kind": "fun",
+          "name": "moveBle",
+          "line": 28
+        }
+      ],
+      "surface_calls": []
+    },
+    {
+      "path": "app/src/main/java/com/entrixy/app/store/OrgVerify.kt",
+      "sha256": "e047643fc6944372ed4fa9c7e3add91066de5b31b4a358fb47d68e89b7dc451d",
+      "lines": 21,
+      "declarations": [
+        {
+          "kind": "object",
+          "name": "OrgVerify",
+          "line": 16
+        },
+        {
+          "kind": "fun",
+          "name": "isVerified",
+          "line": 19
+        }
+      ],
+      "surface_calls": []
+    },
+    {
+      "path": "app/src/main/java/com/entrixy/app/store/PassVouch.kt",
+      "sha256": "4dc5072d32234a243f7893f245918266300c8b6d939452bc660683bfa841e236",
+      "lines": 36,
+      "declarations": [
+        {
+          "kind": "object",
+          "name": "PassVouch",
+          "line": 12
+        },
+        {
+          "kind": "fun",
+          "name": "log",
+          "line": 13
+        },
+        {
+          "kind": "fun",
+          "name": "run",
+          "line": 15
+        }
+      ],
+      "surface_calls": []
+    },
+    {
+      "path": "app/src/main/java/com/entrixy/app/store/Prefs.kt",
+      "sha256": "d69fef498c4541b1cd79d6ff8236514fae4b13cc0415b5c4e9df58bbb2d741d3",
+      "lines": 3631,
+      "declarations": [
+        {
+          "kind": "object",
+          "name": "Prefs",
+          "line": 10
+        },
+        {
+          "kind": "fun",
+          "name": "init",
+          "line": 17
+        },
+        {
+          "kind": "fun",
+          "name": "open",
+          "line": 33
+        },
+        {
+          "kind": "fun",
+          "name": "guestKeyPrefixes",
+          "line": 91
+        },
+        {
+          "kind": "fun",
+          "name": "wipeAfterEviction",
+          "line": 118
+        },
+        {
+          "kind": "fun",
+          "name": "snapshot",
+          "line": 139
+        },
+        {
+          "kind": "fun",
+          "name": "restoreSnapshot",
+          "line": 146
+        },
+        {
+          "kind": "fun",
+          "name": "keyTag",
+          "line": 175
+        },
+        {
+          "kind": "fun",
+          "name": "removeOwnKey",
+          "line": 179
+        },
+        {
+          "kind": "fun",
+          "name": "migrate",
+          "line": 191
+        },
+        {
+          "kind": "fun",
+          "name": "initBackupDir",
+          "line": 252
+        },
+        {
+          "kind": "class",
+          "name": "OwnerAccount",
+          "line": 265
+        },
+        {
+          "kind": "fun",
+          "name": "ownerAccounts",
+          "line": 271
+        },
+        {
+          "kind": "fun",
+          "name": "ownerAccount",
+          "line": 286
+        },
+        {
+          "kind": "fun",
+          "name": "saveOwnerAccount",
+          "line": 289
+        },
+        {
+          "kind": "fun",
+          "name": "setAccount",
+          "line": 297
+        },
+        {
+          "kind": "fun",
+          "name": "removeOwnerAccount",
+          "line": 302
+        },
+        {
+          "kind": "fun",
+          "name": "writeOwnerAccounts",
+          "line": 304
+        },
+        {
+          "kind": "fun",
+          "name": "aliasMap",
+          "line": 349
+        },
+        {
+          "kind": "fun",
+          "name": "saveAliasMap",
+          "line": 352
+        },
+        {
+          "kind": "fun",
+          "name": "localIdFor",
+          "line": 361
+        },
+        {
+          "kind": "fun",
+          "name": "rebindObject",
+          "line": 384
+        },
+        {
+          "kind": "fun",
+          "name": "serverRefOf",
+          "line": 391
+        },
+        {
+          "kind": "fun",
+          "name": "serverIdOf",
+          "line": 399
+        },
+        {
+          "kind": "fun",
+          "name": "retireAliasesOf",
+          "line": 405
+        },
+        {
+          "kind": "fun",
+          "name": "unretireAliasesOf",
+          "line": 416
+        },
+        {
+          "kind": "fun",
+          "name": "dropRetiredAliases",
+          "line": 425
+        },
+        {
+          "kind": "fun",
+          "name": "forgetOwnerSecretsOf",
+          "line": 438
+        },
+        {
+          "kind": "fun",
+          "name": "dropAliasesOf",
+          "line": 449
+        },
+        {
+          "kind": "fun",
+          "name": "credsFor",
+          "line": 463
+        },
+        {
+          "kind": "class",
+          "name": "BlockedNet",
+          "line": 475
+        },
+        {
+          "kind": "fun",
+          "name": "parseNets",
+          "line": 477
+        },
+        {
+          "kind": "fun",
+          "name": "netsToJson",
+          "line": 486
+        },
+        {
+          "kind": "fun",
+          "name": "blockedNets",
+          "line": 497
+        },
+        {
+          "kind": "fun",
+          "name": "addBlockedNet",
+          "line": 499
+        },
+        {
+          "kind": "fun",
+          "name": "removeBlockedNet",
+          "line": 505
+        },
+        {
+          "kind": "fun",
+          "name": "getGuestBlockedNetsRaw",
+          "line": 511
+        },
+        {
+          "kind": "fun",
+          "name": "setGuestBlockedNets",
+          "line": 513
+        },
+        {
+          "kind": "fun",
+          "name": "guestBlockedNets",
+          "line": 517
+        },
+        {
+          "kind": "fun",
+          "name": "allBlockedNets",
+          "line": 521
+        },
+        {
+          "kind": "fun",
+          "name": "isHostRegisteredOn",
+          "line": 528
+        },
+        {
+          "kind": "fun",
+          "name": "sanitizeHost",
+          "line": 553
+        },
+        {
+          "kind": "fun",
+          "name": "accessCodeOf",
+          "line": 569
+        },
+        {
+          "kind": "fun",
+          "name": "setAccessCode",
+          "line": 578
+        },
+        {
+          "kind": "fun",
+          "name": "accessCodeFor",
+          "line": 585
+        },
+        {
+          "kind": "fun",
+          "name": "readBackup",
+          "line": 588
+        },
+        {
+          "kind": "fun",
+          "name": "writeBackup",
+          "line": 593
+        },
+        {
+          "kind": "fun",
+          "name": "securePrefsReset",
+          "line": 602
+        },
+        {
+          "kind": "fun",
+          "name": "clearSecurePrefsReset",
+          "line": 607
+        },
+        {
+          "kind": "fun",
+          "name": "saveKeyPlain",
+          "line": 637
+        },
+        {
+          "kind": "fun",
+          "name": "genUserKey",
+          "line": 646
+        },
+        {
+          "kind": "fun",
+          "name": "pendingHostKeysJson",
+          "line": 659
+        },
+        {
+          "kind": "fun",
+          "name": "savePendingHostKeysJson",
+          "line": 664
+        },
+        {
+          "kind": "fun",
+          "name": "getKnownOrgs",
+          "line": 672
+        },
+        {
+          "kind": "fun",
+          "name": "rememberOrg",
+          "line": 687
+        },
+        {
+          "kind": "fun",
+          "name": "setPendingOrg",
+          "line": 711
+        },
+        {
+          "kind": "fun",
+          "name": "getPendingOrgCode",
+          "line": 715
+        },
+        {
+          "kind": "fun",
+          "name": "getPendingOrgId",
+          "line": 716
+        },
+        {
+          "kind": "fun",
+          "name": "clearPendingOrg",
+          "line": 717
+        },
+        {
+          "kind": "fun",
+          "name": "pendingOrgPrompted",
+          "line": 722
+        },
+        {
+          "kind": "fun",
+          "name": "markPendingOrgPrompted",
+          "line": 723
+        },
+        {
+          "kind": "fun",
+          "name": "forgetOrg",
+          "line": 725
+        },
+        {
+          "kind": "fun",
+          "name": "syncKnownOrgsToState",
+          "line": 736
+        },
+        {
+          "kind": "fun",
+          "name": "nextPendingHostKeyId",
+          "line": 746
+        },
+        {
+          "kind": "class",
+          "name": "PendingHostKey",
+          "line": 752
+        },
+        {
+          "kind": "fun",
+          "name": "addPendingHostKey",
+          "line": 777
+        },
+        {
+          "kind": "fun",
+          "name": "getPendingHostKeys",
+          "line": 801
+        },
+        {
+          "kind": "fun",
+          "name": "updatePendingHostKey",
+          "line": 840
+        },
+        {
+          "kind": "fun",
+          "name": "removePendingHostKey",
+          "line": 846
+        },
+        {
+          "kind": "class",
+          "name": "PendingBleFireEvent",
+          "line": 862
+        },
+        {
+          "kind": "fun",
+          "name": "addPendingBleFireEvent",
+          "line": 871
+        },
+        {
+          "kind": "fun",
+          "name": "getPendingBleFireEventsForKey",
+          "line": 886
+        },
+        {
+          "kind": "fun",
+          "name": "removePendingBleFireEvents",
+          "line": 905
+        },
+        {
+          "kind": "fun",
+          "name": "getBleAutoFireAt",
+          "line": 923
+        },
+        {
+          "kind": "fun",
+          "name": "setBleAutoFireAt",
+          "line": 924
+        },
+        {
+          "kind": "fun",
+          "name": "getGuestBleAutoFireAt",
+          "line": 927
+        },
+        {
+          "kind": "fun",
+          "name": "setGuestBleAutoFireAt",
+          "line": 929
+        },
+        {
+          "kind": "fun",
+          "name": "setPendingKeyError",
+          "line": 945
+        },
+        {
+          "kind": "fun",
+          "name": "getPendingKeyError",
+          "line": 950
+        },
+        {
+          "kind": "fun",
+          "name": "rekeyObject",
+          "line": 952
+        },
+        {
+          "kind": "fun",
+          "name": "kref",
+          "line": 1009
+        },
+        {
+          "kind": "fun",
+          "name": "moveKeyRef",
+          "line": 1022
+        },
+        {
+          "kind": "fun",
+          "name": "copyKeySettings",
+          "line": 1067
+        },
+        {
+          "kind": "fun",
+          "name": "rekeyHostKey",
+          "line": 1095
+        },
+        {
+          "kind": "fun",
+          "name": "adoptLegacyKeyRefs",
+          "line": 1103
+        },
+        {
+          "kind": "fun",
+          "name": "getKeyPlain",
+          "line": 1109
+        },
+        {
+          "kind": "fun",
+          "name": "removeKeyPlain",
+          "line": 1110
+        },
+        {
+          "kind": "fun",
+          "name": "clearPressPins",
+          "line": 1119
+        },
+        {
+          "kind": "fun",
+          "name": "addOwnKeyPublic",
+          "line": 1126
+        },
+        {
+          "kind": "fun",
+          "name": "addOwnKey",
+          "line": 1128
+        },
+        {
+          "kind": "fun",
+          "name": "isOwnKey",
+          "line": 1134
+        },
+        {
+          "kind": "fun",
+          "name": "addRejectedKey",
+          "line": 1140
+        },
+        {
+          "kind": "fun",
+          "name": "isKeyRejected",
+          "line": 1146
+        },
+        {
+          "kind": "fun",
+          "name": "getLastCrashUpload",
+          "line": 1157
+        },
+        {
+          "kind": "fun",
+          "name": "setLastCrashUpload",
+          "line": 1164
+        },
+        {
+          "kind": "fun",
+          "name": "shouldRetryNow",
+          "line": 1180
+        },
+        {
+          "kind": "fun",
+          "name": "bumpRetryBackoff",
+          "line": 1190
+        },
+        {
+          "kind": "fun",
+          "name": "clearRetryBackoff",
+          "line": 1203
+        },
+        {
+          "kind": "fun",
+          "name": "setLastBootHandledAt",
+          "line": 1218
+        },
+        {
+          "kind": "fun",
+          "name": "getLastBootHandled",
+          "line": 1226
+        },
+        {
+          "kind": "fun",
+          "name": "markKeyProcessed",
+          "line": 1234
+        },
+        {
+          "kind": "fun",
+          "name": "isKeyProcessed",
+          "line": 1240
+        },
+        {
+          "kind": "fun",
+          "name": "setCachedPromo",
+          "line": 1245
+        },
+        {
+          "kind": "fun",
+          "name": "setCachedPromoTs",
+          "line": 1263
+        },
+        {
+          "kind": "fun",
+          "name": "getCachedPromoTs",
+          "line": 1268
+        },
+        {
+          "kind": "fun",
+          "name": "getCachedPromo",
+          "line": 1273
+        },
+        {
+          "kind": "fun",
+          "name": "getClickedPromoIds",
+          "line": 1299
+        },
+        {
+          "kind": "fun",
+          "name": "addClickedPromoId",
+          "line": 1305
+        },
+        {
+          "kind": "fun",
+          "name": "getJournalEntries",
+          "line": 1319
+        },
+        {
+          "kind": "fun",
+          "name": "saveJournalEntries",
+          "line": 1358
+        },
+        {
+          "kind": "fun",
+          "name": "getBleEventSeq",
+          "line": 1375
+        },
+        {
+          "kind": "fun",
+          "name": "setBleEventSeq",
+          "line": 1377
+        },
+        {
+          "kind": "fun",
+          "name": "getBleEventTs",
+          "line": 1382
+        },
+        {
+          "kind": "fun",
+          "name": "setBleEventTs",
+          "line": 1384
+        },
+        {
+          "kind": "fun",
+          "name": "getGuestBleEventSeq",
+          "line": 1388
+        },
+        {
+          "kind": "fun",
+          "name": "setGuestBleEventSeq",
+          "line": 1390
+        },
+        {
+          "kind": "fun",
+          "name": "getNumberHangup",
+          "line": 1419
+        },
+        {
+          "kind": "fun",
+          "name": "setNumberHangup",
+          "line": 1422
+        },
+        {
+          "kind": "fun",
+          "name": "getKeyNumberCallReact",
+          "line": 1431
+        },
+        {
+          "kind": "fun",
+          "name": "setKeyNumberCallReact",
+          "line": 1434
+        },
+        {
+          "kind": "fun",
+          "name": "getKeyNumberServeInCall",
+          "line": 1438
+        },
+        {
+          "kind": "fun",
+          "name": "setKeyNumberServeInCall",
+          "line": 1441
+        },
+        {
+          "kind": "fun",
+          "name": "getKeyNumberUrlMode",
+          "line": 1450
+        },
+        {
+          "kind": "fun",
+          "name": "setKeyNumberUrlMode",
+          "line": 1453
+        },
+        {
+          "kind": "fun",
+          "name": "getNotificationSound",
+          "line": 1457
+        },
+        {
+          "kind": "fun",
+          "name": "setNotificationSound",
+          "line": 1460
+        },
+        {
+          "kind": "fun",
+          "name": "getEventSoundUri",
+          "line": 1465
+        },
+        {
+          "kind": "fun",
+          "name": "setEventSoundUri",
+          "line": 1466
+        },
+        {
+          "kind": "fun",
+          "name": "isEventSoundMuted",
+          "line": 1472
+        },
+        {
+          "kind": "fun",
+          "name": "setEventSoundMuted",
+          "line": 1473
+        },
+        {
+          "kind": "fun",
+          "name": "markRestoreAsked",
+          "line": 1498
+        },
+        {
+          "kind": "fun",
+          "name": "restoreAskedRecently",
+          "line": 1501
+        },
+        {
+          "kind": "fun",
+          "name": "pendingKeyMoves",
+          "line": 1539
+        },
+        {
+          "kind": "fun",
+          "name": "setPendingKeyMoves",
+          "line": 1540
+        },
+        {
+          "kind": "fun",
+          "name": "markBackupDone",
+          "line": 1544
+        },
+        {
+          "kind": "fun",
+          "name": "markBackupStale",
+          "line": 1547
+        },
+        {
+          "kind": "fun",
+          "name": "backupAt",
+          "line": 1550
+        },
+        {
+          "kind": "fun",
+          "name": "isBackupStale",
+          "line": 1551
+        },
+        {
+          "kind": "fun",
+          "name": "backupReminderAt",
+          "line": 1552
+        },
+        {
+          "kind": "fun",
+          "name": "setBackupReminderAt",
+          "line": 1553
+        },
+        {
+          "kind": "fun",
+          "name": "takeRestoreKeysFailed",
+          "line": 1556
+        },
+        {
+          "kind": "fun",
+          "name": "setDeviceKeyBound",
+          "line": 1567
+        },
+        {
+          "kind": "fun",
+          "name": "isDeviceKeyBound",
+          "line": 1571
+        },
+        {
+          "kind": "fun",
+          "name": "fpFor",
+          "line": 1583
+        },
+        {
+          "kind": "fun",
+          "name": "newFpFor",
+          "line": 1589
+        },
+        {
+          "kind": "fun",
+          "name": "legacyFp",
+          "line": 1596
+        },
+        {
+          "kind": "fun",
+          "name": "fpMovedHosts",
+          "line": 1597
+        },
+        {
+          "kind": "fun",
+          "name": "fpMovedKeys",
+          "line": 1598
+        },
+        {
+          "kind": "fun",
+          "name": "markFpMovedHost",
+          "line": 1599
+        },
+        {
+          "kind": "fun",
+          "name": "markFpMovedKey",
+          "line": 1602
+        },
+        {
+          "kind": "fun",
+          "name": "finishFpMove",
+          "line": 1605
+        },
+        {
+          "kind": "fun",
+          "name": "fpFrom",
+          "line": 1610
+        },
+        {
+          "kind": "fun",
+          "name": "fpForKey",
+          "line": 1618
+        },
+        {
+          "kind": "fun",
+          "name": "fpForNewKey",
+          "line": 1628
+        },
+        {
+          "kind": "fun",
+          "name": "fpSeed",
+          "line": 1634
+        },
+        {
+          "kind": "fun",
+          "name": "getInstallId",
+          "line": 1644
+        },
+        {
+          "kind": "fun",
+          "name": "getInstallFirstSeenMs",
+          "line": 1655
+        },
+        {
+          "kind": "fun",
+          "name": "getOwnerSelfLabel",
+          "line": 1667
+        },
+        {
+          "kind": "fun",
+          "name": "getDefaultObjAccess",
+          "line": 1670
+        },
+        {
+          "kind": "fun",
+          "name": "setDefaultObjAccess",
+          "line": 1673
+        },
+        {
+          "kind": "fun",
+          "name": "setOwnerSelfLabel",
+          "line": 1676
+        },
+        {
+          "kind": "fun",
+          "name": "setOwnerGuestLabel",
+          "line": 1682
+        },
+        {
+          "kind": "fun",
+          "name": "getOwnerGuestLabel",
+          "line": 1685
+        },
+        {
+          "kind": "fun",
+          "name": "removeOwnerGuestLabel",
+          "line": 1687
+        },
+        {
+          "kind": "fun",
+          "name": "getPausedPrevMode",
+          "line": 1693
+        },
+        {
+          "kind": "fun",
+          "name": "setPausedPrevMode",
+          "line": 1695
+        },
+        {
+          "kind": "fun",
+          "name": "getAppVolume",
+          "line": 1701
+        },
+        {
+          "kind": "fun",
+          "name": "setAppVolume",
+          "line": 1702
+        },
+        {
+          "kind": "fun",
+          "name": "getOrCreateMasterKey",
+          "line": 1713
+        },
+        {
+          "kind": "fun",
+          "name": "getOrCreateObjectKey",
+          "line": 1722
+        },
+        {
+          "kind": "fun",
+          "name": "getObjectKey",
+          "line": 1738
+        },
+        {
+          "kind": "fun",
+          "name": "removeObjectKey",
+          "line": 1745
+        },
+        {
+          "kind": "fun",
+          "name": "objectKeyEpoch",
+          "line": 1763
+        },
+        {
+          "kind": "fun",
+          "name": "getObjectKeyPrev",
+          "line": 1766
+        },
+        {
+          "kind": "fun",
+          "name": "rotateObjectKey",
+          "line": 1772
+        },
+        {
+          "kind": "fun",
+          "name": "setObjectCipher",
+          "line": 1793
+        },
+        {
+          "kind": "fun",
+          "name": "getObjectCipher",
+          "line": 1797
+        },
+        {
+          "kind": "fun",
+          "name": "setLocalPhone",
+          "line": 1801
+        },
+        {
+          "kind": "fun",
+          "name": "getLocalPhone",
+          "line": 1805
+        },
+        {
+          "kind": "fun",
+          "name": "setLocalWebhook",
+          "line": 1810
+        },
+        {
+          "kind": "fun",
+          "name": "getLocalWebhookUrl",
+          "line": 1816
+        },
+        {
+          "kind": "fun",
+          "name": "getLocalWebhookSecret",
+          "line": 1817
+        },
+        {
+          "kind": "fun",
+          "name": "getKeySignPub",
+          "line": 1820
+        },
+        {
+          "kind": "fun",
+          "name": "setVouchedSignPub",
+          "line": 1823
+        },
+        {
+          "kind": "fun",
+          "name": "setOrgKnownPub",
+          "line": 1831
+        },
+        {
+          "kind": "fun",
+          "name": "setKeyOrg",
+          "line": 1847
+        },
+        {
+          "kind": "fun",
+          "name": "getKeyOrg",
+          "line": 1850
+        },
+        {
+          "kind": "fun",
+          "name": "getOrgKnownPub",
+          "line": 1851
+        },
+        {
+          "kind": "fun",
+          "name": "putPressVerified",
+          "line": 1857
+        },
+        {
+          "kind": "fun",
+          "name": "takePressVerified",
+          "line": 1869
+        },
+        {
+          "kind": "fun",
+          "name": "acceptPressVerifiedCall",
+          "line": 1884
+        },
+        {
+          "kind": "fun",
+          "name": "pressVerifiedHost",
+          "line": 1894
+        },
+        {
+          "kind": "fun",
+          "name": "dropPressVerifiedCall",
+          "line": 1901
+        },
+        {
+          "kind": "fun",
+          "name": "pinOrgPub",
+          "line": 1910
+        },
+        {
+          "kind": "fun",
+          "name": "getOrgPub",
+          "line": 1914
+        },
+        {
+          "kind": "fun",
+          "name": "pressNonceFresh",
+          "line": 1919
+        },
+        {
+          "kind": "fun",
+          "name": "objectKeys",
+          "line": 1932
+        },
+        {
+          "kind": "fun",
+          "name": "getSocketOwnerSecret",
+          "line": 1939
+        },
+        {
+          "kind": "fun",
+          "name": "setSocketOwnerSecret",
+          "line": 1943
+        },
+        {
+          "kind": "fun",
+          "name": "getOrCreateSocketOwnerSecret",
+          "line": 1948
+        },
+        {
+          "kind": "fun",
+          "name": "removeSocketOwnerSecret",
+          "line": 1953
+        },
+        {
+          "kind": "fun",
+          "name": "wasSockCredsPushed",
+          "line": 1962
+        },
+        {
+          "kind": "fun",
+          "name": "setSockCredsPushed",
+          "line": 1963
+        },
+        {
+          "kind": "class",
+          "name": "BleRevRec",
+          "line": 1970
+        },
+        {
+          "kind": "fun",
+          "name": "record",
+          "line": 1971
+        },
+        {
+          "kind": "fun",
+          "name": "putBleRevoke",
+          "line": 1976
+        },
+        {
+          "kind": "fun",
+          "name": "getBleRevokes",
+          "line": 1986
+        },
+        {
+          "kind": "fun",
+          "name": "pendingBleRevokes",
+          "line": 1997
+        },
+        {
+          "kind": "fun",
+          "name": "markBleRevokeWritten",
+          "line": 2003
+        },
+        {
+          "kind": "fun",
+          "name": "nextBleRevokeVersion",
+          "line": 2013
+        },
+        {
+          "kind": "fun",
+          "name": "nextRevokeVersion",
+          "line": 2021
+        },
+        {
+          "kind": "fun",
+          "name": "putSocketRevoke",
+          "line": 2030
+        },
+        {
+          "kind": "fun",
+          "name": "getSocketRevokes",
+          "line": 2040
+        },
+        {
+          "kind": "class",
+          "name": "GuestSocketCred",
+          "line": 2049
+        },
+        {
+          "kind": "fun",
+          "name": "saveIncomingSocketRaw",
+          "line": 2053
+        },
+        {
+          "kind": "fun",
+          "name": "getIncomingSocketCred",
+          "line": 2057
+        },
+        {
+          "kind": "fun",
+          "name": "setKeyGuestKey",
+          "line": 2071
+        },
+        {
+          "kind": "fun",
+          "name": "getKeyGuestKey",
+          "line": 2078
+        },
+        {
+          "kind": "fun",
+          "name": "removeKeyGuestKey",
+          "line": 2083
+        },
+        {
+          "kind": "fun",
+          "name": "setIncomingGuestKGuest",
+          "line": 2088
+        },
+        {
+          "kind": "fun",
+          "name": "getIncomingGuestKGuest",
+          "line": 2092
+        },
+        {
+          "kind": "fun",
+          "name": "setDelegatePair",
+          "line": 2100
+        },
+        {
+          "kind": "fun",
+          "name": "getDelegatePub",
+          "line": 2107
+        },
+        {
+          "kind": "fun",
+          "name": "getDelegatePriv",
+          "line": 2108
+        },
+        {
+          "kind": "fun",
+          "name": "setGuestKeyGrp",
+          "line": 2117
+        },
+        {
+          "kind": "fun",
+          "name": "getGuestKeyGrp",
+          "line": 2120
+        },
+        {
+          "kind": "fun",
+          "name": "setSharePair",
+          "line": 2123
+        },
+        {
+          "kind": "fun",
+          "name": "getSharePub",
+          "line": 2129
+        },
+        {
+          "kind": "fun",
+          "name": "getSharePriv",
+          "line": 2130
+        },
+        {
+          "kind": "fun",
+          "name": "seenMessage",
+          "line": 2137
+        },
+        {
+          "kind": "fun",
+          "name": "passJournalNew",
+          "line": 2150
+        },
+        {
+          "kind": "fun",
+          "name": "setShareFrom",
+          "line": 2159
+        },
+        {
+          "kind": "fun",
+          "name": "getShareFrom",
+          "line": 2162
+        },
+        {
+          "kind": "fun",
+          "name": "setPassedName",
+          "line": 2165
+        },
+        {
+          "kind": "fun",
+          "name": "getPassedName",
+          "line": 2168
+        },
+        {
+          "kind": "fun",
+          "name": "setPassedWk",
+          "line": 2171
+        },
+        {
+          "kind": "fun",
+          "name": "getPassedWk",
+          "line": 2174
+        },
+        {
+          "kind": "fun",
+          "name": "setShareWk",
+          "line": 2178
+        },
+        {
+          "kind": "fun",
+          "name": "getShareWk",
+          "line": 2179
+        },
+        {
+          "kind": "fun",
+          "name": "setIncomingDepth",
+          "line": 2182
+        },
+        {
+          "kind": "fun",
+          "name": "getIncomingDepth",
+          "line": 2185
+        },
+        {
+          "kind": "fun",
+          "name": "setIncomingObjectKey",
+          "line": 2188
+        },
+        {
+          "kind": "fun",
+          "name": "getIncomingObjectKey",
+          "line": 2194
+        },
+        {
+          "kind": "fun",
+          "name": "setIncomingObjectKeyPrev",
+          "line": 2200
+        },
+        {
+          "kind": "fun",
+          "name": "getIncomingObjectKeyPrev",
+          "line": 2206
+        },
+        {
+          "kind": "fun",
+          "name": "incomingObjectKeys",
+          "line": 2215
+        },
+        {
+          "kind": "fun",
+          "name": "setIncomingWelcome",
+          "line": 2220
+        },
+        {
+          "kind": "fun",
+          "name": "getIncomingWelcome",
+          "line": 2224
+        },
+        {
+          "kind": "fun",
+          "name": "setIncomingTemplate",
+          "line": 2228
+        },
+        {
+          "kind": "fun",
+          "name": "getIncomingTemplateJson",
+          "line": 2231
+        },
+        {
+          "kind": "fun",
+          "name": "setIncomingOwnerTemplate",
+          "line": 2237
+        },
+        {
+          "kind": "fun",
+          "name": "getIncomingOwnerTemplate",
+          "line": 2240
+        },
+        {
+          "kind": "fun",
+          "name": "getGuestTemplateRaw",
+          "line": 2245
+        },
+        {
+          "kind": "fun",
+          "name": "getObjectOrder",
+          "line": 2249
+        },
+        {
+          "kind": "fun",
+          "name": "setObjectOrder",
+          "line": 2255
+        },
+        {
+          "kind": "fun",
+          "name": "getActionOrder",
+          "line": 2264
+        },
+        {
+          "kind": "fun",
+          "name": "setActionOrder",
+          "line": 2271
+        },
+        {
+          "kind": "fun",
+          "name": "getKeyWelcome",
+          "line": 2277
+        },
+        {
+          "kind": "fun",
+          "name": "setKeyWelcome",
+          "line": 2278
+        },
+        {
+          "kind": "class",
+          "name": "SnapshotConfig",
+          "line": 2290
+        },
+        {
+          "kind": "fun",
+          "name": "getSnapshot",
+          "line": 2301
+        },
+        {
+          "kind": "fun",
+          "name": "setSnapshot",
+          "line": 2312
+        },
+        {
+          "kind": "fun",
+          "name": "getAllowGuestStream",
+          "line": 2328
+        },
+        {
+          "kind": "fun",
+          "name": "setAllowGuestStream",
+          "line": 2331
+        },
+        {
+          "kind": "fun",
+          "name": "getIncomingStreamsAllowed",
+          "line": 2337
+        },
+        {
+          "kind": "fun",
+          "name": "setIncomingStreamsAllowed",
+          "line": 2341
+        },
+        {
+          "kind": "fun",
+          "name": "getIncomingSnapshot",
+          "line": 2347
+        },
+        {
+          "kind": "fun",
+          "name": "getIncomingSnapshotIds",
+          "line": 2363
+        },
+        {
+          "kind": "fun",
+          "name": "setIncomingSnapshot",
+          "line": 2369
+        },
+        {
+          "kind": "fun",
+          "name": "markBundleNeedsRebuild",
+          "line": 2391
+        },
+        {
+          "kind": "fun",
+          "name": "clearBundleRebuild",
+          "line": 2396
+        },
+        {
+          "kind": "fun",
+          "name": "pendingBundleRebuilds",
+          "line": 2402
+        },
+        {
+          "kind": "fun",
+          "name": "markCrashedSync",
+          "line": 2412
+        },
+        {
+          "kind": "fun",
+          "name": "getBleObjects",
+          "line": 2423
+        },
+        {
+          "kind": "fun",
+          "name": "saveBleObjects",
+          "line": 2446
+        },
+        {
+          "kind": "fun",
+          "name": "getHostNumbers",
+          "line": 2469
+        },
+        {
+          "kind": "fun",
+          "name": "saveHostNumbers",
+          "line": 2498
+        },
+        {
+          "kind": "fun",
+          "name": "addBleObject",
+          "line": 2517
+        },
+        {
+          "kind": "fun",
+          "name": "touchBleObject",
+          "line": 2536
+        },
+        {
+          "kind": "fun",
+          "name": "touchIncomingBleObject",
+          "line": 2550
+        },
+        {
+          "kind": "fun",
+          "name": "updateBleObject",
+          "line": 2564
+        },
+        {
+          "kind": "fun",
+          "name": "removeBleObject",
+          "line": 2571
+        },
+        {
+          "kind": "fun",
+          "name": "bleTemplatesJson",
+          "line": 2584
+        },
+        {
+          "kind": "fun",
+          "name": "getBleTemplateRaw",
+          "line": 2589
+        },
+        {
+          "kind": "fun",
+          "name": "getBleTemplate",
+          "line": 2592
+        },
+        {
+          "kind": "fun",
+          "name": "saveBleTemplate",
+          "line": 2597
+        },
+        {
+          "kind": "fun",
+          "name": "removeBleTemplate",
+          "line": 2603
+        },
+        {
+          "kind": "fun",
+          "name": "isBleSharedToKey",
+          "line": 2614
+        },
+        {
+          "kind": "fun",
+          "name": "setBleSharedToKey",
+          "line": 2617
+        },
+        {
+          "kind": "fun",
+          "name": "getBleTokenTtl",
+          "line": 2627
+        },
+        {
+          "kind": "fun",
+          "name": "setBleTokenTtl",
+          "line": 2630
+        },
+        {
+          "kind": "fun",
+          "name": "logUploadId",
+          "line": 2638
+        },
+        {
+          "kind": "fun",
+          "name": "getBlePairs",
+          "line": 2647
+        },
+        {
+          "kind": "fun",
+          "name": "setBlePairs",
+          "line": 2648
+        },
+        {
+          "kind": "fun",
+          "name": "getSocketPairs",
+          "line": 2649
+        },
+        {
+          "kind": "fun",
+          "name": "setSocketPairs",
+          "line": 2650
+        },
+        {
+          "kind": "fun",
+          "name": "getDeniedSocketPairs",
+          "line": 2651
+        },
+        {
+          "kind": "fun",
+          "name": "setDeniedSocketPairs",
+          "line": 2652
+        },
+        {
+          "kind": "fun",
+          "name": "getPausedKeyIds",
+          "line": 2653
+        },
+        {
+          "kind": "fun",
+          "name": "setPausedKeyIds",
+          "line": 2654
+        },
+        {
+          "kind": "fun",
+          "name": "getDelegatedObjectPairs",
+          "line": 2655
+        },
+        {
+          "kind": "fun",
+          "name": "setDelegatedObjectPairs",
+          "line": 2656
+        },
+        {
+          "kind": "fun",
+          "name": "getPendingObjectRotations",
+          "line": 2657
+        },
+        {
+          "kind": "fun",
+          "name": "getPendingRotatedCipher",
+          "line": 2658
+        },
+        {
+          "kind": "fun",
+          "name": "setPendingRotatedCipher",
+          "line": 2659
+        },
+        {
+          "kind": "fun",
+          "name": "queueObjectRotation",
+          "line": 2663
+        },
+        {
+          "kind": "fun",
+          "name": "clearObjectRotation",
+          "line": 2667
+        },
+        {
+          "kind": "fun",
+          "name": "peekBleGuestDid",
+          "line": 2671
+        },
+        {
+          "kind": "fun",
+          "name": "getBleGuestDid",
+          "line": 2673
+        },
+        {
+          "kind": "fun",
+          "name": "allocBleGuestDid",
+          "line": 2686
+        },
+        {
+          "kind": "fun",
+          "name": "resetBleGuestDid",
+          "line": 2702
+        },
+        {
+          "kind": "fun",
+          "name": "getIncomingBleObjects",
+          "line": 2709
+        },
+        {
+          "kind": "fun",
+          "name": "saveIncomingBleObjects",
+          "line": 2738
+        },
+        {
+          "kind": "fun",
+          "name": "removeIncomingBleObject",
+          "line": 2766
+        },
+        {
+          "kind": "fun",
+          "name": "isGuestKeyPaused",
+          "line": 2772
+        },
+        {
+          "kind": "fun",
+          "name": "setGuestKeyPaused",
+          "line": 2773
+        },
+        {
+          "kind": "fun",
+          "name": "upsertIncomingBleObject",
+          "line": 2776
+        },
+        {
+          "kind": "class",
+          "name": "GuestKey",
+          "line": 2784
+        },
+        {
+          "kind": "fun",
+          "name": "getGuestKeys",
+          "line": 2786
+        },
+        {
+          "kind": "fun",
+          "name": "saveGuestKeys",
+          "line": 2797
+        },
+        {
+          "kind": "fun",
+          "name": "addGuestKey",
+          "line": 2807
+        },
+        {
+          "kind": "fun",
+          "name": "hydrateGuestsFromDisk",
+          "line": 2829
+        },
+        {
+          "kind": "fun",
+          "name": "note",
+          "line": 2853
+        },
+        {
+          "kind": "fun",
+          "name": "removeGuestKey",
+          "line": 2863
+        },
+        {
+          "kind": "fun",
+          "name": "updateGuestLabel",
+          "line": 2929
+        },
+        {
+          "kind": "fun",
+          "name": "setLocalIdByTopicHash",
+          "line": 2940
+        },
+        {
+          "kind": "fun",
+          "name": "getLocalIdByTopicHash",
+          "line": 2943
+        },
+        {
+          "kind": "fun",
+          "name": "removeTopicHash",
+          "line": 2947
+        },
+        {
+          "kind": "fun",
+          "name": "pendingMsgs",
+          "line": 2956
+        },
+        {
+          "kind": "fun",
+          "name": "setPendingIncomingMessage",
+          "line": 2959
+        },
+        {
+          "kind": "fun",
+          "name": "getPendingIncomingMessage",
+          "line": 2968
+        },
+        {
+          "kind": "fun",
+          "name": "getPendingIncomingMessageKey",
+          "line": 2972
+        },
+        {
+          "kind": "fun",
+          "name": "hasPendingIncomingMessage",
+          "line": 2973
+        },
+        {
+          "kind": "fun",
+          "name": "getPendingIncomingMessageHash",
+          "line": 2978
+        },
+        {
+          "kind": "fun",
+          "name": "msgHash",
+          "line": 2980
+        },
+        {
+          "kind": "fun",
+          "name": "clearPendingIncomingMessage",
+          "line": 2982
+        },
+        {
+          "kind": "fun",
+          "name": "overridesJson",
+          "line": 2993
+        },
+        {
+          "kind": "fun",
+          "name": "getOverride",
+          "line": 2998
+        },
+        {
+          "kind": "fun",
+          "name": "setLabelOverride",
+          "line": 3004
+        },
+        {
+          "kind": "fun",
+          "name": "setAvatarOverride",
+          "line": 3012
+        },
+        {
+          "kind": "fun",
+          "name": "setWebhook",
+          "line": 3024
+        },
+        {
+          "kind": "fun",
+          "name": "getWebhook",
+          "line": 3031
+        },
+        {
+          "kind": "fun",
+          "name": "getWhToggle",
+          "line": 3040
+        },
+        {
+          "kind": "fun",
+          "name": "setWhToggle",
+          "line": 3041
+        },
+        {
+          "kind": "fun",
+          "name": "getIncomingWhToggle",
+          "line": 3046
+        },
+        {
+          "kind": "fun",
+          "name": "setIncomingWhToggle",
+          "line": 3048
+        },
+        {
+          "kind": "fun",
+          "name": "removeWebhook",
+          "line": 3053
+        },
+        {
+          "kind": "fun",
+          "name": "webhooksJson",
+          "line": 3059
+        },
+        {
+          "kind": "fun",
+          "name": "deviceCredsJson",
+          "line": 3066
+        },
+        {
+          "kind": "fun",
+          "name": "setDeviceCreds",
+          "line": 3071
+        },
+        {
+          "kind": "fun",
+          "name": "getDeviceCreds",
+          "line": 3077
+        },
+        {
+          "kind": "fun",
+          "name": "removeDeviceCreds",
+          "line": 3083
+        },
+        {
+          "kind": "class",
+          "name": "WifiTrigger",
+          "line": 3091
+        },
+        {
+          "kind": "fun",
+          "name": "allWifiTriggers",
+          "line": 3105
+        },
+        {
+          "kind": "fun",
+          "name": "allActiveGeos",
+          "line": 3186
+        },
+        {
+          "kind": "fun",
+          "name": "allGeos",
+          "line": 3238
+        },
+        {
+          "kind": "class",
+          "name": "TimeEntry",
+          "line": 3248
+        },
+        {
+          "kind": "fun",
+          "name": "isExact",
+          "line": 3253
+        },
+        {
+          "kind": "fun",
+          "name": "contains",
+          "line": 3255
+        },
+        {
+          "kind": "class",
+          "name": "GeoPoint",
+          "line": 3270
+        },
+        {
+          "kind": "class",
+          "name": "GuestTemplate",
+          "line": 3272
+        },
+        {
+          "kind": "fun",
+          "name": "guestTplCached",
+          "line": 3329
+        },
+        {
+          "kind": "fun",
+          "name": "invalidateGuestTplCache",
+          "line": 3341
+        },
+        {
+          "kind": "fun",
+          "name": "guestTemplatesJson",
+          "line": 3343
+        },
+        {
+          "kind": "fun",
+          "name": "gtKey",
+          "line": 3348
+        },
+        {
+          "kind": "fun",
+          "name": "parseGuestTemplate",
+          "line": 3352
+        },
+        {
+          "kind": "fun",
+          "name": "lvl",
+          "line": 3353
+        },
+        {
+          "kind": "fun",
+          "name": "getGuestTemplate",
+          "line": 3429
+        },
+        {
+          "kind": "fun",
+          "name": "resolveGeoFromOwner",
+          "line": 3434
+        },
+        {
+          "kind": "fun",
+          "name": "getIncomingTemplate",
+          "line": 3443
+        },
+        {
+          "kind": "class",
+          "name": "ActiveAutomation",
+          "line": 3446
+        },
+        {
+          "kind": "fun",
+          "name": "allActiveAutomations",
+          "line": 3458
+        },
+        {
+          "kind": "fun",
+          "name": "serializeGuestTemplate",
+          "line": 3490
+        },
+        {
+          "kind": "fun",
+          "name": "saveGuestTemplate",
+          "line": 3532
+        },
+        {
+          "kind": "fun",
+          "name": "saveIncomingTemplate",
+          "line": 3541
+        },
+        {
+          "kind": "fun",
+          "name": "removeGuestTemplate",
+          "line": 3545
+        },
+        {
+          "kind": "fun",
+          "name": "copyGuestTemplates",
+          "line": 3553
+        },
+        {
+          "kind": "fun",
+          "name": "setIncomingObjectHidden",
+          "line": 3569
+        },
+        {
+          "kind": "fun",
+          "name": "isIncomingObjectHidden",
+          "line": 3575
+        },
+        {
+          "kind": "fun",
+          "name": "setIncomingBleHidden",
+          "line": 3581
+        },
+        {
+          "kind": "fun",
+          "name": "isIncomingBleHidden",
+          "line": 3587
+        },
+        {
+          "kind": "fun",
+          "name": "clearHiddenObjectsFor",
+          "line": 3591
+        },
+        {
+          "kind": "fun",
+          "name": "setGuestKeyLabelOverride",
+          "line": 3599
+        },
+        {
+          "kind": "fun",
+          "name": "getGuestKeyLabelOverride",
+          "line": 3605
+        },
+        {
+          "kind": "fun",
+          "name": "widgetMap",
+          "line": 3611
+        },
+        {
+          "kind": "fun",
+          "name": "setWidgetBinding",
+          "line": 3614
+        },
+        {
+          "kind": "fun",
+          "name": "getWidgetBinding",
+          "line": 3618
+        },
+        {
+          "kind": "fun",
+          "name": "removeWidgetBinding",
+          "line": 3623
+        },
+        {
+          "kind": "fun",
+          "name": "allWidgetIds",
+          "line": 3627
+        }
+      ],
+      "surface_calls": []
+    },
+    {
+      "path": "app/src/main/java/com/entrixy/app/store/ShareIn.kt",
+      "sha256": "80c34bb49f69253e4c0ad6b9fde046577b0439f0618cc3d26a33d57bf81b1f14",
+      "lines": 164,
+      "declarations": [
+        {
+          "kind": "object",
+          "name": "ShareIn",
+          "line": 19
+        },
+        {
+          "kind": "fun",
+          "name": "log",
+          "line": 21
+        },
+        {
+          "kind": "class",
+          "name": "Result",
+          "line": 23
+        },
+        {
+          "kind": "fun",
+          "name": "accept",
+          "line": 29
+        },
+        {
+          "kind": "fun",
+          "name": "pickUpNewParts",
+          "line": 143
+        },
+        {
+          "kind": "fun",
+          "name": "openMessage",
+          "line": 156
+        }
+      ],
+      "surface_calls": []
+    },
+    {
+      "path": "app/src/main/java/com/entrixy/app/store/Vault.kt",
+      "sha256": "55fdf945885604da1cfbc1090495ae789db807fc29b384e5763517f345cb4ef9",
+      "lines": 954,
+      "declarations": [
+        {
+          "kind": "object",
+          "name": "Vault",
+          "line": 22
+        },
+        {
+          "kind": "fun",
+          "name": "buildDataCipher",
+          "line": 48
+        },
+        {
+          "kind": "fun",
+          "name": "readDataCipher",
+          "line": 82
+        },
+        {
+          "kind": "fun",
+          "name": "rotateObjectKey",
+          "line": 102
+        },
+        {
+          "kind": "class",
+          "name": "GuestBundlePayload",
+          "line": 162
+        },
+        {
+          "kind": "fun",
+          "name": "packTemplates",
+          "line": 176
+        },
+        {
+          "kind": "fun",
+          "name": "packBleShares",
+          "line": 199
+        },
+        {
+          "kind": "fun",
+          "name": "packSocketShares",
+          "line": 282
+        },
+        {
+          "kind": "fun",
+          "name": "buildGuestBundle",
+          "line": 316
+        },
+        {
+          "kind": "fun",
+          "name": "fulfilDelegatedKey",
+          "line": 379
+        },
+        {
+          "kind": "fun",
+          "name": "rebuildBundlesForNumber",
+          "line": 431
+        },
+        {
+          "kind": "fun",
+          "name": "note",
+          "line": 450
+        },
+        {
+          "kind": "fun",
+          "name": "rebuildBundleForKey",
+          "line": 460
+        },
+        {
+          "kind": "fun",
+          "name": "rebuildAllBundles",
+          "line": 497
+        },
+        {
+          "kind": "fun",
+          "name": "retryPendingBundles",
+          "line": 507
+        },
+        {
+          "kind": "fun",
+          "name": "readGuestBundle",
+          "line": 515
+        },
+        {
+          "kind": "fun",
+          "name": "mergeIncomingTemplate",
+          "line": 532
+        },
+        {
+          "kind": "fun",
+          "name": "pick",
+          "line": 547
+        },
+        {
+          "kind": "class",
+          "name": "Geo",
+          "line": 553
+        },
+        {
+          "kind": "fun",
+          "name": "geoOf",
+          "line": 555
+        },
+        {
+          "kind": "fun",
+          "name": "on",
+          "line": 584
+        },
+        {
+          "kind": "fun",
+          "name": "rebuildBundle",
+          "line": 636
+        },
+        {
+          "kind": "class",
+          "name": "ParsedKey",
+          "line": 658
+        },
+        {
+          "kind": "fun",
+          "name": "ingestGuestBundle",
+          "line": 665
+        },
+        {
+          "kind": "fun",
+          "name": "dbg",
+          "line": 666
+        },
+        {
+          "kind": "fun",
+          "name": "splitBlob",
+          "line": 896
+        },
+        {
+          "kind": "fun",
+          "name": "parseKeyInput",
+          "line": 905
+        }
+      ],
+      "surface_calls": []
+    },
+    {
+      "path": "app/src/main/java/com/entrixy/app/ui/CodeGate.kt",
+      "sha256": "ac13f452f872a1f3076ea37bb2763f961c1add27c28cb18eb1ae3320e5fbaea9",
+      "lines": 252,
+      "declarations": [
+        {
+          "kind": "fun",
+          "name": "digits",
+          "line": 35
+        },
+        {
+          "kind": "fun",
+          "name": "CodeField",
+          "line": 38
+        },
+        {
+          "kind": "fun",
+          "name": "CodeSetupDialog",
+          "line": 57
+        },
+        {
+          "kind": "fun",
+          "name": "askBio",
+          "line": 111
+        },
+        {
+          "kind": "fun",
+          "name": "onAuthenticationSucceeded",
+          "line": 117
+        },
+        {
+          "kind": "fun",
+          "name": "CodeEntry",
+          "line": 136
+        },
+        {
+          "kind": "fun",
+          "name": "bio",
+          "line": 149
+        },
+        {
+          "kind": "fun",
+          "name": "submit",
+          "line": 171
+        },
+        {
+          "kind": "fun",
+          "name": "CodeGateDialog",
+          "line": 223
+        },
+        {
+          "kind": "fun",
+          "name": "CodeLockScreen",
+          "line": 241
+        }
+      ],
+      "surface_calls": [
+        {
+          "call": "CodeSetupDialog",
+          "line": 57
+        },
+        {
+          "call": "AlertDialog",
+          "line": 65
+        },
+        {
+          "call": "CodeGateDialog",
+          "line": 223
+        },
+        {
+          "call": "CodeSetupDialog",
+          "line": 226
+        },
+        {
+          "call": "AlertDialog",
+          "line": 229
+        }
+      ]
+    },
+    {
+      "path": "app/src/main/java/com/entrixy/app/ui/ControlsDebugSheet.kt",
+      "sha256": "cd2d49237e13f3b7ea4fa1b595cd17851d191735924512d7d7af9383dee9cc3d",
+      "lines": 308,
+      "declarations": [
+        {
+          "kind": "fun",
+          "name": "ControlsDebugSheet",
+          "line": 32
+        },
+        {
+          "kind": "fun",
+          "name": "Section",
+          "line": 300
+        }
+      ],
+      "surface_calls": [
+        {
+          "call": "ModalBottomSheet",
+          "line": 45
+        },
+        {
+          "call": "DropdownMenu",
+          "line": 238
+        },
+        {
+          "call": "AlertDialog",
+          "line": 255
+        }
+      ]
+    },
+    {
+      "path": "app/src/main/java/com/entrixy/app/ui/CorridorMapScreen.kt",
+      "sha256": "dbfd064f55d76eafb5608026565369038bd57f48a1556b0c0233ee3d6cc95cf3",
+      "lines": 533,
+      "declarations": [
+        {
+          "kind": "fun",
+          "name": "CorridorMapScreen",
+          "line": 86
+        },
+        {
+          "kind": "fun",
+          "name": "bump",
+          "line": 109
+        },
+        {
+          "kind": "fun",
+          "name": "redraw",
+          "line": 154
+        },
+        {
+          "kind": "fun",
+          "name": "singleTapConfirmedHelper",
+          "line": 160
+        },
+        {
+          "kind": "fun",
+          "name": "longPressHelper",
+          "line": 164
+        },
+        {
+          "kind": "fun",
+          "name": "onMarkerDrag",
+          "line": 200
+        },
+        {
+          "kind": "fun",
+          "name": "onMarkerDragEnd",
+          "line": 201
+        },
+        {
+          "kind": "fun",
+          "name": "onMarkerDragStart",
+          "line": 202
+        },
+        {
+          "kind": "fun",
+          "name": "finishStroke",
+          "line": 213
+        },
+        {
+          "kind": "fun",
+          "name": "DarkPlate",
+          "line": 380
+        },
+        {
+          "kind": "fun",
+          "name": "PlateIcon",
+          "line": 391
+        },
+        {
+          "kind": "fun",
+          "name": "OutlineWhite",
+          "line": 399
+        },
+        {
+          "kind": "fun",
+          "name": "roundedPolyline",
+          "line": 421
+        },
+        {
+          "kind": "fun",
+          "name": "toGeo",
+          "line": 437
+        },
+        {
+          "kind": "fun",
+          "name": "metersBetween",
+          "line": 452
+        },
+        {
+          "kind": "fun",
+          "name": "simplifyToGate",
+          "line": 465
+        },
+        {
+          "kind": "fun",
+          "name": "orientToGate",
+          "line": 509
+        },
+        {
+          "kind": "fun",
+          "name": "snapEndToGate",
+          "line": 519
+        },
+        {
+          "kind": "fun",
+          "name": "hint",
+          "line": 525
+        }
+      ],
+      "surface_calls": [
+        {
+          "call": "Dialog",
+          "line": 237
+        }
+      ]
+    },
+    {
+      "path": "app/src/main/java/com/entrixy/app/ui/GuestAutomationEditor.kt",
+      "sha256": "372b2f992c5db20671234846a5840eca2ca3caaf5a7f840ff88574d587b6efc7",
+      "lines": 1452,
+      "declarations": [
+        {
+          "kind": "class",
+          "name": "Level",
+          "line": 78
+        },
+        {
+          "kind": "fun",
+          "name": "fromKey",
+          "line": 84
+        },
+        {
+          "kind": "fun",
+          "name": "GuestAutomationEditor",
+          "line": 90
+        },
+        {
+          "kind": "fun",
+          "name": "save",
+          "line": 122
+        },
+        {
+          "kind": "fun",
+          "name": "RuleCard",
+          "line": 467
+        },
+        {
+          "kind": "fun",
+          "name": "LevelDropdown",
+          "line": 580
+        },
+        {
+          "kind": "fun",
+          "name": "ActivationSection",
+          "line": 640
+        },
+        {
+          "kind": "fun",
+          "name": "PulsatingCircle",
+          "line": 714
+        },
+        {
+          "kind": "fun",
+          "name": "Modifier.sliderTrim",
+          "line": 760
+        },
+        {
+          "kind": "fun",
+          "name": "FieldSection",
+          "line": 768
+        },
+        {
+          "kind": "fun",
+          "name": "StatusLine",
+          "line": 785
+        },
+        {
+          "kind": "fun",
+          "name": "PillButton",
+          "line": 802
+        },
+        {
+          "kind": "fun",
+          "name": "GeoPointEditor",
+          "line": 826
+        },
+        {
+          "kind": "fun",
+          "name": "RadiusEditor",
+          "line": 999
+        },
+        {
+          "kind": "fun",
+          "name": "TimeInlineEditor",
+          "line": 1043
+        },
+        {
+          "kind": "fun",
+          "name": "WeekdayPicker",
+          "line": 1173
+        },
+        {
+          "kind": "fun",
+          "name": "formatMinutes",
+          "line": 1206
+        },
+        {
+          "kind": "fun",
+          "name": "fetchLocNow",
+          "line": 1209
+        },
+        {
+          "kind": "fun",
+          "name": "WifiInlineEditor",
+          "line": 1222
+        },
+        {
+          "kind": "fun",
+          "name": "currentNet",
+          "line": 1240
+        },
+        {
+          "kind": "fun",
+          "name": "SegmentedRow",
+          "line": 1398
+        },
+        {
+          "kind": "fun",
+          "name": "SavedChip",
+          "line": 1429
+        }
+      ],
+      "surface_calls": [
+        {
+          "call": "ModalBottomSheet",
+          "line": 158
+        },
+        {
+          "call": "CodeSetupDialog",
+          "line": 423
+        },
+        {
+          "call": "DropdownMenu",
+          "line": 586
+        },
+        {
+          "call": "AlertDialog",
+          "line": 1147
+        }
+      ]
+    },
+    {
+      "path": "app/src/main/java/com/entrixy/app/ui/GuestCallEditor.kt",
+      "sha256": "1c0b7773546b48b555004ed427ef305955c95d1b21e1d5334e64e02ad2385899",
+      "lines": 270,
+      "declarations": [
+        {
+          "kind": "fun",
+          "name": "GuestCallEditor",
+          "line": 34
+        },
+        {
+          "kind": "fun",
+          "name": "persist",
+          "line": 65
+        },
+        {
+          "kind": "fun",
+          "name": "persistWhMode",
+          "line": 70
+        }
+      ],
+      "surface_calls": [
+        {
+          "call": "ModalBottomSheet",
+          "line": 99
+        },
+        {
+          "call": "AlertDialog",
+          "line": 251
+        }
+      ]
+    },
+    {
+      "path": "app/src/main/java/com/entrixy/app/ui/GuestUrlEditor.kt",
+      "sha256": "0d9a4cc914759fbc65aa2d124b3ee998dbb09849c1327c492feb4803a08bd26b",
+      "lines": 127,
+      "declarations": [
+        {
+          "kind": "fun",
+          "name": "GuestUrlEditor",
+          "line": 33
+        },
+        {
+          "kind": "fun",
+          "name": "persist",
+          "line": 46
+        }
+      ],
+      "surface_calls": [
+        {
+          "call": "ModalBottomSheet",
+          "line": 52
+        }
+      ]
+    },
+    {
+      "path": "app/src/main/java/com/entrixy/app/ui/GuestsScreen.kt",
+      "sha256": "f96fa3dfdbe38694a9195722d59926f502bc62d0e72de509aeab98b3e697a9cb",
+      "lines": 2403,
+      "declarations": [
+        {
+          "kind": "fun",
+          "name": "GuestsScreen",
+          "line": 57
+        },
+        {
+          "kind": "fun",
+          "name": "accessOf",
+          "line": 74
+        },
+        {
+          "kind": "fun",
+          "name": "orgLabelsFor",
+          "line": 125
+        },
+        {
+          "kind": "fun",
+          "name": "pendingCodeFor",
+          "line": 130
+        },
+        {
+          "kind": "fun",
+          "name": "saveOwnerName",
+          "line": 284
+        },
+        {
+          "kind": "fun",
+          "name": "setDef",
+          "line": 320
+        },
+        {
+          "kind": "fun",
+          "name": "toggleBle",
+          "line": 1130
+        },
+        {
+          "kind": "fun",
+          "name": "MessageSendDialog",
+          "line": 1931
+        },
+        {
+          "kind": "fun",
+          "name": "MessageSheet",
+          "line": 1960
+        },
+        {
+          "kind": "fun",
+          "name": "formatBleTtl",
+          "line": 2168
+        },
+        {
+          "kind": "fun",
+          "name": "BleTokenTtlSheet",
+          "line": 2185
+        },
+        {
+          "kind": "fun",
+          "name": "ObjectAccessSheet",
+          "line": 2274
+        },
+        {
+          "kind": "fun",
+          "name": "AccessCheckRow",
+          "line": 2335
+        },
+        {
+          "kind": "fun",
+          "name": "ObjectAccessIcon",
+          "line": 2382
+        },
+        {
+          "kind": "fun",
+          "name": "ServerGroupHeader",
+          "line": 2393
+        },
+        {
+          "kind": "class",
+          "name": "TplTarget",
+          "line": 2400
+        }
+      ],
+      "surface_calls": [
+        {
+          "call": "Dialog",
+          "line": 720
+        },
+        {
+          "call": "Dialog",
+          "line": 745
+        },
+        {
+          "call": "ModalBottomSheet",
+          "line": 808
+        },
+        {
+          "call": "ModalBottomSheet",
+          "line": 1349
+        },
+        {
+          "call": "AlertDialog",
+          "line": 1742
+        },
+        {
+          "call": "AlertDialog",
+          "line": 1798
+        },
+        {
+          "call": "ModalBottomSheet",
+          "line": 1984
+        },
+        {
+          "call": "ModalBottomSheet",
+          "line": 2202
+        },
+        {
+          "call": "ModalBottomSheet",
+          "line": 2284
+        }
+      ]
+    },
+    {
+      "path": "app/src/main/java/com/entrixy/app/ui/HelpScreen.kt",
+      "sha256": "7fc02d429cb9a9b9d0b32f67d35221386afa8dc6a884a6679f8577a9b9c554b1",
+      "lines": 126,
+      "declarations": [
+        {
+          "kind": "fun",
+          "name": "HelpScreen",
+          "line": 28
+        },
+        {
+          "kind": "fun",
+          "name": "guideUrl",
+          "line": 100
+        },
+        {
+          "kind": "fun",
+          "name": "HelpSection",
+          "line": 107
+        }
+      ],
+      "surface_calls": []
+    },
+    {
+      "path": "app/src/main/java/com/entrixy/app/ui/HomeScreen.kt",
+      "sha256": "9b9b911ecd552f6cb6b0dc18d0dd1451de17a1d6947196f9209ac380eb49d68e",
+      "lines": 677,
+      "declarations": [
+        {
+          "kind": "fun",
+          "name": "HomeScreen",
+          "line": 47
+        },
+        {
+          "kind": "fun",
+          "name": "PromoCard",
+          "line": 558
+        },
+        {
+          "kind": "fun",
+          "name": "trackPromoView",
+          "line": 618
+        },
+        {
+          "kind": "fun",
+          "name": "openPromoUrl",
+          "line": 645
+        },
+        {
+          "kind": "fun",
+          "name": "LoaderScreen",
+          "line": 659
+        }
+      ],
+      "surface_calls": []
+    },
+    {
+      "path": "app/src/main/java/com/entrixy/app/ui/IconsDebugSheet.kt",
+      "sha256": "9221ac7a6dff271e3df3152e1f65f8680c85483f6a852bb857f53b953de7761e",
+      "lines": 333,
+      "declarations": [
+        {
+          "kind": "fun",
+          "name": "IconsDebugSheet",
+          "line": 163
+        },
+        {
+          "kind": "fun",
+          "name": "IconRow",
+          "line": 304
+        }
+      ],
+      "surface_calls": [
+        {
+          "call": "ModalBottomSheet",
+          "line": 248
+        }
+      ]
+    },
+    {
+      "path": "app/src/main/java/com/entrixy/app/ui/JournalScreen.kt",
+      "sha256": "d12a85ba90f23b654e17b286590acb92e1f90d4dce9a7a2ca30cfeaac5d7a79c",
+      "lines": 260,
+      "declarations": [
+        {
+          "kind": "fun",
+          "name": "JournalScreen",
+          "line": 42
+        },
+        {
+          "kind": "fun",
+          "name": "JournalActionButton",
+          "line": 141
+        },
+        {
+          "kind": "fun",
+          "name": "JournalRow",
+          "line": 167
+        },
+        {
+          "kind": "fun",
+          "name": "formatJournalTimeTime",
+          "line": 226
+        },
+        {
+          "kind": "fun",
+          "name": "formatJournalTimeDate",
+          "line": 228
+        },
+        {
+          "kind": "fun",
+          "name": "journalAsText",
+          "line": 232
+        },
+        {
+          "kind": "fun",
+          "name": "copyJournal",
+          "line": 247
+        },
+        {
+          "kind": "fun",
+          "name": "shareJournal",
+          "line": 252
+        }
+      ],
+      "surface_calls": []
+    },
+    {
+      "path": "app/src/main/java/com/entrixy/app/ui/PassOnSection.kt",
+      "sha256": "3554619ef8d765e2325d6ec031a768d53178111093aedac43bdf01c9594c4776",
+      "lines": 613,
+      "declarations": [
+        {
+          "kind": "class",
+          "name": "PassSource",
+          "line": 51
+        },
+        {
+          "kind": "class",
+          "name": "PassAllow",
+          "line": 58
+        },
+        {
+          "kind": "class",
+          "name": "PassObj",
+          "line": 61
+        },
+        {
+          "kind": "class",
+          "name": "PassPart",
+          "line": 64
+        },
+        {
+          "kind": "class",
+          "name": "PassedKey",
+          "line": 71
+        },
+        {
+          "kind": "fun",
+          "name": "PassOnSection",
+          "line": 77
+        },
+        {
+          "kind": "fun",
+          "name": "reload",
+          "line": 99
+        },
+        {
+          "kind": "fun",
+          "name": "linkOf",
+          "line": 149
+        },
+        {
+          "kind": "fun",
+          "name": "accessOf",
+          "line": 356
+        },
+        {
+          "kind": "fun",
+          "name": "ints",
+          "line": 363
+        },
+        {
+          "kind": "fun",
+          "name": "PassSheet",
+          "line": 376
+        },
+        {
+          "kind": "fun",
+          "name": "inKey",
+          "line": 393
+        },
+        {
+          "kind": "fun",
+          "name": "passable",
+          "line": 398
+        },
+        {
+          "kind": "fun",
+          "name": "maxDepth",
+          "line": 413
+        },
+        {
+          "kind": "fun",
+          "name": "maxPool",
+          "line": 414
+        },
+        {
+          "kind": "fun",
+          "name": "defaultAccess",
+          "line": 419
+        },
+        {
+          "kind": "fun",
+          "name": "hostOf",
+          "line": 437
+        },
+        {
+          "kind": "fun",
+          "name": "errorText",
+          "line": 554
+        },
+        {
+          "kind": "fun",
+          "name": "ok",
+          "line": 563
+        },
+        {
+          "kind": "fun",
+          "name": "create",
+          "line": 573
+        },
+        {
+          "kind": "fun",
+          "name": "edit",
+          "line": 598
+        }
+      ],
+      "surface_calls": [
+        {
+          "call": "AlertDialog",
+          "line": 324
+        },
+        {
+          "call": "ModalBottomSheet",
+          "line": 443
+        }
+      ]
+    },
+    {
+      "path": "app/src/main/java/com/entrixy/app/ui/QrCode.kt",
+      "sha256": "3d325086d7d049c23fbce2841c1e6ed6b40cea05b9cc9394b9f63e12e3cc626c",
+      "lines": 34,
+      "declarations": [
+        {
+          "kind": "fun",
+          "name": "QrCode",
+          "line": 17
+        },
+        {
+          "kind": "fun",
+          "name": "generate",
+          "line": 27
+        }
+      ],
+      "surface_calls": []
+    },
+    {
+      "path": "app/src/main/java/com/entrixy/app/ui/SettingsScreen.kt",
+      "sha256": "b71b1705da86791c0087981dfb46705031b6744d6921185c9faeb1e16231cd0e",
+      "lines": 4842,
+      "declarations": [
+        {
+          "kind": "object",
+          "name": "PickPhoneContract",
+          "line": 99
+        },
+        {
+          "kind": "fun",
+          "name": "createIntent",
+          "line": 100
+        },
+        {
+          "kind": "fun",
+          "name": "parseResult",
+          "line": 104
+        },
+        {
+          "kind": "class",
+          "name": "ObjItem",
+          "line": 111
+        },
+        {
+          "kind": "class",
+          "name": "Own",
+          "line": 112
+        },
+        {
+          "kind": "class",
+          "name": "Guest",
+          "line": 114
+        },
+        {
+          "kind": "class",
+          "name": "Ble",
+          "line": 118
+        },
+        {
+          "kind": "class",
+          "name": "GuestBle",
+          "line": 120
+        },
+        {
+          "kind": "fun",
+          "name": "SettingsGroup",
+          "line": 132
+        },
+        {
+          "kind": "fun",
+          "name": "SettingsScreen",
+          "line": 150
+        },
+        {
+          "kind": "fun",
+          "name": "partsOf",
+          "line": 1211
+        },
+        {
+          "kind": "fun",
+          "name": "applyLock",
+          "line": 1470
+        },
+        {
+          "kind": "fun",
+          "name": "choose",
+          "line": 1936
+        },
+        {
+          "kind": "fun",
+          "name": "close",
+          "line": 2102
+        },
+        {
+          "kind": "fun",
+          "name": "processKey",
+          "line": 2756
+        },
+        {
+          "kind": "fun",
+          "name": "persistGuest",
+          "line": 2790
+        },
+        {
+          "kind": "fun",
+          "name": "runScan",
+          "line": 2895
+        },
+        {
+          "kind": "fun",
+          "name": "AddObjectSheet",
+          "line": 3041
+        },
+        {
+          "kind": "fun",
+          "name": "DeviceCredRow",
+          "line": 3629
+        },
+        {
+          "kind": "fun",
+          "name": "EditObjectSheet",
+          "line": 3655
+        },
+        {
+          "kind": "fun",
+          "name": "metersToRssi",
+          "line": 4020
+        },
+        {
+          "kind": "fun",
+          "name": "rssiToMeters",
+          "line": 4030
+        },
+        {
+          "kind": "fun",
+          "name": "presetIndex",
+          "line": 4040
+        },
+        {
+          "kind": "fun",
+          "name": "ObjectAvatarBadge",
+          "line": 4048
+        },
+        {
+          "kind": "fun",
+          "name": "pushAvatarToServer",
+          "line": 4065
+        },
+        {
+          "kind": "fun",
+          "name": "AvatarPickerDialog",
+          "line": 4266
+        },
+        {
+          "kind": "fun",
+          "name": "SoundEventCard",
+          "line": 4332
+        },
+        {
+          "kind": "fun",
+          "name": "previewPlay",
+          "line": 4360
+        },
+        {
+          "kind": "fun",
+          "name": "SnapshotCard",
+          "line": 4445
+        },
+        {
+          "kind": "fun",
+          "name": "update",
+          "line": 4446
+        },
+        {
+          "kind": "fun",
+          "name": "EditBleObjectSheet",
+          "line": 4603
+        },
+        {
+          "kind": "fun",
+          "name": "InfoRow",
+          "line": 4747
+        },
+        {
+          "kind": "fun",
+          "name": "WebhookKindSelector",
+          "line": 4768
+        },
+        {
+          "kind": "fun",
+          "name": "newWebhookSecret",
+          "line": 4783
+        },
+        {
+          "kind": "fun",
+          "name": "WebhookSecretField",
+          "line": 4793
+        },
+        {
+          "kind": "fun",
+          "name": "WebhookModeSelector",
+          "line": 4818
+        }
+      ],
+      "surface_calls": [
+        {
+          "call": "AlertDialog",
+          "line": 154
+        },
+        {
+          "call": "AlertDialog",
+          "line": 760
+        },
+        {
+          "call": "AlertDialog",
+          "line": 790
+        },
+        {
+          "call": "AlertDialog",
+          "line": 1065
+        },
+        {
+          "call": "AlertDialog",
+          "line": 1107
+        },
+        {
+          "call": "AlertDialog",
+          "line": 1283
+        },
+        {
+          "call": "CodeGateDialog",
+          "line": 1520
+        },
+        {
+          "call": "CodeGateDialog",
+          "line": 1527
+        },
+        {
+          "call": "CodeSetupDialog",
+          "line": 1534
+        },
+        {
+          "call": "AlertDialog",
+          "line": 1647
+        },
+        {
+          "call": "AlertDialog",
+          "line": 1733
+        },
+        {
+          "call": "AlertDialog",
+          "line": 1750
+        },
+        {
+          "call": "AlertDialog",
+          "line": 1769
+        },
+        {
+          "call": "AlertDialog",
+          "line": 2020
+        },
+        {
+          "call": "Dialog",
+          "line": 2104
+        },
+        {
+          "call": "AlertDialog",
+          "line": 2272
+        },
+        {
+          "call": "AlertDialog",
+          "line": 2317
+        },
+        {
+          "call": "AlertDialog",
+          "line": 2549
+        },
+        {
+          "call": "AlertDialog",
+          "line": 2628
+        },
+        {
+          "call": "AlertDialog",
+          "line": 2680
+        },
+        {
+          "call": "AlertDialog",
+          "line": 2725
+        },
+        {
+          "call": "AlertDialog",
+          "line": 2736
+        },
+        {
+          "call": "AlertDialog",
+          "line": 2864
+        },
+        {
+          "call": "AlertDialog",
+          "line": 2999
+        },
+        {
+          "call": "ModalBottomSheet",
+          "line": 3116
+        },
+        {
+          "call": "ModalBottomSheet",
+          "line": 3690
+        },
+        {
+          "call": "AlertDialog",
+          "line": 4272
+        },
+        {
+          "call": "ModalBottomSheet",
+          "line": 4618
+        },
+        {
+          "call": "AlertDialog",
+          "line": 4718
+        },
+        {
+          "call": "AlertDialog",
+          "line": 4830
+        }
+      ]
+    },
+    {
+      "path": "app/src/main/java/com/entrixy/app/ui/components/ActionCard.kt",
+      "sha256": "4362428668b6dd5dc14d607265fa26e89364b9384220d46f0d1804e3ec54e840",
+      "lines": 1259,
+      "declarations": [
+        {
+          "kind": "fun",
+          "name": "ActionCard",
+          "line": 80
+        },
+        {
+          "kind": "fun",
+          "name": "loadTpl",
+          "line": 151
+        },
+        {
+          "kind": "fun",
+          "name": "fireCallNow",
+          "line": 413
+        },
+        {
+          "kind": "fun",
+          "name": "runAuthThenCall",
+          "line": 439
+        },
+        {
+          "kind": "fun",
+          "name": "GeoHowToDialog",
+          "line": 1016
+        },
+        {
+          "kind": "fun",
+          "name": "HowToItem",
+          "line": 1088
+        },
+        {
+          "kind": "fun",
+          "name": "ActionRowButton",
+          "line": 1110
+        },
+        {
+          "kind": "fun",
+          "name": "AvatarButton",
+          "line": 1127
+        },
+        {
+          "kind": "fun",
+          "name": "formatHostPause",
+          "line": 1174
+        },
+        {
+          "kind": "fun",
+          "name": "formatDistance",
+          "line": 1188
+        },
+        {
+          "kind": "class",
+          "name": "NextTrig",
+          "line": 1209
+        },
+        {
+          "kind": "fun",
+          "name": "nextTimeTriggerMs",
+          "line": 1211
+        },
+        {
+          "kind": "fun",
+          "name": "formatCountdown",
+          "line": 1251
+        }
+      ],
+      "surface_calls": [
+        {
+          "call": "CodeGateDialog",
+          "line": 465
+        },
+        {
+          "call": "AlertDialog",
+          "line": 472
+        },
+        {
+          "call": "AlertDialog",
+          "line": 1042
+        }
+      ]
+    },
+    {
+      "path": "app/src/main/java/com/entrixy/app/ui/components/AvatarPreset.kt",
+      "sha256": "e6ca8e1a0ec7ab3b7c8b2e0f740b3049b3b46afa028f666fc582b45a48a88991",
+      "lines": 38,
+      "declarations": [
+        {
+          "kind": "fun",
+          "name": "avatarPresetIndex",
+          "line": 37
+        }
+      ],
+      "surface_calls": []
+    },
+    {
+      "path": "app/src/main/java/com/entrixy/app/ui/components/LinkifiedText.kt",
+      "sha256": "0ed5f186fe99de64f8d50109e1c397b6468b3276576a98ecdfbaddc97684212f",
+      "lines": 95,
+      "declarations": [
+        {
+          "kind": "class",
+          "name": "LinkHit",
+          "line": 15
+        },
+        {
+          "kind": "fun",
+          "name": "LinkifiedText",
+          "line": 24
+        },
+        {
+          "kind": "fun",
+          "name": "buildAnnotated",
+          "line": 75
+        }
+      ],
+      "surface_calls": []
+    },
+    {
+      "path": "app/src/main/java/com/entrixy/app/ui/components/Modifiers.kt",
+      "sha256": "cc81464cf3f0463dce92a6e88717ac5041b9b424a4e62e99fb0b5b8c9bc63273",
+      "lines": 25,
+      "declarations": [
+        {
+          "kind": "fun",
+          "name": "Modifier.clickableNoRipple",
+          "line": 15
+        }
+      ],
+      "surface_calls": []
+    },
+    {
+      "path": "app/src/main/java/com/entrixy/app/ui/components/NumberWheel.kt",
+      "sha256": "b1272a9aa5d3066740c45adf463fbfb8d1d6ec2542ab22edbd28da6c06630935",
+      "lines": 62,
+      "declarations": [
+        {
+          "kind": "fun",
+          "name": "NumberWheel",
+          "line": 13
+        }
+      ],
+      "surface_calls": []
+    },
+    {
+      "path": "app/src/main/java/com/entrixy/app/ui/components/OpenPositionCorners.kt",
+      "sha256": "ad956baf9b3b941789ed09d263147efc37477acc7c6a2efae03078308e0f4d02",
+      "lines": 80,
+      "declarations": [
+        {
+          "kind": "fun",
+          "name": "OpenPositionCorners",
+          "line": 27
+        }
+      ],
+      "surface_calls": []
+    },
+    {
+      "path": "app/src/main/java/com/entrixy/app/ui/components/OrgLogo.kt",
+      "sha256": "1605c5665d6103e363bd42c428e159b3563efbce8265f184bf4c9f05cf17c73c",
+      "lines": 106,
+      "declarations": [
+        {
+          "kind": "fun",
+          "name": "orgProven",
+          "line": 30
+        },
+        {
+          "kind": "fun",
+          "name": "OrgLogo",
+          "line": 34
+        },
+        {
+          "kind": "object",
+          "name": "OrgLogoStore",
+          "line": 81
+        },
+        {
+          "kind": "fun",
+          "name": "ensure",
+          "line": 84
+        }
+      ],
+      "surface_calls": []
+    },
+    {
+      "path": "app/src/main/java/com/entrixy/app/ui/components/Paragraphs.kt",
+      "sha256": "0ebf66893fe9fb782653fe0d7e41d911f8082241c0ab2126b592b3d785ac649f",
+      "lines": 23,
+      "declarations": [
+        {
+          "kind": "fun",
+          "name": "Paragraphs",
+          "line": 16
+        }
+      ],
+      "surface_calls": []
+    },
+    {
+      "path": "app/src/main/java/com/entrixy/app/ui/components/QrScan.kt",
+      "sha256": "411a450bebd29b0affa584ff6aa582c4a5fd176b96e2316b7f822c9591d8100e",
+      "lines": 41,
+      "declarations": [
+        {
+          "kind": "fun",
+          "name": "scanQr",
+          "line": 18
+        },
+        {
+          "kind": "fun",
+          "name": "run",
+          "line": 26
+        }
+      ],
+      "surface_calls": []
+    },
+    {
+      "path": "app/src/main/java/com/entrixy/app/ui/components/StatusBadge.kt",
+      "sha256": "c148d2fe6cfd6c806efb656f6defaab5949198179c7f0677a10017cbc3529d7f",
+      "lines": 57,
+      "declarations": [
+        {
+          "kind": "fun",
+          "name": "StatusBadge",
+          "line": 18
+        },
+        {
+          "kind": "fun",
+          "name": "SectionHeader",
+          "line": 50
+        }
+      ],
+      "surface_calls": []
+    },
+    {
+      "path": "app/src/main/java/com/entrixy/app/ui/components/StreamView.kt",
+      "sha256": "e82ae2fceddef7c2578a79a1c7d0e43caa7e21d7995c4981bd126d3c10a13ba9",
+      "lines": 273,
+      "declarations": [
+        {
+          "kind": "fun",
+          "name": "buildStreamAuthHeaders",
+          "line": 57
+        },
+        {
+          "kind": "fun",
+          "name": "StreamView",
+          "line": 74
+        },
+        {
+          "kind": "fun",
+          "name": "onPlayerError",
+          "line": 120
+        },
+        {
+          "kind": "fun",
+          "name": "onPlaybackStateChanged",
+          "line": 124
+        },
+        {
+          "kind": "fun",
+          "name": "onVideoSizeChanged",
+          "line": 130
+        },
+        {
+          "kind": "class",
+          "name": "StreamStatus",
+          "line": 239
+        },
+        {
+          "kind": "object",
+          "name": "Loading",
+          "line": 240
+        },
+        {
+          "kind": "object",
+          "name": "Ok",
+          "line": 241
+        },
+        {
+          "kind": "class",
+          "name": "Error",
+          "line": 242
+        },
+        {
+          "kind": "fun",
+          "name": "detectVideo",
+          "line": 245
+        },
+        {
+          "kind": "fun",
+          "name": "humanizeError",
+          "line": 256
+        }
+      ],
+      "surface_calls": []
+    },
+    {
+      "path": "app/src/main/java/com/entrixy/app/ui/theme/Theme.kt",
+      "sha256": "f2b68a2484e72a61c6fb067ca371053ee19cc245d1af726bf0dc2c89cf41922c",
+      "lines": 194,
+      "declarations": [
+        {
+          "kind": "fun",
+          "name": "DialerTheme",
+          "line": 166
+        }
+      ],
+      "surface_calls": []
+    },
+    {
+      "path": "app/src/main/java/com/entrixy/app/util/AppLock.kt",
+      "sha256": "c3efe2e95b77ee79107a4b8fb56793f7c2edd97b8a7e2f265ef41b3e68f80952",
+      "lines": 51,
+      "declarations": [
+        {
+          "kind": "object",
+          "name": "AppLock",
+          "line": 16
+        },
+        {
+          "kind": "fun",
+          "name": "enabled",
+          "line": 24
+        },
+        {
+          "kind": "fun",
+          "name": "onBackground",
+          "line": 26
+        },
+        {
+          "kind": "fun",
+          "name": "applySecureWindow",
+          "line": 33
+        },
+        {
+          "kind": "fun",
+          "name": "check",
+          "line": 39
+        },
+        {
+          "kind": "fun",
+          "name": "unlocked",
+          "line": 46
+        }
+      ],
+      "surface_calls": []
+    },
+    {
+      "path": "app/src/main/java/com/entrixy/app/util/Diagnostics.kt",
+      "sha256": "e383e37c4d22c2ae2a38b78e077e479982037c644de135916318ca44f769dacb",
+      "lines": 55,
+      "declarations": [
+        {
+          "kind": "object",
+          "name": "Diagnostics",
+          "line": 15
+        },
+        {
+          "kind": "fun",
+          "name": "sendLogs",
+          "line": 18
+        }
+      ],
+      "surface_calls": []
+    },
+    {
+      "path": "app/src/main/java/com/entrixy/app/util/LogSafe.kt",
+      "sha256": "d909a4cbf80c49dac2cb7505f17560c053b416e5d033eee6e35eaa21ab1f4c43",
+      "lines": 13,
+      "declarations": [
+        {
+          "kind": "object",
+          "name": "LogSafe",
+          "line": 5
+        },
+        {
+          "kind": "fun",
+          "name": "url",
+          "line": 6
+        }
+      ],
+      "surface_calls": []
+    },
+    {
+      "path": "app/src/main/java/com/entrixy/app/util/Oem.kt",
+      "sha256": "fc4b0eeeb8fb3a2abcdaae765b3d15d94ee4d6bbc64d4518800f34135242e097",
+      "lines": 226,
+      "declarations": [
+        {
+          "kind": "object",
+          "name": "Oem",
+          "line": 22
+        },
+        {
+          "kind": "fun",
+          "name": "isProblematic",
+          "line": 31
+        },
+        {
+          "kind": "fun",
+          "name": "manufacturerName",
+          "line": 35
+        },
+        {
+          "kind": "fun",
+          "name": "gmsAvailable",
+          "line": 40
+        },
+        {
+          "kind": "fun",
+          "name": "openBatteryOptimizationSettings",
+          "line": 46
+        },
+        {
+          "kind": "fun",
+          "name": "openAppDetails",
+          "line": 73
+        },
+        {
+          "kind": "fun",
+          "name": "openAutostartSettings",
+          "line": 86
+        },
+        {
+          "kind": "fun",
+          "name": "isSamsung",
+          "line": 152
+        },
+        {
+          "kind": "fun",
+          "name": "hasAutostartScreen",
+          "line": 161
+        },
+        {
+          "kind": "fun",
+          "name": "tips",
+          "line": 169
+        }
+      ],
+      "surface_calls": []
+    },
+    {
+      "path": "app/src/main/java/com/entrixy/app/util/SoundPlayer.kt",
+      "sha256": "1fb61a05db1e887166192d6c231a1a1cf5c35a6bf32325aba6e3177bff48b17a",
+      "lines": 115,
+      "declarations": [
+        {
+          "kind": "object",
+          "name": "SoundPlayer",
+          "line": 20
+        },
+        {
+          "kind": "fun",
+          "name": "defaultRawFor",
+          "line": 21
+        },
+        {
+          "kind": "fun",
+          "name": "ensurePool",
+          "line": 41
+        },
+        {
+          "kind": "fun",
+          "name": "playEvent",
+          "line": 76
+        }
+      ],
+      "surface_calls": []
+    },
+    {
+      "path": "app/src/main/java/com/entrixy/app/widget/KeyWidgetActionReceiver.kt",
+      "sha256": "8d8fa657378ee88ec7ebeb9c4ade2a75f4f9dd14b3d08344984523624ae310e8",
+      "lines": 175,
+      "declarations": [
+        {
+          "kind": "class",
+          "name": "KeyWidgetActionReceiver",
+          "line": 17
+        },
+        {
+          "kind": "fun",
+          "name": "onReceive",
+          "line": 18
+        },
+        {
+          "kind": "fun",
+          "name": "launchApp",
+          "line": 108
+        },
+        {
+          "kind": "fun",
+          "name": "flashColor",
+          "line": 122
+        },
+        {
+          "kind": "fun",
+          "name": "parseActionKey",
+          "line": 149
+        }
+      ],
+      "surface_calls": []
+    },
+    {
+      "path": "app/src/main/java/com/entrixy/app/widget/KeyWidgetConfigActivity.kt",
+      "sha256": "1e3a76286880cf349687033d998a81e7589f573b45ba06822e09bfef0d5b9cad",
+      "lines": 157,
+      "declarations": [
+        {
+          "kind": "class",
+          "name": "KeyWidgetConfigActivity",
+          "line": 37
+        },
+        {
+          "kind": "fun",
+          "name": "onCreate",
+          "line": 41
+        },
+        {
+          "kind": "fun",
+          "name": "ConfigScreen",
+          "line": 75
+        },
+        {
+          "kind": "fun",
+          "name": "ActionRow",
+          "line": 110
+        }
+      ],
+      "surface_calls": []
+    },
+    {
+      "path": "app/src/main/java/com/entrixy/app/widget/KeyWidgetProvider.kt",
+      "sha256": "b60f357047e33f73fcc21145ea1597eb6f057c53c0ca6555eb3a6692566a2eb9",
+      "lines": 358,
+      "declarations": [
+        {
+          "kind": "class",
+          "name": "KeyWidgetProvider",
+          "line": 30
+        },
+        {
+          "kind": "fun",
+          "name": "onUpdate",
+          "line": 32
+        },
+        {
+          "kind": "fun",
+          "name": "onDeleted",
+          "line": 37
+        },
+        {
+          "kind": "fun",
+          "name": "onAppWidgetOptionsChanged",
+          "line": 42
+        },
+        {
+          "kind": "fun",
+          "name": "nonce",
+          "line": 59
+        },
+        {
+          "kind": "fun",
+          "name": "renderWidget",
+          "line": 68
+        },
+        {
+          "kind": "fun",
+          "name": "roundedBitmap",
+          "line": 165
+        },
+        {
+          "kind": "fun",
+          "name": "resolveStatusColor",
+          "line": 206
+        },
+        {
+          "kind": "fun",
+          "name": "resolveStateBgRes",
+          "line": 219
+        },
+        {
+          "kind": "fun",
+          "name": "resolveAvatarBg",
+          "line": 254
+        },
+        {
+          "kind": "fun",
+          "name": "makeWhiteTransparent",
+          "line": 288
+        },
+        {
+          "kind": "fun",
+          "name": "composeColorToArgb",
+          "line": 304
+        },
+        {
+          "kind": "fun",
+          "name": "drawableToBitmap",
+          "line": 312
+        },
+        {
+          "kind": "fun",
+          "name": "objectGone",
+          "line": 329
+        },
+        {
+          "kind": "fun",
+          "name": "rerenderAll",
+          "line": 349
+        }
+      ],
+      "surface_calls": []
+    }
+  ]
+}
