@@ -6,6 +6,7 @@ from capture_simulator import ROOT,APP,OUTPUT,BUNDLE,TEXT_TOOL,run,prepare_devic
 PAGES={
  'buttons': ['Кнопки','Добавить сервер','Отказать'],
  'fields': ['Поля и переключатели','Название объекта','Подтверждать нажатие'],
+ 'key-page': ['Полученный ключ','Обновить данные','Удалить ключ с iPhone'],
  'rows': ['Списки и разделители','Полученный ключ','Обновить данные'],
  'objects': ['Карточки объектов','Контроллер не в сети'],
  'journal': ['Журнал','Копировать','Очистить','Контроллер принял команду'],
@@ -16,7 +17,7 @@ PAGES={
  'avatar': ['Картинка объекта','Загрузить свою картинку','готовый значок'],
  'selectors': ['Выбор и сроки','Действует до','Радиус'],
 }
-TITLES={'buttons':'Кнопки и состояния','fields':'Поля и переключатели','rows':'Списки и разделители','objects':'Карточки объектов','journal':'Журнал','navigation':'Навигация и разделы','confirm':'Диалог подтверждения','delete':'Диалог удаления','code':'Создание кода Entrixy','avatar':'Своя картинка и пресеты','selectors':'Выбор и сроки'}
+TITLES={'key-page':'Вложенная страница с нижней навигацией','buttons':'Кнопки и состояния','fields':'Поля и переключатели','rows':'Списки и разделители','objects':'Карточки объектов','journal':'Журнал','navigation':'Навигация и разделы','confirm':'Диалог подтверждения','delete':'Диалог удаления','code':'Создание кода Entrixy','avatar':'Своя картинка и пресеты','selectors':'Выбор и сроки'}
 def main():
  OUTPUT.mkdir(parents=True,exist_ok=True)
  run('xcrun','swiftc',str(ROOT/'scripts/verify_capture_text.swift'),'-o',str(TEXT_TOOL),timeout=120)
@@ -39,7 +40,7 @@ def main():
    path=OUTPUT/('iphone16-light-design-'+page+'.png');deadline=time.monotonic()+240
    while True:
     run('xcrun','simctl','io',device,'screenshot',str(path))
-    check=subprocess.run([str(TEXT_TOOL),str(path),*expected],capture_output=True,text=True,timeout=180)
+    check=subprocess.run([str(TEXT_TOOL),str(path),*expected,'Управление','Настройки','Гости','Журнал'],capture_output=True,text=True,timeout=180)
     if check.returncode==0:break
     if check.returncode!=1 or time.monotonic()>deadline:raise RuntimeError(page+': '+check.stdout+check.stderr)
     time.sleep(1)

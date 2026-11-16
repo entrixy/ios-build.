@@ -17,13 +17,18 @@ struct NativeDesignCatalog: View {
     @State private var confirmation = true
     @State private var biometric = false
     @State private var choice = 1
-    @State private var mainTab = 1
+    @State private var mainTab: AppTab
+    @State private var showingCatalog = true
+    @State private var showingKeyPage = false
     @State private var radius = 100.0
     @State private var date = Date(timeIntervalSince1970: 1_794_729_600)
     @State private var photo: PhotosPickerItem?
     @State private var imageData: Data?
     @State private var message: String?
-    init(page: String) { self.page = page }
+    init(page: String) {
+        self.page = page
+        _mainTab = State(initialValue: page == "journal" ? .journal : (["objects", "confirm", "delete", "code"].contains(page) ? .control : .settings))
+    }
     private let ink = Color(red: 27/255, green: 29/255, blue: 59/255)
     private let red = Color(red: 186/255, green: 26/255, blue: 26/255)
     private var title: String {
@@ -34,6 +39,7 @@ struct NativeDesignCatalog: View {
         case "objects": return "Карточки объектов"
         case "journal": return "Журнал"
         case "navigation": return "Навигация"
+        case "key-page": return "Ключи"
         case "confirm": return "Подтверждение"
         case "delete": return "Удаление"
         case "code": return "Код Entrixy"
@@ -43,34 +49,35 @@ struct NativeDesignCatalog: View {
         }
     }
     var body: some View {
-        Group {
-            if page == "navigation" {
-                TabView(selection: $mainTab) {
-                    NavigationStack {
-                        VStack { objectCard(online: true); Spacer() }.padding(20)
-                            .background(Color(uiColor: .systemGroupedBackground))
-                            .navigationTitle("Управление")
-                    }.tabItem { Label("Управление", image: "tab-control") }.tag(0)
-                    catalogScreen.tabItem { Label("Настройки", image: "tab-settings") }.tag(1)
-                    NavigationStack {
-                        Text("Ключи, выданные гостям").navigationTitle("Гости")
-                    }.tabItem { Label("Гости", image: "tab-guests") }.tag(2)
-                    NavigationStack {
-                        VStack { journal; Spacer() }.padding(20)
-                            .background(Color(uiColor: .systemGroupedBackground))
-                            .navigationTitle("Журнал")
-                    }.tabItem { Label("Журнал", image: "tab-journal") }.tag(3)
-                }
-            } else {
-                catalogScreen
+        catalogScreen
+            .safeAreaInset(edge: .bottom, spacing: 0) {
+                CatalogBottomNavigation(selection: $mainTab) { showingCatalog = false }
             }
-        }.tint(ink).preferredColorScheme(.light)
+            .overlay { if let dialog { dialogOverlay(dialog) } }
+            .tint(ink).preferredColorScheme(.light)
+    }
+    private var mainTitle: String {
+        switch mainTab {
+        case .control: return "Управление"
+        case .settings: return "Настройки"
+        case .guests: return "Гости"
+        case .journal: return "Журнал"
+        }
+    }
+    @ViewBuilder private var mainSection: some View {
+        switch mainTab {
+        case .control: objectCard(online: true)
+        case .settings: navigation
+        case .guests: Text("Ключи, выданные гостям")
+        case .journal: journal
+        }
     }
     private var catalogScreen: some View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: 20) {
-                    if page == "buttons" { buttons }
+                    if !showingCatalog { mainSection }
+                    else if page == "buttons" { buttons }
                     else if page == "fields" { fields }
                     else if page == "rows" { rows }
                     else if page == "objects" { objects }
@@ -87,17 +94,18 @@ struct NativeDesignCatalog: View {
                 }.padding(20).frame(maxWidth: .infinity, alignment: .leading)
             }
             .background(Color(uiColor: .systemGroupedBackground))
-            .navigationTitle(title).navigationBarTitleDisplayMode(.inline)
-            .safeAreaInset(edge: .bottom, spacing: 0) {
-                Text("ДИЗАЙН-КОД · НА УТВЕРЖДЕНИЕ").font(.system(size: 10, weight: .semibold))
-                    .frame(maxWidth: .infinity).padding(10).background(.background)
+            .navigationTitle(showingCatalog ? title : mainTitle).navigationBarTitleDisplayMode(.inline)
+            .navigationDestination(isPresented: $showingKeyPage) {
+                ScrollView { rows.padding(20) }
+                    .background(Color(uiColor: .systemGroupedBackground))
+                    .navigationTitle("Полученный ключ").navigationBarTitleDisplayMode(.inline)
             }
-            .overlay { if let dialog { dialogOverlay(dialog) } }
         }
         .tint(ink)
         .preferredColorScheme(.light)
         .task {
             if ["confirm", "delete", "code"].contains(page) { dialog = page }
+            if page == "key-page" { showingKeyPage = true }
             let status: [String: Any] = ["ready": true, "page": page, "native_design": true, "network_requests": 0, "command_frames": 0]
             if let data = try? JSONSerialization.data(withJSONObject: status) {
                 let path = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)[0].appendingPathComponent("native-design-status.json")
@@ -221,7 +229,7 @@ struct NativeDesignCatalog: View {
             }.pickerStyle(.segmented)
             Text("Вкладки настроек повторяют Android.").font(.footnote).foregroundStyle(.secondary)
             panel { NavigationLink("Полученный ключ") { Text("Содержимое ключа").navigationTitle("Полученный ключ").navigationBarTitleDisplayMode(.inline) }.padding(.vertical, 18) }
-            Text("Основные разделы переключаются нижней панелью. Она остаётся у нижнего края экрана при прокрутке.").font(.footnote).foregroundStyle(.secondary)
+            Text("Нижняя панель общая для разделов и вложенных страниц.").font(.footnote).foregroundStyle(.secondary)
         }
     }
     private var avatar: some View {
@@ -277,6 +285,33 @@ struct NativeDesignCatalog: View {
                 }.padding(24).frame(width: min(proxy.size.width - 32, 420)).background(.background, in: RoundedRectangle(cornerRadius: 20))
             }.frame(width: proxy.size.width, height: proxy.size.height)
         }
+    }
+}
+// One flat full-width surface, shared by every catalog page and pushed destination.
+private struct CatalogBottomNavigation: View {
+    @Binding var selection: AppTab
+    let onSelect: () -> Void
+    private let tabs: [(AppTab, String, String)] = [
+        (.control, "Управление", "tab-control"), (.settings, "Настройки", "tab-settings"),
+        (.guests, "Гости", "tab-guests"), (.journal, "Журнал", "tab-journal")
+    ]
+    var body: some View {
+        VStack(spacing: 0) {
+            Divider()
+            HStack(spacing: 0) {
+                ForEach(tabs, id: \.0) { tab, title, icon in
+                    Button { selection = tab; onSelect() } label: {
+                        VStack(spacing: 5) {
+                            Image(icon).resizable().scaledToFit().frame(width: 26, height: 26)
+                            Text(title).font(.system(size: 11, weight: selection == tab ? .semibold : .regular))
+                        }.frame(maxWidth: .infinity, minHeight: 56)
+                            .foregroundStyle(selection == tab ? Brand.ink : Brand.secondaryInk)
+                            .contentShape(Rectangle())
+                    }.buttonStyle(.plain)
+                        .accessibilityAddTraits(selection == tab ? .isSelected : [])
+                }
+            }.padding(.horizontal, 8).padding(.top, 6).padding(.bottom, 4)
+        }.background(Color(uiColor: .secondarySystemGroupedBackground).ignoresSafeArea(edges: .bottom))
     }
 }
 private struct CatalogButtonStyle: ButtonStyle {
