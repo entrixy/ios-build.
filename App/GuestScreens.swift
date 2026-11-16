@@ -147,9 +147,9 @@ struct SettingsScreen: View {
                 case .system:
                     Section {
                         Button("Добавить сервер") { addingServer = true }.buttonStyle(SecondaryActionStyle()).actionListRow()
-                        NavigationLink("Мои серверы") { OwnerServersScreen() }
                     }
                     Section {
+                        NavigationLink("Мои серверы") { OwnerServersScreen() }
                         Picker("Тема", selection: $appearance) {
                             Text("Как в системе").tag("system"); Text("Светлая").tag("light"); Text("Тёмная").tag("dark")
                         }
