@@ -1,0 +1,488 @@
+{
+  "kind": "stage-two-product-review",
+  "source_sha": "b3176051cccc75fc3b8c199fcd086a20d95bd4f3",
+  "captures": [
+    {
+      "screen": "empty",
+      "title": "Пустой профиль: доступные разделы",
+      "file": "iphone16-light-stage2-empty.png",
+      "device": "iphone16",
+      "appearance": "light",
+      "source_sha": "b3176051cccc75fc3b8c199fcd086a20d95bd4f3",
+      "product_routes": true,
+      "profile": {
+        "product_routes": true,
+        "guests": 0,
+        "tabs": [
+          "settings",
+          "journal"
+        ],
+        "route": "empty",
+        "owners": 0,
+        "journal": 0,
+        "ready": true
+      },
+      "visible_text_verified": true,
+      "runtime": "com.apple.CoreSimulator.SimRuntime.iOS-26-2",
+      "sha256": "bc8190b53b84c08870824068574fd0f4a4c5a618277cb20e77564153bd6ee77d"
+    },
+    {
+      "screen": "guest-control",
+      "title": "Гость: управление объектом",
+      "file": "iphone16-light-stage2-guest-control.png",
+      "device": "iphone16",
+      "appearance": "light",
+      "source_sha": "b3176051cccc75fc3b8c199fcd086a20d95bd4f3",
+      "product_routes": true,
+      "profile": {
+        "product_routes": true,
+        "owners": 0,
+        "ready": true,
+        "route": "guest-control",
+        "journal": 0,
+        "tabs": [
+          "control",
+          "settings",
+          "journal"
+        ],
+        "guests": 1
+      },
+      "visible_text_verified": true,
+      "runtime": "com.apple.CoreSimulator.SimRuntime.iOS-26-2",
+      "sha256": "a1db119c62a19533924b1bcbc8a1f39e0c163a97dd7d3c84396fcd8ce96efad2"
+    },
+    {
+      "screen": "owner-control",
+      "title": "Управление своим объектом",
+      "file": "iphone16-light-stage2-owner-control.png",
+      "device": "iphone16",
+      "appearance": "light",
+      "source_sha": "b3176051cccc75fc3b8c199fcd086a20d95bd4f3",
+      "product_routes": true,
+      "profile": {
+        "journal": 0,
+        "route": "owner-control",
+        "owners": 1,
+        "ready": true,
+        "guests": 0,
+        "product_routes": true,
+        "tabs": [
+          "control",
+          "settings",
+          "guests",
+          "journal"
+        ]
+      },
+      "visible_text_verified": true,
+      "runtime": "com.apple.CoreSimulator.SimRuntime.iOS-26-2",
+      "sha256": "b4a88dc7b00aadcda0c6a94e128e4b185230031abaf766b6a1edacbed3fdc2f9"
+    },
+    {
+      "screen": "mixed-objects",
+      "title": "Общий список: свои, гостевые и Bluetooth",
+      "file": "iphone16-light-stage2-mixed-objects.png",
+      "device": "iphone16",
+      "appearance": "light",
+      "source_sha": "b3176051cccc75fc3b8c199fcd086a20d95bd4f3",
+      "product_routes": true,
+      "profile": {
+        "tabs": [
+          "control",
+          "settings",
+          "guests",
+          "journal"
+        ],
+        "ready": true,
+        "guests": 1,
+        "route": "mixed-objects",
+        "journal": 0,
+        "product_routes": true,
+        "owners": 1
+      },
+      "visible_text_verified": true,
+      "runtime": "com.apple.CoreSimulator.SimRuntime.iOS-26-2",
+      "sha256": "927ac1c5d6f089963831a5711415ad593fb4d43d124e9a97112832543b8d2c66"
+    },
+    {
+      "screen": "guest-keys",
+      "title": "Настройки: полученные ключи",
+      "file": "iphone16-light-stage2-guest-keys.png",
+      "device": "iphone16",
+      "appearance": "light",
+      "source_sha": "b3176051cccc75fc3b8c199fcd086a20d95bd4f3",
+      "product_routes": true,
+      "profile": {
+        "guests": 1,
+        "ready": true,
+        "owners": 0,
+        "tabs": [
+          "control",
+          "settings",
+          "journal"
+        ],
+        "journal": 0,
+        "product_routes": true,
+        "route": "guest-keys"
+      },
+      "visible_text_verified": true,
+      "runtime": "com.apple.CoreSimulator.SimRuntime.iOS-26-2",
+      "sha256": "8a554b51963d540829c26126f4e9d5278aa5721f018385b840342980c93f56bf"
+    },
+    {
+      "screen": "key-detail",
+      "title": "Полученный ключ: вложенная страница",
+      "file": "iphone16-light-stage2-key-detail.png",
+      "device": "iphone16",
+      "appearance": "light",
+      "source_sha": "b3176051cccc75fc3b8c199fcd086a20d95bd4f3",
+      "product_routes": true,
+      "profile": {
+        "ready": true,
+        "route": "key-detail",
+        "journal": 0,
+        "tabs": [
+          "control",
+          "settings",
+          "journal"
+        ],
+        "owners": 0,
+        "guests": 1,
+        "product_routes": true
+      },
+      "visible_text_verified": true,
+      "runtime": "com.apple.CoreSimulator.SimRuntime.iOS-26-2",
+      "sha256": "eab3ced104ea4e5b5df43bd5f1a475dae68398d866e528e3d0243307bc710271"
+    },
+    {
+      "screen": "owner-objects",
+      "title": "Владелец: объекты в настройках",
+      "file": "iphone16-light-stage2-owner-objects.png",
+      "device": "iphone16",
+      "appearance": "light",
+      "source_sha": "b3176051cccc75fc3b8c199fcd086a20d95bd4f3",
+      "product_routes": true,
+      "profile": {
+        "product_routes": true,
+        "guests": 0,
+        "journal": 0,
+        "ready": true,
+        "tabs": [
+          "control",
+          "settings",
+          "guests",
+          "journal"
+        ],
+        "owners": 1,
+        "route": "owner-objects"
+      },
+      "visible_text_verified": true,
+      "runtime": "com.apple.CoreSimulator.SimRuntime.iOS-26-2",
+      "sha256": "87e5de659c3be659d816606a9480536cc3de5ea528ade9b1bc5b674371bbedcd"
+    },
+    {
+      "screen": "owner-expanded",
+      "title": "Свой объект: раскрытые действия",
+      "file": "iphone16-light-stage2-owner-expanded.png",
+      "device": "iphone16",
+      "appearance": "light",
+      "source_sha": "b3176051cccc75fc3b8c199fcd086a20d95bd4f3",
+      "product_routes": true,
+      "profile": {
+        "tabs": [
+          "control",
+          "settings",
+          "guests",
+          "journal"
+        ],
+        "product_routes": true,
+        "ready": true,
+        "journal": 0,
+        "owners": 1,
+        "route": "owner-expanded",
+        "guests": 0
+      },
+      "visible_text_verified": true,
+      "runtime": "com.apple.CoreSimulator.SimRuntime.iOS-26-2",
+      "sha256": "2092c33a1a1a6b0dd74391343e5b7a2c26dd3d7c69d57759b6c19eb3b1bcc58a"
+    },
+    {
+      "screen": "guest-expanded",
+      "title": "Полученный объект: локальные действия",
+      "file": "iphone16-light-stage2-guest-expanded.png",
+      "device": "iphone16",
+      "appearance": "light",
+      "source_sha": "b3176051cccc75fc3b8c199fcd086a20d95bd4f3",
+      "product_routes": true,
+      "profile": {
+        "ready": true,
+        "journal": 0,
+        "product_routes": true,
+        "route": "guest-expanded",
+        "tabs": [
+          "control",
+          "settings",
+          "journal"
+        ],
+        "guests": 1,
+        "owners": 0
+      },
+      "visible_text_verified": true,
+      "runtime": "com.apple.CoreSimulator.SimRuntime.iOS-26-2",
+      "sha256": "133eaaca22b2b176cdbb0cd5bb2c20f48e12bef23c301c0d62f92da01829cf2e"
+    },
+    {
+      "screen": "add-object",
+      "title": "Добавление объекта: тип Bluetooth",
+      "file": "iphone16-light-stage2-add-object.png",
+      "device": "iphone16",
+      "appearance": "light",
+      "source_sha": "b3176051cccc75fc3b8c199fcd086a20d95bd4f3",
+      "product_routes": true,
+      "profile": {
+        "owners": 1,
+        "product_routes": true,
+        "journal": 0,
+        "tabs": [
+          "control",
+          "settings",
+          "guests",
+          "journal"
+        ],
+        "guests": 0,
+        "ready": true,
+        "route": "add-object"
+      },
+      "visible_text_verified": true,
+      "runtime": "com.apple.CoreSimulator.SimRuntime.iOS-26-2",
+      "sha256": "506120114f6c314cd12dfc635ed251a9453057513731f6317bfeda0377746ede"
+    },
+    {
+      "screen": "object-delete",
+      "title": "Удаление объекта: подтверждение",
+      "file": "iphone16-light-stage2-object-delete.png",
+      "device": "iphone16",
+      "appearance": "light",
+      "source_sha": "b3176051cccc75fc3b8c199fcd086a20d95bd4f3",
+      "product_routes": true,
+      "profile": {
+        "product_routes": true,
+        "owners": 1,
+        "tabs": [
+          "control",
+          "settings",
+          "guests",
+          "journal"
+        ],
+        "journal": 0,
+        "route": "object-delete",
+        "guests": 0,
+        "ready": true
+      },
+      "visible_text_verified": true,
+      "runtime": "com.apple.CoreSimulator.SimRuntime.iOS-26-2",
+      "sha256": "065821f56784d698fd0b90c1255a2fd6527e0258d534cb13accce4a22e0e6db8"
+    },
+    {
+      "screen": "owner-guests",
+      "title": "Владелец: раздел гостей",
+      "file": "iphone16-light-stage2-owner-guests.png",
+      "device": "iphone16",
+      "appearance": "light",
+      "source_sha": "b3176051cccc75fc3b8c199fcd086a20d95bd4f3",
+      "product_routes": true,
+      "profile": {
+        "owners": 1,
+        "journal": 0,
+        "route": "owner-guests",
+        "guests": 0,
+        "ready": true,
+        "product_routes": true,
+        "tabs": [
+          "control",
+          "settings",
+          "guests",
+          "journal"
+        ]
+      },
+      "visible_text_verified": true,
+      "runtime": "com.apple.CoreSimulator.SimRuntime.iOS-26-2",
+      "sha256": "78596f37f326cc57cc980b6721ec159edcdbc57ed952a2a866d626ce820d8037"
+    },
+    {
+      "screen": "delegating-guests",
+      "title": "Гость с правом передачи: раздел гостей",
+      "file": "iphone16-light-stage2-delegating-guests.png",
+      "device": "iphone16",
+      "appearance": "light",
+      "source_sha": "b3176051cccc75fc3b8c199fcd086a20d95bd4f3",
+      "product_routes": true,
+      "profile": {
+        "tabs": [
+          "control",
+          "settings",
+          "guests",
+          "journal"
+        ],
+        "ready": true,
+        "route": "delegating-guests",
+        "journal": 0,
+        "guests": 1,
+        "product_routes": true,
+        "owners": 0
+      },
+      "visible_text_verified": true,
+      "runtime": "com.apple.CoreSimulator.SimRuntime.iOS-26-2",
+      "sha256": "819732687f0a551fc41881932bb144b9cef90cd30865741f6dbfd8c40ff7d143"
+    },
+    {
+      "screen": "system",
+      "title": "Настройки: система",
+      "file": "iphone16-light-stage2-system.png",
+      "device": "iphone16",
+      "appearance": "light",
+      "source_sha": "b3176051cccc75fc3b8c199fcd086a20d95bd4f3",
+      "product_routes": true,
+      "profile": {
+        "journal": 0,
+        "product_routes": true,
+        "ready": true,
+        "guests": 1,
+        "owners": 0,
+        "route": "system",
+        "tabs": [
+          "control",
+          "settings",
+          "journal"
+        ]
+      },
+      "visible_text_verified": true,
+      "runtime": "com.apple.CoreSimulator.SimRuntime.iOS-26-2",
+      "sha256": "19bf7c91cb8addc1cd6ca71f5ad54e959897ec0802b041e26c5489badaf7d9b9"
+    },
+    {
+      "screen": "code-settings",
+      "title": "Код и вход: вложенная страница",
+      "file": "iphone16-light-stage2-code-settings.png",
+      "device": "iphone16",
+      "appearance": "light",
+      "source_sha": "b3176051cccc75fc3b8c199fcd086a20d95bd4f3",
+      "product_routes": true,
+      "profile": {
+        "ready": true,
+        "guests": 1,
+        "product_routes": true,
+        "tabs": [
+          "control",
+          "settings",
+          "journal"
+        ],
+        "route": "code-settings",
+        "owners": 0,
+        "journal": 0
+      },
+      "visible_text_verified": true,
+      "runtime": "com.apple.CoreSimulator.SimRuntime.iOS-26-2",
+      "sha256": "de76fff8145a8ffbc980c44dccb76f64d83d27b2c5ee6ebad73b5e43fe2c175f"
+    },
+    {
+      "screen": "sounds",
+      "title": "Настройки: звуки пока не перенесены",
+      "file": "iphone16-light-stage2-sounds.png",
+      "device": "iphone16",
+      "appearance": "light",
+      "source_sha": "b3176051cccc75fc3b8c199fcd086a20d95bd4f3",
+      "product_routes": true,
+      "profile": {
+        "owners": 0,
+        "product_routes": true,
+        "route": "sounds",
+        "tabs": [
+          "control",
+          "settings",
+          "journal"
+        ],
+        "guests": 1,
+        "journal": 0,
+        "ready": true
+      },
+      "visible_text_verified": true,
+      "runtime": "com.apple.CoreSimulator.SimRuntime.iOS-26-2",
+      "sha256": "d39739483b8a4606a23f81579ba67ce5ccbc2ebda20685aaa8ecc416602a22c0"
+    },
+    {
+      "screen": "add-key",
+      "title": "Добавление ключа",
+      "file": "iphone16-light-stage2-add-key.png",
+      "device": "iphone16",
+      "appearance": "light",
+      "source_sha": "b3176051cccc75fc3b8c199fcd086a20d95bd4f3",
+      "product_routes": true,
+      "profile": {
+        "product_routes": true,
+        "owners": 0,
+        "route": "add-key",
+        "journal": 0,
+        "tabs": [
+          "settings",
+          "journal"
+        ],
+        "guests": 0,
+        "ready": true
+      },
+      "visible_text_verified": true,
+      "runtime": "com.apple.CoreSimulator.SimRuntime.iOS-26-2",
+      "sha256": "1b7ebeed870c81c49a36cf9e7cc6d9101cdb88b3e9c093364426044cf2096cbe"
+    },
+    {
+      "screen": "add-server",
+      "title": "Добавление сервера",
+      "file": "iphone16-light-stage2-add-server.png",
+      "device": "iphone16",
+      "appearance": "light",
+      "source_sha": "b3176051cccc75fc3b8c199fcd086a20d95bd4f3",
+      "product_routes": true,
+      "profile": {
+        "route": "add-server",
+        "owners": 1,
+        "guests": 0,
+        "tabs": [
+          "control",
+          "settings",
+          "guests",
+          "journal"
+        ],
+        "ready": true,
+        "product_routes": true,
+        "journal": 0
+      },
+      "visible_text_verified": true,
+      "runtime": "com.apple.CoreSimulator.SimRuntime.iOS-26-2",
+      "sha256": "64ba39e048aa7e2e2513bbbc38cafd64afb77e346af380356b0f9913f96fdf5c"
+    },
+    {
+      "screen": "journal",
+      "title": "Пустой журнал действий",
+      "file": "iphone16-light-stage2-journal.png",
+      "device": "iphone16",
+      "appearance": "light",
+      "source_sha": "b3176051cccc75fc3b8c199fcd086a20d95bd4f3",
+      "product_routes": true,
+      "profile": {
+        "guests": 1,
+        "journal": 0,
+        "owners": 0,
+        "tabs": [
+          "control",
+          "settings",
+          "journal"
+        ],
+        "route": "journal",
+        "product_routes": true,
+        "ready": true
+      },
+      "visible_text_verified": true,
+      "runtime": "com.apple.CoreSimulator.SimRuntime.iOS-26-2",
+      "sha256": "17d73ee99d785e5749421fad16fdd008aaf714c120f327d1e1064a64a518580d"
+    }
+  ]
+}
