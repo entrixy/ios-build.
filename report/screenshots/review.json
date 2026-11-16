@@ -1,6 +1,6 @@
 {
   "kind": "stage-two-product-review",
-  "source_sha": "b3176051cccc75fc3b8c199fcd086a20d95bd4f3",
+  "source_sha": "61d828d60da665ab02b770a3ab906c105f33db95",
   "captures": [
     {
       "screen": "empty",
@@ -8,23 +8,23 @@
       "file": "iphone16-light-stage2-empty.png",
       "device": "iphone16",
       "appearance": "light",
-      "source_sha": "b3176051cccc75fc3b8c199fcd086a20d95bd4f3",
+      "source_sha": "61d828d60da665ab02b770a3ab906c105f33db95",
       "product_routes": true,
       "profile": {
-        "product_routes": true,
         "guests": 0,
+        "journal": 0,
+        "route": "empty",
+        "ready": true,
+        "owners": 0,
         "tabs": [
           "settings",
           "journal"
         ],
-        "route": "empty",
-        "owners": 0,
-        "journal": 0,
-        "ready": true
+        "product_routes": true
       },
       "visible_text_verified": true,
       "runtime": "com.apple.CoreSimulator.SimRuntime.iOS-26-2",
-      "sha256": "bc8190b53b84c08870824068574fd0f4a4c5a618277cb20e77564153bd6ee77d"
+      "sha256": "6f573df1fdc452a41db795e73262a9c59fe7b1318c9f2bbe15b5c58721e232f5"
     },
     {
       "screen": "guest-control",
@@ -32,24 +32,24 @@
       "file": "iphone16-light-stage2-guest-control.png",
       "device": "iphone16",
       "appearance": "light",
-      "source_sha": "b3176051cccc75fc3b8c199fcd086a20d95bd4f3",
+      "source_sha": "61d828d60da665ab02b770a3ab906c105f33db95",
       "product_routes": true,
       "profile": {
-        "product_routes": true,
         "owners": 0,
         "ready": true,
-        "route": "guest-control",
-        "journal": 0,
+        "product_routes": true,
         "tabs": [
           "control",
           "settings",
           "journal"
         ],
-        "guests": 1
+        "guests": 1,
+        "journal": 0,
+        "route": "guest-control"
       },
       "visible_text_verified": true,
       "runtime": "com.apple.CoreSimulator.SimRuntime.iOS-26-2",
-      "sha256": "a1db119c62a19533924b1bcbc8a1f39e0c163a97dd7d3c84396fcd8ce96efad2"
+      "sha256": "b7321cb5118046f57040207f8457fe64280a2e628bdfec9ecbea35e69848ae5f"
     },
     {
       "screen": "owner-control",
@@ -57,25 +57,25 @@
       "file": "iphone16-light-stage2-owner-control.png",
       "device": "iphone16",
       "appearance": "light",
-      "source_sha": "b3176051cccc75fc3b8c199fcd086a20d95bd4f3",
+      "source_sha": "61d828d60da665ab02b770a3ab906c105f33db95",
       "product_routes": true,
       "profile": {
-        "journal": 0,
         "route": "owner-control",
         "owners": 1,
         "ready": true,
-        "guests": 0,
-        "product_routes": true,
         "tabs": [
           "control",
           "settings",
           "guests",
           "journal"
-        ]
+        ],
+        "journal": 0,
+        "guests": 0,
+        "product_routes": true
       },
       "visible_text_verified": true,
       "runtime": "com.apple.CoreSimulator.SimRuntime.iOS-26-2",
-      "sha256": "b4a88dc7b00aadcda0c6a94e128e4b185230031abaf766b6a1edacbed3fdc2f9"
+      "sha256": "31571bcf9945fedbc9a28bbb9724d98bf032defd161bc75084f579f5a7e36de7"
     },
     {
       "screen": "mixed-objects",
@@ -83,25 +83,25 @@
       "file": "iphone16-light-stage2-mixed-objects.png",
       "device": "iphone16",
       "appearance": "light",
-      "source_sha": "b3176051cccc75fc3b8c199fcd086a20d95bd4f3",
+      "source_sha": "61d828d60da665ab02b770a3ab906c105f33db95",
       "product_routes": true,
       "profile": {
+        "owners": 1,
+        "route": "mixed-objects",
+        "journal": 0,
         "tabs": [
           "control",
           "settings",
           "guests",
           "journal"
         ],
-        "ready": true,
         "guests": 1,
-        "route": "mixed-objects",
-        "journal": 0,
         "product_routes": true,
-        "owners": 1
+        "ready": true
       },
       "visible_text_verified": true,
       "runtime": "com.apple.CoreSimulator.SimRuntime.iOS-26-2",
-      "sha256": "927ac1c5d6f089963831a5711415ad593fb4d43d124e9a97112832543b8d2c66"
+      "sha256": "bcc41b829d951b1ba7d84ee0b8ea7b5f334cf8a2c4d05b5e376b462ffd988391"
     },
     {
       "screen": "guest-keys",
@@ -109,24 +109,24 @@
       "file": "iphone16-light-stage2-guest-keys.png",
       "device": "iphone16",
       "appearance": "light",
-      "source_sha": "b3176051cccc75fc3b8c199fcd086a20d95bd4f3",
+      "source_sha": "61d828d60da665ab02b770a3ab906c105f33db95",
       "product_routes": true,
       "profile": {
-        "guests": 1,
-        "ready": true,
+        "journal": 0,
         "owners": 0,
         "tabs": [
           "control",
           "settings",
           "journal"
         ],
-        "journal": 0,
         "product_routes": true,
-        "route": "guest-keys"
+        "route": "guest-keys",
+        "ready": true,
+        "guests": 1
       },
       "visible_text_verified": true,
       "runtime": "com.apple.CoreSimulator.SimRuntime.iOS-26-2",
-      "sha256": "8a554b51963d540829c26126f4e9d5278aa5721f018385b840342980c93f56bf"
+      "sha256": "9249081d2c74d4276acd301bbb387c74d22e85f26353c45cd62c91bf16bc7714"
     },
     {
       "screen": "key-detail",
@@ -134,20 +134,20 @@
       "file": "iphone16-light-stage2-key-detail.png",
       "device": "iphone16",
       "appearance": "light",
-      "source_sha": "b3176051cccc75fc3b8c199fcd086a20d95bd4f3",
+      "source_sha": "61d828d60da665ab02b770a3ab906c105f33db95",
       "product_routes": true,
       "profile": {
-        "ready": true,
-        "route": "key-detail",
-        "journal": 0,
         "tabs": [
           "control",
           "settings",
           "journal"
         ],
-        "owners": 0,
         "guests": 1,
-        "product_routes": true
+        "owners": 0,
+        "route": "key-detail",
+        "product_routes": true,
+        "journal": 0,
+        "ready": true
       },
       "visible_text_verified": true,
       "runtime": "com.apple.CoreSimulator.SimRuntime.iOS-26-2",
@@ -159,25 +159,25 @@
       "file": "iphone16-light-stage2-owner-objects.png",
       "device": "iphone16",
       "appearance": "light",
-      "source_sha": "b3176051cccc75fc3b8c199fcd086a20d95bd4f3",
+      "source_sha": "61d828d60da665ab02b770a3ab906c105f33db95",
       "product_routes": true,
       "profile": {
+        "owners": 1,
+        "journal": 0,
+        "route": "owner-objects",
+        "ready": true,
         "product_routes": true,
         "guests": 0,
-        "journal": 0,
-        "ready": true,
         "tabs": [
           "control",
           "settings",
           "guests",
           "journal"
-        ],
-        "owners": 1,
-        "route": "owner-objects"
+        ]
       },
       "visible_text_verified": true,
       "runtime": "com.apple.CoreSimulator.SimRuntime.iOS-26-2",
-      "sha256": "87e5de659c3be659d816606a9480536cc3de5ea528ade9b1bc5b674371bbedcd"
+      "sha256": "80f63731e0470b8a9584ea6585fce866e3543007911843dd75f288f95ca1fc6d"
     },
     {
       "screen": "owner-expanded",
@@ -185,25 +185,25 @@
       "file": "iphone16-light-stage2-owner-expanded.png",
       "device": "iphone16",
       "appearance": "light",
-      "source_sha": "b3176051cccc75fc3b8c199fcd086a20d95bd4f3",
+      "source_sha": "61d828d60da665ab02b770a3ab906c105f33db95",
       "product_routes": true,
       "profile": {
+        "guests": 0,
+        "journal": 0,
+        "product_routes": true,
+        "owners": 1,
+        "ready": true,
+        "route": "owner-expanded",
         "tabs": [
           "control",
           "settings",
           "guests",
           "journal"
-        ],
-        "product_routes": true,
-        "ready": true,
-        "journal": 0,
-        "owners": 1,
-        "route": "owner-expanded",
-        "guests": 0
+        ]
       },
       "visible_text_verified": true,
       "runtime": "com.apple.CoreSimulator.SimRuntime.iOS-26-2",
-      "sha256": "2092c33a1a1a6b0dd74391343e5b7a2c26dd3d7c69d57759b6c19eb3b1bcc58a"
+      "sha256": "fb5a70f7e161a830e88a3aab08c237cd0c665a68cbe7438061d29521209dae11"
     },
     {
       "screen": "guest-expanded",
@@ -211,24 +211,24 @@
       "file": "iphone16-light-stage2-guest-expanded.png",
       "device": "iphone16",
       "appearance": "light",
-      "source_sha": "b3176051cccc75fc3b8c199fcd086a20d95bd4f3",
+      "source_sha": "61d828d60da665ab02b770a3ab906c105f33db95",
       "product_routes": true,
       "profile": {
-        "ready": true,
-        "journal": 0,
+        "owners": 0,
+        "guests": 1,
         "product_routes": true,
-        "route": "guest-expanded",
+        "journal": 0,
         "tabs": [
           "control",
           "settings",
           "journal"
         ],
-        "guests": 1,
-        "owners": 0
+        "route": "guest-expanded",
+        "ready": true
       },
       "visible_text_verified": true,
       "runtime": "com.apple.CoreSimulator.SimRuntime.iOS-26-2",
-      "sha256": "133eaaca22b2b176cdbb0cd5bb2c20f48e12bef23c301c0d62f92da01829cf2e"
+      "sha256": "69219bb1611b663183e96fbda71e2913e4ab9aefbde4f623179ca1a48e20d300"
     },
     {
       "screen": "add-object",
@@ -236,12 +236,9 @@
       "file": "iphone16-light-stage2-add-object.png",
       "device": "iphone16",
       "appearance": "light",
-      "source_sha": "b3176051cccc75fc3b8c199fcd086a20d95bd4f3",
+      "source_sha": "61d828d60da665ab02b770a3ab906c105f33db95",
       "product_routes": true,
       "profile": {
-        "owners": 1,
-        "product_routes": true,
-        "journal": 0,
         "tabs": [
           "control",
           "settings",
@@ -249,8 +246,11 @@
           "journal"
         ],
         "guests": 0,
+        "owners": 1,
         "ready": true,
-        "route": "add-object"
+        "route": "add-object",
+        "journal": 0,
+        "product_routes": true
       },
       "visible_text_verified": true,
       "runtime": "com.apple.CoreSimulator.SimRuntime.iOS-26-2",
@@ -262,25 +262,25 @@
       "file": "iphone16-light-stage2-object-delete.png",
       "device": "iphone16",
       "appearance": "light",
-      "source_sha": "b3176051cccc75fc3b8c199fcd086a20d95bd4f3",
+      "source_sha": "61d828d60da665ab02b770a3ab906c105f33db95",
       "product_routes": true,
       "profile": {
-        "product_routes": true,
+        "ready": true,
         "owners": 1,
+        "guests": 0,
+        "journal": 0,
+        "route": "object-delete",
         "tabs": [
           "control",
           "settings",
           "guests",
           "journal"
         ],
-        "journal": 0,
-        "route": "object-delete",
-        "guests": 0,
-        "ready": true
+        "product_routes": true
       },
       "visible_text_verified": true,
       "runtime": "com.apple.CoreSimulator.SimRuntime.iOS-26-2",
-      "sha256": "065821f56784d698fd0b90c1255a2fd6527e0258d534cb13accce4a22e0e6db8"
+      "sha256": "f77c63eaf60264abd494a57a37252b7ebdde3a11e681934e7dc3dc435d0fb5bc"
     },
     {
       "screen": "owner-guests",
@@ -288,25 +288,25 @@
       "file": "iphone16-light-stage2-owner-guests.png",
       "device": "iphone16",
       "appearance": "light",
-      "source_sha": "b3176051cccc75fc3b8c199fcd086a20d95bd4f3",
+      "source_sha": "61d828d60da665ab02b770a3ab906c105f33db95",
       "product_routes": true,
       "profile": {
-        "owners": 1,
-        "journal": 0,
-        "route": "owner-guests",
-        "guests": 0,
-        "ready": true,
         "product_routes": true,
+        "guests": 0,
         "tabs": [
           "control",
           "settings",
           "guests",
           "journal"
-        ]
+        ],
+        "route": "owner-guests",
+        "ready": true,
+        "journal": 0,
+        "owners": 1
       },
       "visible_text_verified": true,
       "runtime": "com.apple.CoreSimulator.SimRuntime.iOS-26-2",
-      "sha256": "78596f37f326cc57cc980b6721ec159edcdbc57ed952a2a866d626ce820d8037"
+      "sha256": "ddbbe282ff33e6aa8419ed508da9821c9fe35e048182ab5f3e395e963bf01be3"
     },
     {
       "screen": "delegating-guests",
@@ -314,7 +314,7 @@
       "file": "iphone16-light-stage2-delegating-guests.png",
       "device": "iphone16",
       "appearance": "light",
-      "source_sha": "b3176051cccc75fc3b8c199fcd086a20d95bd4f3",
+      "source_sha": "61d828d60da665ab02b770a3ab906c105f33db95",
       "product_routes": true,
       "profile": {
         "tabs": [
@@ -324,15 +324,15 @@
           "journal"
         ],
         "ready": true,
-        "route": "delegating-guests",
         "journal": 0,
+        "route": "delegating-guests",
         "guests": 1,
         "product_routes": true,
         "owners": 0
       },
       "visible_text_verified": true,
       "runtime": "com.apple.CoreSimulator.SimRuntime.iOS-26-2",
-      "sha256": "819732687f0a551fc41881932bb144b9cef90cd30865741f6dbfd8c40ff7d143"
+      "sha256": "a0dcfa951e217fe80e4b80e7435b3b5a3ae0c835031e165dc1907d2667d180f0"
     },
     {
       "screen": "system",
@@ -340,24 +340,24 @@
       "file": "iphone16-light-stage2-system.png",
       "device": "iphone16",
       "appearance": "light",
-      "source_sha": "b3176051cccc75fc3b8c199fcd086a20d95bd4f3",
+      "source_sha": "61d828d60da665ab02b770a3ab906c105f33db95",
       "product_routes": true,
       "profile": {
-        "journal": 0,
         "product_routes": true,
-        "ready": true,
         "guests": 1,
-        "owners": 0,
         "route": "system",
+        "ready": true,
+        "owners": 0,
         "tabs": [
           "control",
           "settings",
           "journal"
-        ]
+        ],
+        "journal": 0
       },
       "visible_text_verified": true,
       "runtime": "com.apple.CoreSimulator.SimRuntime.iOS-26-2",
-      "sha256": "19bf7c91cb8addc1cd6ca71f5ad54e959897ec0802b041e26c5489badaf7d9b9"
+      "sha256": "eedc89849d8dec4e4587ea22308a58d623f63235f90ffa71312f2b8afc190206"
     },
     {
       "screen": "code-settings",
@@ -365,24 +365,24 @@
       "file": "iphone16-light-stage2-code-settings.png",
       "device": "iphone16",
       "appearance": "light",
-      "source_sha": "b3176051cccc75fc3b8c199fcd086a20d95bd4f3",
+      "source_sha": "61d828d60da665ab02b770a3ab906c105f33db95",
       "product_routes": true,
       "profile": {
         "ready": true,
-        "guests": 1,
         "product_routes": true,
         "tabs": [
           "control",
           "settings",
           "journal"
         ],
+        "journal": 0,
         "route": "code-settings",
         "owners": 0,
-        "journal": 0
+        "guests": 1
       },
       "visible_text_verified": true,
       "runtime": "com.apple.CoreSimulator.SimRuntime.iOS-26-2",
-      "sha256": "de76fff8145a8ffbc980c44dccb76f64d83d27b2c5ee6ebad73b5e43fe2c175f"
+      "sha256": "3b6a6b488241e62e3bdfeb8638dfb7ca30e403d21280c1a5f2db4458ac6f2a2e"
     },
     {
       "screen": "sounds",
@@ -390,24 +390,24 @@
       "file": "iphone16-light-stage2-sounds.png",
       "device": "iphone16",
       "appearance": "light",
-      "source_sha": "b3176051cccc75fc3b8c199fcd086a20d95bd4f3",
+      "source_sha": "61d828d60da665ab02b770a3ab906c105f33db95",
       "product_routes": true,
       "profile": {
-        "owners": 0,
-        "product_routes": true,
-        "route": "sounds",
         "tabs": [
           "control",
           "settings",
           "journal"
         ],
         "guests": 1,
+        "route": "sounds",
+        "owners": 0,
         "journal": 0,
-        "ready": true
+        "ready": true,
+        "product_routes": true
       },
       "visible_text_verified": true,
       "runtime": "com.apple.CoreSimulator.SimRuntime.iOS-26-2",
-      "sha256": "d39739483b8a4606a23f81579ba67ce5ccbc2ebda20685aaa8ecc416602a22c0"
+      "sha256": "538828ff35cc90c47d217c7b5baf1e64993ea0935a1790c03af8372197d45b3c"
     },
     {
       "screen": "add-key",
@@ -415,18 +415,18 @@
       "file": "iphone16-light-stage2-add-key.png",
       "device": "iphone16",
       "appearance": "light",
-      "source_sha": "b3176051cccc75fc3b8c199fcd086a20d95bd4f3",
+      "source_sha": "61d828d60da665ab02b770a3ab906c105f33db95",
       "product_routes": true,
       "profile": {
-        "product_routes": true,
-        "owners": 0,
         "route": "add-key",
-        "journal": 0,
+        "owners": 0,
         "tabs": [
           "settings",
           "journal"
         ],
+        "product_routes": true,
         "guests": 0,
+        "journal": 0,
         "ready": true
       },
       "visible_text_verified": true,
@@ -439,21 +439,21 @@
       "file": "iphone16-light-stage2-add-server.png",
       "device": "iphone16",
       "appearance": "light",
-      "source_sha": "b3176051cccc75fc3b8c199fcd086a20d95bd4f3",
+      "source_sha": "61d828d60da665ab02b770a3ab906c105f33db95",
       "product_routes": true,
       "profile": {
-        "route": "add-server",
-        "owners": 1,
+        "ready": true,
         "guests": 0,
+        "owners": 1,
+        "journal": 0,
+        "route": "add-server",
+        "product_routes": true,
         "tabs": [
           "control",
           "settings",
           "guests",
           "journal"
-        ],
-        "ready": true,
-        "product_routes": true,
-        "journal": 0
+        ]
       },
       "visible_text_verified": true,
       "runtime": "com.apple.CoreSimulator.SimRuntime.iOS-26-2",
@@ -465,24 +465,24 @@
       "file": "iphone16-light-stage2-journal.png",
       "device": "iphone16",
       "appearance": "light",
-      "source_sha": "b3176051cccc75fc3b8c199fcd086a20d95bd4f3",
+      "source_sha": "61d828d60da665ab02b770a3ab906c105f33db95",
       "product_routes": true,
       "profile": {
+        "route": "journal",
         "guests": 1,
-        "journal": 0,
+        "ready": true,
         "owners": 0,
+        "product_routes": true,
         "tabs": [
           "control",
           "settings",
           "journal"
         ],
-        "route": "journal",
-        "product_routes": true,
-        "ready": true
+        "journal": 0
       },
       "visible_text_verified": true,
       "runtime": "com.apple.CoreSimulator.SimRuntime.iOS-26-2",
-      "sha256": "17d73ee99d785e5749421fad16fdd008aaf714c120f327d1e1064a64a518580d"
+      "sha256": "c577252af1c7a90e75a31392712dee0cbaa6240b4bd7ebfcf6eb1172bf4fafe8"
     }
   ]
 }
