@@ -14,8 +14,7 @@ struct AppNavigationState: Equatable {
 extension AppModel {
     var navigationState: AppNavigationState {
         let owned = owners.contains { !($0.objects ?? []).isEmpty }
-        let ownedActions = owners.contains { ($0.objects ?? []).contains(where: \.ownerCardAvailable) }
-        return AppNavigationState(hasActions: ownedActions || guests.contains { !$0.objects.isEmpty },
+        return AppNavigationState(hasActions: !controlObjects.isEmpty,
             hasOwnObjects: owned, canDelegate: guests.contains { (1...5).contains($0.incomingDepth ?? 0) })
     }
 }

@@ -79,4 +79,42 @@ final class NavigationUITests: XCTestCase {
         guest.buttons["main-tab-guests"].tap()
         XCTAssertTrue(guest.buttons["Передать полученный доступ"].waitForExistence(timeout: 15))
     }
+    func testReceivedObjectRenameAndHideKeepTheKey() {
+        let app = launch("guest-expanded")
+        XCTAssertTrue(app.buttons["Название"].waitForExistence(timeout: 10))
+        app.buttons["Название"].tap()
+        let field = app.textFields["Название"]
+        XCTAssertTrue(field.waitForExistence(timeout: 10)); field.tap()
+        let old = field.value as? String ?? ""
+        field.typeText(String(repeating: XCUIKeyboardKey.delete.rawValue, count: old.count) + "Yard")
+        app.buttons["Сохранить"].tap()
+        let row = app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH %@", "object-settings-guest:")).firstMatch
+        XCTAssertTrue(row.waitForExistence(timeout: 10))
+        app.buttons["main-tab-control"].tap()
+        XCTAssertTrue(app.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", "Yard.")).firstMatch.waitForExistence(timeout: 10))
+        app.buttons["main-tab-settings"].tap()
+        XCTAssertTrue(row.waitForExistence(timeout: 10))
+        if !app.buttons["Скрыть"].exists { row.tap() }
+        app.buttons["Скрыть"].tap()
+        app.buttons["Скрыть объект"].tap()
+        XCTAssertTrue(app.staticTexts["Пока нет объектов"].waitForExistence(timeout: 10))
+        assertBottom(app, ["settings", "journal"])
+        app.segmentedControls.buttons["Ключи"].tap()
+        XCTAssertTrue(app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH %@", "received-key-")).firstMatch.waitForExistence(timeout: 10))
+    }
+    func testBLECreationStartsFromAddObjectAndKeepsItsName() {
+        let app = launch("owner-objects")
+        XCTAssertFalse(app.buttons["Привязать Bluetooth-контроллер"].exists)
+        app.buttons["Добавить объект"].tap()
+        let field = app.textFields["Название"]
+        XCTAssertTrue(field.waitForExistence(timeout: 10)); field.tap(); field.typeText("BLE Yard")
+        let picker = app.descendants(matching: .any)["owner-object-kind"].firstMatch
+        XCTAssertTrue(picker.exists); picker.tap()
+        app.buttons["Bluetooth"].tap()
+        app.buttons["Продолжить привязку"].tap()
+        XCTAssertTrue(app.buttons["Найти контроллеры"].waitForExistence(timeout: 10))
+        XCTAssertEqual(app.textFields["Название объекта"].value as? String, "BLE Yard")
+        XCTAssertTrue(app.buttons["Отмена"].exists)
+        // No scan, pairing or physical command is issued by this test.
+    }
 }

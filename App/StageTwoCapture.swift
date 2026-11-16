@@ -6,6 +6,7 @@ enum StageTwoCapture: String, CaseIterable {
     case empty, guestControl = "guest-control", guestKeys = "guest-keys", keyDetail = "key-detail"
     case ownerObjects = "owner-objects", ownerGuests = "owner-guests", delegatingGuests = "delegating-guests"
     case system, codeSettings = "code-settings", sounds, addKey = "add-key", addServer = "add-server", journal
+    case ownerExpanded = "owner-expanded", guestExpanded = "guest-expanded", addObject = "add-object"
     static var current: Self? {
         let args = ProcessInfo.processInfo.arguments
         guard let i = args.firstIndex(of: "--stage-two"), args.indices.contains(i + 1) else { return nil }
@@ -14,7 +15,7 @@ enum StageTwoCapture: String, CaseIterable {
     var settingsTab: SettingsTab {
         switch self {
         case .guestKeys, .keyDetail, .addKey: return .keys
-        case .system, .codeSettings: return .system
+        case .system, .codeSettings, .addServer: return .system
         case .sounds: return .sounds
         default: return .objects
         }
@@ -22,7 +23,7 @@ enum StageTwoCapture: String, CaseIterable {
     var mainTab: AppTab {
         switch self { case .guestControl: return .control; case .ownerGuests, .delegatingGuests: return .guests; case .journal: return .journal; default: return .settings }
     }
-    var isOwner: Bool { [.ownerObjects, .ownerGuests, .addServer].contains(self) }
+    var isOwner: Bool { [.ownerObjects, .ownerGuests, .addServer, .ownerExpanded, .addObject].contains(self) }
     var isEmpty: Bool { [.empty, .addKey].contains(self) }
 }
 private final class StageTwoStorage: StateStorage {
@@ -47,7 +48,7 @@ struct StageTwoRoot: View {
         if route.isOwner {
             var owner = try! OwnerAccount(importing: "controller.invalid", masterKey: Data(repeating: 22, count: 32), credentials: OwnerCredentials(deviceID: String(repeating: "a", count: 32), deviceSecret: String(repeating: "b", count: 64)))
             var object = try! OwnerObject(masterKey: owner.masterKey, label: "Ворота во двор", kind: "webhook", url: "https://actuator.invalid/open", secret: "public-capture-secret")
-            object.numberID = 7; object.pending = nil; object.available = true
+            object.numberID = 7; object.pending = nil; object.available = true; object.revision = 1
             owner.objects = [object]; state.owners = [owner]
         }
         _model = StateObject(wrappedValue: AppModel(storage: StageTwoStorage(state)))

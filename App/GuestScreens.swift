@@ -4,78 +4,33 @@ import EntrixyCore
 struct ControlScreen: View {
     @EnvironmentObject private var model: AppModel
     @State private var query = ""
-    @State private var actionIntent: ActionIntent?
     let addKey: () -> Void
-
-    private func matches(_ object: GuestObject) -> Bool {
-        query.isEmpty || object.label.localizedCaseInsensitiveContains(query)
+    private var entries: [CatalogObject] {
+        model.controlObjects.filter { query.isEmpty || model.objectLabel($0).localizedCaseInsensitiveContains(query) }
     }
     var body: some View {
         Group {
-            if model.guests.isEmpty && model.owners.allSatisfy({ ($0.objects ?? []).allSatisfy({ !$0.ownerCardAvailable }) }) {
+            if model.controlObjects.isEmpty {
                 EmptyScreen(image: "icon-key", title: "Ваши объекты", detail: "Добавьте свой объект в настройках или ключ, полученный от владельца.")
             } else {
                 ScrollView {
                     LazyVStack(alignment: .leading, spacing: 16) {
-                        OwnerControlSection(control: model.ownerControl, query: query, ble: model.bleControl)
-                        ForEach(model.guests) { guest in
-                            if guest.objects.isEmpty && query.isEmpty {
-                                VStack(alignment: .leading, spacing: 8) {
-                                    Text(guest.invite.server).font(.headline)
-                                    ConnectionLabel(guestID: guest.id, paused: guest.paused)
-                                    Text("Объекты появятся после обновления данных ключа.").font(.subheadline).foregroundStyle(.secondary)
-                                }.padding(20).frame(maxWidth: .infinity, alignment: .leading)
-                                    .background(.background, in: RoundedRectangle(cornerRadius: 22))
-                            }
-                            ForEach(guest.objects.filter(matches)) { object in
-                                Button {
-                                    guard let intent = model.actionIntent(guestID: guest.id, object: object) else { return }
-                                    if intent.policy.confirmation || intent.policy.authentication != nil { actionIntent = intent }
-                                    else { Task { await model.execute(intent) } }
-                                } label: {
-                                    HStack(spacing: 16) {
-                                        ObjectAvatar(object: object, guestID: guest.id, size: 56)
-                                        VStack(alignment: .leading, spacing: 6) {
-                                            Text(object.label).font(.headline).foregroundStyle(.primary)
-                                            if object.kind == "ble" {
-                                                Text(guest.paused ? "Доступ приостановлен" : "Bluetooth").font(.subheadline).foregroundStyle(Brand.secondaryInk)
-                                            } else if !guest.paused && model.connection(for: guest.id) == .connected {
-                                                Text(model.objectConnectionTitle(guestID: guest.id, object: object))
-                                                    .font(.subheadline).foregroundStyle(Brand.secondaryInk)
-                                                    .fixedSize(horizontal: false, vertical: true)
-                                            } else { ConnectionLabel(guestID: guest.id, paused: guest.paused) }
-                                            if let rejection = model.actionRejections[guest.id + "|" + object.id],
-                                               object.kind == "ble" || rejection.message.trimmingCharacters(in: CharacterSet(charactersIn: ". ")) != model.objectConnectionTitle(guestID: guest.id, object: object) {
-                                                Text(rejection.message).font(.subheadline).foregroundStyle(.red)
-                                                    .fixedSize(horizontal: false, vertical: true)
-                                            }
-                                            BLEGuestActionMessage(model: model.bleGuestControl, actionKey: guest.id + "|" + object.id)
-                                            if let text = model.actionMessages[guest.id + "|" + object.id] {
-                                                Text(text).font(.subheadline).foregroundStyle(Brand.secondaryInk).fixedSize(horizontal: false, vertical: true)
-                                            }
-                                        }.frame(maxWidth: .infinity, alignment: .leading)
-                                    }.padding(16).background(.background, in: RoundedRectangle(cornerRadius: 22))
-                                }.buttonStyle(CardActionStyle())
-                                    .modifier(ActionRejectionFeedback(rejection: model.actionRejections[guest.id + "|" + object.id]))
-                                    .accessibilityLabel(object.label + ". " + model.objectActionTitle(guestID: guest.id, object: object))
-                                    .accessibilityHint("Выполнить действие с объектом")
+                        OwnerPhoneRequestRows(control: model.ownerControl)
+                        ForEach(entries) { entry in
+                            switch entry {
+                            case let .owned(owner, object):
+                                OwnerCatalogControlCard(control: model.ownerControl, ble: model.bleControl, owner: owner, object: object)
+                            case let .received(guest, object): GuestCatalogControlCard(guest: guest, object: object)
                             }
                         }
-                        if !query.isEmpty && !model.guests.flatMap(\.objects).contains(where: matches)
-                            && !model.owners.contains(where: { owner in
-                                (owner.objects ?? []).contains { object in
-                                    let label = (try? object.metadata(masterKey: owner.masterKey)["label"] as? String) ?? ""
-                                    return object.numberID != nil && object.pending == nil && object.available != false && label.localizedCaseInsensitiveContains(query)
-                                }
-                            }) {
+                        if !query.isEmpty && entries.isEmpty {
                             Text("Ничего не найдено").foregroundStyle(.secondary).frame(maxWidth: .infinity).padding(32)
                         }
                     }.padding(20)
                 }.background(Color(uiColor: .systemGroupedBackground))
-                    .refreshable { await model.refresh() }
+                    .refreshable { await model.refreshOwners(); await model.refresh() }
             }
         }
-        .sheet(item: $actionIntent) { ActionConfirmation(intent: $0) }
         .searchable(text: $query, placement: .navigationBarDrawer(displayMode: .automatic), prompt: "Найти объект")
         .navigationTitle("Управление")
         .toolbar {
@@ -85,6 +40,41 @@ struct ControlScreen: View {
             }
         }
         .overlay(alignment: .bottom) { if model.busy { ProgressView().padding() } }
+    }
+}
+
+private struct GuestCatalogControlCard: View {
+    @EnvironmentObject private var model: AppModel
+    let guest: SavedGuest
+    let object: GuestObject
+    @State private var actionIntent: ActionIntent?
+    private var entry: CatalogObject { .received(guest, object) }
+    var body: some View {
+        Button {
+            guard let intent = model.actionIntent(guestID: guest.id, object: object) else { return }
+            if intent.policy.confirmation || intent.policy.authentication != nil { actionIntent = intent }
+            else { Task { await model.execute(intent) } }
+        } label: {
+            HStack(spacing: 16) {
+                CatalogStatusAvatar(entry: entry, control: model.ownerControl)
+                VStack(alignment: .leading, spacing: 6) {
+                    Text(model.objectLabel(entry)).font(.headline).foregroundStyle(.primary)
+                    ObjectSourceLabel(entry: entry)
+                    if guest.paused { Text("Доступ приостановлен").font(.subheadline).foregroundStyle(Brand.secondaryInk) }
+                    if let rejection = model.actionRejections[guest.id + "|" + object.id] {
+                        Text(rejection.message).font(.subheadline).foregroundStyle(.red).fixedSize(horizontal: false, vertical: true)
+                    }
+                    BLEGuestActionMessage(model: model.bleGuestControl, actionKey: guest.id + "|" + object.id)
+                    if let text = model.actionMessages[guest.id + "|" + object.id] {
+                        Text(text).font(.subheadline).foregroundStyle(Brand.secondaryInk).fixedSize(horizontal: false, vertical: true)
+                    }
+                }.frame(maxWidth: .infinity, alignment: .leading)
+            }.padding(16).background(.background, in: RoundedRectangle(cornerRadius: 22))
+        }.buttonStyle(CardActionStyle())
+            .modifier(ActionRejectionFeedback(rejection: model.actionRejections[guest.id + "|" + object.id]))
+            .accessibilityLabel(model.objectLabel(entry) + ". " + model.objectActionTitle(guestID: guest.id, object: object))
+            .accessibilityHint("Выполнить действие с объектом")
+            .sheet(item: $actionIntent) { ActionConfirmation(intent: $0) }
     }
 }
 
@@ -119,6 +109,7 @@ struct SettingsScreen: View {
     @State private var showCodeSettings = false
     @State private var addingKey = false
     @State private var addingServer = false
+    @State private var addingObject = false
     @State private var keyInput = ""
     var body: some View {
         VStack(spacing: 0) {
@@ -129,32 +120,12 @@ struct SettingsScreen: View {
             List {
                 switch selected {
                 case .objects:
-                    if model.owners.isEmpty && model.guests.allSatisfy({ $0.objects.isEmpty }) {
-                        Text("Пока нет объектов").foregroundStyle(Brand.secondaryInk)
-                    }
-                    ForEach(model.owners) { owner in
-                        if owner.registrationPending {
-                            Section(owner.server) {
-                                Text("Регистрация ожидает подтверждения").foregroundStyle(Brand.secondaryInk)
-                                NavigationLink("Проверить сервер") { OwnerServersScreen() }
-                            }
-                        } else { OwnerObjectRows(server: owner.server) }
-                    }
-                    ForEach(model.guests) { guest in
-                        Section(guest.invite.server) {
-                            ForEach(guest.objects) { object in
-                                HStack(spacing: 12) {
-                                    ObjectAvatar(object: object, guestID: guest.id, size: 42)
-                                    Text(object.label)
-                                }.padding(.vertical, 6)
-                            }
-                        }
-                    }
+                    if model.catalogObjects().isEmpty { Text("Пока нет объектов").foregroundStyle(Brand.secondaryInk) }
+                    ObjectSettingsRows(entries: model.catalogObjects())
                     Section {
-                        Button("Добавить сервер") { addingServer = true }.buttonStyle(PrimaryActionStyle())
-                            .actionListRow()
+                        Button("Добавить объект") { addingObject = true }.buttonStyle(SecondaryActionStyle()).actionListRow()
+                            .disabled(!model.storageReady || model.ownerBusy)
                     }
-                    Section { NavigationLink("Мои серверы") { OwnerServersScreen() } }
                 case .keys:
                     if model.guests.isEmpty { Text("Пока нет полученных ключей").foregroundStyle(Brand.secondaryInk) }
                     ForEach(model.guests) { guest in
@@ -175,6 +146,10 @@ struct SettingsScreen: View {
                     Text("Настройки звуков ещё не перенесены в iOS.").foregroundStyle(Brand.secondaryInk)
                 case .system:
                     Section {
+                        Button("Добавить сервер") { addingServer = true }.buttonStyle(SecondaryActionStyle()).actionListRow()
+                        NavigationLink("Мои серверы") { OwnerServersScreen() }
+                    }
+                    Section {
                         Picker("Тема", selection: $appearance) {
                             Text("Как в системе").tag("system"); Text("Светлая").tag("light"); Text("Тёмная").tag("dark")
                         }
@@ -188,12 +163,14 @@ struct SettingsScreen: View {
             }.scrollContentBackground(.hidden).compactListSections()
                 .refreshable { if selected == .objects { await model.refreshOwners() }; await model.refresh() }
         }.background(Color(uiColor: .systemGroupedBackground)).navigationTitle("Настройки")
+            .toolbar { if selected == .objects && model.catalogObjects().count > 1 { EditButton().accessibilityLabel("Порядок объектов") } }
             .navigationDestination(isPresented: $showCodeSettings) { AppEntryLockSettings() }
             .navigationDestination(isPresented: $showKey) {
                 if let guest = model.guests.first { KeyDetailScreen(guestID: guest.id) }
             }
             .sheet(isPresented: $addingKey) { KeyImportScreen(input: $keyInput) }
             .sheet(isPresented: $addingServer) { AddOwnerServerScreen() }
+            .sheet(isPresented: $addingObject) { AddCatalogObjectScreen() }
             .task {
                 #if DEBUG && targetEnvironment(simulator)
                 if let scenario = ActionCaptureScenario.current, [ActionCaptureScenario.appCodeSetup, .appCodeSettings].contains(scenario) { selected = .system; showCodeSettings = true }
@@ -202,6 +179,7 @@ struct SettingsScreen: View {
                     showKey = route == .keyDetail
                     showCodeSettings = route == .codeSettings
                     addingServer = route == .addServer
+                    addingObject = route == .addObject
                 }
                 #endif
                 if PreviewRouting.keyDetail && !model.guests.isEmpty { selected = .keys; showKey = true }

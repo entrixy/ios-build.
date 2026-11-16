@@ -43,6 +43,7 @@ import EntrixyCore
                 return true
             }.sorted { $0.rssi > $1.rssi }
             guard let discovery = matching.first else { messages[key] = "Контроллер не найден. Поднесите iPhone ближе и разбудите его."; return }
+            app.noteBLESighting(.received(guestID: intent.guestID, objectID: intent.object.id))
             _ = try app.guestBLEMaterial(intent)
             let connection = try await transport.connect(discovery.id, pairing: false); channel = connection
             let hasResults = try await connection.enableResults()

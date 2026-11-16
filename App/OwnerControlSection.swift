@@ -1,14 +1,9 @@
 import SwiftUI
 import EntrixyCore
 
-struct OwnerControlSection: View {
+struct OwnerPhoneRequestRows: View {
     @EnvironmentObject private var app: AppModel
     @ObservedObject var control: OwnerControlModel
-    let query: String
-    @State private var selected: OwnerActionIntent?
-    @ObservedObject var ble: BLEOwnerControlModel
-    init(control: OwnerControlModel, query: String, ble: BLEOwnerControlModel) { self.control = control; self.query = query; self.ble = ble }
-
     var body: some View {
         ForEach(control.phoneRequests) { request in
             if let owner = app.owners.first(where: { $0.server == request.server }),
@@ -27,34 +22,38 @@ struct OwnerControlSection: View {
                 }.padding(16).background(.background, in: RoundedRectangle(cornerRadius: 22))
             }
         }
-        ForEach(app.owners) { owner in
-            ForEach((owner.objects ?? []).filter(\.ownerCardAvailable)) { object in
-                let label = (try? object.metadata(masterKey: owner.masterKey)["label"] as? String) ?? "Название недоступно"
-                if query.isEmpty || label.localizedCaseInsensitiveContains(query) {
-                    Button {
-                        guard let intent = app.ownerActionIntent(server: owner.server, objectID: object.id) else { return }
-                        if intent.policy.confirmation || intent.policy.authentication != nil { selected = intent }
-                        else { Task { await app.execute(intent) } }
-                    } label: {
-                        HStack(spacing: 16) {
-                            OwnerObjectAvatar(object: object, masterKey: owner.masterKey, size: 56)
-                            VStack(alignment: .leading, spacing: 6) {
-                                Text(label).font(.headline).foregroundStyle(.primary)
-                                Text(control.cardStatus(server: owner.server, object: object))
-                                    .font(.subheadline).foregroundStyle(Brand.secondaryInk)
-                                if let rejection = app.ownerActionRejections[object.id],
-                                   rejection.message.trimmingCharacters(in: CharacterSet(charactersIn: ". ")) != control.cardStatus(server: owner.server, object: object) {
-                                    Text(rejection.message).font(.subheadline).foregroundStyle(.red)
-                                }
-                                if let message = ble.messages[object.id] { Text(message).font(.subheadline).foregroundStyle(Brand.secondaryInk) }
-                                if let message = control.messages[object.id] { Text(message).font(.subheadline).foregroundStyle(Brand.secondaryInk) }
-                            }.frame(maxWidth: .infinity, alignment: .leading)
-                        }.padding(16).background(.background, in: RoundedRectangle(cornerRadius: 22))
-                    }.buttonStyle(CardActionStyle())
-                        .modifier(ActionRejectionFeedback(rejection: app.ownerActionRejections[object.id]))
-                }
-            }
-        }
-        .sheet(item: $selected) { ActionConfirmation(ownerIntent: $0) }
+    }
+}
+
+struct OwnerCatalogControlCard: View {
+    @EnvironmentObject private var app: AppModel
+    @ObservedObject var control: OwnerControlModel
+    @ObservedObject var ble: BLEOwnerControlModel
+    let owner: OwnerAccount
+    let object: OwnerObject
+    @State private var selected: OwnerActionIntent?
+    private var entry: CatalogObject { .owned(owner, object) }
+    var body: some View {
+        Button {
+            guard let intent = app.ownerActionIntent(server: owner.server, objectID: object.id) else { return }
+            if intent.policy.confirmation || intent.policy.authentication != nil { selected = intent }
+            else { Task { await app.execute(intent) } }
+        } label: {
+            HStack(spacing: 16) {
+                CatalogStatusAvatar(entry: entry, control: control)
+                VStack(alignment: .leading, spacing: 6) {
+                    Text(app.objectLabel(entry)).font(.headline).foregroundStyle(.primary)
+                    ObjectSourceLabel(entry: entry)
+                    if let rejection = app.ownerActionRejections[object.id] {
+                        Text(rejection.message).font(.subheadline).foregroundStyle(.red)
+                    }
+                    if let message = ble.messages[object.id] { Text(message).font(.subheadline).foregroundStyle(Brand.secondaryInk) }
+                    if let message = control.messages[object.id] { Text(message).font(.subheadline).foregroundStyle(Brand.secondaryInk) }
+                }.frame(maxWidth: .infinity, alignment: .leading)
+            }.padding(16).background(.background, in: RoundedRectangle(cornerRadius: 22))
+        }.buttonStyle(CardActionStyle())
+            .modifier(ActionRejectionFeedback(rejection: app.ownerActionRejections[object.id]))
+            .accessibilityLabel(app.objectLabel(entry) + ". Управлять")
+            .sheet(item: $selected) { ActionConfirmation(ownerIntent: $0) }
     }
 }

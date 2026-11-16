@@ -106,29 +106,12 @@ struct OwnerObjectRows: View {
         Group {
             if let owner {
                 Section {
-                    ForEach(owner.objects ?? []) { object in
-                        NavigationLink { OwnerObjectEditor(server: server, objectID: object.id) } label: {
-                            HStack(spacing: 14) {
-                                OwnerObjectAvatar(object: object, masterKey: owner.masterKey, size: 42)
-                                VStack(alignment: .leading, spacing: 6) {
-                                    Text((try? object.metadata(masterKey: owner.masterKey)["label"] as? String) ?? "Название недоступно").font(.headline)
-                                    if object.pending != nil {
-                                        Text(object.sent ? "Ожидает подтверждения сервера" : "Изменение не применено")
-                                            .font(.subheadline).foregroundStyle(Brand.secondaryInk)
-                                    }
-                                    if let message = model.ownerObjectMessages[object.id] {
-                                        Text(message).font(.subheadline).foregroundStyle(Brand.secondaryInk)
-                                    }
-                                }
-                            }.padding(.vertical, 5)
-                        }.alignmentGuide(.listRowSeparatorLeading) { _ in 0 }
-                    }
+                    ObjectSettingsRows(entries: model.catalogObjects().filter {
+                        if case let .owned(account, _) = $0 { return account.server == server }
+                        return false
+                    })
                     if (owner.objects ?? []).isEmpty { Text("Пока нет добавленных объектов").foregroundStyle(Brand.secondaryInk) }
-                    NavigationLink { BLEPairingScreen(server: server) } label: {
-                        Label("Привязать Bluetooth-контроллер", systemImage: "antenna.radiowaves.left.and.right")
-                    }.disabled(model.ownerBusy || owner.registrationPending)
-                        .alignmentGuide(.listRowSeparatorLeading) { _ in 0 }
-                } header: { Text(server) }
+                }
                 Section {
                     Button { adding = true } label: { Label("Добавить объект", systemImage: "plus") }
                         .buttonStyle(SecondaryActionStyle())
@@ -167,12 +150,18 @@ struct AddOwnerObjectScreen: View {
     @State private var url = ""
     @State private var secret = ""
     @State private var claimCode = ""
+    @State private var pairing = false
+    var embedded = false
     private var complete: Bool {
         !label.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty &&
-        (kind == "device" ? !claimCode.isEmpty : (kind == "call" ? !phone.isEmpty : !url.isEmpty && !secret.isEmpty))
+        (kind == "ble" || (kind == "device" ? !claimCode.isEmpty : (kind == "call" ? !phone.isEmpty : !url.isEmpty && !secret.isEmpty)))
     }
     var body: some View {
-        NavigationStack {
+        Group {
+            if embedded { fields } else { NavigationStack { fields } }
+        }
+    }
+    private var fields: some View {
             Form {
                 Section {
                     AppField("Название") {
@@ -182,7 +171,8 @@ struct AddOwnerObjectScreen: View {
                         Text("Контроллер Entrixy").tag("device")
                         Text("Телефонный звонок").tag("call")
                         Text("HTTPS-запрос с сервера").tag("webhook")
-                    }
+                        Text("Bluetooth").tag("ble")
+                    }.accessibilityIdentifier("owner-object-kind")
                     if kind == "device" {
                         AppField("Код с корпуса контроллера") {
                             TextField("Код с корпуса контроллера", text: $claimCode).textInputAutocapitalization(.characters).autocorrectionDisabled()
@@ -192,6 +182,8 @@ struct AddOwnerObjectScreen: View {
                             TextField("Номер телефона", text: $phone).keyboardType(.phonePad)
                         }
                         Text("iOS требует подтверждать телефонный звонок. Фоновый автодозвон недоступен.").font(.footnote).foregroundStyle(Brand.secondaryInk)
+                    } else if kind == "ble" {
+                        Text("Включите режим привязки на своём контроллере и держите iPhone рядом.").font(.footnote).foregroundStyle(Brand.secondaryInk)
                     } else {
                         AppField("Адрес HTTPS-запроса") {
                             TextField("https://…", text: $url).keyboardType(.URL).textInputAutocapitalization(.never).autocorrectionDisabled()
@@ -204,6 +196,7 @@ struct AddOwnerObjectScreen: View {
                 } header: { Text(server) }
                 Section {
                     Button {
+                        if kind == "ble" { pairing = true; return }
                         Task {
                             let before = Set(model.owners.first(where: { $0.server == server })?.objects?.map(\.id) ?? [])
                             let result = await model.createOwnerObject(server: server, label: label, kind: kind, phone: phone, url: url, secret: secret, claimCode: claimCode)
@@ -212,18 +205,26 @@ struct AddOwnerObjectScreen: View {
                             if result || !after.subtracting(before).isEmpty { dismiss() }
                         }
                     } label: {
-                        ActionButtonLabel(title: "Добавить объект", busy: model.ownerBusy)
+                        ActionButtonLabel(title: kind == "ble" ? "Продолжить привязку" : "Добавить объект", busy: model.ownerBusy)
                     }.buttonStyle(PrimaryActionStyle()).actionListRow()
                         .disabled(!complete || model.ownerBusy)
                 }
             }
             .navigationTitle("Добавить объект").navigationBarTitleDisplayMode(.inline)
+            .task {
+                #if DEBUG && targetEnvironment(simulator)
+                if StageTwoCapture.current == .addObject { kind = "ble"; label = "Новый BLE-объект" }
+                #endif
+            }
+            .navigationDestination(isPresented: $pairing) {
+                BLEPairingScreen(server: server, initialLabel: label)
+                    .sheetDismissFooter(disabled: model.ownerBusy) { dismiss() }
+            }
             .sheetDismissFooter(disabled: model.ownerBusy) { dismiss() }
 
             .alert("Entrixy", isPresented: Binding(get: { model.errorMessage != nil }, set: { if !$0 { model.errorMessage = nil } })) {
                 Button("Понятно") { model.errorMessage = nil }
             } message: { Text(model.errorMessage ?? "") }
-        }
     }
 }
 

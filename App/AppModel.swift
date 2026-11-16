@@ -24,6 +24,8 @@ final class AppModel: ObservableObject {
     private var unsavedOwnerObjects: [UUID: OwnerObject] = [:]
     private var unsavedOwnerCredentials: [String: OwnerCredentials] = [:]
     @Published private(set) var guests: [SavedGuest] = []
+    @Published private(set) var objectPreferences = ObjectCatalogPreferences()
+    @Published private(set) var bleVisibleUntil: [ObjectReference: TimeInterval] = [:]
     @Published private(set) var busy = false
     @Published private(set) var storageReady = false
     @Published private(set) var journal: [JournalEntry] = []
@@ -98,6 +100,9 @@ final class AppModel: ObservableObject {
             delegatedJournalLedger = state.delegatedJournalLedger ?? DelegatedJournalLedger()
             try delegatedJournalLedger.validate()
             owners = state.owners ?? []
+            let preferences = state.objectPreferences ?? ObjectCatalogPreferences()
+            try preferences.validate()
+            objectPreferences = preferences
             usedOwnerPresses = state.usedOwnerPresses ?? [:]
             pendingRestore = state.pendingRestore
             delegations = state.delegations ?? []
@@ -137,9 +142,18 @@ final class AppModel: ObservableObject {
         #endif
     }
 
-    private func save(_ updated: [SavedGuest]) throws {
-        try storage.save(SavedState(identity: identity, guests: updated, journal: journal, actionCode: actionCode, owners: owners, usedOwnerPresses: usedOwnerPresses, pendingRestore: pendingRestore, delegations: delegations, passedAccess: passedAccess, receivedDelegations: receivedDelegations, incomingMessages: incomingMessages, outgoingMessages: outgoingMessages, delegatedJournalLedger: delegatedJournalLedger, appLockEnabled: appLockEnabled, appEntryBiometricEnabled: appEntryBiometricEnabled))
+    private func save(_ updated: [SavedGuest], preferences: ObjectCatalogPreferences? = nil) throws {
+        let preferences = preferences ?? objectPreferences
+        try preferences.validate()
+        try storage.save(SavedState(identity: identity, guests: updated, journal: journal, actionCode: actionCode, owners: owners, usedOwnerPresses: usedOwnerPresses, pendingRestore: pendingRestore, delegations: delegations, passedAccess: passedAccess, receivedDelegations: receivedDelegations, incomingMessages: incomingMessages, outgoingMessages: outgoingMessages, delegatedJournalLedger: delegatedJournalLedger, appLockEnabled: appLockEnabled, appEntryBiometricEnabled: appEntryBiometricEnabled, objectPreferences: preferences))
         guests = updated
+        if objectPreferences != preferences { objectPreferences = preferences }
+    }
+
+    @discardableResult func saveObjectPreferences(_ preferences: ObjectCatalogPreferences) -> Bool {
+        guard canManageGuestAccess, !busy, !ownerBusy else { return false }
+        do { try save(guests, preferences: preferences); return true }
+        catch { errorMessage = "Не удалось сохранить настройки объекта. Прежние настройки сохранены."; return false }
     }
 
     func makeOwnerLive(_ owner: OwnerAccount) throws -> OwnerLiveTransport {
@@ -350,6 +364,7 @@ final class AppModel: ObservableObject {
         let previousReceived = receivedDelegations
         let previousIncoming = incomingMessages, previousOutgoing = outgoingMessages
         let previousLedger = delegatedJournalLedger
+        let restoredPreferences = try objectPreferences.merging(plan.payload.objectPreferences)
         let restoredIncoming = try mergedIncoming(plan.payload.incomingMessages ?? [])
         let existing = Set(journal.map(\.id))
         journal += plan.payload.journal.filter { $0.isAction && !existing.contains($0.id) }
@@ -375,7 +390,7 @@ final class AppModel: ObservableObject {
             outgoingMessages.sort { $0.created > $1.created }; outgoingMessages = Array(outgoingMessages.prefix(100))
             if let ledger = plan.payload.delegatedJournalLedger { try delegatedJournalLedger.merge(ledger) }
             pendingRestore = nil
-            try save(guests)
+            try save(guests, preferences: restoredPreferences)
         } catch {
             pendingRestore = previousPlan; journal = previousJournal; usedOwnerPresses = previousPresses
             passedAccess = previousPassed; receivedDelegations = previousReceived
@@ -385,7 +400,7 @@ final class AppModel: ObservableObject {
     }
 
     private func saveOwners(_ updated: [OwnerAccount]) throws {
-        try storage.save(SavedState(identity: identity, guests: guests, journal: journal, actionCode: actionCode, owners: updated, usedOwnerPresses: usedOwnerPresses, pendingRestore: pendingRestore, delegations: delegations, passedAccess: passedAccess, receivedDelegations: receivedDelegations, incomingMessages: incomingMessages, outgoingMessages: outgoingMessages, delegatedJournalLedger: delegatedJournalLedger, appLockEnabled: appLockEnabled, appEntryBiometricEnabled: appEntryBiometricEnabled))
+        try storage.save(SavedState(identity: identity, guests: guests, journal: journal, actionCode: actionCode, owners: updated, usedOwnerPresses: usedOwnerPresses, pendingRestore: pendingRestore, delegations: delegations, passedAccess: passedAccess, receivedDelegations: receivedDelegations, incomingMessages: incomingMessages, outgoingMessages: outgoingMessages, delegatedJournalLedger: delegatedJournalLedger, appLockEnabled: appLockEnabled, appEntryBiometricEnabled: appEntryBiometricEnabled, objectPreferences: objectPreferences))
         owners = updated
     }
 
@@ -399,7 +414,8 @@ final class AppModel: ObservableObject {
         } else { guest.bleCache = try GuestBLECache(bundle: bundle, snapshot: snapshot, key: guest.invite.bundleKey, epoch: epoch) }
     }
     func guestBLEMaterial(_ intent: ActionIntent) throws -> BLEGuestGrant {
-        guard canManageGuestAccess, !busy, let guest = guests.first(where: { $0.id == intent.guestID }),
+        guard objectIsVisible(.received(guestID: intent.guestID, objectID: intent.object.id)),
+              canManageGuestAccess, !busy, let guest = guests.first(where: { $0.id == intent.guestID }),
               !guest.paused, guest.objects.contains(intent.object), let cache = guest.bleCache,
               cache.revision == intent.revision else { throw BLETransportFailure.cancelled }
         let material = try cache.open(key: guest.invite.bundleKey)
@@ -1059,6 +1075,10 @@ final class AppModel: ObservableObject {
             if !guests.contains(where: { $0.id == invite.id }) {
                 // Persist credentials before binding, including when the bind response is lost.
                 try save(guests + [SavedGuest(invite: invite)])
+            } else if let guest = guests.first(where: { $0.id == invite.id }) {
+                var preferences = objectPreferences
+                preferences.reveal(guest.objects.map { .received(guestID: guest.id, objectID: $0.id) })
+                try save(guests, preferences: preferences)
             }
             await refresh()
             return true
@@ -1202,7 +1222,8 @@ final class AppModel: ObservableObject {
             incomingMessages.removeAll { $0.guestID == id }
             for i in receivedDelegations.indices { receivedDelegations[i].parts.removeAll { $0.guestID == id } }
             receivedDelegations.removeAll { $0.parts.isEmpty }
-            do { try save(guests.filter { $0.id != id }) }
+            var preferences = objectPreferences; preferences.removeGuest(id)
+            do { try save(guests.filter { $0.id != id }, preferences: preferences) }
             catch { receivedDelegations = previousReceived; incomingMessages = previousMessages; throw error }
             for object in removed?.objects ?? [] {
                 let key = AvatarCache.key(guestID: id, objectID: object.id)
@@ -1253,7 +1274,7 @@ final class AppModel: ObservableObject {
 
     func journalLabel(_ entry: JournalEntry) -> String {
         for guest in guests {
-            if let object = guest.objects.first(where: { guest.id + "|" + $0.id == entry.actionKey }) { return object.label }
+            if let object = guest.objects.first(where: { guest.id + "|" + $0.id == entry.actionKey }) { return objectLabel(.received(guest, object)) }
         }
         return entry.what
     }
@@ -1494,6 +1515,7 @@ private final class ActionLink {
 
 extension AppModel {
     func actionIntent(guestID: String, object: GuestObject) -> ActionIntent? {
+        guard objectIsVisible(.received(guestID: guestID, objectID: object.id)) else { return nil }
         actionRejections.removeValue(forKey: guestID + "|" + object.id)
         do {
             if object.kind == "ble" {
@@ -1923,5 +1945,46 @@ extension AppModel {
         do { try save(guests) } catch { actionCode = saved; throw error }
         authorizedIntent = nil
         return true
+    }
+}
+
+
+extension AppModel {
+    /// Observational presentation state only. It never authorizes a command.
+    func noteBLESighting(_ target: ObjectReference, sleepSeconds: UInt8? = nil) {
+        let window = sleepSeconds.map { min(60, max(5, Int($0) * 5 + 5)) } ?? 60
+        bleVisibleUntil[target] = ProcessInfo.processInfo.systemUptime + TimeInterval(window)
+    }
+    func objectAvailability(_ entry: CatalogObject, now: TimeInterval = ProcessInfo.processInfo.systemUptime) -> CatalogAvailability {
+        if entry.kind == "webhook" { return .neutral }
+        if case let .received(guest, _) = entry, guest.paused { return .offline }
+        if entry.kind == "ble" {
+            if case let .received(guest, object) = entry {
+                guard let cache = guest.bleCache, let material = try? cache.open(key: guest.invite.bundleKey),
+                      (try? GuestActionPolicy.decodeBLE(bundle: material.bundle, numberID: object.numberID,
+                        epoch: max(cache.maximumEpoch, UInt64(max(0, Date().timeIntervalSince1970))))) != nil else { return .offline }
+            }
+            guard let until = bleVisibleUntil[entry.target] else { return .unknown }
+            return now < until ? .ready : .offline
+        }
+        switch entry {
+        case let .owned(owner, object):
+            if object.kind == "call" { return .ready }
+            guard ownerControl.connections[owner.server] == .connected else {
+                return ownerControl.connections[owner.server] == .connecting ? .connecting : .offline
+            }
+            guard let id = object.routing["device_id_ref"].flatMap(Int.init) else { return .unknown }
+            return ownerControl.onlineDevices[owner.server]?.contains(id) == true ? .ready : .offline
+        case let .received(guest, object):
+            switch connection(for: guest.id) {
+            case .connecting: return .connecting
+            case .offline, .unavailable: return .offline
+            case .connected: break
+            }
+            guard let link = actionLinks[guest.id], let bundle = link.bundle, let snapshot = link.snapshot,
+                  let policy = try? GuestActionPolicy.decode(bundle: bundle, snapshot: snapshot, numberID: object.numberID) else { return .unknown }
+            if policy.kind == "device" { return policy.deviceID.map { link.devices.contains($0) } == true ? .ready : .offline }
+            return link.hostOnline ? .ready : .offline
+        }
     }
 }

@@ -29,6 +29,7 @@ struct SavedState: Codable {
     var delegatedJournalLedger: DelegatedJournalLedger? = nil
     var appLockEnabled: Bool? = nil
     var appEntryBiometricEnabled: Bool? = nil
+    var objectPreferences: ObjectCatalogPreferences? = nil
 }
 
 /// One local, device-only Keychain item. Read/decode failures never mean “new installation”.
@@ -65,6 +66,7 @@ struct KeychainStore: StateStorage {
     }
 
     private func validateOwners(_ state: SavedState) throws {
+        try state.objectPreferences?.validate()
         try state.pendingRestore?.validate()
         let received = state.receivedDelegations ?? []
         guard received.count <= 1000, Set(received.map(\.id)).count == received.count else { throw Failure(status: errSecDecode) }

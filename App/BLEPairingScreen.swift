@@ -4,15 +4,19 @@ import EntrixyCore
 struct BLEPairingScreen: View {
     @EnvironmentObject private var app: AppModel
     let server: String
+    var initialLabel = ""
     var manager: BLEPairingModel? = nil
-    var body: some View { BLEPairingContent(model: manager ?? app.blePairing, server: server).environmentObject(app) }
+    var body: some View { BLEPairingContent(model: manager ?? app.blePairing, server: server, label: initialLabel).environmentObject(app) }
 }
 
 private struct BLEPairingContent: View {
     @EnvironmentObject private var app: AppModel
     @ObservedObject var model: BLEPairingModel
     let server: String
-    @State private var label = ""
+    @State private var label: String
+    init(model: BLEPairingModel, server: String, label: String = "") {
+        self.model = model; self.server = server; _label = State(initialValue: label)
+    }
     @State private var selected: BLEDiscovery?
     private var records: [BLEPairingRecord] { app.owners.first(where: { $0.server == server })?.blePairings ?? [] }
     var body: some View {

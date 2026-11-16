@@ -17,6 +17,7 @@ struct IOSBackupPayload: Codable {
     let incomingMessages: [SavedMessage]?
     let outgoingMessages: [OutgoingMessage]?
     let delegatedJournalLedger: DelegatedJournalLedger?
+    let objectPreferences: ObjectCatalogPreferences?
     init(state: SavedState) {
         app = "entrixy-ios"; version = 1; created = Date(); sourceIdentity = state.identity
         owners = state.owners ?? []; guests = state.guests
@@ -27,8 +28,10 @@ struct IOSBackupPayload: Codable {
         incomingMessages = state.incomingMessages
         outgoingMessages = state.outgoingMessages
         delegatedJournalLedger = state.delegatedJournalLedger
+        objectPreferences = state.objectPreferences
     }
     func validate() throws {
+        try objectPreferences?.validate()
         try delegatedJournalLedger?.validate()
         guard app == "entrixy-ios", version == 1, sourceIdentity.count == 32, owners.count <= 100,
               (!owners.isEmpty || !guests.isEmpty || !(passedAccess ?? []).isEmpty), guests.count <= 1000, journal.count <= 500, usedOwnerPresses.count <= 2048,
