@@ -47,25 +47,41 @@ made for this checkpoint. The public 19-frame gallery is the previous catalogue.
   list card. New hosted tests cover storage-before-POST, no replay and double tap,
   but have not been run on an Apple simulator yet.
 
+- Incoming effective rules are now used by every network/BLE action policy
+  decoder and physical FIRE revalidation. Fresh authenticated owner force rules
+  override stale local snapshots; local edits invalidate pending authorization.
+  The policy pins the exact effective template through PIN/biometry and BLE I/O.
+  Server routing, network bans, controller credentials and token validity remain
+  authoritative. Unsupported multi-condition gates still block execution.
+
 ## Actual verification
 
-Linux Swift6.0.3 + swift-crypto: 173 core tests, zero failures, including immutable
+Linux Swift6.0.3 + swift-crypto: 176 core tests, zero failures, including immutable
 in-flight bundle requests, scoped templates, force bounds, overnight windows,
 private camera material, stale edit rejection, durable device registration,
 avatar rollback, per-key local override isolation and the Android phone-webhook
-HMAC format/response/state-expiry rules. App and hosted-test Swift
+HMAC format/response/state-expiry rules. New hosted tests also cover one-time
+device registration/result storage and retaining newer local rule edits while
+recovering an acknowledgement. These are source additions until the exact Apple
+run finishes. App and hosted-test Swift
 sources passed frontend syntax parsing. Imported strings, YAML/plists and
 whitespace checks passed.
 
-This does NOT establish an Apple build, native interactions, device operation or
-App Store readiness. The separate ci/functional-port workflow builds Debug/test
-bundles and Release with fixture isolation, without booting a simulator, taking
-screenshots or actuating anything. Its exact-source result is recorded afterward.
+Public source 4afbbcbb56a35f386839114ff4331e548a965a2f (native15392b0),
+[Apple run43956299201](https://github.com/entrixy/ios-build./actions/runs/43956299201)
+passed173 core tests, Debug build-for-testing, Release and fixture isolation.
+This confirms the first version of the object/rule/avatar/phone-webhook source
+compiles with Xcode26.3. It did not execute hosted tests or UI interactions.
+Later effective-policy/recovery/editor changes require their own exact-source run.
+No screenshot or physical command was performed.
+
+This does NOT establish native interactions, device operation or App Store readiness. The separate ci/functional-port workflow builds Debug/test
+bundles and Release with fixture isolation, without taking screenshots or actuating hardware. It then runs hosted native
+transaction tests on an isolated simulator, without UI automation. Its exact-source result is recorded afterward.
 
 ## Remaining required implementation and acceptance
 
-- Integrate effective incoming rules into every manual authorization/revalidation;
-  keep existing conservative combined-condition guards until real observations
+- Keep existing conservative combined-condition guards until real observations
   and runtime evaluation are connected.
 - Port actual automatic execution/rearm/session behavior and GeoCorridorMatcher;
   background/permission behavior and passive authenticated BLE observations.

@@ -148,13 +148,15 @@ struct AddOwnerObjectScreen: View {
     @State private var kind = "call"
     @State private var phone = ""
     @State private var url = ""
-    @State private var secret = GuestCrypto.base64URL(GuestCrypto.randomBytes(count: 24))
+    @State private var secret = PhoneWebhook.newSecret()
     @State private var webhookMode = "phone"
+    @State private var serverModeWarning = false
     @State private var webhookToggle = false
     @State private var claimMode = false
     @State private var claimCode = ""
     @State private var pairing = false
     @State private var contacts = false
+    @FocusState private var editingName: Bool
     var embedded = false
     var completion: ((ObjectReference?) -> Void)? = nil
     private var complete: Bool {
@@ -179,21 +181,25 @@ struct AddOwnerObjectScreen: View {
                                     .font(.footnote).foregroundStyle(Brand.secondaryInk)
                             }
                         }.frame(maxWidth: .infinity, alignment: .leading).contentShape(Rectangle())
-                    }.buttonStyle(.plain).accessibilityAddTraits(kind == value ? .isSelected : [])
+                    }.buttonStyle(.plain).accessibilityIdentifier("owner-object-type-" + value)
+                        .accessibilityAddTraits(kind == value ? .isSelected : [])
                 }
             } header: { Text(ProductText.string("add_object_type_title")) }
                 .accessibilityIdentifier("owner-object-kind")
             Section {
                 AppField(ProductText.string("add_object_name")) {
                     TextField(ProductText.string("add_object_name_placeholder"), text: $label)
+                        .accessibilityLabel(ProductText.string("add_object_name"))
+                        .focused($editingName).submitLabel(.done).onSubmit { editingName = false }
                         .onChange(of: label) { label = String($0.replacingOccurrences(of: "\n", with: "").replacingOccurrences(of: "\r", with: "").prefix(64)) }
                 }
                 if kind == "call" {
                     AppField(ProductText.string("add_object_phone")) {
                         TextField(ProductText.string("add_object_phone_placeholder"), text: $phone).keyboardType(.phonePad)
+                            .accessibilityLabel(ProductText.string("add_object_phone"))
                     }
                 } else if kind == "webhook" {
-                    WebhookConfigurationFields(url: $url, secret: $secret, mode: $webhookMode, toggles: $webhookToggle)
+                    WebhookConfigurationFields(url: $url, secret: $secret, mode: $webhookMode, toggles: $webhookToggle, requestServerMode: { serverModeWarning = true })
                 } else if kind == "ble" {
                     Text(ProductText.string("ble_pair_hint")).font(.footnote).foregroundStyle(Brand.secondaryInk)
                 } else {
@@ -251,6 +257,12 @@ struct AddOwnerObjectScreen: View {
         .alert("Entrixy", isPresented: Binding(get: { model.errorMessage != nil }, set: { if !$0 { model.errorMessage = nil } })) {
             Button("Понятно") { model.errorMessage = nil }
         } message: { Text(model.errorMessage ?? "") }
+        .accessibilityHidden(serverModeWarning)
+        .overlay {
+            if serverModeWarning {
+                WebhookServerModeConfirmation(cancel: { serverModeWarning = false }, confirm: { webhookMode = "server"; serverModeWarning = false })
+            }
+        }
     }
     private func save() async {
         // Opening a form never registers a replacement owner identity.
@@ -317,6 +329,7 @@ private struct OwnerObjectEditorForm: View {
     let showDeleteOnLaunch: Bool
     @State private var draft: OwnerObjectEdit
     @State private var automation = false
+    @State private var serverModeWarning = false
     @State private var credentials: DeviceConfigurationCredentials?
     @State private var showingCredentials = false
     @State private var noCredentials = false
@@ -324,7 +337,9 @@ private struct OwnerObjectEditorForm: View {
     @State private var deleting = false
     init(server: String, objectID: UUID, initialDraft: OwnerObjectEdit, showDeleteOnLaunch: Bool) {
         self.server = server; self.objectID = objectID; self.showDeleteOnLaunch = showDeleteOnLaunch
-        _draft = State(initialValue: initialDraft)
+        var draft = initialDraft
+        if draft.webhookSecret.isEmpty { draft.webhookSecret = PhoneWebhook.newSecret() }
+        _draft = State(initialValue: draft)
     }
     private var object: OwnerObject? { model.owners.first { $0.server == server }?.objects?.first { $0.id == objectID } }
     private var canSave: Bool {
@@ -351,7 +366,7 @@ private struct OwnerObjectEditorForm: View {
                         }
                     } else if object.kind == "webhook" {
                         WebhookConfigurationFields(url: $draft.webhookURL, secret: $draft.webhookSecret,
-                            mode: $draft.webhookMode, toggles: $draft.webhookToggle)
+                            mode: $draft.webhookMode, toggles: $draft.webhookToggle, requestServerMode: { serverModeWarning = true })
                     }
                 }.disabled(model.ownerBusy || object.pending != nil || object.available == false)
                 if object.kind == "call" { PhoneHangupLimitation(hangupSeconds: draft.local.hangupSeconds) }
@@ -379,17 +394,23 @@ private struct OwnerObjectEditorForm: View {
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
                 Button { automation = true } label: { Image(systemName: "arrow.triangle.2.circlepath") }
-                    .accessibilityLabel(ProductText.string("owner_automation_desc"))
+                    .accessibilityLabel(ProductText.string("owner_automation_desc")).accessibilityIdentifier("owner-object-automation")
             }
         }
         .sheet(isPresented: $automation) { AutomationEditor(destination: .object(.owned(server: server, objectID: objectID))) }
         .sheet(isPresented: $showingCredentials) { if let credentials { DeviceCredentialsSheet(credentials: credentials, server: server) } }
+        .alert("Entrixy", isPresented: Binding(get: { model.errorMessage != nil }, set: { if !$0 { model.errorMessage = nil } })) {
+            Button(ProductText.string("btn_ok")) { model.errorMessage = nil }
+        } message: { Text(model.errorMessage ?? "") }
         .alert(ProductText.string("edit_object_no_creds_title"), isPresented: $noCredentials) {
             Button(ProductText.string("btn_ok"), role: .cancel) {}
         } message: { Text(ProductText.string("edit_object_no_creds_text")) }
         .task { if showDeleteOnLaunch { deleting = true } }
+        .accessibilityHidden(serverModeWarning || deleting)
         .overlay {
-            if deleting {
+            if serverModeWarning {
+                WebhookServerModeConfirmation(cancel: { serverModeWarning = false }, confirm: { draft.webhookMode = "server"; serverModeWarning = false })
+            } else if deleting {
                 AppConfirmationDialog(title: "Удалить объект?", message: "Гости потеряют доступ к этому объекту.",
                     actionTitle: "Удалить объект", destructive: true, cancel: { deleting = false }, confirm: {
                         deleting = false

@@ -11,8 +11,10 @@ public struct GuestActionPolicy {
     public let authentication: String?
     public let toggles: Bool
     public let blockedReason: String?
+    /// Pinned through authentication and immediately before each physical FIRE.
+    public let template: Data
 
-    public static func decodeBLE(bundle: Data, numberID: Int, epoch: UInt64) throws -> (policy: GuestActionPolicy, grant: BLEGuestGrant) {
+    public static func decodeBLE(bundle: Data, numberID: Int, epoch: UInt64, overrides: IncomingAutomationConfiguration? = nil) throws -> (policy: GuestActionPolicy, grant: BLEGuestGrant) {
         guard let contents = try JSONSerialization.jsonObject(with: bundle) as? [String: Any],
               let rows = contents["ble"] as? [[String: Any]],
               rows.count <= 1000 else { throw GuestCrypto.Failure.invalidEnvelope }
@@ -21,7 +23,7 @@ public struct GuestActionPolicy {
         let grant = try BLEGuestGrant(row: row)
         guard grant.isValid(at: epoch) else { throw BLECommandSession.Failure.expired }
         guard row["tpl"] == nil || row["tpl"] is [String: Any] else { throw GuestCrypto.Failure.invalidEnvelope }
-        let template = row["tpl"] as? [String: Any] ?? [:]
+        let template = try resolvedTemplate(row["tpl"] as? [String: Any] ?? [:], overrides: overrides)
         func flag(_ field: String) throws -> Bool {
             guard let raw = template[field] else { return false }
             guard let n = raw as? NSNumber, CFGetTypeID(n) == CFBooleanGetTypeID() else { throw GuestCrypto.Failure.invalidEnvelope }
@@ -43,10 +45,11 @@ public struct GuestActionPolicy {
         if mode == "all" && channels.count > 1 { blocked = "Совместная проверка условий этого объекта пока не поддерживается на iOS." }
         let confirmation = try flag("confirm_on") || flag("confirm")
         return (GuestActionPolicy(kind: "ble", deviceID: nil, credential: nil, serverWebhook: false,
-            confirmation: confirmation, authentication: auth, toggles: true, blockedReason: blocked), grant)
+            confirmation: confirmation, authentication: auth, toggles: true, blockedReason: blocked,
+            template: try JSONSerialization.data(withJSONObject: template, options: .sortedKeys)), grant)
     }
 
-    public static func decode(bundle: Data, snapshot: Data, numberID: Int) throws -> GuestActionPolicy {
+    public static func decode(bundle: Data, snapshot: Data, numberID: Int, overrides: IncomingAutomationConfiguration? = nil) throws -> GuestActionPolicy {
         guard let b = try JSONSerialization.jsonObject(with: bundle) as? [String: Any],
               let s = try JSONSerialization.jsonObject(with: snapshot) as? [String: Any],
               let row = (s["numbers"] as? [[String: Any]])?.first(where: { $0["id"] as? Int == numberID }),
@@ -68,6 +71,7 @@ public struct GuestActionPolicy {
                 template = object
             }
         }
+        template = try resolvedTemplate(template, overrides: overrides)
         func flag(_ field: String) throws -> Bool {
             guard let value = template[field] else { return false }
             guard let n = value as? NSNumber, CFGetTypeID(n) == CFBooleanGetTypeID() else { throw GuestCrypto.Failure.invalidEnvelope }
@@ -102,6 +106,18 @@ public struct GuestActionPolicy {
         }
         return GuestActionPolicy(kind: kind, deviceID: row["device_id"] as? Int, credential: credential,
                                  serverWebhook: serverWebhook, confirmation: confirm, authentication: authentication,
-                                 toggles: (metadata["wh_toggle"] as? Int) == 1, blockedReason: blocked)
+                                 toggles: (metadata["wh_toggle"] as? Int) == 1, blockedReason: blocked,
+                                 template: try JSONSerialization.data(withJSONObject: template, options: .sortedKeys))
     }
+    private static func resolvedTemplate(_ fresh: [String: Any], overrides: IncomingAutomationConfiguration?) throws -> [String: Any] {
+        guard var local = overrides else { return fresh }
+        // The authenticated bundle is authoritative. The locally retained owner
+        // snapshot is only a merge baseline; it cannot relax new force settings.
+        let owner = try AutomationTemplate(data: JSONSerialization.data(withJSONObject: fresh))
+        local.receive(owner)
+        try local.edit(local.effective)
+        guard let result = try JSONSerialization.jsonObject(with: local.effective.data()) as? [String: Any] else { throw GuestCrypto.Failure.invalidEnvelope }
+        return result
+    }
+
 }

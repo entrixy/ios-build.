@@ -92,6 +92,9 @@ public extension OwnerAccount {
                         current.effectiveNumberIDs = incoming.effectiveNumberIDs; current.access = incoming.access; current.state = incoming.state
                     } else if current.pending != nil { current.sent = current.sent || incoming.sent }
                 }
+                current.automationTemplates = current.automationTemplates ?? incoming.automationTemplates
+                current.streamAllowed = current.streamAllowed ?? incoming.streamAllowed
+                current.objectSettingsToken = current.objectSettingsToken ?? incoming.objectSettingsToken
                 issued[index] = current
             } else {
                 guard !issued.contains(where: { ($0.keyID != nil && $0.keyID == incoming.keyID) || $0.guestID == incoming.guestID }) else { throw GuestCrypto.Failure.invalidEnvelope }

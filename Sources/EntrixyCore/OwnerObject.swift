@@ -59,7 +59,7 @@ public struct OwnerObject: Codable, Identifiable, Equatable {
         let key = GuestCrypto.randomBytes(count: 32)
         // K_obj is shared with guests. Phone numbers and webhook secrets must stay owner-only.
         localPhone = kind == "call" ? normalizedPhone : nil
-        var metadata: [String: Any] = ["label": label.trimmingCharacters(in: .whitespacesAndNewlines), "avatar_type": "preset:3"]
+        var metadata: [String: Any] = ["label": label.trimmingCharacters(in: .whitespacesAndNewlines), "avatar_type": "preset:0"]
         if kind == "webhook" && webhookToggle { metadata["wh_toggle"] = 1 }
         id = UUID()
         self.kind = kind
@@ -94,7 +94,7 @@ public struct OwnerObject: Codable, Identifiable, Equatable {
         let key = GuestCrypto.randomBytes(count: 32)
         id = UUID(); kind = "ble"; wrappedKey = try GuestCrypto.encrypt(key: masterKey, plaintext: key)
         cipher = try GuestCrypto.encrypt(key: key, plaintext: JSONSerialization.data(withJSONObject:
-            ["label": pairing.label, "avatar_type": "preset:3"], options: .sortedKeys))
+            ["label": pairing.label, "avatar_type": "preset:0"], options: .sortedKeys))
         wrappedBLESecret = pairing.wrappedSecret; bleDeviceID = pairing.deviceID
         routing = [:]; pending = .create; sent = false
     }

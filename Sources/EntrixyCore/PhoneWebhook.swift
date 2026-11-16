@@ -8,6 +8,9 @@ import Crypto
 /// HostService.postWebhook: the receiver verifies the canonical text, not JSON
 /// serialization. The object identifier is the server's, never a local UUID.
 public enum PhoneWebhook {
+    public static func newSecret() -> String {
+        GuestCrypto.randomBytes(count: 16).map { String(format: "%02x", $0) }.joined()
+    }
     public static func action(requested: GuestAction?, toggles: Bool, position: String?) -> GuestAction {
         if requested == .close { return .close }
         if requested == .toggle || (requested == nil && toggles) { return ["open", "opening"].contains(position ?? "") ? .close : .open }

@@ -305,9 +305,8 @@ final class OwnerControlModel: ObservableObject {
               let key = try owner.authorizedGuest(keyID: keyID, numberID: number),
               let press = json["press"] as? [String: Any],
               let callID = json["call_id"] as? String, !callID.isEmpty, callID.utf8.count <= 256 else { return nil }
-        if webhookOnly {
-            guard press["action"] as? String == (json["action"] as? String ?? "") else { return nil }
-        }
+        let expectedAction = webhookOnly ? (json["action"] as? String ?? "") : ""
+        guard press["action"] as? String == expectedAction else { return nil }
         let nonce = try OwnerGuestPress.verify(press, publicKey: key.publicKey, server: server, numberID: number)
         try app.consumeOwnerPress(server + ":" + key.id.uuidString + ":" + nonce)
         return OwnerPhoneRequest(server: server, callID: callID, objectID: object.id, keyID: key.id,
@@ -356,7 +355,7 @@ final class OwnerControlModel: ObservableObject {
                   let key = try? owner.authorizedGuest(localID: request.keyID, numberID: number) else { return }
             do { _ = try OwnerGuestPress.verify(request.press, publicKey: key.publicKey, server: server, numberID: number) }
             catch { await decline(request); app.errorMessage = "Запрос гостя устарел или больше не разрешён."; return }
-            who = key.label
+            who = ProductText.string("journal_who_guest", key.label)
             phoneRequests.removeAll { $0.id == request.id }
             if request.needsConfirmation {
                 guard let link = links[server], link.authenticated else { return }
@@ -382,6 +381,7 @@ final class OwnerControlModel: ObservableObject {
         active && !webhookInFlight.contains(.owned(server: server, objectID: objectID))
     }
     func phoneWebhook(server: String, objectID: UUID, action requested: GuestAction = .open, request: OwnerPhoneRequest? = nil) async {
+        defer { if let request { acceptedWebhookRequests.remove(request.id) } }
         let target = ObjectReference.owned(server: server, objectID: objectID)
         guard active, app.canManageGuestAccess, !webhookInFlight.contains(target),
               let owner = app.owners.first(where: { $0.server == server }),
@@ -401,7 +401,7 @@ final class OwnerControlModel: ObservableObject {
                 do { try await link.live.sendAction(JSONSerialization.data(withJSONObject: ["type": "confirm_response", "call_id": request.callID, "accept": true])) }
                 catch { return }
             } else { guard acceptedWebhookRequests.remove(request.id) != nil else { return } }
-            who = key.label
+            who = ProductText.string("journal_who_guest", key.label)
             let signed = request.press["action"] as? String ?? ""
             direction = signed.isEmpty ? nil : GuestAction(rawValue: signed)
         }

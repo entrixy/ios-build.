@@ -61,13 +61,13 @@ final class GuestActionTests: XCTestCase {
             XCTAssertEqual(frame["action"] as? String, action.isEmpty ? nil : action)
         }
     }
-    private func policy(template: Any = [String: Any](), metadata: [String: Any] = ["label": "Test"], extra: [String: Any] = [:]) throws -> GuestActionPolicy {
+    private func policy(template: Any = [String: Any](), metadata: [String: Any] = ["label": "Test"], extra: [String: Any] = [:], overrides: IncomingAutomationConfiguration? = nil) throws -> GuestActionPolicy {
         let key = Data(repeating: 9, count: 32)
         var bundle: [String: Any] = ["obj_keys": ["7": GuestCrypto.base64URL(key)], "templates": ["7": template]]
         bundle.merge(extra) { _, new in new }
         let row: [String: Any] = ["id": 7, "type": "webhook", "data_cipher": try GuestCrypto.encrypt(key: key, plaintext: JSONSerialization.data(withJSONObject: metadata))]
         return try GuestActionPolicy.decode(bundle: JSONSerialization.data(withJSONObject: bundle),
-            snapshot: JSONSerialization.data(withJSONObject: ["numbers": [row]]), numberID: 7)
+            snapshot: JSONSerialization.data(withJSONObject: ["numbers": [row]]), numberID: 7, overrides: overrides)
     }
     func testManualOverrideMatchesAndroidAndUnsupportedHardGatesFailClosed() throws {
         XCTAssertNil(try policy(template: ["mode": "any", "geo_on": true, "wifi_on": true]).blockedReason)
@@ -88,4 +88,34 @@ final class GuestActionTests: XCTestCase {
         if case .action = try GuestEvent.decode(Data(#"{"type":"error","reason":"disabled","number_id":7}"#.utf8)) {} else { XCTFail() }
         if case .unavailable = try GuestEvent.decode(Data(#"{"type":"error","reason":"disabled"}"#.utf8)) {} else { XCTFail() }
     }
+    func testSuggestedLocalAuthenticationIsUsedByRealActionPolicy() throws {
+        var owner = AutomationTemplate()
+        var local = IncomingAutomationConfiguration(owner: owner)
+        var edited = local.effective; edited.authEnabled = true; edited.authMode = "pin"; edited.confirmEnabled = true
+        try local.edit(edited)
+        let decoded = try policy(template: JSONSerialization.jsonObject(with: owner.data()), overrides: local)
+        XCTAssertEqual(decoded.authentication, "pin"); XCTAssertTrue(decoded.confirmation)
+        owner.authEnabled = true; owner.authMode = "biometric"; owner.authLevel = .force
+        let forced = try policy(template: JSONSerialization.jsonObject(with: owner.data()), overrides: local)
+        XCTAssertEqual(forced.authentication, "biometric")
+        XCTAssertNotEqual(decoded.template, forced.template)
+    }
+    func testFreshOwnerForceAllCannotBeRelaxedByOldLocalSnapshot() throws {
+        var local = IncomingAutomationConfiguration(owner: AutomationTemplate())
+        local.effective.geoEnabled = false; local.effective.wifiEnabled = false
+        var fresh = AutomationTemplate(); fresh.combineLevel = .force; fresh.combineMode = "all"
+        fresh.geoEnabled = true; fresh.wifiEnabled = true
+        let decoded = try policy(template: JSONSerialization.jsonObject(with: fresh.data()), overrides: local)
+        XCTAssertNotNil(decoded.blockedReason)
+        let effective = try AutomationTemplate(data: decoded.template)
+        XCTAssertTrue(effective.geoEnabled); XCTAssertTrue(effective.wifiEnabled)
+    }
+    func testLocalUnknownFieldsCannotChangeOwnerServerRoutingOrNetworkBan() throws {
+        let malicious = try AutomationTemplate(data: Data(#"{"server_webhook":true}"#.utf8))
+        var local = IncomingAutomationConfiguration(owner: malicious)
+        local.owner = AutomationTemplate()
+        let decoded = try policy(template: ["server_webhook": false], extra: ["net_block": ["restricted"]], overrides: local)
+        XCTAssertFalse(decoded.serverWebhook); XCTAssertNotNil(decoded.blockedReason)
+    }
+
 }

@@ -9,7 +9,9 @@ from capture_simulator import create_booted_device, cleanup_device
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--only-ui", action="store_true", help="Run unchanged UI assertions on a fresh runner without hosted unit tests")
+    selection = parser.add_mutually_exclusive_group()
+    selection.add_argument("--only-native", action="store_true", help="Run hosted native tests without UI automation")
+    selection.add_argument("--only-ui", action="store_true", help="Run unchanged UI assertions on a fresh runner without hosted unit tests")
     args = parser.parse_args()
     sdk = subprocess.check_output(['xcrun', '--sdk', 'iphonesimulator', '--show-sdk-version'], text=True).strip()
     runtimes = json.loads(subprocess.check_output(['xcrun', 'simctl', 'list', 'runtimes', '--json']))['runtimes']
@@ -22,6 +24,8 @@ def main():
             'CODE_SIGNING_ALLOWED=YES', 'CODE_SIGN_IDENTITY=-', 'test']
         if args.only_ui:
             command.append('-only-testing:EntrixyUITests')
+        elif args.only_native:
+            command.append('-only-testing:EntrixyAppTests')
         subprocess.run(command, check=True, timeout=1800)
     except (subprocess.CalledProcessError, subprocess.TimeoutExpired):
         # Retain the exact failed UI frame/hierarchy instead of guessing from a

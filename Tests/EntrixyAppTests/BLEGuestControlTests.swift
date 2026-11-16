@@ -154,4 +154,20 @@ private final class GuestBLEStorage: StateStorage {
         XCTAssertEqual(app.journal.first?.result, "Контроллер принял команду")
     }
 
+    func testChangedLocalRulesInvalidatePendingBluetoothAuthorization() async throws {
+        let (_, central, app, guest, _) = try fixture()
+        let object = guest.objects[0]
+        let intent = try XCTUnwrap(app.actionIntent(guestID: guest.id, object: object))
+        let context = try app.automationContext(.object(.received(guestID: guest.id, objectID: object.id)))
+        var updated = context.template; updated.authEnabled = true; updated.authMode = "pin"
+        XCTAssertTrue(app.saveAutomation(context, template: updated))
+        XCTAssertThrowsError(try app.guestBLEMaterial(intent))
+        await app.execute(intent)
+        XCTAssertTrue(central.channel.writes.isEmpty)
+        XCTAssertTrue(app.journal.isEmpty)
+        let fresh = try XCTUnwrap(app.actionIntent(guestID: guest.id, object: object))
+        XCTAssertEqual(fresh.policy.authentication, "pin")
+        XCTAssertNotEqual(fresh.policy.template, intent.policy.template)
+    }
+
 }

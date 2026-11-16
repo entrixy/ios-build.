@@ -14,7 +14,7 @@ final class NavigationUITests: XCTestCase {
     }
     private func launch(_ route: String) -> XCUIApplication {
         let app = XCUIApplication()
-        app.launchArguments = ["--stage-two", route]
+        app.launchArguments = ["--stage-two", route, "-AppleLanguages", "(ru)", "-AppleLocale", "ru_RU"]
         app.launch()
         activeApp = app
         XCTAssertTrue(app.buttons["main-tab-settings"].waitForExistence(timeout: 20))
@@ -112,12 +112,12 @@ final class NavigationUITests: XCTestCase {
         let app = launch("owner-objects")
         XCTAssertFalse(app.buttons["Привязать Bluetooth-контроллер"].exists)
         app.buttons["Добавить объект"].tap()
+        app.buttons["owner-object-type-ble"].tap()
         let field = app.textFields["Название"]
-        XCTAssertTrue(field.waitForExistence(timeout: 10)); field.tap(); field.typeText("BLE Yard")
-        let picker = app.descendants(matching: .any)["owner-object-kind"].firstMatch
-        XCTAssertTrue(picker.exists); picker.tap()
-        app.buttons["Bluetooth"].tap()
-        app.buttons["Продолжить привязку"].tap()
+        XCTAssertTrue(field.waitForExistence(timeout: 10)); field.tap(); field.typeText("BLE Yard\n")
+        let save = app.buttons["Сохранить"]
+        if !save.isHittable { app.swipeUp() }
+        save.tap()
         XCTAssertTrue(app.buttons["Найти контроллеры"].waitForExistence(timeout: 10))
         XCTAssertEqual(app.textFields["Название объекта"].value as? String, "BLE Yard")
         XCTAssertTrue(app.buttons["Отмена"].exists)
@@ -138,4 +138,39 @@ final class NavigationUITests: XCTestCase {
         XCTAssertLessThan(bleCard.frame.minY, ownCard.frame.minY); XCTAssertLessThan(ownCard.frame.minY, guestCard.frame.minY)
         assertBottom(app, ["control", "settings", "guests", "journal"])
     }
+    func testObjectCreationUsesAndroidTypeOrderAndDefaultCall() {
+        let app = launch("empty")
+        app.buttons["Добавить объект"].tap()
+        let types = ["call", "webhook", "device", "ble"].map { app.buttons["owner-object-type-" + $0] }
+        for button in types { XCTAssertTrue(button.waitForExistence(timeout: 10)) }
+        for index in 1..<types.count { XCTAssertLessThan(types[index-1].frame.minY, types[index].frame.minY) }
+        XCTAssertTrue(types[0].isSelected)
+        XCTAssertTrue(app.textFields["Номер для звонка"].exists)
+        XCTAssertTrue(app.buttons["Добавить из контактов"].exists)
+        XCTAssertGreaterThan(app.textFields["Название"].frame.minY, types.last!.frame.minY)
+    }
+    func testActualWebhookEditorContainsAndroidFieldsAndAutomationRoute() {
+        let app = launch("owner-expanded")
+        app.buttons["Настройки"].tap()
+        XCTAssertTrue(app.navigationBars["Редактировать объект"].waitForExistence(timeout: 10))
+        XCTAssertEqual(app.textFields["Название"].value as? String, "Ворота во двор")
+        XCTAssertFalse(app.staticTexts["Значок объекта"].exists)
+        XCTAssertFalse(app.buttons["Сохранить защиту"].exists)
+        XCTAssertTrue(app.buttons["owner-object-automation"].isHittable)
+        app.buttons["owner-object-automation"].tap()
+        XCTAssertTrue(app.staticTexts["Условия"].waitForExistence(timeout: 10))
+        XCTAssertTrue(app.staticTexts["Wi-Fi"].exists)
+        XCTAssertTrue(app.buttons["Закрыть"].exists)
+        app.buttons["Закрыть"].tap()
+        XCTAssertTrue(app.buttons["owner-object-automation"].waitForExistence(timeout: 10))
+    }
+    func testAvatarPickerOpensFromAvatarAndKeepsObjectRow() {
+        let app = launch("owner-objects")
+        app.buttons["Иконка объекта"].tap()
+        for index in 1...8 { XCTAssertTrue(app.buttons["Иконка \(index)"].waitForExistence(timeout: 10)) }
+        XCTAssertTrue(app.buttons["Загрузить иконку"].exists)
+        app.buttons["Отмена"].tap()
+        XCTAssertTrue(app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH %@", "object-settings-owner:")).firstMatch.waitForExistence(timeout: 10))
+    }
+
 }

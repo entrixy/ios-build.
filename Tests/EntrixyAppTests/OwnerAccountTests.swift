@@ -16,6 +16,7 @@ private final class RecordingOwnerAPI: OwnerTransport {
     var registrations = 0
     var syncs = 0
     var mutations = 0
+    var deviceRegistrations = 0
     var loseCreateReply = false
     var rows: [[String: Any]] = []
     var keyRows: [[String: Any]] = []
@@ -79,7 +80,9 @@ private final class RecordingOwnerAPI: OwnerTransport {
             if let cipher = json["key_cipher"] { keyRows[index]["key_cipher"] = cipher; keyRows[index]["needs_bundle"] = 0 }
             if loseKeyEditReply { throw URLError(.networkConnectionLost) }
         case .claim: return Data(#"{"device_id":9}"#.utf8)
-        case .deviceRegister: throw GuestCrypto.Failure.invalidEnvelope
+        case .deviceRegister:
+            deviceRegistrations += 1
+            return Data(("{\"device_id\":9,\"device_key\":\"" + String(repeating: "c", count: 32) + "\",\"device_secret\":\"" + String(repeating: "d", count: 32) + "\"}").utf8)
         case .create:
             rows = [["id": 7, "type": json["type"]!, "data_cipher": json["data_cipher"]!, "data_cipher_revision": 100]]
             if loseCreateReply { throw URLError(.networkConnectionLost) }
@@ -719,4 +722,71 @@ extension OwnerAccountTests {
         XCTAssertNil(restored.owners[0].blePairings?.first?.objectID)
         XCTAssertTrue(restored.journal.isEmpty)
     }
+    @MainActor func testRecoveringReplyRetainsNewerLocalGuestRulesWithoutAnotherMutation() async throws {
+        let storage = OwnerMemoryStorage(), api = RecordingOwnerAPI()
+        let model = AppModel(storage: storage, ownerAPI: api)
+        _ = await model.addOwner(server: "owner.invalid", accessCode: "")
+        _ = await model.createOwnerObject(server: "owner.invalid", label: "Ворота", kind: "webhook", phone: "", url: "https://actuator.invalid/open", secret: "owner-private", claimCode: "")
+        _ = await model.createOwnerKey(server: "owner.invalid", label: "Гость", numberIDs: [7], welcome: "", nativeOnly: false, confirmation: true)
+        let key = try XCTUnwrap(model.owners[0].issuedKeys?.first)
+        let object = try XCTUnwrap(model.owners[0].objects?.first)
+        api.beforeMutation = { operation, _ in if operation == .keyEdit { storage.failing = true } }
+        let edited = await model.editOwnerKey(server: "owner.invalid", keyID: key.id, label: "Новое имя", numberIDs: [7], welcome: "", confirmation: nil)
+        XCTAssertFalse(edited); XCTAssertTrue(model.canSaveOwnerKeyResult(key.id))
+        storage.failing = false; api.beforeMutation = nil
+        let context = try model.automationContext(.issued(server: "owner.invalid", keyID: key.id, objectID: object.id))
+        var latest = context.template; latest.timeEnabled = true
+        latest.timeEntries = [.init(weekdays: [2,3,4], fromMin: 480, toMin: 600)]
+        XCTAssertTrue(model.saveAutomation(context, template: latest, allowStream: false))
+        let mutations = api.keyMutations
+        await model.retrySavingOwnerKeyResult(server: "owner.invalid", keyID: key.id)
+        XCTAssertEqual(api.keyMutations, mutations)
+        let owner = model.owners[0], saved = try XCTUnwrap(owner.issuedKeys?.first)
+        XCTAssertNil(saved.pending)
+        XCTAssertEqual(try saved.objectTemplate(numberID: 7, owner: owner), latest)
+        XCTAssertEqual(saved.streamAllowed, [])
+        XCTAssertNotNil(owner.bundleRefreshQueue?[key.id.uuidString])
+        model.suspend()
+    }
+
+    @MainActor func testNewDeviceCredentialsPersistBeforeCreateAndSurviveLostSecondReply() async throws {
+        let storage = OwnerMemoryStorage(), api = RecordingOwnerAPI()
+        let model = AppModel(storage: storage, ownerAPI: api)
+        _ = await model.addOwner(server: "owner.invalid", accessCode: "")
+        api.loseCreateReply = true
+        api.beforeMutation = { operation, _ in
+            if operation == .create {
+                let owner = storage.state!.owners![0]
+                let object = owner.objects![0]
+                XCTAssertNotNil(try? object.deviceCredentials(masterKey: owner.masterKey))
+                XCTAssertEqual(object.routing["device_id_ref"], "9")
+            }
+        }
+        let created = await model.createOwnerObject(server: "owner.invalid", label: "Контроллер", kind: "device", phone: "", url: "", secret: "", claimCode: "", registerDevice: true)
+        XCTAssertFalse(created)
+        XCTAssertEqual(api.deviceRegistrations, 1)
+        let restarted = AppModel(storage: storage, ownerAPI: api)
+        await restarted.refreshOwners()
+        XCTAssertEqual(api.deviceRegistrations, 1)
+        let object = try XCTUnwrap(restarted.owners[0].objects?.first)
+        XCTAssertNil(object.pending); XCTAssertEqual(object.numberID, 7)
+        XCTAssertEqual(try restarted.ownerDeviceCredentials(server: "owner.invalid", objectID: object.id)?.key, String(repeating: "c", count: 32))
+        XCTAssertTrue(restarted.journal.isEmpty)
+    }
+    @MainActor func testReceivedDeviceParametersCanBeSavedWithoutRegisteringAgain() async throws {
+        let storage = OwnerMemoryStorage(), api = RecordingOwnerAPI()
+        let model = AppModel(storage: storage, ownerAPI: api)
+        _ = await model.addOwner(server: "owner.invalid", accessCode: "")
+        api.beforeMutation = { operation, _ in if operation == .deviceRegister { storage.failing = true } }
+        _ = await model.createOwnerObject(server: "owner.invalid", label: "Контроллер", kind: "device", phone: "", url: "", secret: "", claimCode: "", registerDevice: true)
+        let id = try XCTUnwrap(model.owners[0].objects?.first?.id)
+        XCTAssertTrue(model.canSaveOwnerObjectResult(id))
+        storage.failing = false; api.beforeMutation = nil
+        await model.retrySavingOwnerObjectResult(server: "owner.invalid", objectID: id)
+        XCTAssertEqual(api.deviceRegistrations, 1)
+        XCTAssertEqual(model.owners[0].objects?.first?.numberID, 7)
+        XCTAssertNotNil(try model.ownerDeviceCredentials(server: "owner.invalid", objectID: id))
+        XCTAssertEqual(api.mutations, 2)
+    }
+
 }

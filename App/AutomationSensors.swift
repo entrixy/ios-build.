@@ -8,13 +8,14 @@ struct AutomationWiFiNetwork: Equatable {
     let bssid: String
 }
 
-@MainActor final class AutomationSensors: NSObject, ObservableObject, CLLocationManagerDelegate {
+@MainActor final class AutomationSensors: NSObject, ObservableObject, @preconcurrency CLLocationManagerDelegate {
     @Published private(set) var location: CLLocation?
     @Published private(set) var network: AutomationWiFiNetwork?
     @Published private(set) var locationAuthorization: CLAuthorizationStatus = .notDetermined
     @Published private(set) var locating = false
     @Published private(set) var message: String?
     var onLocation: ((CLLocation) -> Void)?
+    // Core Location delivers delegate callbacks on the initializing main run loop.
     private let manager = CLLocationManager()
     private var requests: [CheckedContinuation<CLLocation, Error>] = []
     private var requestTimeout: Task<Void, Never>?

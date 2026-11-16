@@ -7,7 +7,7 @@ struct WebhookConfigurationFields: View {
     @Binding var secret: String
     @Binding var mode: String
     @Binding var toggles: Bool
-    @State private var revealing = false
+    let requestServerMode: () -> Void
     var body: some View {
         AppField(ProductText.string("add_object_webhook_url")) {
             TextField(ProductText.string("add_object_webhook_url_placeholder"), text: $url)
@@ -15,23 +15,54 @@ struct WebhookConfigurationFields: View {
         }
         AppField(ProductText.string("add_object_webhook_secret")) {
             HStack {
-                Group {
-                    if revealing { TextField("",text:$secret) } else { SecureField("",text:$secret) }
-                }.textInputAutocapitalization(.never).autocorrectionDisabled()
-                Button { revealing.toggle() } label: { Image(systemName: revealing ? "eye.slash" : "eye") }.buttonStyle(.borderless).accessibilityLabel("Показать секрет")
-                Button { UIPasteboard.general.string = secret } label: { Image(systemName:"doc.on.doc") }.buttonStyle(.borderless).accessibilityLabel(ProductText.string("btn_copy"))
-                Button { secret = GuestCrypto.base64URL(GuestCrypto.randomBytes(count:24)) } label: { Image(systemName:"arrow.clockwise") }.buttonStyle(.borderless).accessibilityLabel("Новый секрет")
+                TextField("", text: $secret).textInputAutocapitalization(.never).autocorrectionDisabled()
+                Button { UIPasteboard.general.string = secret } label: { Image(systemName: "doc.on.doc") }
+                    .buttonStyle(.borderless).accessibilityLabel(ProductText.string("btn_copy")).disabled(secret.isEmpty)
             }
             Text(ProductText.string("add_object_webhook_secret_hint")).font(.footnote).foregroundStyle(Brand.secondaryInk)
         }
-        Picker(ProductText.string("guest_tpl_wifi_mode"),selection:$mode) {
-            Text(ProductText.string("add_object_webhook_mode_phone")).tag("phone")
-            Text(ProductText.string("add_object_webhook_mode_server")).tag("server")
-        }.pickerStyle(.inline)
-        Picker(ProductText.string("webhook_kind_title"),selection:$toggles) {
-            Text(ProductText.string("webhook_kind_pulse")).tag(false)
-            Text(ProductText.string("webhook_kind_toggle")).tag(true)
-        }.pickerStyle(.inline)
+        VStack(alignment: .leading, spacing: 4) {
+            ObjectRadioChoice(title: ProductText.string("add_object_webhook_mode_phone"), selected: mode == "phone") { mode = "phone" }
+            ObjectRadioChoice(title: ProductText.string("add_object_webhook_mode_server"), selected: mode == "server") {
+                if mode != "server" { requestServerMode() }
+            }
+        }
+        VStack(alignment: .leading, spacing: 4) {
+            Text(ProductText.string("webhook_kind_title")).font(.subheadline.weight(.semibold))
+            ObjectRadioChoice(title: ProductText.string("webhook_kind_pulse"), selected: !toggles) { toggles = false }
+            ObjectRadioChoice(title: ProductText.string("webhook_kind_toggle"), selected: toggles) { toggles = true }
+        }
+    }
+}
+
+struct WebhookServerModeConfirmation: View {
+    let cancel: () -> Void
+    let confirm: () -> Void
+    var body: some View {
+        AppDialogSurface {
+            VStack(alignment: .leading, spacing: 18) {
+                Text(ProductText.string("webhook_server_mode_title")).font(.title3.bold()).accessibilityAddTraits(.isHeader)
+                Text(ProductText.string("webhook_server_mode_warning"))
+                HStack(spacing: 12) {
+                    Button(ProductText.string("btn_cancel"), action: cancel).buttonStyle(SecondaryActionStyle())
+                    Button(ProductText.string("btn_ok"), action: confirm).buttonStyle(PrimaryActionStyle())
+                }
+            }
+        }
+    }
+}
+
+private struct ObjectRadioChoice: View {
+    let title: String
+    let selected: Bool
+    let select: () -> Void
+    var body: some View {
+        Button(action: select) {
+            HStack(spacing: 12) {
+                Image(systemName: selected ? "largecircle.fill.circle" : "circle")
+                Text(title).font(.subheadline).frame(maxWidth: .infinity, alignment: .leading)
+            }.foregroundStyle(Brand.ink).frame(minHeight: DesignMetrics.secondaryHeight).contentShape(Rectangle())
+        }.buttonStyle(.plain).accessibilityAddTraits(selected ? .isSelected : [])
     }
 }
 
@@ -42,7 +73,12 @@ struct ObjectCameraFields: View {
         return path.hasPrefix("rtsp://") || path.hasPrefix("rtmp://") || [".m3u8",".mpd",".mp4",".webm",".mkv"].contains { path.hasSuffix($0) }
     }
     var body: some View {
-        Toggle(ProductText.string("snap_title"),isOn:$camera.enabled)
+        Toggle(isOn: $camera.enabled) {
+            VStack(alignment: .leading, spacing: 4) {
+                Text(ProductText.string("snap_title"))
+                Text(ProductText.string("snap_hint")).font(.footnote).foregroundStyle(Brand.secondaryInk)
+            }
+        }
         if camera.enabled {
             AppField(ProductText.string("snap_url_label")) {
                 TextField("https://cam.example.com/snap.jpg",text:$camera.url)
@@ -50,9 +86,14 @@ struct ObjectCameraFields: View {
             }
             Text(ProductText.string(camera.url.isEmpty ? "snap_type_unknown" : video ? "snap_type_video" : "snap_type_jpeg"))
                 .font(.footnote).foregroundStyle(Brand.secondaryInk)
-            Picker(ProductText.string("automation_rule_auth"),selection:$camera.authType) {
-                ForEach(["none","basic","bearer","header"],id:\.self) { value in Text(ProductText.string("snap_auth_"+value)).tag(value) }
-            }.pickerStyle(.segmented)
+            LazyVGrid(columns: [GridItem(.adaptive(minimum: 120))], spacing: 8) {
+                ForEach(["none", "basic", "bearer", "header"], id: \.self) { value in
+                    Button { camera.authType = value } label: { Text(ProductText.string("snap_auth_" + value)).font(.subheadline) }
+                        .buttonStyle(SecondaryActionStyle())
+                        .overlay(RoundedRectangle(cornerRadius: DesignMetrics.actionRadius).strokeBorder(camera.authType == value ? Brand.ink : .clear, lineWidth: 2))
+                        .accessibilityAddTraits(camera.authType == value ? .isSelected : [])
+                }
+            }
             if camera.authType == "header" {
                 AppField(ProductText.string("snap_auth_header_name")) {
                     TextField("X-Api-Key",text:$camera.authHeader).textInputAutocapitalization(.never).autocorrectionDisabled()
@@ -60,7 +101,7 @@ struct ObjectCameraFields: View {
             }
             if camera.authType != "none" {
                 AppField(ProductText.string("snap_auth_"+camera.authType+"_value")) {
-                    SecureField("",text:$camera.authValue).textInputAutocapitalization(.never).autocorrectionDisabled()
+                    TextField("",text:$camera.authValue).textInputAutocapitalization(.never).autocorrectionDisabled().textInputAutocapitalization(.never).autocorrectionDisabled()
                 }
             }
             if !video {
