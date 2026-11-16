@@ -1,13 +1,13 @@
 {
-  "SOURCE_SHA": "167fe3403a86fd7fadd5a969a7ae66e1fd091c3b",
-  "BUILD_RESULT": "cancelled",
-  "BUILD_URL": "https://github.com/entrixy/ios-build./actions/runs/43818335755",
+  "SOURCE_SHA": "7ff99ed599b9c8ae061b54d17bcbc5ebb1d04eca",
+  "BUILD_RESULT": "success",
+  "BUILD_URL": "https://github.com/entrixy/ios-build./actions/runs/43818443994",
   "checks": {
-    "core_tests": "cancelled",
-    "debug_build": "skipped",
-    "release_build": "skipped",
-    "native_tests": "skipped",
-    "captures": "skipped"
+    "core_tests": "success",
+    "debug_build": "success",
+    "release_build": "success",
+    "native_tests": "success",
+    "captures": "success"
   },
   "capture_mode": "native-swiftui-design-catalog",
   "visual_review": "pending"

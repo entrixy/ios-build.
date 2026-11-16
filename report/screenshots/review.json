@@ -1,0 +1,150 @@
+{
+  "kind": "native-design-review",
+  "source_sha": "7ff99ed599b9c8ae061b54d17bcbc5ebb1d04eca",
+  "captures": [
+    {
+      "screen": "buttons",
+      "title": "Кнопки и состояния",
+      "file": "iphone16-light-design-buttons.png",
+      "device": "iphone16",
+      "appearance": "light",
+      "source_sha": "7ff99ed599b9c8ae061b54d17bcbc5ebb1d04eca",
+      "native_design": true,
+      "visible_text_verified": true,
+      "runtime": "com.apple.CoreSimulator.SimRuntime.iOS-26-2",
+      "sha256": "56ff43088d564ac50d22b885e9f64a3ebd6949e618b11857e1e5c0eb6644b0aa"
+    },
+    {
+      "screen": "fields",
+      "title": "Поля и переключатели",
+      "file": "iphone16-light-design-fields.png",
+      "device": "iphone16",
+      "appearance": "light",
+      "source_sha": "7ff99ed599b9c8ae061b54d17bcbc5ebb1d04eca",
+      "native_design": true,
+      "visible_text_verified": true,
+      "runtime": "com.apple.CoreSimulator.SimRuntime.iOS-26-2",
+      "sha256": "cf0fca79cd15ad627cf430ffc68ea37e1c60edd32971c21053bed7d3b890289a"
+    },
+    {
+      "screen": "key-page",
+      "title": "Вложенная страница с нижней навигацией",
+      "file": "iphone16-light-design-key-page.png",
+      "device": "iphone16",
+      "appearance": "light",
+      "source_sha": "7ff99ed599b9c8ae061b54d17bcbc5ebb1d04eca",
+      "native_design": true,
+      "visible_text_verified": true,
+      "runtime": "com.apple.CoreSimulator.SimRuntime.iOS-26-2",
+      "sha256": "dfab2d251662b283b1df920ae4a64db802a2af534dff7c51f94d9e4deb41fd31"
+    },
+    {
+      "screen": "rows",
+      "title": "Списки и разделители",
+      "file": "iphone16-light-design-rows.png",
+      "device": "iphone16",
+      "appearance": "light",
+      "source_sha": "7ff99ed599b9c8ae061b54d17bcbc5ebb1d04eca",
+      "native_design": true,
+      "visible_text_verified": true,
+      "runtime": "com.apple.CoreSimulator.SimRuntime.iOS-26-2",
+      "sha256": "7f0192fac24c78e2659e824db8ca6f2b852124e93a3b08a564f0cc2c97558a6e"
+    },
+    {
+      "screen": "objects",
+      "title": "Карточки объектов",
+      "file": "iphone16-light-design-objects.png",
+      "device": "iphone16",
+      "appearance": "light",
+      "source_sha": "7ff99ed599b9c8ae061b54d17bcbc5ebb1d04eca",
+      "native_design": true,
+      "visible_text_verified": true,
+      "runtime": "com.apple.CoreSimulator.SimRuntime.iOS-26-2",
+      "sha256": "d03fb0f152302fe3d6856ec58c3c96fcb8a43049ec32ff72290ad5740a132f80"
+    },
+    {
+      "screen": "journal",
+      "title": "Журнал",
+      "file": "iphone16-light-design-journal.png",
+      "device": "iphone16",
+      "appearance": "light",
+      "source_sha": "7ff99ed599b9c8ae061b54d17bcbc5ebb1d04eca",
+      "native_design": true,
+      "visible_text_verified": true,
+      "runtime": "com.apple.CoreSimulator.SimRuntime.iOS-26-2",
+      "sha256": "1fcc22f99951fadbc385c21903dc37d44ca5898f8135abb78311d7bed705b717"
+    },
+    {
+      "screen": "navigation",
+      "title": "Навигация и разделы",
+      "file": "iphone16-light-design-navigation.png",
+      "device": "iphone16",
+      "appearance": "light",
+      "source_sha": "7ff99ed599b9c8ae061b54d17bcbc5ebb1d04eca",
+      "native_design": true,
+      "visible_text_verified": true,
+      "runtime": "com.apple.CoreSimulator.SimRuntime.iOS-26-2",
+      "sha256": "047052f41fce09c7846466ee2020a032d3c1756657dcc9192cc8305c31754037"
+    },
+    {
+      "screen": "confirm",
+      "title": "Диалог подтверждения",
+      "file": "iphone16-light-design-confirm.png",
+      "device": "iphone16",
+      "appearance": "light",
+      "source_sha": "7ff99ed599b9c8ae061b54d17bcbc5ebb1d04eca",
+      "native_design": true,
+      "visible_text_verified": true,
+      "runtime": "com.apple.CoreSimulator.SimRuntime.iOS-26-2",
+      "sha256": "9e2bb66caea2eca1729e4bbf7c442762c6e7e00613f1c1d0b520878670206838"
+    },
+    {
+      "screen": "delete",
+      "title": "Диалог удаления",
+      "file": "iphone16-light-design-delete.png",
+      "device": "iphone16",
+      "appearance": "light",
+      "source_sha": "7ff99ed599b9c8ae061b54d17bcbc5ebb1d04eca",
+      "native_design": true,
+      "visible_text_verified": true,
+      "runtime": "com.apple.CoreSimulator.SimRuntime.iOS-26-2",
+      "sha256": "57d94853c8837e351cb2383659fd3a488ca087569f102125aaeec41abdd2bea9"
+    },
+    {
+      "screen": "code",
+      "title": "Создание кода Entrixy",
+      "file": "iphone16-light-design-code.png",
+      "device": "iphone16",
+      "appearance": "light",
+      "source_sha": "7ff99ed599b9c8ae061b54d17bcbc5ebb1d04eca",
+      "native_design": true,
+      "visible_text_verified": true,
+      "runtime": "com.apple.CoreSimulator.SimRuntime.iOS-26-2",
+      "sha256": "5843526e69a38b5e5931b4fcb77c593effd9f0428074f8908c22d414bb282a42"
+    },
+    {
+      "screen": "avatar",
+      "title": "Своя картинка и пресеты",
+      "file": "iphone16-light-design-avatar.png",
+      "device": "iphone16",
+      "appearance": "light",
+      "source_sha": "7ff99ed599b9c8ae061b54d17bcbc5ebb1d04eca",
+      "native_design": true,
+      "visible_text_verified": true,
+      "runtime": "com.apple.CoreSimulator.SimRuntime.iOS-26-2",
+      "sha256": "62a2d8112c28c0b97f6b32651511e7ae8c2d3c7cfc1d01a457f50aa8e55155e2"
+    },
+    {
+      "screen": "selectors",
+      "title": "Выбор и сроки",
+      "file": "iphone16-light-design-selectors.png",
+      "device": "iphone16",
+      "appearance": "light",
+      "source_sha": "7ff99ed599b9c8ae061b54d17bcbc5ebb1d04eca",
+      "native_design": true,
+      "visible_text_verified": true,
+      "runtime": "com.apple.CoreSimulator.SimRuntime.iOS-26-2",
+      "sha256": "249ef4cfe99a18c3f822fef9a23d3b7a756b59f11f96c0080e661fe56cb30840"
+    }
+  ]
+}
