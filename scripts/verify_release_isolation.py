@@ -5,7 +5,7 @@ import plistlib
 from pathlib import Path
 
 MARKERS = [b'--capture-actions', b'preview-bootstrap.json', b'action-capture-status.json',
-           b'com.entrixy.ios.capture.', b'controller.invalid', b'--native-design', b'native-design-status.json']
+           b'com.entrixy.ios.capture.', b'controller.invalid', b'--native-design', b'native-design-status.json', b'--stage-two', b'stage-two-status.json']
 
 
 def main():

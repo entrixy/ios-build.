@@ -36,7 +36,7 @@ struct OwnerServersScreen: View {
                 Button { adding = true } label: { Label("Добавить сервер", systemImage: "plus") }
                     .disabled(!model.storageReady || model.ownerBusy)
             } header: { Text("Мои серверы") }
-            footer: { Text("На каждом сервере сохраняется отдельный доступ владельца. Полученные от других людей ключи находятся в разделе «Полученные ключи».") }
+            footer: { Text("На каждом сервере сохраняется отдельный доступ владельца. Полученные от других людей ключи находятся в настройках на вкладке «Ключи».") }
         }
         .navigationTitle("Мои серверы").navigationBarTitleDisplayMode(.inline)
         .refreshable { await model.refreshOwners() }
@@ -91,11 +91,20 @@ struct AddOwnerServerScreen: View {
 
 struct OwnerObjectsScreen: View {
     @EnvironmentObject private var model: AppModel
+    let server: String
+    var body: some View {
+        List { OwnerObjectRows(server: server) }
+            .navigationTitle("Мои объекты").navigationBarTitleDisplayMode(.inline)
+            .refreshable { await model.refreshOwners() }
+    }
+}
+struct OwnerObjectRows: View {
+    @EnvironmentObject private var model: AppModel
     @State private var adding = false
     let server: String
     private var owner: OwnerAccount? { model.owners.first { $0.server == server } }
     var body: some View {
-        List {
+        Group {
             if let owner {
                 Section {
                     ForEach(owner.objects ?? []) { object in
@@ -140,8 +149,6 @@ struct OwnerObjectsScreen: View {
                 }
             }
         }
-        .navigationTitle("Мои объекты").navigationBarTitleDisplayMode(.inline)
-        .refreshable { await model.refreshOwners() }
         .sheet(isPresented: $adding) { AddOwnerObjectScreen(server: server) }
     }
 }

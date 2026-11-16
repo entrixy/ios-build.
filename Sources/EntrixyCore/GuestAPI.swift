@@ -1,4 +1,5 @@
 import Foundation
+import CoreFoundation
 #if canImport(FoundationNetworking)
 import FoundationNetworking
 #endif
@@ -189,12 +190,22 @@ public final class GuestAPI: GuestMigrationTransport, DelegationTransport, Guest
     }
 
     public func bundle(invite: GuestInvite, fingerprint: String) async throws -> Data {
+        try await bundleWithDepth(invite: invite, fingerprint: fingerprint).contents
+    }
+    public func bundleWithDepth(invite: GuestInvite, fingerprint: String) async throws -> (contents: Data, depth: Int) {
         let response = try await post(invite: invite, fingerprint: fingerprint, endpoint: "key_bundle", body: Data("{}".utf8))
         guard let object = try JSONSerialization.jsonObject(with: response) as? [String: Any],
               let cipher = object["bundle_cipher"] as? String, !cipher.isEmpty else {
             throw Failure(status: 0, code: "awaiting_owner")
         }
-        return try GuestCrypto.decrypt(key: invite.bundleKey, envelope: cipher)
+        let raw = object["delegate_depth"]
+        let depth = raw == nil ? 0 : (raw as? Int ?? -1)
+        guard (0...5).contains(depth) else { throw Failure(status: 0, code: "invalid_delegate_depth") }
+        if let raw {
+            guard let number = raw as? NSNumber, CFGetTypeID(number) != CFBooleanGetTypeID(),
+                  number.doubleValue == Double(depth) else { throw Failure(status: 0, code: "invalid_delegate_depth") }
+        }
+        return (try GuestCrypto.decrypt(key: invite.bundleKey, envelope: cipher), depth)
     }
     /// Read-only initial WSS snapshot; never sends an opening or retries a command.
     public func snapshot(invite: GuestInvite, fingerprint: String) async throws -> Data {

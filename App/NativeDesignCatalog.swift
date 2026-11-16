@@ -38,7 +38,7 @@ struct NativeDesignCatalog: View {
         case "rows": return "Списки и разделители"
         case "objects": return "Карточки объектов"
         case "journal": return "Журнал"
-        case "navigation": return "Навигация"
+        case "navigation": return "Настройки"
         case "key-page": return "Ключи"
         case "confirm": return "Подтверждение"
         case "delete": return "Удаление"
@@ -51,7 +51,7 @@ struct NativeDesignCatalog: View {
     var body: some View {
         catalogScreen
             .safeAreaInset(edge: .bottom, spacing: 0) {
-                CatalogBottomNavigation(selection: $mainTab) {
+                AppBottomNavigation(selection: $mainTab) {
                     showingCatalog = false
                     showingKeyPage = false
                 }
@@ -226,7 +226,7 @@ struct NativeDesignCatalog: View {
     }
     private var navigation: some View {
         VStack(alignment: .leading, spacing: 20) {
-            HStack { BrandLogo(); Text("Настройки").font(.title2.bold()); Spacer() }
+            HStack { BrandLogo(); Spacer() }
             Picker("Раздел настроек", selection: $choice) {
                 Text("Объекты").tag(0); Text("Ключи").tag(1); Text("Звуки").tag(2); Text("Система").tag(3)
             }.pickerStyle(.segmented)
@@ -290,41 +290,13 @@ struct NativeDesignCatalog: View {
         }
     }
 }
-// One flat full-width surface, shared by every catalog page and pushed destination.
-private struct CatalogBottomNavigation: View {
-    @Binding var selection: AppTab
-    let onSelect: () -> Void
-    private let tabs: [(AppTab, String, String)] = [
-        (.control, "Управление", "tab-control"), (.settings, "Настройки", "tab-settings"),
-        (.guests, "Гости", "tab-guests"), (.journal, "Журнал", "tab-journal")
-    ]
-    var body: some View {
-        VStack(spacing: 0) {
-            Divider()
-            HStack(spacing: 0) {
-                ForEach(tabs, id: \.0) { tab, title, icon in
-                    Button { selection = tab; onSelect() } label: {
-                        VStack(spacing: 5) {
-                            Image(icon).resizable().scaledToFit().frame(width: 26, height: 26)
-                            Text(title).font(.system(size: 11, weight: selection == tab ? .semibold : .regular))
-                        }.frame(maxWidth: .infinity, minHeight: 56)
-                            .foregroundStyle(selection == tab ? Brand.ink : Brand.secondaryInk)
-                            .contentShape(Rectangle())
-                    }.buttonStyle(.plain)
-                        .accessibilityAddTraits(selection == tab ? .isSelected : [])
-                }
-            }.padding(.horizontal, 8).padding(.top, 6).padding(.bottom, 4)
-        }.background(Color(uiColor: .secondarySystemGroupedBackground).ignoresSafeArea(edges: .bottom))
-    }
-}
 private struct CatalogButtonStyle: ButtonStyle {
-    @Environment(\.isEnabled) private var enabled
     let kind: Int
     func makeBody(configuration: Configuration) -> some View {
-        configuration.label
-            .foregroundStyle(!enabled ? Color.secondary : (kind == 1 ? Color(red: 27/255, green: 29/255, blue: 59/255) : .white))
-            .background(!enabled ? Color(uiColor: .systemGray5) : (kind == 2 ? Color(red: 186/255, green: 26/255, blue: 26/255) : (kind == 1 ? Color(red: 226/255, green: 227/255, blue: 237/255) : Color(red: 27/255, green: 29/255, blue: 59/255))), in: RoundedRectangle(cornerRadius: 12))
-            .opacity(configuration.isPressed ? 0.8 : 1)
+        if kind == 0 { PrimaryActionStyle().makeBody(configuration: configuration) }
+        else if kind == 2 {
+            configuration.label.foregroundStyle(Color.white).background(AppPalette.destructive, in: RoundedRectangle(cornerRadius: DesignMetrics.actionRadius)).opacity(configuration.isPressed ? 0.8 : 1)
+        } else { SecondaryActionStyle().makeBody(configuration: configuration) }
     }
 }
 #endif

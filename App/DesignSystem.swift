@@ -5,8 +5,8 @@ import UIKit
 enum DesignMetrics {
     static let pageInset: CGFloat = 20
     static let sectionGap: CGFloat = 20
-    static let actionRadius: CGFloat = 14
-    static let primaryHeight: CGFloat = 54
+    static let actionRadius: CGFloat = 12
+    static let primaryHeight: CGFloat = 48
     static let secondaryHeight: CGFloat = 48
 }
 
@@ -29,26 +29,26 @@ struct PrimaryActionStyle: ButtonStyle {
     @Environment(\.isEnabled) private var isEnabled
     func makeBody(configuration: Configuration) -> some View {
         configuration.label.font(.headline)
-            .foregroundStyle(isEnabled ? Color(uiColor: .systemBackground) : Brand.secondaryInk)
+            .foregroundStyle(isEnabled ? (configuration.role == .destructive ? Color.white : Color(uiColor: .systemBackground)) : Brand.secondaryInk)
             .frame(maxWidth: .infinity).frame(minHeight: DesignMetrics.primaryHeight)
-            .background(isEnabled ? Brand.ink : Color(uiColor: .tertiarySystemFill),
+            .background(isEnabled ? (configuration.role == .destructive ? AppPalette.destructive : Brand.ink) : Color(uiColor: .tertiarySystemFill),
                         in: RoundedRectangle(cornerRadius: DesignMetrics.actionRadius))
             .opacity(configuration.isPressed ? 0.86 : 1)
     }
 }
 
+enum AppPalette {
+    static let destructive = Color(uiColor: UIColor { $0.userInterfaceStyle == .dark ? UIColor(red: 1, green: 0.40, blue: 0.36, alpha: 1) : UIColor(red: 186/255, green: 26/255, blue: 26/255, alpha: 1) })
+    static let secondary = Color(uiColor: UIColor { $0.userInterfaceStyle == .dark ? UIColor(white: 0.23, alpha: 1) : UIColor(red: 226/255, green: 227/255, blue: 237/255, alpha: 1) })
+}
 struct SecondaryActionStyle: ButtonStyle {
-    let surface: Color
-    init(surface: Color = Color(uiColor: .secondarySystemGroupedBackground)) { self.surface = surface }
     @Environment(\.isEnabled) private var isEnabled
     func makeBody(configuration: Configuration) -> some View {
         configuration.label.font(.body.weight(.semibold))
-            .foregroundStyle(isEnabled ? (configuration.role == .destructive ? Color(uiColor: .systemRed) : Brand.ink) : Brand.secondaryInk)
+            .foregroundStyle(isEnabled ? (configuration.role == .destructive ? Color.white : Brand.ink) : Brand.secondaryInk)
             .padding(.horizontal, 14)
             .frame(maxWidth: .infinity, minHeight: DesignMetrics.secondaryHeight)
-            .background(surface, in: RoundedRectangle(cornerRadius: DesignMetrics.actionRadius))
-            .overlay(RoundedRectangle(cornerRadius: DesignMetrics.actionRadius)
-                .strokeBorder(isEnabled && configuration.role == .destructive ? Color(uiColor: .systemRed) : Brand.secondaryInk.opacity(0.45), lineWidth: 1))
+            .background(isEnabled ? (configuration.role == .destructive ? AppPalette.destructive : AppPalette.secondary) : Color(uiColor: .systemGray5), in: RoundedRectangle(cornerRadius: DesignMetrics.actionRadius))
             .opacity(configuration.isPressed ? 0.8 : 1)
     }
 }

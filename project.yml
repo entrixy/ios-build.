@@ -65,6 +65,16 @@ targets:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.entrixy.ios.tests
         GENERATE_INFOPLIST_FILE: YES
+  EntrixyUITests:
+    type: bundle.ui-testing
+    platform: iOS
+    sources: [Tests/EntrixyUITests]
+    dependencies:
+      - target: Entrixy
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.entrixy.ios.uitests
+        GENERATE_INFOPLIST_FILE: YES
 schemes:
   Entrixy:
     build:
@@ -75,6 +85,7 @@ schemes:
       targets:
         Entrixy: all
         EntrixyAppTests: [test]
+        EntrixyUITests: [test]
     test:
-      targets: [EntrixyAppTests]
+      targets: [EntrixyAppTests, EntrixyUITests]
       gatherCoverageData: false

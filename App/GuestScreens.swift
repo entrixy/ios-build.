@@ -18,7 +18,6 @@ struct ControlScreen: View {
                 ScrollView {
                     LazyVStack(alignment: .leading, spacing: 16) {
                         OwnerControlSection(control: model.ownerControl, query: query, ble: model.bleControl)
-                        if !model.guests.isEmpty { Text("Полученные объекты").font(.subheadline).foregroundStyle(.secondary) }
                         ForEach(model.guests) { guest in
                             if guest.objects.isEmpty && query.isEmpty {
                                 VStack(alignment: .leading, spacing: 8) {
@@ -110,58 +109,101 @@ struct ConnectionLabel: View {
     }
 }
 
+enum SettingsTab: String, CaseIterable { case objects = "Объекты", keys = "Ключи", sounds = "Звуки", system = "Система" }
+
 struct SettingsScreen: View {
     @EnvironmentObject private var model: AppModel
     @AppStorage("entrixy.appearance") private var appearance = "system"
+    @State private var selected: SettingsTab = .objects
     @State private var showKey = false
     @State private var showCodeSettings = false
+    @State private var addingKey = false
+    @State private var addingServer = false
+    @State private var keyInput = ""
     var body: some View {
-        List {
-            Section("Полученные ключи") {
-                if model.guests.isEmpty { Text("Пока нет полученных ключей").foregroundStyle(.secondary) }
-                ForEach(model.guests) { guest in
-                    NavigationLink { KeyDetailScreen(guestID: guest.id) } label: {
-                        VStack(alignment: .leading, spacing: 7) {
-                            Text(guest.invite.server).font(.headline)
-                            Text("Объектов: \(guest.objects.count)").font(.subheadline).foregroundStyle(.secondary)
-                            ConnectionLabel(guestID: guest.id, paused: guest.paused)
-                        }.padding(.vertical, 4)
+        VStack(spacing: 0) {
+            Picker("Раздел настроек", selection: $selected) {
+                ForEach(SettingsTab.allCases, id: \.self) { Text($0.rawValue).tag($0) }
+            }.pickerStyle(.segmented).padding(.horizontal, 20).padding(.vertical, 12)
+                .accessibilityIdentifier("settings-sections")
+            List {
+                switch selected {
+                case .objects:
+                    if model.owners.isEmpty && model.guests.allSatisfy({ $0.objects.isEmpty }) {
+                        Text("Пока нет объектов").foregroundStyle(Brand.secondaryInk)
+                    }
+                    ForEach(model.owners) { owner in
+                        if owner.registrationPending {
+                            Section(owner.server) {
+                                Text("Регистрация ожидает подтверждения").foregroundStyle(Brand.secondaryInk)
+                                NavigationLink("Проверить сервер") { OwnerServersScreen() }
+                            }
+                        } else { OwnerObjectRows(server: owner.server) }
+                    }
+                    ForEach(model.guests) { guest in
+                        Section(guest.invite.server) {
+                            ForEach(guest.objects) { object in
+                                HStack(spacing: 12) {
+                                    ObjectAvatar(object: object, guestID: guest.id, size: 42)
+                                    Text(object.label)
+                                }.padding(.vertical, 6)
+                            }
+                        }
+                    }
+                    Section {
+                        Button("Добавить сервер") { addingServer = true }.buttonStyle(PrimaryActionStyle())
+                            .listRowBackground(Color.clear)
+                        NavigationLink("Мои серверы") { OwnerServersScreen() }
+                    }
+                case .keys:
+                    if model.guests.isEmpty { Text("Пока нет полученных ключей").foregroundStyle(Brand.secondaryInk) }
+                    ForEach(model.guests) { guest in
+                        NavigationLink { KeyDetailScreen(guestID: guest.id) } label: {
+                            VStack(alignment: .leading, spacing: 7) {
+                                Text(guest.invite.server).font(.headline)
+                                Text("Объектов: \(guest.objects.count)").font(.subheadline).foregroundStyle(Brand.secondaryInk)
+                                ConnectionLabel(guestID: guest.id, paused: guest.paused)
+                            }.padding(.vertical, 4)
+                        }.accessibilityIdentifier("received-key-" + guest.id)
+                    }
+                    Section {
+                        Button("Добавить ключ") { keyInput = ""; addingKey = true }.buttonStyle(PrimaryActionStyle()).listRowBackground(Color.clear)
+                        NavigationLink("Ожидаемые ключи") { DelegationInboxScreen() }
+                    }
+                case .sounds:
+                    Text("Настройки звуков ещё не перенесены в iOS.").foregroundStyle(Brand.secondaryInk)
+                case .system:
+                    Section {
+                        Picker("Тема", selection: $appearance) {
+                            Text("Как в системе").tag("system"); Text("Светлая").tag("light"); Text("Тёмная").tag("dark")
+                        }
+                        NavigationLink("Код и вход") { AppEntryLockSettings() }
+                        NavigationLink("Резервная копия") { BackupScreen(manager: model.backups) }
+                        NavigationLink("Сообщения") { MessagesScreen() }
+                        NavigationLink("Лицензии") { LicenseScreen() }
+                        KeyValueRow(title: "Версия", value: Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "—")
                     }
                 }
-            }
-            Section("Мои объекты") {
-                NavigationLink("Мои серверы") { OwnerServersScreen() }
-            }
-            Section("Оформление") {
-                Picker("Тема", selection: $appearance) {
-                    Text("Как в системе").tag("system")
-                    Text("Светлая").tag("light")
-                    Text("Тёмная").tag("dark")
-                }
-            }
-            Section("Система") {
-                KeyValueRow(title: "Приложение", value: "Entrixy для iOS")
-                KeyValueRow(title: "Версия", value: "0.1.0")
-                NavigationLink("Код и вход") { AppEntryLockSettings() }
-                NavigationLink("Сообщения") { MessagesScreen() }
-                NavigationLink("Ожидаемые ключи") { DelegationInboxScreen() }
-                NavigationLink("Резервная копия") { BackupScreen(manager: model.backups) }
-                NavigationLink("Лицензии") { LicenseScreen() }
-            }
-        }.navigationTitle("Настройки")
-            .refreshable { await model.refresh() }
+            }.scrollContentBackground(.hidden)
+                .refreshable { if selected == .objects { await model.refreshOwners() }; await model.refresh() }
+        }.background(Color(uiColor: .systemGroupedBackground)).navigationTitle("Настройки")
             .navigationDestination(isPresented: $showCodeSettings) { AppEntryLockSettings() }
             .navigationDestination(isPresented: $showKey) {
                 if let guest = model.guests.first { KeyDetailScreen(guestID: guest.id) }
             }
+            .sheet(isPresented: $addingKey) { KeyImportScreen(input: $keyInput) }
+            .sheet(isPresented: $addingServer) { AddOwnerServerScreen() }
             .task {
                 #if DEBUG && targetEnvironment(simulator)
-                if let scenario = ActionCaptureScenario.current, [ActionCaptureScenario.appCodeSetup, .appCodeSettings].contains(scenario) { showCodeSettings = true }
-                #endif
-                if PreviewRouting.keyDetail && !model.guests.isEmpty {
-                    try? await Task.sleep(nanoseconds: 400_000_000)
-                    showKey = true
+                if let scenario = ActionCaptureScenario.current, [ActionCaptureScenario.appCodeSetup, .appCodeSettings].contains(scenario) { selected = .system; showCodeSettings = true }
+                if let route = StageTwoCapture.current {
+                    selected = route.settingsTab
+                    showKey = route == .keyDetail
+                    showCodeSettings = route == .codeSettings
+                    addingServer = route == .addServer
                 }
+                #endif
+                if PreviewRouting.keyDetail && !model.guests.isEmpty { selected = .keys; showKey = true }
             }
     }
 }
@@ -174,24 +216,26 @@ struct KeyDetailScreen: View {
     var body: some View {
         Group {
             if let guest = model.guests.first(where: { $0.id == guestID }) {
-                List {
-                    Section {
+                ScrollView {
+                    VStack(alignment: .leading, spacing: DesignMetrics.sectionGap) {
+                    VStack(alignment: .leading, spacing: 12) {
                         KeyValueRow(title: "Сервер", value: guest.invite.server)
+                        Divider()
                         KeyValueRow(title: "Объектов", value: String(guest.objects.count))
+                        Divider()
                         ConnectionLabel(guestID: guest.id, paused: guest.paused)
                         if let date = guest.checkedAt {
+                            Divider()
                             KeyValueRow(title: "Обновлено", value: date.formatted(date: .abbreviated, time: .shortened))
                         }
-                    }
-                    Section {
+                    }.padding(16).background(Color(uiColor: .secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 16))
                         Button { Task { await model.refresh() } } label: {
-                            Label("Обновить данные", systemImage: "arrow.clockwise").foregroundStyle(Brand.ink)
+                            Label("Обновить данные", systemImage: "arrow.clockwise")
                         }.buttonStyle(SecondaryActionStyle()).disabled(model.busy)
-                    }
-                    Section {
                         Button("Удалить ключ с iPhone", role: .destructive) { removing = true }.buttonStyle(SecondaryActionStyle()).disabled(model.busy)
-                    } footer: { Text("Удаление уберёт ключ и его объекты из этого приложения. Повторно добавить ключ можно по исходной ссылке.").foregroundStyle(Brand.secondaryInk) }
-                }
+                        Text("Удаление уберёт ключ и его объекты из этого приложения. Повторно добавить ключ можно по исходной ссылке.").font(.footnote).foregroundStyle(Brand.secondaryInk)
+                    }.padding(DesignMetrics.pageInset)
+                }.background(Color(uiColor: .systemGroupedBackground))
             } else { EmptyScreen(image: "icon-key", title: "Ключ удалён", detail: "Вы можете добавить его снова по ссылке владельца.") }
         }
         .navigationTitle("Полученный ключ").navigationBarTitleDisplayMode(.inline)
@@ -219,7 +263,7 @@ struct JournalScreen: View {
                 }
                 Button(role: .destructive) { model.clearJournal() } label: { JournalToolbarItem(symbol: "trash", title: "Очистить") }
             }
-            .buttonStyle(SecondaryActionStyle(surface: .clear)).foregroundStyle(Brand.ink).disabled(model.journal.isEmpty)
+            .buttonStyle(SecondaryActionStyle()).foregroundStyle(Brand.ink).disabled(model.journal.isEmpty)
             .padding(.horizontal, DesignMetrics.pageInset).padding(.top, 12).padding(.bottom, 16)
             if model.journal.isEmpty {
                 Text("Журнал пуст. Здесь будут появляться вызовы.")
@@ -263,7 +307,7 @@ struct JournalScreen: View {
         }
         .task {
             #if DEBUG && targetEnvironment(simulator)
-            guard ActionCaptureScenario.current == nil else { return }
+            guard ActionCaptureScenario.current == nil && StageTwoCapture.current == nil else { return }
             #endif
             await model.passManager.reload()
         }

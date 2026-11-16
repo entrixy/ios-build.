@@ -33,6 +33,25 @@ final class GuestAPITests: XCTestCase {
     }
     override func tearDown() { StubProtocol.handler = nil; super.tearDown() }
 
+    func testBundleDepthHintIsPreservedWithoutChangingCiphertextAndRejectsInvalidTypes() async throws {
+        let link = try invite()
+        let payload = Data("{}".utf8)
+        let cipher = try GuestCrypto.encrypt(key: link.bundleKey, plaintext: payload)
+        for depth in [0, 1, 5] {
+            StubProtocol.handler = { _ in (200, try JSONSerialization.data(withJSONObject: ["bundle_cipher": cipher, "delegate_depth": depth])) }
+            let reply = try await api().bundleWithDepth(invite: link, fingerprint: "test")
+            XCTAssertEqual(reply.depth, depth); XCTAssertEqual(reply.contents, payload)
+        }
+        for invalid in [true, -1, 6, 1.5, "1"] as [Any] {
+            StubProtocol.handler = { _ in (200, try JSONSerialization.data(withJSONObject: ["bundle_cipher": cipher, "delegate_depth": invalid])) }
+            do { _ = try await api().bundleWithDepth(invite: link, fingerprint: "test"); XCTFail("Invalid depth accepted") }
+            catch { XCTAssertEqual((error as? GuestAPI.Failure)?.code, "invalid_delegate_depth") }
+        }
+        StubProtocol.handler = { _ in (200, try JSONSerialization.data(withJSONObject: ["bundle_cipher": cipher])) }
+        let legacy = try await api().bundleWithDepth(invite: link, fingerprint: "test")
+        XCTAssertEqual(legacy.depth, 0)
+    }
+
     private func requestBody(_ request: URLRequest) throws -> Data {
         if let body = request.httpBody { return body }
         guard let stream = request.httpBodyStream else { return Data() }

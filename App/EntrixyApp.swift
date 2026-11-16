@@ -8,7 +8,9 @@ struct EntrixyApp: App {
         WindowGroup {
             Group {
             #if DEBUG && targetEnvironment(simulator)
-            if let page = NativeDesignCatalog.requestedPage {
+            if let route = StageTwoCapture.current {
+                StageTwoRoot(route: route)
+            } else if let page = NativeDesignCatalog.requestedPage {
                 NativeDesignCatalog(page: page)
             } else if let scenario = ActionCaptureScenario.current {
                 ActionCaptureRoot(scenario: scenario)
@@ -47,6 +49,7 @@ private struct LiveAppRoot: View {
 struct RootView: View {
     @EnvironmentObject private var model: AppModel
     @State private var selectedTab: AppTab
+    @State private var userPickedTab = false
     @State private var adding = false
     @State private var input = ""
     private let showAddKeyOnLaunch: Bool
@@ -59,17 +62,26 @@ struct RootView: View {
     }
 
     var body: some View {
-        TabView(selection: $selectedTab) {
-            NavigationStack { ControlScreen { input = ""; adding = true }.modifier(BrandNavigationHeader()) }
-                .tabItem { Label("Управление", image: "tab-control") }.tag(AppTab.control)
-            NavigationStack { SettingsScreen().modifier(BrandNavigationHeader()) }
-                .tabItem { Label("Настройки", image: "tab-settings") }.tag(AppTab.settings)
-            NavigationStack { OwnerGuestsScreen().modifier(BrandNavigationHeader()) }.tabItem { Label("Гости", image: "tab-guests") }.tag(AppTab.guests)
-            NavigationStack { JournalScreen().modifier(BrandNavigationHeader()) }
-                .tabItem { Label("Журнал", image: "tab-journal") }.tag(AppTab.journal)
+        NavigationStack {
+            Group {
+                switch model.navigationState.resolve(selectedTab) {
+                case .control: ControlScreen { input = ""; adding = true }.modifier(BrandNavigationHeader())
+                case .settings: SettingsScreen().modifier(BrandNavigationHeader())
+                case .guests: OwnerGuestsScreen().modifier(BrandNavigationHeader())
+                case .journal: JournalScreen().modifier(BrandNavigationHeader())
+                }
+            }
+        }.id(selectedTab)
+        .safeAreaInset(edge: .bottom, spacing: 0) {
+            AppBottomNavigation(selection: $selectedTab, tabs: model.navigationState.tabs) { userPickedTab = true }
+        }
+        .onChange(of: model.navigationState) { value in
+            if !userPickedTab && value.hasActions && selectedTab == .settings { selectedTab = .control }
+            else { selectedTab = value.resolve(selectedTab) }
         }
         .tint(Brand.primary)
         .task {
+            selectedTab = model.navigationState.resolve(selectedTab)
             if let url = pendingURL { pendingURL = nil; receiveURL(url) }
             if showAddKeyOnLaunch {
                 try? await Task.sleep(nanoseconds: 400_000_000)

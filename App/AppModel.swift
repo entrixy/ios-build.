@@ -1091,7 +1091,8 @@ final class AppModel: ObservableObject {
                 let fingerprint = GuestCrypto.hash(identity + Data(entry.invite.server.utf8))
                 try await api.bind(invite: entry.invite, fingerprint: fingerprint)
                 guard foreground else { return }
-                let bundle = try await api.bundle(invite: entry.invite, fingerprint: fingerprint)
+                let bundleReply = try await api.bundleWithDepth(invite: entry.invite, fingerprint: fingerprint)
+                let bundle = bundleReply.contents
                 guard foreground else { return }
                 if let b = try JSONSerialization.jsonObject(with: bundle) as? [String: Any],
                    let networks = b["net_block"] as? [Any], !networks.isEmpty {
@@ -1105,6 +1106,7 @@ final class AppModel: ObservableObject {
                 if let index = updated.firstIndex(where: { $0.id == entry.id }) {
                     try updateBLECache(&updated[index], bundle: bundle, snapshot: snapshot)
                     updated[index].objects = objects
+                    updated[index].incomingDepth = bundleReply.depth
                     updated[index].paused = message?["mode"] as? String == "off"
                     updated[index].checkedAt = Date()
                     try save(updated)

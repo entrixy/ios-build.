@@ -8,6 +8,8 @@ struct SavedGuest: Codable, Identifiable {
     var checkedAt: Date?
     var paused = false
     var bleCache: GuestBLECache? = nil
+    // Display/navigation hint only; actual delegation is checked against live allowance.
+    var incomingDepth: Int? = nil
     var id: String { invite.id }
 }
 

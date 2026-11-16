@@ -7,10 +7,10 @@ struct OwnerGuestsScreen: View {
     @State private var adding = false
     var body: some View {
         List {
-            if !model.guests.isEmpty || !model.passedAccess.isEmpty {
+            if model.navigationState.canDelegate || !model.passedAccess.isEmpty {
                 Section { NavigationLink("Передать полученный доступ") { PassedAccessScreen() } }
             }
-            if model.owners.filter({ !$0.registrationPending }).isEmpty {
+            if model.owners.filter({ !$0.registrationPending }).isEmpty && !model.navigationState.canDelegate {
                 Section {
                     Text("Добавьте свой сервер и объекты в настройках, чтобы выдавать ключи гостям.").foregroundStyle(Brand.secondaryInk)
                     NavigationLink("Мои серверы") { OwnerServersScreen() }
@@ -49,7 +49,7 @@ struct OwnerGuestsScreen: View {
             }
         }
         .navigationTitle("Гости")
-        .toolbar { ToolbarItem(placement: .primaryAction) { Button { adding = true } label: { Image(systemName: "plus").accessibilityLabel("Выдать ключ") }.disabled(model.ownerBusy || model.owners.allSatisfy(\.registrationPending)) } }
+        .toolbar { if model.owners.contains(where: { !$0.registrationPending }) { ToolbarItem(placement: .primaryAction) { Button { adding = true } label: { Image(systemName: "plus").accessibilityLabel("Выдать ключ") }.disabled(model.ownerBusy) } } }
         .refreshable { await model.refreshOwners() }
         .sheet(isPresented: $adding) { IssueOwnerKeyScreen() }
     }
