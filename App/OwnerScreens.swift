@@ -122,15 +122,20 @@ struct OwnerObjectRows: View {
                                     }
                                 }
                             }.padding(.vertical, 5)
-                        }
+                        }.alignmentGuide(.listRowSeparatorLeading) { _ in 0 }
                     }
                     if (owner.objects ?? []).isEmpty { Text("Пока нет добавленных объектов").foregroundStyle(Brand.secondaryInk) }
                     NavigationLink { BLEPairingScreen(server: server) } label: {
                         Label("Привязать Bluetooth-контроллер", systemImage: "antenna.radiowaves.left.and.right")
                     }.disabled(model.ownerBusy || owner.registrationPending)
-                    Button { adding = true } label: { Label("Добавить объект", systemImage: "plus") }
-                        .disabled(model.ownerBusy || owner.registrationPending)
+                        .alignmentGuide(.listRowSeparatorLeading) { _ in 0 }
                 } header: { Text(server) }
+                Section {
+                    Button { adding = true } label: { Label("Добавить объект", systemImage: "plus") }
+                        .buttonStyle(SecondaryActionStyle())
+                        .disabled(model.ownerBusy || owner.registrationPending)
+                        .listRowBackground(Color.clear).listRowInsets(EdgeInsets()).listRowSeparator(.hidden)
+                }
                 if !(owner.bleArchivedObjects ?? []).isEmpty {
                     Section {
                         ForEach(owner.bleArchivedObjects ?? []) { object in

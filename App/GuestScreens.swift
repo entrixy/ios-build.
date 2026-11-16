@@ -152,9 +152,9 @@ struct SettingsScreen: View {
                     }
                     Section {
                         Button("Добавить сервер") { addingServer = true }.buttonStyle(PrimaryActionStyle())
-                            .listRowBackground(Color.clear)
-                        NavigationLink("Мои серверы") { OwnerServersScreen() }
+                            .listRowBackground(Color.clear).listRowInsets(EdgeInsets()).listRowSeparator(.hidden)
                     }
+                    Section { NavigationLink("Мои серверы") { OwnerServersScreen() } }
                 case .keys:
                     if model.guests.isEmpty { Text("Пока нет полученных ключей").foregroundStyle(Brand.secondaryInk) }
                     ForEach(model.guests) { guest in
@@ -167,9 +167,10 @@ struct SettingsScreen: View {
                         }.accessibilityIdentifier("received-key-" + guest.id)
                     }
                     Section {
-                        Button("Добавить ключ") { keyInput = ""; addingKey = true }.buttonStyle(PrimaryActionStyle()).listRowBackground(Color.clear)
-                        NavigationLink("Ожидаемые ключи") { DelegationInboxScreen() }
+                        Button("Добавить ключ") { keyInput = ""; addingKey = true }.buttonStyle(PrimaryActionStyle())
+                            .listRowBackground(Color.clear).listRowInsets(EdgeInsets()).listRowSeparator(.hidden)
                     }
+                    Section { NavigationLink("Ожидаемые ключи") { DelegationInboxScreen() } }
                 case .sounds:
                     Text("Настройки звуков ещё не перенесены в iOS.").foregroundStyle(Brand.secondaryInk)
                 case .system:

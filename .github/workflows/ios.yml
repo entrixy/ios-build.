@@ -67,6 +67,13 @@ jobs:
       - name: Capture production navigation and settings on iPhone simulator
         id: captures
         run: python3 scripts/capture_stage_two.py 2>&1 | tee .local-checks/ci/screenshots.log
+      - name: Upload native screen review before interaction tests
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: native-screen-review
+          path: .local-checks/ci/screenshots/
+          retention-days: 3
       - name: Test native Keychain migration, journal and QR photo import
         id: native_tests
         run: python3 scripts/test_simulator.py 2>&1 | tee .local-checks/ci/native-tests.log

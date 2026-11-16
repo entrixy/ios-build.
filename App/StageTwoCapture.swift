@@ -39,7 +39,7 @@ struct StageTwoRoot: View {
         var state = SavedState(identity: Data(repeating: 83, count: 32), guests: [])
         if !route.isEmpty && !route.isOwner {
             let invite = try! GuestInvite.parse("https://controller.invalid/key#AAECAwQFBgcICQoLDA0ODxAREhMUFRYX" + String(repeating: "A", count: 43))
-            let object = try! JSONDecoder().decode(GuestObject.self, from: Data(#"{"id":"7","numberID":7,"kind":"device","label":"Ворота во двор","avatarType":"preset:4"}"#.utf8))
+            let object = try! JSONDecoder().decode(GuestObject.self, from: Data(#"{"id":"7","numberID":7,"kind":"device","label":"Ворота во двор","avatarType":"preset:3"}"#.utf8))
             var guest = SavedGuest(invite: invite, objects: [object])
             guest.incomingDepth = route == .delegatingGuests ? 1 : 0
             state.guests = [guest]
