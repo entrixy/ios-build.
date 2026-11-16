@@ -65,7 +65,6 @@ struct ObjectSettingsRows: View {
     let entries: [CatalogObject]
     @State private var expanded = Set<ObjectReference>()
     @State private var task: ObjectSettingsTask?
-    @State private var deletion: ObjectReference?
 
     var body: some View {
         ForEach(entries) { entry in
@@ -98,7 +97,7 @@ struct ObjectSettingsRows: View {
                         Button { task = entry.kindTask } label: {
                             Label(entry.isOwned ? "Настройки" : "Название", systemImage: "pencil")
                         }.buttonStyle(SecondaryActionStyle())
-                        Button(role: .destructive) { deletion = entry.target } label: {
+                        Button(role: .destructive) { model.objectRemovalTarget = entry.target } label: {
                             Label(entry.isOwned ? "Удалить" : "Скрыть", systemImage: "trash")
                         }.buttonStyle(SecondaryActionStyle())
                             .disabled(model.ownerBusy || model.busy || entry.deletionPending)
@@ -124,36 +123,15 @@ struct ObjectSettingsRows: View {
             case .rename(let target): ReceivedObjectNameScreen(target: target)
             }
         }
-        .confirmationDialog(deletionTitle, isPresented: Binding(get: { deletion != nil }, set: { if !$0 { deletion = nil } }), titleVisibility: .visible) {
-            if let target = deletion {
-                switch target {
-                case let .owned(server, objectID):
-                    Button("Удалить объект", role: .destructive) {
-                        deletion = nil
-                        Task { await model.deleteOwnerObject(server: server, objectID: objectID) }
-                    }
-                case .received:
-                    Button("Скрыть объект", role: .destructive) { if model.hideReceivedObject(target) { deletion = nil } }
-                }
-            }
-            Button("Отмена", role: .cancel) { deletion = nil }
-        } message: {
-            if let target = deletion, case .received = target {
-                Text("Ключ и остальные объекты останутся. Повторное добавление исходного ключа вернёт скрытый объект.")
-            } else { Text("Гости потеряют доступ к этому объекту.") }
-        }
         .task {
             #if DEBUG && targetEnvironment(simulator)
-            if let route = StageTwoCapture.current, [.ownerExpanded, .guestExpanded].contains(route), let first = entries.first {
+            if let route = StageTwoCapture.current, [StageTwoCapture.ownerExpanded, .guestExpanded].contains(route), let first = entries.first {
                 expanded.insert(first.target)
             }
             #endif
         }
     }
-    private var deletionTitle: String {
-        guard let target = deletion, let entry = model.catalogObject(target) else { return "Удалить объект?" }
-        return (entry.isOwned ? "Удалить «" : "Скрыть «") + model.objectLabel(entry) + "»?"
-    }
+
 }
 
 private extension CatalogObject {
@@ -203,5 +181,30 @@ struct AddCatalogObjectScreen: View {
                     .sheetDismissFooter(disabled: model.ownerBusy) { dismiss() }
             }
         }
+    }
+}
+
+
+struct ObjectRemovalConfirmation: View {
+    @EnvironmentObject private var model: AppModel
+    let target: ObjectReference
+    private var received: Bool { if case .received = target { return true }; return false }
+    var body: some View {
+        AppConfirmationDialog(title: received ? "Скрыть объект?" : "Удалить объект?",
+            message: message, actionTitle: received ? "Скрыть объект" : "Удалить объект", destructive: true,
+            cancel: { model.objectRemovalTarget = nil }, confirm: {
+                guard model.canManageGuestAccess, model.catalogObject(target) != nil else { model.objectRemovalTarget = nil; return }
+                switch target {
+                case let .owned(server, objectID):
+                    model.objectRemovalTarget = nil
+                    Task { await model.deleteOwnerObject(server: server, objectID: objectID) }
+                case .received:
+                    if model.hideReceivedObject(target) { model.objectRemovalTarget = nil }
+                }
+            })
+    }
+    private var message: String {
+        let label = model.catalogObject(target).map { "«" + model.objectLabel($0) + "». " } ?? ""
+        return label + (received ? "Ключ и остальные объекты останутся. Повторное добавление исходного ключа вернёт скрытый объект." : "Гости потеряют доступ к этому объекту.")
     }
 }

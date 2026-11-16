@@ -319,9 +319,13 @@ struct OwnerObjectEditor: View {
             }
             if showDeleteOnLaunch { deleting = true }
         }
-        .confirmationDialog("Удалить объект с сервера? Гости потеряют доступ к нему.", isPresented: $deleting, titleVisibility: .visible) {
-            Button("Удалить объект", role: .destructive) {
-                Task { await model.deleteOwnerObject(server: server, objectID: objectID); if object == nil { dismiss() } }
+        .overlay {
+            if deleting {
+                AppConfirmationDialog(title: "Удалить объект?", message: "Гости потеряют доступ к этому объекту.",
+                    actionTitle: "Удалить объект", destructive: true, cancel: { deleting = false }, confirm: {
+                        deleting = false
+                        Task { await model.deleteOwnerObject(server: server, objectID: objectID); if object == nil { dismiss() } }
+                    })
             }
         }
     }

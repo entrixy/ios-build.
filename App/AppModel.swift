@@ -24,6 +24,7 @@ final class AppModel: ObservableObject {
     private var unsavedOwnerObjects: [UUID: OwnerObject] = [:]
     private var unsavedOwnerCredentials: [String: OwnerCredentials] = [:]
     @Published private(set) var guests: [SavedGuest] = []
+    @Published var objectRemovalTarget: ObjectReference?
     @Published private(set) var objectPreferences = ObjectCatalogPreferences()
     @Published private(set) var bleVisibleUntil: [ObjectReference: TimeInterval] = [:]
     @Published private(set) var busy = false

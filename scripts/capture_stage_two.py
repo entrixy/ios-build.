@@ -11,6 +11,7 @@ PAGES = {
  'owner-expanded': ['Настройки', 'Ворота во двор', 'Удалить', 'Добавить объект'],
  'guest-expanded': ['Настройки', 'Ворота во двор', 'Название', 'Скрыть'],
  'add-object': ['Добавить объект', 'Тип объекта', 'Bluetooth', 'Продолжить привязку'],
+ 'object-delete': ['Удалить объект?', 'Гости потеряют доступ', 'Отмена'],
  'owner-guests': ['Гости', 'Выданных ключей пока нет'],
  'delegating-guests': ['Гости', 'Передать полученный доступ'],
  'system': ['Настройки', 'Система', 'Код и вход', 'Резервная копия'],
@@ -24,6 +25,7 @@ TITLES = {
  'owner-expanded': 'Свой объект: раскрытые действия',
  'guest-expanded': 'Полученный объект: локальные действия',
  'add-object': 'Добавление объекта: тип Bluetooth',
+ 'object-delete': 'Удаление объекта: подтверждение',
  'empty': 'Пустой профиль: доступные разделы',
  'guest-control': 'Гость: управление объектом',
  'guest-keys': 'Настройки: полученные ключи',
@@ -58,10 +60,10 @@ def main():
     time.sleep(.5)
    state=json.loads(status.read_text())
    assert state['ready'] and state['route']==page and state['product_routes'] and state['journal']==0, state
-   owner=page in ['owner-objects','owner-guests','add-server','owner-expanded','add-object'];empty=page in ['empty','add-key']
+   owner=page in ['owner-objects','owner-guests','add-server','owner-expanded','add-object','object-delete'];empty=page in ['empty','add-key']
    tabs=(['control'] if not empty else [])+['settings']+(['guests'] if owner or page=='delegating-guests' else [])+['journal']
    assert state['tabs']==tabs and state['owners']==int(owner) and state['guests']==int(not owner and not empty),state
-   visible_tabs=[] if page in ['add-key','add-server','add-object'] else [{'control':'Управление','settings':'Настройки','guests':'Гости','journal':'Журнал'}[x] for x in tabs]
+   visible_tabs=[] if page in ['add-key','add-server','add-object','object-delete'] else [{'control':'Управление','settings':'Настройки','guests':'Гости','journal':'Журнал'}[x] for x in tabs]
    path=OUTPUT/('iphone16-light-stage2-'+page+'.png');deadline=time.monotonic()+240
    while True:
     run('xcrun','simctl','io',device,'screenshot',str(path))

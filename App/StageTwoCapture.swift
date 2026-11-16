@@ -7,6 +7,7 @@ enum StageTwoCapture: String, CaseIterable {
     case ownerObjects = "owner-objects", ownerGuests = "owner-guests", delegatingGuests = "delegating-guests"
     case system, codeSettings = "code-settings", sounds, addKey = "add-key", addServer = "add-server", journal
     case ownerExpanded = "owner-expanded", guestExpanded = "guest-expanded", addObject = "add-object"
+    case objectDelete = "object-delete"
     static var current: Self? {
         let args = ProcessInfo.processInfo.arguments
         guard let i = args.firstIndex(of: "--stage-two"), args.indices.contains(i + 1) else { return nil }
@@ -23,7 +24,7 @@ enum StageTwoCapture: String, CaseIterable {
     var mainTab: AppTab {
         switch self { case .guestControl: return .control; case .ownerGuests, .delegatingGuests: return .guests; case .journal: return .journal; default: return .settings }
     }
-    var isOwner: Bool { [.ownerObjects, .ownerGuests, .addServer, .ownerExpanded, .addObject].contains(self) }
+    var isOwner: Bool { [.ownerObjects, .ownerGuests, .addServer, .ownerExpanded, .addObject, .objectDelete].contains(self) }
     var isEmpty: Bool { [.empty, .addKey].contains(self) }
 }
 private final class StageTwoStorage: StateStorage {
@@ -59,6 +60,7 @@ struct StageTwoRoot: View {
             .preferredColorScheme(.light)
             .task {
                 // Production RootView and screens; fixture data never calls resume/bind/send.
+                if route == .objectDelete, let target = model.catalogObjects().first?.target { model.objectRemovalTarget = target }
                 let status: [String: Any] = ["ready": model.storageReady, "route": route.rawValue,
                     "tabs": model.navigationState.tabs.map(\.rawValue), "owners": model.owners.count,
                     "guests": model.guests.count, "journal": model.journal.count, "product_routes": true]
