@@ -5,6 +5,8 @@ from capture_simulator import ROOT, OUTPUT, BUNDLE, TEXT_TOOL, run, prepare_devi
 PAGES = {
  'empty': ['Настройки', 'Объекты', 'Пока нет объектов', 'Добавить объект'],
  'guest-control': ['Управление', 'Ворота во двор'],
+ 'owner-control': ['Управление', 'Ворота во двор', 'Свой'],
+ 'mixed-objects': ['Настройки', 'Дверь Bluetooth', 'Ворота во двор', 'Гостевой въезд'],
  'guest-keys': ['Настройки', 'Ключи', 'controller.invalid', 'Добавить ключ'],
  'key-detail': ['Полученный ключ', 'Обновить данные', 'Удалить ключ с iPhone'],
  'owner-objects': ['Настройки', 'Объекты', 'Ворота во двор', 'Добавить объект'],
@@ -22,6 +24,8 @@ PAGES = {
  'journal': ['Журнал', 'Копировать', 'Очистить', 'Журнал пуст'],
 }
 TITLES = {
+ 'owner-control': 'Управление своим объектом',
+ 'mixed-objects': 'Общий список: свои, гостевые и Bluetooth',
  'owner-expanded': 'Свой объект: раскрытые действия',
  'guest-expanded': 'Полученный объект: локальные действия',
  'add-object': 'Добавление объекта: тип Bluetooth',
@@ -60,9 +64,9 @@ def main():
     time.sleep(.5)
    state=json.loads(status.read_text())
    assert state['ready'] and state['route']==page and state['product_routes'] and state['journal']==0, state
-   owner=page in ['owner-objects','owner-guests','add-server','owner-expanded','add-object','object-delete'];empty=page in ['empty','add-key']
+   owner=page in ['owner-objects','owner-guests','add-server','owner-expanded','add-object','object-delete','owner-control','mixed-objects'];empty=page in ['empty','add-key']
    tabs=(['control'] if not empty else [])+['settings']+(['guests'] if owner or page=='delegating-guests' else [])+['journal']
-   assert state['tabs']==tabs and state['owners']==int(owner) and state['guests']==int(not owner and not empty),state
+   assert state['tabs']==tabs and state['owners']==int(owner) and state['guests']==int((not owner and not empty) or page=='mixed-objects'),state
    visible_tabs=[] if page in ['add-key','add-server','add-object','object-delete'] else [{'control':'Управление','settings':'Настройки','guests':'Гости','journal':'Журнал'}[x] for x in tabs]
    path=OUTPUT/('iphone16-light-stage2-'+page+'.png');deadline=time.monotonic()+240
    while True:

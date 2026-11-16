@@ -42,6 +42,12 @@ final class NavigationUITests: XCTestCase {
         XCTAssertTrue(app.buttons["Отмена"].isHittable)
         app.buttons["Отмена"].tap()
         assertBottom(app, ["settings", "journal"])
+        app.segmentedControls.buttons["Объекты"].tap()
+        app.buttons["Добавить объект"].tap()
+        XCTAssertTrue(app.descendants(matching: .any)["owner-object-kind"].firstMatch.waitForExistence(timeout: 10))
+        XCTAssertTrue(app.textFields["Название"].exists)
+        app.buttons["Отмена"].tap()
+        assertBottom(app, ["settings", "journal"])
         app.buttons["main-tab-journal"].tap()
         XCTAssertTrue(app.staticTexts["Журнал пуст. Здесь будут появляться вызовы."].waitForExistence(timeout: 5))
     }
@@ -116,5 +122,20 @@ final class NavigationUITests: XCTestCase {
         XCTAssertEqual(app.textFields["Название объекта"].value as? String, "BLE Yard")
         XCTAssertTrue(app.buttons["Отмена"].exists)
         // No scan, pairing or physical command is issued by this test.
+    }
+    func testMixedObjectsUseTheSameInterleavedOrderInBothRoots() {
+        let app = launch("mixed-objects")
+        func row(_ name: String) -> XCUIElement {
+            app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH %@ AND label CONTAINS %@", "object-settings-", name)).firstMatch
+        }
+        let ble = row("Дверь Bluetooth"), own = row("Ворота во двор"), guest = row("Гостевой въезд")
+        XCTAssertTrue(ble.waitForExistence(timeout: 10)); XCTAssertTrue(own.exists); XCTAssertTrue(guest.exists)
+        XCTAssertLessThan(ble.frame.minY, own.frame.minY); XCTAssertLessThan(own.frame.minY, guest.frame.minY)
+        app.buttons["main-tab-control"].tap()
+        func card(_ name: String) -> XCUIElement { app.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", name + ".")).firstMatch }
+        let bleCard = card("Дверь Bluetooth"), ownCard = card("Ворота во двор"), guestCard = card("Гостевой въезд")
+        XCTAssertTrue(bleCard.waitForExistence(timeout: 10)); XCTAssertTrue(ownCard.exists); XCTAssertTrue(guestCard.exists)
+        XCTAssertLessThan(bleCard.frame.minY, ownCard.frame.minY); XCTAssertLessThan(ownCard.frame.minY, guestCard.frame.minY)
+        assertBottom(app, ["control", "settings", "guests", "journal"])
     }
 }

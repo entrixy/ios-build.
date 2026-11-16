@@ -170,7 +170,7 @@ struct AddCatalogObjectScreen: View {
     @Environment(\.dismiss) private var dismiss
     var body: some View {
         if model.owners.filter({ !$0.registrationPending }).isEmpty {
-            AddOwnerServerScreen()
+            AddOwnerObjectScreen(server: model.owners.first?.server ?? "entrixy.com")
         } else if let owner = model.owners.first(where: { !$0.registrationPending }), model.owners.filter({ !$0.registrationPending }).count == 1 {
             AddOwnerObjectScreen(server: owner.server)
         } else {

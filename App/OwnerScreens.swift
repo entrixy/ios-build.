@@ -194,10 +194,25 @@ struct AddOwnerObjectScreen: View {
                         Text("Сервер будет отправлять подписанные запросы. Адрес и секрет передаются этому серверу для выполнения команды.").font(.footnote).foregroundStyle(Brand.secondaryInk)
                     }
                 } header: { Text(server) }
+                if let owner = model.owners.first(where: { $0.server == server }), owner.registrationPending {
+                    Section {
+                        Text(model.ownerMessages[server] ?? "Доступ владельца ещё не подтверждён.").foregroundStyle(Brand.secondaryInk)
+                        NavigationLink("Проверить доступ владельца") { OwnerServersScreen() }
+                    }
+                }
                 Section {
                     Button {
-                        if kind == "ble" { pairing = true; return }
                         Task {
+                            // Android registers the owner on first object save;
+                            // opening the form itself never creates an identity.
+                            if !model.owners.contains(where: { $0.server == server }) {
+                                guard await model.addOwner(server: server, accessCode: "") else { return }
+                            }
+                            guard model.owners.first(where: { $0.server == server })?.credentials != nil else {
+                                model.errorMessage = "Сначала завершите сохранённую регистрацию владельца. Повторная регистрация не отправлялась."
+                                return
+                            }
+                            if kind == "ble" { pairing = true; return }
                             let before = Set(model.owners.first(where: { $0.server == server })?.objects?.map(\.id) ?? [])
                             let result = await model.createOwnerObject(server: server, label: label, kind: kind, phone: phone, url: url, secret: secret, claimCode: claimCode)
                             let after = Set(model.owners.first(where: { $0.server == server })?.objects?.map(\.id) ?? [])

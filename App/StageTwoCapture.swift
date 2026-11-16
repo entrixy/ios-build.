@@ -8,6 +8,7 @@ enum StageTwoCapture: String, CaseIterable {
     case system, codeSettings = "code-settings", sounds, addKey = "add-key", addServer = "add-server", journal
     case ownerExpanded = "owner-expanded", guestExpanded = "guest-expanded", addObject = "add-object"
     case objectDelete = "object-delete"
+    case ownerControl = "owner-control", mixedObjects = "mixed-objects"
     static var current: Self? {
         let args = ProcessInfo.processInfo.arguments
         guard let i = args.firstIndex(of: "--stage-two"), args.indices.contains(i + 1) else { return nil }
@@ -22,9 +23,9 @@ enum StageTwoCapture: String, CaseIterable {
         }
     }
     var mainTab: AppTab {
-        switch self { case .guestControl: return .control; case .ownerGuests, .delegatingGuests: return .guests; case .journal: return .journal; default: return .settings }
+        switch self { case .guestControl, .ownerControl: return .control; case .ownerGuests, .delegatingGuests: return .guests; case .journal: return .journal; default: return .settings }
     }
-    var isOwner: Bool { [.ownerObjects, .ownerGuests, .addServer, .ownerExpanded, .addObject, .objectDelete].contains(self) }
+    var isOwner: Bool { [.ownerObjects, .ownerGuests, .addServer, .ownerExpanded, .addObject, .objectDelete, .ownerControl, .mixedObjects].contains(self) }
     var isEmpty: Bool { [.empty, .addKey].contains(self) }
 }
 private final class StageTwoStorage: StateStorage {
@@ -39,10 +40,13 @@ struct StageTwoRoot: View {
     init(route: StageTwoCapture) {
         self.route = route
         var state = SavedState(identity: Data(repeating: 83, count: 32), guests: [])
-        if !route.isEmpty && !route.isOwner {
+        if !route.isEmpty && (!route.isOwner || route == .mixedObjects) {
             let invite = try! GuestInvite.parse("https://controller.invalid/key#AAECAwQFBgcICQoLDA0ODxAREhMUFRYX" + String(repeating: "A", count: 43))
             let object = try! JSONDecoder().decode(GuestObject.self, from: Data(#"{"id":"7","numberID":7,"kind":"device","label":"Ворота во двор","avatarType":"preset:3"}"#.utf8))
             var guest = SavedGuest(invite: invite, objects: [object])
+            if route == .mixedObjects {
+                guest.objects = try! JSONDecoder().decode([GuestObject].self, from: Data(#"[{"id":"n:7","numberID":7,"kind":"device","label":"Гостевой въезд","avatarType":"preset:0"},{"id":"b:8","numberID":8,"kind":"ble","label":"Дверь Bluetooth","avatarType":"preset:2"}]"#.utf8))
+            }
             guest.incomingDepth = route == .delegatingGuests ? 1 : 0
             state.guests = [guest]
         }
@@ -51,6 +55,11 @@ struct StageTwoRoot: View {
             var object = try! OwnerObject(masterKey: owner.masterKey, label: "Ворота во двор", kind: "webhook", url: "https://actuator.invalid/open", secret: "public-capture-secret")
             object.numberID = 7; object.pending = nil; object.available = true; object.revision = 1
             owner.objects = [object]; state.owners = [owner]
+        }
+        if route == .mixedObjects, let owner = state.owners?.first, let object = owner.objects?.first, let guest = state.guests.first {
+            state.objectPreferences = ObjectCatalogPreferences(order: [
+                .received(guestID: guest.id, objectID: "b:8"), .owned(server: owner.server, objectID: object.id),
+                .received(guestID: guest.id, objectID: "n:7")])
         }
         _model = StateObject(wrappedValue: AppModel(storage: StageTwoStorage(state)))
     }
