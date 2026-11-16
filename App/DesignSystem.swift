@@ -91,6 +91,18 @@ private struct SheetDismissFooter: ViewModifier {
 }
 
 extension View {
+    /// Keep the system's grouped-list corner mask outside the actual button.
+    /// A zero-inset 48pt row becomes a capsule on iOS 26 despite our 12pt shape.
+    func actionListRow() -> some View {
+        padding(.vertical, 16).listRowInsets(EdgeInsets())
+            .listRowBackground(Color.clear).listRowSeparator(.hidden)
+    }
+
+    @ViewBuilder func compactListSections() -> some View {
+        if #available(iOS 17.0, *) { listSectionSpacing(0) }
+        else { self }
+    }
+
     func sheetDismissFooter(_ title: String = "Отмена", disabled: Bool = false,
                             action: @escaping () -> Void) -> some View {
         modifier(SheetDismissFooter(title: title, disabled: disabled, action: action))

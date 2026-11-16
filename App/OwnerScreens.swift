@@ -74,8 +74,7 @@ struct AddOwnerServerScreen: View {
                         ActionButtonLabel(title: "Добавить сервер", busy: model.ownerBusy)
                     }
                     .buttonStyle(PrimaryActionStyle())
-                    .listRowInsets(EdgeInsets())
-                    .listRowBackground(Color.clear)
+                    .actionListRow()
                     .disabled(model.ownerBusy || !model.storageReady || server.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
                 }
             }
@@ -93,7 +92,7 @@ struct OwnerObjectsScreen: View {
     @EnvironmentObject private var model: AppModel
     let server: String
     var body: some View {
-        List { OwnerObjectRows(server: server) }
+        List { OwnerObjectRows(server: server) }.compactListSections()
             .navigationTitle("Мои объекты").navigationBarTitleDisplayMode(.inline)
             .refreshable { await model.refreshOwners() }
     }
@@ -134,7 +133,7 @@ struct OwnerObjectRows: View {
                     Button { adding = true } label: { Label("Добавить объект", systemImage: "plus") }
                         .buttonStyle(SecondaryActionStyle())
                         .disabled(model.ownerBusy || owner.registrationPending)
-                        .listRowBackground(Color.clear).listRowInsets(EdgeInsets()).listRowSeparator(.hidden)
+                        .actionListRow()
                 }
                 if !(owner.bleArchivedObjects ?? []).isEmpty {
                     Section {

@@ -152,7 +152,7 @@ struct SettingsScreen: View {
                     }
                     Section {
                         Button("Добавить сервер") { addingServer = true }.buttonStyle(PrimaryActionStyle())
-                            .listRowBackground(Color.clear).listRowInsets(EdgeInsets()).listRowSeparator(.hidden)
+                            .actionListRow()
                     }
                     Section { NavigationLink("Мои серверы") { OwnerServersScreen() } }
                 case .keys:
@@ -168,7 +168,7 @@ struct SettingsScreen: View {
                     }
                     Section {
                         Button("Добавить ключ") { keyInput = ""; addingKey = true }.buttonStyle(PrimaryActionStyle())
-                            .listRowBackground(Color.clear).listRowInsets(EdgeInsets()).listRowSeparator(.hidden)
+                            .actionListRow()
                     }
                     Section { NavigationLink("Ожидаемые ключи") { DelegationInboxScreen() } }
                 case .sounds:
@@ -185,7 +185,7 @@ struct SettingsScreen: View {
                         KeyValueRow(title: "Версия", value: Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "—")
                     }
                 }
-            }.scrollContentBackground(.hidden)
+            }.scrollContentBackground(.hidden).compactListSections()
                 .refreshable { if selected == .objects { await model.refreshOwners() }; await model.refresh() }
         }.background(Color(uiColor: .systemGroupedBackground)).navigationTitle("Настройки")
             .navigationDestination(isPresented: $showCodeSettings) { AppEntryLockSettings() }
