@@ -74,7 +74,7 @@ struct ObjectSettingsRows: View {
                     Button { model.objectAvatarTarget = entry.target } label: {
                         CatalogAvatar(entry:entry,size:56).frame(width:56,height:56).contentShape(Rectangle())
                     }.buttonStyle(.plain).frame(width:56,height:56).contentShape(Rectangle())
-                        .accessibilityElement(children:.ignore).accessibilityLabel(ProductText.string("avatar_picker_title"))
+                        .accessibilityLabel(ProductText.string("avatar_picker_title"))
                         .accessibilityIdentifier("object-avatar-" + entry.target.id).disabled(entry.deletionPending)
                     Button {
                     withAnimation(.easeInOut(duration: 0.2)) {

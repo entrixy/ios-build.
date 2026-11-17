@@ -10,6 +10,7 @@ enum StageTwoCapture: String, CaseIterable {
     case objectDelete = "object-delete"
     case ownerControl = "owner-control", mixedObjects = "mixed-objects"
     case ownerConfirmation = "owner-confirmation", ownerCodeConfirmation = "owner-code-confirmation"
+    case deviceClaim = "device-claim"
     static var current: Self? {
         let args = ProcessInfo.processInfo.arguments
         guard let i = args.firstIndex(of: "--stage-two"), args.indices.contains(i + 1) else { return nil }
@@ -27,7 +28,7 @@ enum StageTwoCapture: String, CaseIterable {
         switch self { case .guestControl, .ownerControl, .ownerConfirmation, .ownerCodeConfirmation: return .control; case .ownerGuests, .delegatingGuests: return .guests; case .journal: return .journal; default: return .settings }
     }
     var isOwner: Bool { [.ownerObjects, .ownerGuests, .addServer, .ownerExpanded, .addObject, .objectDelete, .ownerControl, .mixedObjects, .ownerConfirmation, .ownerCodeConfirmation].contains(self) }
-    var isEmpty: Bool { [.empty, .addKey].contains(self) }
+    var isEmpty: Bool { [.empty, .addKey, .deviceClaim].contains(self) }
 }
 private final class StageTwoStorage: StateStorage {
     var state: SavedState
@@ -74,7 +75,8 @@ struct StageTwoRoot: View {
         _model = StateObject(wrappedValue: app)
     }
     var body: some View {
-        RootView(initialTab: route.mainTab, showAddKey: route == .addKey)
+        RootView(initialTab: route.mainTab, showAddKey: route == .addKey,
+                 pendingURL:.constant(route == .deviceClaim ? URL(string:"https://factory.invalid:8443/claim?c=a1b2-c3d4") : nil))
             .environmentObject(model)
             .preferredColorScheme(.light)
             .task {
