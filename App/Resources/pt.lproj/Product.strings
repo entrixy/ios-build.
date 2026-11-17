@@ -889,3 +889,22 @@
 "weekday_wed" = "Qua";
 "widget_config_empty" = "Adicione primeiro um objeto na aplicação";
 "widget_config_title" = "Escolha o objeto";
+
+// Native iOS help and language accessibility.
+"ios_language" = "Idioma";
+"ios_help_auto" = "A abertura automática utiliza as condições configuradas de localização, Wi-Fi, horário e Bluetooth enquanto Entrixy está aberto na aba de controle.";
+"ios_help_permissions" = "Permita as funções necessárias aos seus objetos nos Ajustes do iPhone: Bluetooth, localização, câmera e notificações. As chamadas continuam exigindo confirmação no app Telefone.";
+
+// Entrixy code controls on iOS.
+"ios_entry_lock_hint" = "Solicitado ao abrir o app e após um minuto em segundo plano. Para desativar, é necessário o código Entrixy atual.";
+"ios_entry_bio_hint" = "Face ID ou Touch ID pode desbloquear o app. Alterações na biometria exigem o código Entrixy e uma nova configuração.";
+"ios_entry_bio_unavailable" = "Face ID ou Touch ID não está configurado neste iPhone.";
+"ios_code_save_failed" = "Não foi possível salvar a alteração. A proteção anterior foi mantida.";
+
+// Native backup transfer presentation.
+"ios_backup_remaining" = "Servidores restantes: %1$d; chaves recebidas: %2$d.";
+"ios_backup_continue" = "Continuar transferência";
+"ios_backup_contents" = "Servidores próprios: %1$d; chaves recebidas: %2$d.";
+"ios_backup_transfer_hint" = "As vinculações da cópia serão transferidas para este iPhone pelos servidores. Os acessos existentes em conflito não serão substituídos. O código Entrixy local e a biometria são configurados separadamente neste dispositivo.";
+"ios_backup_transfer" = "Transferir";
+"ios_backup_check" = "Verificar";

@@ -48,6 +48,7 @@ private struct LiveAppRoot: View {
 
 struct RootView: View {
     @EnvironmentObject private var model: AppModel
+    @AppStorage("entrixy.language") private var language = ""
     @State private var selectedTab: AppTab
     @State private var userPickedTab = false
     @State private var adding = false
@@ -73,14 +74,16 @@ struct RootView: View {
                     case .journal: JournalScreen().modifier(BrandNavigationHeader())
                     }
                 }
-            }.id(selectedTab)
+            }.id(selectedTab.rawValue + ":" + language)
             // Reserve a real sibling layout region. UIKit lists inside a
             // NavigationStack can cover an outer safeAreaInset's hit targets.
             AppBottomNavigation(selection: $selectedTab, tabs: model.navigationState.tabs) { userPickedTab = true }
         }
-        .accessibilityHidden(model.objectRemovalTarget != nil || model.objectAvatarTarget != nil || model.ownerGuestRequestPending || model.companyRequestID != nil || model.guestRemovalTarget != nil)
+        .accessibilityHidden(model.objectRemovalTarget != nil || model.objectAvatarTarget != nil || model.ownerGuestRequestPending || model.companyRequestID != nil || model.guestRemovalTarget != nil || model.codePrompt != nil || model.backupPromptPending)
+        .overlay { BackupFlowHost(flow:model.backupPresentation) }
         .overlay {
-            if let target = model.objectRemovalTarget { ObjectRemovalConfirmation(target: target) }
+            if let prompt = model.codePrompt { AppCodeDialog(request:prompt).id(prompt.id) }
+            else if let target = model.objectRemovalTarget { ObjectRemovalConfirmation(target: target) }
             else if let target = model.objectAvatarTarget { ObjectAvatarPicker(target: target) }
             else if let target = model.guestRemovalTarget { GuestRemovalDialog(target:target) }
             else if let id = model.companyRequestID, let company = model.companies.first(where:{ $0.id == id }) {
@@ -99,6 +102,7 @@ struct RootView: View {
             else { selectedTab = value.resolve(selectedTab) }
         }
         .tint(Brand.primary)
+        .environment(\.locale,Locale(identifier:ProductText.language))
         .task {
             selectedTab = model.navigationState.resolve(selectedTab)
             if let url = pendingURL { pendingURL = nil; receiveURL(url) }
@@ -120,6 +124,11 @@ struct RootView: View {
         } message: { Text(model.errorMessage ?? "") }
     }
     private func receiveURL(_ url: URL) {
+        if url.isFileURL, ["eib","ekb"].contains(url.pathExtension.lowercased()) {
+            selectedTab = .settings; userPickedTab = true; model.settingsRequest = .system
+            if !model.backups.hasPendingRestore { Task { await model.backupPresentation.acceptFile(.success(url)) } }
+            return
+        }
         if let company = try? CompanyInvite.parse(url.absoluteString) {
             Task { await model.receiveCompanyInvite(company) }; return
         }
@@ -148,6 +157,9 @@ struct BrandNavigationHeader: ViewModifier {
             } else {
                 ToolbarItem(placement: .navigationBarLeading) { BrandLogo() }
             }
+            if #available(iOS 26.0, *) {
+                ToolbarItem(placement:.navigationBarTrailing) { AppHeaderActions() }.sharedBackgroundVisibility(.hidden)
+            } else { ToolbarItem(placement:.navigationBarTrailing) { AppHeaderActions() } }
         }
     }
 }

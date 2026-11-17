@@ -31,7 +31,7 @@ struct ControlScreen: View {
             }
         }
         .searchable(text: $query, placement: .navigationBarDrawer(displayMode: .automatic), prompt: "Найти объект")
-        .navigationTitle("Управление")
+        .navigationTitle(ProductText.string("tab_actions"))
         .onAppear { model.automation.setWorking(true) }
         .onDisappear { model.automation.setWorking(false) }
         .toolbar {
@@ -99,7 +99,17 @@ struct ConnectionLabel: View {
     }
 }
 
-enum SettingsTab: String, CaseIterable { case objects = "Объекты", keys = "Ключи", sounds = "Звуки", system = "Система" }
+enum SettingsTab: String, CaseIterable {
+    case objects = "Объекты", keys = "Ключи", sounds = "Звуки", system = "Система"
+    var title: String {
+        switch self {
+        case .objects: return ProductText.string("settings_tab_objects")
+        case .keys: return ProductText.string("settings_tab_keys")
+        case .sounds: return ProductText.string("settings_tab_sounds")
+        case .system: return ProductText.string("settings_tab_system")
+        }
+    }
+}
 
 struct SettingsScreen: View {
     @EnvironmentObject private var model: AppModel
@@ -116,7 +126,7 @@ struct SettingsScreen: View {
     var body: some View {
         VStack(spacing: 0) {
             Picker("Раздел настроек", selection: $selected) {
-                ForEach(SettingsTab.allCases, id: \.self) { Text($0.rawValue).tag($0) }
+                ForEach(SettingsTab.allCases, id: \.self) { Text($0.title).tag($0) }
             }.pickerStyle(.segmented).padding(.horizontal, 20).padding(.vertical, 12)
                 .accessibilityIdentifier("settings-sections")
             List {
@@ -151,15 +161,24 @@ struct SettingsScreen: View {
                     SoundSettingsRows()
                 case .system:
                     Section {
-                        Button("Добавить сервер") { addingServer = true }.buttonStyle(SecondaryActionStyle()).actionListRow()
-                    }
+                        ForEach(["system","light","dark"],id:\.self) { choice in
+                            Button { appearance = choice } label: {
+                                HStack(spacing:12) {
+                                    Image(systemName:appearance == choice ? "largecircle.fill.circle" : "circle")
+                                    Text(ProductText.string("theme_" + choice)).frame(maxWidth:.infinity,alignment:.leading)
+                                }.foregroundStyle(Brand.ink).frame(minHeight:44).contentShape(Rectangle())
+                            }.buttonStyle(.plain).accessibilityAddTraits(appearance == choice ? .isSelected : [])
+                        }
+                    } header: { Text(ProductText.string("theme_section")) }
+                    AppCodeSettingsSection()
+                    BackupSettingsSection(flow:model.backupPresentation)
                     Section {
                         NavigationLink("Мои серверы") { OwnerServersScreen() }
-                        Picker("Тема", selection: $appearance) {
-                            Text("Как в системе").tag("system"); Text("Светлая").tag("light"); Text("Тёмная").tag("dark")
-                        }
-                        NavigationLink("Код и вход") { AppEntryLockSettings() }
-                        NavigationLink("Резервная копия") { BackupScreen(manager: model.backups) }
+                    } header: { Text(ProductText.string("server_section")) }
+                    Section {
+                        Button(ProductText.string("server_add")) { addingServer = true }.buttonStyle(SecondaryActionStyle()).actionListRow()
+                    }
+                    Section {
                         NavigationLink("Сообщения") { MessagesScreen() }
                         NavigationLink("Лицензии") { LicenseScreen() }
                         KeyValueRow(title: "Версия", value: Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "—")
@@ -167,7 +186,7 @@ struct SettingsScreen: View {
                 }
             }.scrollContentBackground(.hidden).compactListSections()
                 .refreshable { if selected == .objects { await model.refreshOwners() }; await model.refresh() }
-        }.background(Color(uiColor: .systemGroupedBackground)).navigationTitle("Настройки")
+        }.background(Color(uiColor: .systemGroupedBackground)).navigationTitle(ProductText.string("tab_settings"))
             .toolbar { if selected == .objects && model.catalogObjects().count > 1 { EditButton().accessibilityLabel("Порядок объектов") } }
             .navigationDestination(isPresented: $showCodeSettings) { AppEntryLockSettings() }
             .navigationDestination(isPresented: $showKey) {
@@ -186,6 +205,7 @@ struct SettingsScreen: View {
                 }
             }
             .task {
+                if let requested = model.settingsRequest { selected = requested; model.settingsRequest = nil }
                 #if DEBUG && targetEnvironment(simulator)
                 if let scenario = ActionCaptureScenario.current, [ActionCaptureScenario.appCodeSetup, .appCodeSettings].contains(scenario) { selected = .system; showCodeSettings = true }
                 if let route = StageTwoCapture.current {
@@ -198,6 +218,7 @@ struct SettingsScreen: View {
                 #endif
                 if PreviewRouting.keyDetail && !model.guests.isEmpty { selected = .keys; showKey = true }
             }
+            .onChange(of:model.settingsRequest) { requested in if let requested { selected = requested; model.settingsRequest = nil } }
     }
 }
 
@@ -289,7 +310,7 @@ struct JournalScreen: View {
                 }.listStyle(.plain).scrollContentBackground(.hidden)
             }
         }
-        .background(Color(uiColor: .systemGroupedBackground)).navigationTitle("Журнал")
+        .background(Color(uiColor: .systemGroupedBackground)).navigationTitle(ProductText.string("tab_journal"))
         .overlay(alignment: .bottom) {
             if copied {
                 Text("Журнал скопирован").font(.subheadline)

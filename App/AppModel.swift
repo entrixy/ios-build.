@@ -44,6 +44,9 @@ final class AppModel: ObservableObject {
     @Published var companyRequestID: String?
     @Published var companyGrantRequest: String?
     @Published var guestRemovalTarget: GuestRemovalTarget?
+    @Published var codePrompt: AppCodePrompt?
+    @Published var backupPromptPending = false
+    @Published var settingsRequest: SettingsTab?
     @Published private(set) var bleAutomationDisarmed = Set<String>()
     @Published private(set) var cameraActivity: [ObjectReference: UInt64] = [:]
     func noteCameraAction(_ target: ObjectReference) { cameraActivity[target] = (cameraActivity[target] ?? 0) &+ 1 }
@@ -61,6 +64,7 @@ final class AppModel: ObservableObject {
     private var identity = Data()
     private var pendingRestore: BackupRestorePlan?
     lazy var backups = BackupManager(app: self)
+    lazy var backupPresentation = BackupPresentation(app:self,manager:backups)
     lazy var delegationInbox = DelegationInbox(app: self)
     lazy var passManager = PassManager(app: self)
     private lazy var bleTransport = CoreBluetoothTransport()
@@ -349,7 +353,7 @@ final class AppModel: ObservableObject {
         do { try save(guests) } catch { pendingRestore = previous; throw error }
     }
     func beginBackupRestore() throws {
-        guard storageReady, !ownerBusy, !busy else { throw BackupFailure.busy }
+        guard storageReady, foreground, !appLocked, !ownerBusy, !busy else { throw BackupFailure.busy }
         ownerBusy = true; busy = true
         let wasForeground = foreground
         ownerControl.suspend()
@@ -1477,6 +1481,8 @@ final class AppModel: ObservableObject {
     }
 
     func suspend() {
+        codePrompt = nil
+        backupPresentation.cancel()
         automation.suspend(); automaticPermits.removeAll()
         ownerSettingsTask?.cancel(); ownerSettingsTask = nil; ownerSettingsTaskGeneration = nil
         delegationInbox.suspend()
@@ -2274,6 +2280,10 @@ extension AppModel {
         do { try save(guests) } catch { actionCode = saved; throw error }
         authorizedIntent = nil
         return true
+    }
+    func verifySettingsCode(_ code: String) async throws -> Bool {
+        guard canManageGuestAccess else { return false }
+        return try await authorizeCode(code,authentication:"pin",requestID:nil)
     }
 }
 

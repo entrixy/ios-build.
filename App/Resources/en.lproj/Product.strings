@@ -889,3 +889,22 @@
 "weekday_wed" = "Wed";
 "widget_config_empty" = "Add an object in the app first";
 "widget_config_title" = "Pick an object";
+
+// Native iOS help and language accessibility.
+"ios_language" = "Language";
+"ios_help_auto" = "Automatic opening uses your configured location, Wi-Fi, time and Bluetooth conditions while Entrixy is open on its actions tab.";
+"ios_help_permissions" = "Allow the permissions needed by your objects in iPhone Settings: Bluetooth, location, camera and notifications. A call still requires confirmation in the Phone app.";
+
+// Entrixy code controls on iOS.
+"ios_entry_lock_hint" = "Asked when opening the app and after a minute in the background. Turning it off requires your current Entrixy code.";
+"ios_entry_bio_hint" = "Face ID or Touch ID can unlock the app. Changes to enrolled biometrics require your Entrixy code and setup again.";
+"ios_entry_bio_unavailable" = "Face ID or Touch ID is not set up on this iPhone.";
+"ios_code_save_failed" = "Could not save the change. Existing protection remains in place.";
+
+// Native backup transfer presentation.
+"ios_backup_remaining" = "Owners remaining: %1$d; received keys: %2$d.";
+"ios_backup_continue" = "Continue transfer";
+"ios_backup_contents" = "Owner servers: %1$d; received keys: %2$d.";
+"ios_backup_transfer_hint" = "The backup will transfer its server bindings to this iPhone. Existing conflicting access will be kept unchanged. Set up the local Entrixy code and biometrics on this device separately.";
+"ios_backup_transfer" = "Transfer";
+"ios_backup_check" = "Check";

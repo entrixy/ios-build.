@@ -81,7 +81,7 @@ struct OwnerGuestsScreen: View {
                     PassedGuestsSection(otherSection:hasOwn)
                 }
             }.padding(.horizontal,DesignMetrics.pageInset).padding(.bottom,32)
-        }.background(Color(uiColor:.systemGroupedBackground)).navigationTitle("Гости")
+        }.background(Color(uiColor:.systemGroupedBackground)).navigationTitle(ProductText.string("tab_guests"))
             .refreshable { await model.refreshOwners(); await model.passManager.reload() }
             .sheet(item:$task) { value in
                 switch value {

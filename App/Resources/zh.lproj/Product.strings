@@ -889,3 +889,22 @@
 "weekday_wed" = "周三";
 "widget_config_empty" = "请先在应用中添加对象";
 "widget_config_title" = "选择对象";
+
+// Native iOS help and language accessibility.
+"ios_language" = "语言";
+"ios_help_auto" = "Entrixy 在控制标签页中打开时，自动开启会根据您设置的位置、Wi-Fi、时间和蓝牙条件执行。";
+"ios_help_permissions" = "请在 iPhone 设置中允许对象所需的蓝牙、定位、相机和通知权限。拨打电话仍需在“电话”App 中确认。";
+
+// Entrixy code controls on iOS.
+"ios_entry_lock_hint" = "打开 App 和在后台停留一分钟后需要输入。关闭此功能需要当前 Entrixy 密码。";
+"ios_entry_bio_hint" = "Face ID 或 Touch ID 可解锁 App。更改已录入的生物识别信息后，需要输入 Entrixy 密码并重新设置。";
+"ios_entry_bio_unavailable" = "此 iPhone 尚未设置 Face ID 或 Touch ID。";
+"ios_code_save_failed" = "无法保存更改。原有保护保持不变。";
+
+// Native backup transfer presentation.
+"ios_backup_remaining" = "剩余服务器：%1$d；收到的钥匙：%2$d。";
+"ios_backup_continue" = "继续迁移";
+"ios_backup_contents" = "自己的服务器：%1$d；收到的钥匙：%2$d。";
+"ios_backup_transfer_hint" = "备份中的服务器绑定将迁移到此 iPhone。发生冲突的现有访问权限不会被替换。请在此设备上单独设置本地 Entrixy 密码和生物识别。";
+"ios_backup_transfer" = "迁移";
+"ios_backup_check" = "检查";

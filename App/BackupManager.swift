@@ -135,6 +135,7 @@ final class BackupManager: ObservableObject {
     @Published private(set) var message: String?
     @Published private(set) var preview: IOSBackupPayload?
     @Published private(set) var exportData: Data?
+    private(set) var exportMaterialIDs = Set<String>()
     @Published private(set) var remainingOwners = 0
     @Published private(set) var remainingGuests = 0
     @Published private(set) var importMessages: [String:String] = [:]
@@ -146,6 +147,7 @@ final class BackupManager: ObservableObject {
         self.app = app; self.guestMover = guestMover; self.refreshAfterRestore = refreshAfterRestore
         updateProgress()
     }
+    func makePresentation() -> BackupPresentation { BackupPresentation(app:app,manager:self) }
 
     func export(password: String) async throws -> Data {
         guard !busy else { throw BackupFailure.busy }
@@ -158,6 +160,7 @@ final class BackupManager: ObservableObject {
         let bytes = try JSONEncoder().encode(payload)
         let encrypted = try await Task.detached(priority: .userInitiated) { try BackupEnvelope.seal(bytes, password: password) }.value
         exportData = encrypted
+        exportMaterialIDs = state.backupMaterialIDs
         return encrypted
     }
 
@@ -259,7 +262,7 @@ final class BackupManager: ObservableObject {
     func refreshImportedGuests() async {
         for source in app.androidPendingGuests { await recoverImportedGuest(source.id) }
     }
-    func clearExport() { exportData = nil }
+    func clearExport() { exportData = nil; exportMaterialIDs = [] }
     func report(_ error: Error) {
         switch error {
         case BackupEnvelope.Failure.passwordOrDamage: message = "Неверный пароль или файл повреждён. Доступы не изменялись."

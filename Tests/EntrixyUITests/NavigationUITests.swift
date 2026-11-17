@@ -195,4 +195,30 @@ final class NavigationUITests: XCTestCase {
         // Form inspection never saves a key, sends a command or opens a camera.
     }
 
+    func testEntryLockSettingsUseCompactCodeDialogsAndWrongCodeCannotDisableLock() {
+        let app = launch("empty")
+        app.segmentedControls.buttons["Система"].tap()
+        let lock = app.switches.matching(NSPredicate(format:"label CONTAINS %@","Спрашивать код при входе")).firstMatch
+        for _ in 0..<4 { if lock.isHittable { break }; app.swipeUp() }
+        XCTAssertTrue(lock.isHittable); lock.tap()
+        let code = app.secureTextFields["Код Entrixy"], repeated = app.secureTextFields["Повторите код"]
+        XCTAssertTrue(code.waitForExistence(timeout:10)); XCTAssertTrue(repeated.exists)
+        code.tap(); code.typeText("1234"); repeated.tap(); repeated.typeText("1234")
+        app.buttons["Сохранить"].tap()
+        XCTAssertTrue(app.buttons["Сменить код"].waitForExistence(timeout:15))
+        XCTAssertEqual(lock.value as? String,"1")
+        lock.tap()
+        let current = app.secureTextFields["Текущий код"]
+        XCTAssertTrue(current.waitForExistence(timeout:10)); current.tap(); current.typeText("0000")
+        app.buttons["ОК"].tap()
+        XCTAssertTrue(app.staticTexts["Неверный код"].waitForExistence(timeout:10))
+        app.buttons["Отмена"].tap()
+        XCTAssertEqual(lock.value as? String,"1")
+        lock.tap(); XCTAssertTrue(current.waitForExistence(timeout:10))
+        current.tap(); current.typeText("1234"); app.buttons["ОК"].tap()
+        let disabled = XCTNSPredicateExpectation(predicate:NSPredicate { _,_ in lock.exists && lock.value as? String == "0" },object:lock)
+        XCTAssertEqual(XCTWaiter.wait(for:[disabled],timeout:15),.completed)
+        assertBottom(app,["settings","journal"])
+    }
+
 }

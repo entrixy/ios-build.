@@ -45,6 +45,12 @@ targets:
         CFBundleURLTypes:
           - CFBundleURLName: com.entrixy.ios.invite
             CFBundleURLSchemes: [entrixy]
+        CFBundleDocumentTypes:
+          - CFBundleTypeName: Entrixy Encrypted Backup
+            CFBundleTypeRole: Viewer
+            LSHandlerRank: Alternate
+            LSItemContentTypes: [com.entrixy.ios.backup, com.entrixy.android.backup]
+        LSSupportsOpeningDocumentsInPlace: true
         UTExportedTypeDeclarations:
           - UTTypeIdentifier: com.entrixy.ios.backup
             UTTypeDescription: Entrixy iOS Backup
