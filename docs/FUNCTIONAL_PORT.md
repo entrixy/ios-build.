@@ -742,3 +742,82 @@ Failure export now actually retained the native PNG and screen recording. The
 private PNG was inspected; it shows the original object row and avatar, not an
 opened picker. It is diagnostic evidence, not a replacement gallery capture.
 No new product batch/site publication has occurred.
+
+
+Intel UI run44130029382/job134204239696 on public7895b08/nativebf724a7
+failed before any UI test began: Core240 and Debug passed, but CoreSimulator cold
+boot stalled; bounded recovery also timed out creating a replacement. This is
+not a new UI assertion result. No retry of that same stale source was requested.
+The latest ARM review is run44134044615/job134218585629 on public7630c62/native
+d1f89b7, queued at17:15UTC. All309 app/core/test/project/Package files were actually
+byte-compared with no differences (private current-ui-equivalence.json). Expected
+core245/UI16 are source counts for this queued run, not a passing result.
+
+
+## Actual automatic-gate result and incoming proof fixture correction
+
+Public64094ad/native6b42489 run44132343577/job134212519533 passed Apple240
+core, Debug and Release/isolation, then executed146 hosted tests with ONE failure.
+All four new owner-gate cases passed (confirm once/cancel/PIN and expired/storage/
+background/changed policy), together with existing runtime/BLE/transaction cases.
+New guest-gate case failed unwrapping the proposed prompt: its test constructed
+proofs from the raw wire template, whereas the real coordinator evaluates the
+received three-way effective template with added owner radius/minimum bounds.
+These unequal templates were correctly rejected. The fixture now evaluates the
+actual scoped automationContext template and asserts geo/confirm/auth survived
+the merge before evaluating evidence. Production equality guards, PIN assertions,
+no-send-before-approval and duplicate challenge assertions remain unchanged.
+Syntax/diff pass; the complete corrected suite still needs a fresh actual result.
+
+
+## Owned BLE information — current follow-up source
+
+Read SettingsScreen.kt owned BLE row (Settings, AutoMode, Info, Delete), its full
+infoBleId dialog and BleScanReceiver/BleCrypto metadata decoding before this change.
+The owned BLE expanded row now includes Info after automation, before deletion.
+The common compact dialog uses the object's label and shows battery, hardware,
+firmware nibbles, sleep, status flags and actual observation age. With no verified
+metadata it shows Android's no-data message, never a fabricated 0% or firmware.
+No info action is added to guest BLE rows: the encrypted telemetry is owner-only.
+
+BLEDeviceInformation authenticates/decrypts the existing v3/v4 optional fields;
+legacy16/17-byte advertisements cannot create readings. The actual passive owner
+observer populates an in-memory scoped (host/object) cache only after matching
+DID/owner/state validation; no scan/FIRE/pair/register operation is performed by
+opening Info. Cache entries for removed/lost/mismatched objects are discarded on
+owner save. No telemetry enters SavedState/backups or becomes proximity authority.
+Background closes the dialog; an open modal cannot trigger another automatic
+command. The shared button styles, original avatars and flat navigation remain.
+
+Three new independent frozen-vector tests passed within actual Linux248/zero
+(log ble-information-core.log); complete Swift frontend parse and diff checks pass.
+One UI SOURCE case covers Info -> no data -> Close -> same row/tabs without a
+radio session. Latest expected UI17, native146 unchanged; Apple typing/runtime
+of these new fields still pending. No physical controller or product capture used.
+
+
+AutomationEditor's local code-setup flow now uses the same compact AppDialogSurface
+instead of opening another full-height navigation form. Shared filled Cancel/Save,
+field labels, digit filtering and Android forgotten-code warning are preserved;
+cancel still invokes the existing finishCodeSetup policy/force guards. Typed code
+clears on leaving/scene inactivity; saving still uses the protected model API.
+Syntax/diff checks pass, actual Apple/layout verification is pending. No new core
+behavior or extra runtime test is claimed by this presentation-only follow-up.
+
+
+## Actual complete sixteen-case UI pass
+
+Public7630c622512eea3b33f0458f6010cb0e95ffc57e/native d1f89b7,
+[run44134044615](https://github.com/entrixy/ios-build./actions/runs/44134044615),
+job134218585629 actually passed Apple245 core, Debug test build and all16 UI cases
+(442.107 seconds, zero failures). Avatar Button selection/tap, all eight original
+presets, upload-button presence and cancellation passed. Real photo selection or
+upload was not performed by that test. Factory claim code/origin/cancel and compact
+card confirmation/code setup also passed. No new product PNG batch was generated.
+This source predates BLE Information/late dialog completion cleanup/code setup
+inside AutomationEditor. A latest-source UI17 follow-up is required for those.
+
+The earlier functional publicbbad08b/nativea70c33a additionally completed core240,
+Debug, Release/isolation and all141 hosted native tests (55.706 seconds, zero
+failures) in run44131228346/job134208518844. Do not combine the two source results
+into a claim that the newest entire app has passed every check.

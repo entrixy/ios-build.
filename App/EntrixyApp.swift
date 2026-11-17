@@ -84,7 +84,7 @@ struct RootView: View {
             // NavigationStack can cover an outer safeAreaInset's hit targets.
             AppBottomNavigation(selection: $selectedTab, tabs: model.navigationState.tabs) { userPickedTab = true }
         }
-        .accessibilityHidden(model.actionPrompt != nil || model.objectRemovalTarget != nil || model.objectAvatarTarget != nil || model.ownerGuestRequestPending || model.companyRequestID != nil || model.guestRemovalTarget != nil || model.codePrompt != nil || model.backupPromptPending || model.serverPrompt != nil)
+        .accessibilityHidden(model.actionPrompt != nil || model.bleInformationTarget != nil || model.objectRemovalTarget != nil || model.objectAvatarTarget != nil || model.ownerGuestRequestPending || model.companyRequestID != nil || model.guestRemovalTarget != nil || model.codePrompt != nil || model.backupPromptPending || model.serverPrompt != nil)
         .overlay { BackupFlowHost(flow:model.backupPresentation) }
         .overlay {
             if let prompt = model.actionPrompt { ActionConfirmation(request:prompt).id(prompt.id) }
@@ -92,6 +92,7 @@ struct RootView: View {
             else if let prompt = model.codePrompt { AppCodeDialog(request:prompt).id(prompt.id) }
             else if let target = model.objectRemovalTarget { ObjectRemovalConfirmation(target: target) }
             else if let target = model.objectAvatarTarget { ObjectAvatarPicker(target: target) }
+            else if let target = model.bleInformationTarget { BLEInformationDialog(target:target) }
             else if let target = model.guestRemovalTarget { GuestRemovalDialog(target:target) }
             else if let id = model.companyRequestID, let company = model.companies.first(where:{ $0.id == id }) {
                 CompanyRequestDialog(company:company) { granted,hasObjects in

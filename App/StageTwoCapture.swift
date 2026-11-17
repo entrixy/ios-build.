@@ -11,6 +11,7 @@ enum StageTwoCapture: String, CaseIterable {
     case ownerControl = "owner-control", mixedObjects = "mixed-objects"
     case ownerConfirmation = "owner-confirmation", ownerCodeConfirmation = "owner-code-confirmation"
     case deviceClaim = "device-claim"
+    case ownerBLEObjects = "owner-ble-objects"
     static var current: Self? {
         let args = ProcessInfo.processInfo.arguments
         guard let i = args.firstIndex(of: "--stage-two"), args.indices.contains(i + 1) else { return nil }
@@ -27,7 +28,7 @@ enum StageTwoCapture: String, CaseIterable {
     var mainTab: AppTab {
         switch self { case .guestControl, .ownerControl, .ownerConfirmation, .ownerCodeConfirmation: return .control; case .ownerGuests, .delegatingGuests: return .guests; case .journal: return .journal; default: return .settings }
     }
-    var isOwner: Bool { [.ownerObjects, .ownerGuests, .addServer, .ownerExpanded, .addObject, .objectDelete, .ownerControl, .mixedObjects, .ownerConfirmation, .ownerCodeConfirmation].contains(self) }
+    var isOwner: Bool { [.ownerObjects, .ownerGuests, .addServer, .ownerExpanded, .addObject, .objectDelete, .ownerControl, .mixedObjects, .ownerConfirmation, .ownerCodeConfirmation, .ownerBLEObjects].contains(self) }
     var isEmpty: Bool { [.empty, .addKey, .deviceClaim].contains(self) }
 }
 private final class StageTwoStorage: StateStorage {
@@ -56,6 +57,9 @@ struct StageTwoRoot: View {
             var owner = try! OwnerAccount(importing: "controller.invalid", masterKey: Data(repeating: 22, count: 32), credentials: OwnerCredentials(deviceID: String(repeating: "a", count: 32), deviceSecret: String(repeating: "b", count: 64)))
             let confirmationRoute = route == .ownerConfirmation || route == .ownerCodeConfirmation
             var object = try! OwnerObject(masterKey: owner.masterKey, label: "Ворота во двор", kind: confirmationRoute ? "call" : "webhook", phone: confirmationRoute ? "+10000000000" : "", url: confirmationRoute ? "" : "https://actuator.invalid/open", secret: confirmationRoute ? "" : "public-capture-secret")
+            if route == .ownerBLEObjects {
+                object = try! OwnerObject(importing:object.id,numberID:7,kind:"ble",cipher:object.cipher,wrappedKey:object.wrappedKey,masterKey:owner.masterKey,bleSecret:Data(repeating:9,count:32),bleDeviceID:123)
+            }
             object.numberID = 7; object.pending = nil; object.available = true; object.revision = 1
             if route == .ownerConfirmation { object.localPolicy = Data(#"{"confirm_on":true}"#.utf8) }
             if route == .ownerCodeConfirmation { object.localPolicy = Data(#"{"auth_on":true,"auth":"pin"}"#.utf8) }

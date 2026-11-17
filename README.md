@@ -8,14 +8,18 @@ This repository is private working source; no new distribution license is assign
 
 The active task is the full Android port, followed by one reviewed native screenshot
 batch. It remains incomplete. The gallery still shows the previous 19-frame catalogue.
-Latest completed functional Apple snapshot: native `fe9e8e1`, public
-`76276e70ef82bb651f2f9cb87fb8b08746c0e8e6`,
-[run 44126465550](https://github.com/entrixy/ios-build./actions/runs/44126465550):
-240 core tests, Debug/test bundles, Release/isolation and 140 hosted native tests
-passed. This includes servers, sound/rule backups, received-access passing and
-authenticated HLS/MP4 transport. It does not prove actual camera decoding or hardware.
-The separate earlier UI run executed 14 tests: nine passed, five failed. Fixes to
-control identifiers, avatar hit area and test targeting await a fresh UI run.
+Latest completed functional Apple snapshot: native `a70c33a`, public
+`bbad08ba38c371b39059b251583c4a5b7a2b5f7a`,
+[run 44131228346](https://github.com/entrixy/ios-build./actions/runs/44131228346):
+240 core tests, Debug/test bundles, Release/isolation and 141 hosted native tests
+passed. This includes the compact manual confirmation/PIN dialogs.
+A later source, native `d1f89b7` / public `7630c62`, passed Apple245 core, Debug and
+all16 UI cases in [run 44134044615](https://github.com/entrixy/ios-build./actions/runs/44134044615),
+including avatar picker/presets/upload button, card confirmation/PIN and factory
+claim links. Its hosted native suite was not run in that UI job.
+Latest BLE information/code-editor follow-ups have Linux248 and syntax checks;
+their Apple/native/UI17 results remain pending. Actual camera decoding/hardware,
+remaining full-port routes, signing and the final screenshot batch remain incomplete.
 Exact implementation boundaries and pending checks: [FUNCTIONAL_PORT.md](docs/FUNCTIONAL_PORT.md).
 
 ### Historical catalogue checkpoint — 16 November 2026

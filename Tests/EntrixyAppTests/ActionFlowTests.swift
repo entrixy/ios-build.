@@ -69,6 +69,12 @@ final class ActionFlowTests: XCTestCase {
             template.authMode = gate == "pin" ? "pin" : nil
             let wire = try XCTUnwrap(JSONSerialization.jsonObject(with:template.data()) as? [String:Any])
             let (model,controller,guest,object) = try await fixture(template:wire)
+            // Runtime evaluates the received three-way result, including owner
+            // bounds added by the merge, not the unmerged wire template.
+            template = try model.automationContext(.object(.received(guestID:guest.id,objectID:object.id))).template
+            XCTAssertTrue(template.geoEnabled)
+            XCTAssertEqual(template.confirmEnabled,gate == "confirm")
+            XCTAssertEqual(template.authEnabled,gate == "pin")
             if gate == "pin" { try await model.setActionCode("1234") }
             let now = Date()
             var runtime = AutomationRuntime(sessionStarted:now.timeIntervalSince1970-60)
