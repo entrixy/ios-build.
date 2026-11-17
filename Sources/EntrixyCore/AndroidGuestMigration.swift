@@ -10,6 +10,7 @@ public struct AndroidGuestMigration: Codable, Identifiable {
     public let bundleKey: Data?
     public let recipient: BundleKeySeal.Recipient?
     public let incomingAutomation: [String:AndroidIncomingAutomation]?
+    public let privacyNetworks: [PrivacyNetwork]?
     public var id: String { identity.id }
     public init(document: AndroidBackupDocument, guest: AndroidBackupDocument.Guest) throws {
         guard try document.guests().contains(guest), let seed = try document.sourceSeed(required:true) else { throw GuestCrypto.Failure.invalidEnvelope }
@@ -18,6 +19,7 @@ public struct AndroidGuestMigration: Codable, Identifiable {
         bundleKey = try document.invitation(for:guest)?.bundleKey
         recipient = try document.recipient(for:guest)
         incomingAutomation = try document.incomingAutomation(localID:guest.localID)
+        privacyNetworks = try document.guestPrivacyNetworks(localID:guest.localID)
         try validate()
     }
     public func validate() throws {
@@ -27,6 +29,7 @@ public struct AndroidGuestMigration: Codable, Identifiable {
               bundleKey == nil || bundleKey?.count == 32 else { throw GuestCrypto.Failure.invalidEnvelope }
         if let recipient { try BundleKeySeal.validate(recipient) }
         try AndroidIncomingAutomation.validate(incomingAutomation ?? [:])
+        try PrivacyNetwork.validate(privacyNetworks ?? [])
     }
 }
 

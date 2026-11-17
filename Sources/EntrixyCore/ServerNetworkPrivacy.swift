@@ -30,9 +30,50 @@ public struct PrivacyNetwork: Codable, Equatable, Hashable {
         }
     }
     public var wire: [String:String] { var row = ["s":ssid]; if let bssid { row["b"] = bssid }; return row }
+    public var comparisonKey: String { ssid.lowercased()+"\0"+(bssid ?? "") }
+    public static func validate(_ values: [Self]) throws {
+        guard values.count <= 256 else { throw GuestCrypto.Failure.invalidEnvelope }
+        for value in values { _ = try Self(ssid:value.ssid,bssid:value.bssid) }
+    }
     public func matches(ssid: String?, bssid: String?) -> Bool {
         if let ssid, self.ssid.caseInsensitiveCompare(ssid) == .orderedSame { return true }
         return self.bssid != nil && bssid != nil && self.bssid?.caseInsensitiveCompare(bssid!) == .orderedSame
+    }
+}
+
+public struct NetworkPrivacyPreferences: Codable, Equatable {
+    public var own: [PrivacyNetwork]
+    /// Local iOS consent only. Another owner or an imported backup cannot opt
+    /// this phone into cellular charges/roaming that iOS does not expose here.
+    public var cellularAuthorized: Bool
+    private enum CodingKeys: String, CodingKey { case own, cellularAuthorized }
+    public init(own: [PrivacyNetwork] = [],cellularAuthorized: Bool = false) throws {
+        self.own = own; self.cellularAuthorized = cellularAuthorized; try validate()
+    }
+    public init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy:CodingKeys.self)
+        try self.init(own:c.decodeIfPresent([PrivacyNetwork].self,forKey:.own) ?? [],
+                      cellularAuthorized:c.decodeIfPresent(Bool.self,forKey:.cellularAuthorized) ?? false)
+    }
+    public func validate() throws {
+        try PrivacyNetwork.validate(own)
+        guard Set(own.map(\.comparisonKey)).count == own.count else { throw GuestCrypto.Failure.invalidEnvelope }
+    }
+    public func merging(_ imported: Self?) throws -> Self {
+        guard let imported else { return self }; try validate(); try imported.validate()
+        var seen = Set<String>()
+        let combined = (own+imported.own).filter { seen.insert($0.comparisonKey).inserted }
+        return try Self(own:combined,cellularAuthorized:cellularAuthorized)
+    }
+}
+
+public extension AndroidBackupDocument {
+    func networkPrivacyPreferences() throws -> NetworkPrivacyPreferences {
+        try NetworkPrivacyPreferences(own:PrivacyNetwork.decode(jsonArray("blocked_wifi",limit:256)))
+    }
+    func guestPrivacyNetworks(localID: Int) throws -> [PrivacyNetwork] {
+        guard localID > 0 else { throw GuestCrypto.Failure.invalidEnvelope }
+        return try PrivacyNetwork.decode(jsonArray("blocked_wifi_g_\(localID)",limit:256))
     }
 }
 
@@ -79,7 +120,7 @@ public struct ServerProxyConnect {
         let lines = text.components(separatedBy:"\r\n")
         guard lines.count <= 64 else { throw Failure.invalid }
         let request = lines[0].split(separator:" ",omittingEmptySubsequences:false)
-        guard request.count == 3, request[0] == "CONNECT", request[2] == "HTTP/1.1",
+        guard request.count == 3, request[0] == "CONNECT", ["HTTP/1.0","HTTP/1.1"].contains(request[2]),
               let parts = URLComponents(string:"https://" + request[1]),
               parts.user == nil, parts.password == nil, parts.query == nil, parts.fragment == nil,
               parts.path.isEmpty, let name = parts.host, let port = parts.port, (1...65535).contains(port) else { throw Failure.invalid }
@@ -93,9 +134,17 @@ public struct ServerProxyConnect {
                   headers[field] == nil else { throw Failure.invalid }
             headers[field] = value
         }
+        // A Host without the default HTTPS port identifies the same authority.
+        // Never accept a different host or a different explicit port.
+        func sameAuthority(_ value: String) -> Bool {
+            guard let h = URLComponents(string:"https://"+value), h.user == nil, h.password == nil,
+                  h.path.isEmpty,h.query == nil,h.fragment == nil,
+                  h.host?.caseInsensitiveCompare(name) == .orderedSame else { return false }
+            return (h.port ?? 443) == port
+        }
         guard headers["transfer-encoding"] == nil,
               headers["content-length"].map({ $0 == "0" }) ?? true,
-              headers["host"].map({ $0.caseInsensitiveCompare(authority) == .orderedSame }) ?? true else { throw Failure.invalid }
+              headers["host"].map(sameAuthority) ?? true else { throw Failure.invalid }
         let supplied = Data((headers["proxy-authorization"] ?? "").utf8), expected = Data(authorization.utf8)
         guard !expected.isEmpty, supplied.count == expected.count,
               zip(supplied,expected).reduce(UInt8(0),{ $0 | ($1.0 ^ $1.1) }) == 0 else { throw Failure.unauthorized }

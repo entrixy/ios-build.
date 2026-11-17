@@ -26,6 +26,7 @@ struct IOSBackupPayload: Codable {
     let selectedOwnerServer: String?
     let eventSounds: EventSoundBackup?
     let objectPreferences: ObjectCatalogPreferences?
+    let networkPrivacy: NetworkPrivacyPreferences?
     init(state: SavedState, created: Date = Date(), androidGuests: [AndroidGuestMigration]? = nil,eventSounds: EventSoundBackup? = nil) {
         app = "entrixy-ios"; version = 1; self.created = created; sourceIdentity = state.identity
         owners = state.owners ?? []; guests = state.guests
@@ -37,6 +38,9 @@ struct IOSBackupPayload: Codable {
         outgoingMessages = state.outgoingMessages
         delegatedJournalLedger = state.delegatedJournalLedger
         objectPreferences = state.objectPreferences
+        // Importing a backup never authorizes this phone's cellular use.
+        var privacy = state.networkPrivacy; privacy?.cellularAuthorized = false
+        networkPrivacy = privacy
         ownerGuestDefaults = state.ownerGuestDefaults
         companies = state.companies
         androidArchives = state.androidArchives
@@ -58,10 +62,11 @@ struct IOSBackupPayload: Codable {
         // per-server fingerprint and never use sourceIdentity for authorization.
         let hash = document.archiveID
         let provenance = Data(stride(from:0,to:64,by:2).map { UInt8(hash.dropFirst($0).prefix(2),radix:16)! })
-        let state = SavedState(identity:provenance,guests:[],owners:owners,ownerGuestDefaults:try document.guestDefaults(),companies:try document.companies(),androidArchives:[document],selectedOwnerServer:try document.primaryServer())
+        let state = SavedState(identity:provenance,guests:[],owners:owners,ownerGuestDefaults:try document.guestDefaults(),companies:try document.companies(),androidArchives:[document],selectedOwnerServer:try document.primaryServer(),networkPrivacy:try document.networkPrivacyPreferences())
         self.init(state:state,created:document.created,androidGuests:migrations,eventSounds:try document.eventSoundBackup())
     }
     func validate() throws {
+        try networkPrivacy?.validate()
         try eventSounds?.validate()
         if let host = selectedOwnerServer { guard try GuestInvite.normalizeServer(host) == host else { throw BackupFailure.invalidPayload } }
         try ownerGuestDefaults?.validate()
@@ -242,7 +247,7 @@ final class BackupManager: ObservableObject {
                 let invite = try await guestMover.recover(identity:source.identity,bundleKey:source.bundleKey,recipient:source.recipient,fingerprint:newFingerprint)
                 guard invite == nil || invite?.id == source.id else { throw BackupFailure.invalidPayload }
                 plan.restoredAndroidGuests = (plan.restoredAndroidGuests ?? []) + [source.id]
-                if let invite { try app.activateBackupGuest(SavedGuest(invite:invite,requiresBLEExitOnRestore:true,androidAutomation:source.incomingAutomation),plan:plan) }
+                if let invite { try app.activateBackupGuest(SavedGuest(invite:invite,requiresBLEExitOnRestore:true,androidAutomation:source.incomingAutomation,privacyNetworks:source.privacyNetworks),plan:plan) }
                 else { try app.activatePendingAndroidGuest(source,plan:plan) }
                 updateProgress()
             }

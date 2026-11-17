@@ -173,7 +173,7 @@ import EntrixyCore
             _ = try await session.data(from:URL(string:"https://server.invalid/private")!)
             XCTFail("Echo server is not a valid TLS peer")
         } catch { }
-        XCTAssertGreaterThan(attempts,0)
+        XCTAssertGreaterThan(attempts,0,proxy.rejectedHeaderShapeForTesting ?? "No rejected HTTP header")
         XCTAssertFalse(echo.received.isEmpty)
         XCTAssertNotEqual(String(data:echo.received,encoding:.utf8)?.contains("GET /private"),true)
     }

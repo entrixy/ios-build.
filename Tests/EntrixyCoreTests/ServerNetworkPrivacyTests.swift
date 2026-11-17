@@ -46,6 +46,33 @@ final class ServerNetworkPrivacyTests: XCTestCase {
         XCTAssertThrowsError(try network("Home","not-an-address"))
         XCTAssertThrowsError(try network(String(repeating:"a",count:257)))
     }
+    func testBackupMergeRetainsLocalCellularConsentAndDeduplicatesNetworkNames() throws {
+        let local = try NetworkPrivacyPreferences(own:[network("Home",nil)])
+        let imported = try NetworkPrivacyPreferences(own:[network("HOME",nil),network("Office",nil)],cellularAuthorized:true)
+        let merged = try local.merging(imported)
+        XCTAssertEqual(merged.own.map(\.ssid),["Home","Office"])
+        XCTAssertFalse(merged.cellularAuthorized)
+        let authorized = try NetworkPrivacyPreferences(cellularAuthorized:true)
+        XCTAssertTrue(try authorized.merging(local).cellularAuthorized)
+        XCTAssertEqual(try JSONDecoder().decode(NetworkPrivacyPreferences.self,from:JSONEncoder().encode(merged)),merged)
+        XCTAssertThrowsError(try NetworkPrivacyPreferences(own:[network("Home",nil),network("HOME",nil)]))
+    }
+    func testAndroidRulesStayScopedAndNeverChangeTheRetainedArchive() throws {
+        let entries: [String:Any] = [
+            "blocked_wifi":["t":"s","v":"[{\"s\":\"Home\"}]"],
+            "blocked_wifi_g_7":["t":"s","v":"[{\"s\":\"Owner home\"}]"],
+            "blocked_wifi_g_8":["t":"s","v":"[{\"s\":\"Other home\"}]"],
+            "unmapped_setting":["t":"s","v":"preserve me"]]
+        let bytes = try JSONSerialization.data(withJSONObject:["app":"entrixy","ver":1,"created":1700000000,"device":"test","count":entries.count,"entries":entries])
+        let document = try AndroidBackupDocument(bytes)
+        XCTAssertEqual(try document.networkPrivacyPreferences().own.map(\.ssid),["Home"])
+        XCTAssertFalse(try document.networkPrivacyPreferences().cellularAuthorized)
+        XCTAssertEqual(try document.guestPrivacyNetworks(localID:7).map(\.ssid),["Owner home"])
+        XCTAssertEqual(try document.guestPrivacyNetworks(localID:8).map(\.ssid),["Other home"])
+        XCTAssertEqual(try document.guestPrivacyNetworks(localID:9),[])
+        XCTAssertThrowsError(try document.guestPrivacyNetworks(localID:0))
+        XCTAssertEqual(document.original,bytes)
+    }
 }
 
 final class ServerProxyConnectTests: XCTestCase {
@@ -62,6 +89,12 @@ final class ServerProxyConnectTests: XCTestCase {
     func testIPv6TargetKeepsItsPortAndProducesAnUnbracketedNetworkHost() throws {
         let value = try ServerProxyConnect(header("[::1]:9443"),authorization:authorization)
         XCTAssertEqual(value.server,"[::1]:9443"); XCTAssertEqual(value.host,"::1"); XCTAssertEqual(value.port,9443)
+    }
+    func testLegacyConnectAndHostDefaultPortAreEquivalentWithoutAllowingAnotherTarget() throws {
+        let old = String(decoding:header(),as:UTF8.self).replacingOccurrences(of:"HTTP/1.1",with:"HTTP/1.0").replacingOccurrences(of:"Host: server.invalid:443",with:"Host: server.invalid")
+        XCTAssertEqual(try ServerProxyConnect(Data(old.utf8),authorization:authorization).port,443)
+        let nonDefault = String(decoding:header("server.invalid:8443"),as:UTF8.self).replacingOccurrences(of:"Host: server.invalid:8443",with:"Host: server.invalid")
+        XCTAssertThrowsError(try ServerProxyConnect(Data(nonDefault.utf8),authorization:authorization))
     }
     func testAnIncompleteHeaderWaitsButOversizedInputDoesNot() {
         XCTAssertThrowsError(try ServerProxyConnect(Data("CONNECT server.invalid:443 HTTP/1.1\r\n".utf8),authorization:authorization)) {
