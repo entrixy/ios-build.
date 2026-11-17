@@ -17,6 +17,7 @@ private struct AppSoundPreferences: Codable {
     var volume: Float = 0.1
     var muted = Set<AppSoundEvent>()
     var custom = Set<AppSoundEvent>()
+    var generation: String? = nil
 }
 
 @MainActor final class AppSoundCenter: NSObject, ObservableObject, @preconcurrency AVAudioPlayerDelegate {
@@ -30,13 +31,16 @@ private struct AppSoundPreferences: Codable {
     private let key = "entrixy.event-sounds.v1"
     private var players: [AVAudioPlayer] = []
     private var bundled: [AppSoundEvent:Data] = [:]
+    private var generation: String?
     init(defaults: UserDefaults = .standard, directory: URL? = nil, notificationDirectory: URL? = nil) {
         self.defaults = defaults
         self.directory = directory ?? FileManager.default.urls(for:.applicationSupportDirectory,in:.userDomainMask)[0].appendingPathComponent("EventSounds",isDirectory:true)
         self.notificationDirectory = notificationDirectory ?? FileManager.default.urls(for:.libraryDirectory,in:.userDomainMask)[0].appendingPathComponent("Sounds",isDirectory:true)
         super.init()
-        if let bytes = defaults.data(forKey:key), let preferences = try? JSONDecoder().decode(AppSoundPreferences.self,from:bytes), preferences.volume.isFinite {
+        if let bytes = defaults.data(forKey:key), let preferences = try? JSONDecoder().decode(AppSoundPreferences.self,from:bytes), preferences.volume.isFinite,
+           preferences.generation.map({ UUID(uuidString:$0) != nil }) ?? true {
             volume = min(1,max(0,preferences.volume)); muted = preferences.muted; custom = preferences.custom
+            generation = preferences.generation
         }
     }
     func setVolume(_ value: Float) { guard value.isFinite else { return }; volume = min(1,max(0,value)); persist() }
@@ -50,10 +54,10 @@ private struct AppSoundPreferences: Codable {
         let access = url.startAccessingSecurityScopedResource(); defer { if access { url.stopAccessingSecurityScopedResource() } }
         let size = try url.resourceValues(forKeys:[.fileSizeKey]).fileSize ?? 0
         guard (1...16_777_216).contains(size) else { throw CocoaError(.fileReadCorruptFile) }
-        let bytes = try Data(contentsOf:url,options:.mappedIfSafe)
+        let bytes = try Self.readSampleFile(url)
         let player = try AVAudioPlayer(data:bytes)
         guard player.duration.isFinite, player.duration > 0 else { throw CocoaError(.fileReadCorruptFile) }
-        try FileManager.default.createDirectory(at:directory,withIntermediateDirectories:true)
+        try FileManager.default.createDirectory(at:customURL(event).deletingLastPathComponent(),withIntermediateDirectories:true)
         try bytes.write(to:customURL(event),options:[.atomic,.completeFileProtectionUntilFirstUserAuthentication])
         custom.insert(event); persist()
     }
@@ -115,10 +119,77 @@ private struct AppSoundPreferences: Codable {
             return UNNotificationSound(named:UNNotificationSoundName(rawValue:name))
         } catch { return .default }
     }
+    struct RestoreStage {
+        fileprivate let generation: String
+        fileprivate let material: EventSoundBackup
+        fileprivate let root: URL
+    }
+    func backupMaterial() throws -> EventSoundBackup {
+        var samples: [String:Data] = [:], missing = Set<String>()
+        for event in custom {
+            let url = customURL(event)
+            guard FileManager.default.fileExists(atPath:url.path) else { missing.insert(event.rawValue); continue }
+            let data = try Self.readSampleFile(url)
+            try Self.validateSample(data)
+            samples[event.rawValue] = data
+        }
+        return try EventSoundBackup(volume:volume,muted:Set(muted.map(\.rawValue)),samples:samples,unavailableSamples:missing)
+    }
+    static func validateBackup(_ material: EventSoundBackup) throws {
+        try material.validate()
+        for sample in material.samples.values { try validateSample(sample) }
+    }
+    private static func validateSample(_ bytes: Data) throws {
+        let player = try AVAudioPlayer(data:bytes)
+        guard player.duration.isFinite, player.duration > 0 else { throw CocoaError(.fileReadCorruptFile) }
+    }
+    private static func readSampleFile(_ url: URL) throws -> Data {
+        let handle = try FileHandle(forReadingFrom:url); defer { try? handle.close() }
+        var data = Data()
+        while let chunk = try handle.read(upToCount:65536), !chunk.isEmpty {
+            guard data.count + chunk.count <= BackupEnvelope.maxPayloadSize else { throw CocoaError(.fileReadTooLarge) }
+            data.append(chunk)
+        }
+        guard !data.isEmpty else { throw CocoaError(.fileReadCorruptFile) }
+        return data
+    }
+    /// Stage a complete generation before ownership moves. A corrupt sample or
+    /// disk write failure cannot replace any currently selected user file.
+    func prepareRestore(_ material: EventSoundBackup) throws -> RestoreStage {
+        try Self.validateBackup(material)
+        let stage = RestoreStage(generation:UUID().uuidString,material:material,root:directory)
+        let folder = directory.appendingPathComponent(stage.generation,isDirectory:true)
+        do {
+            try FileManager.default.createDirectory(at:folder,withIntermediateDirectories:true)
+            for (event,data) in material.samples { try data.write(to:folder.appendingPathComponent(event+".audio"),options:[.atomic,.completeFileProtectionUntilFirstUserAuthentication]) }
+            return stage
+        } catch { try? FileManager.default.removeItem(at:folder); throw error }
+    }
+    func discardUnusedRestore(_ stage: RestoreStage) {
+        if generation != stage.generation { try? FileManager.default.removeItem(at:directory.appendingPathComponent(stage.generation,isDirectory:true)) }
+    }
+    func commitRestore(_ stage: RestoreStage,commitAccess: () throws -> Void) throws {
+        guard stage.root == directory else { throw CocoaError(.fileReadCorruptFile) }
+        for (event,data) in stage.material.samples {
+            let staged = directory.appendingPathComponent(stage.generation,isDirectory:true).appendingPathComponent(event+".audio")
+            guard try Self.readSampleFile(staged) == data else { throw CocoaError(.fileReadCorruptFile) }
+        }
+        let previous = AppSoundPreferences(volume:volume,muted:muted,custom:custom,generation:generation)
+        players.forEach { $0.stop() }; players.removeAll()
+        generation = stage.generation; volume = stage.material.volume
+        muted = Set(stage.material.muted.compactMap(AppSoundEvent.init(rawValue:)))
+        custom = Set(stage.material.samples.keys.compactMap(AppSoundEvent.init(rawValue:)))
+        persist()
+        do { try commitAccess() }
+        catch {
+            generation = previous.generation; volume = previous.volume; muted = previous.muted; custom = previous.custom; persist()
+            throw error
+        }
+    }
     func audioPlayerDidFinishPlaying(_ player: AVAudioPlayer, successfully flag: Bool) { players.removeAll { $0 === player } }
-    private func customURL(_ event: AppSoundEvent) -> URL { directory.appendingPathComponent(event.rawValue+".audio") }
+    private func customURL(_ event: AppSoundEvent) -> URL { (generation.map { directory.appendingPathComponent($0,isDirectory:true) } ?? directory).appendingPathComponent(event.rawValue+".audio") }
     private func persist() {
-        if let data = try? JSONEncoder().encode(AppSoundPreferences(volume:volume,muted:muted,custom:custom)) { defaults.set(data,forKey:key) }
+        if let data = try? JSONEncoder().encode(AppSoundPreferences(volume:volume,muted:muted,custom:custom,generation:generation)) { defaults.set(data,forKey:key) }
     }
 }
 
@@ -173,5 +244,6 @@ struct SoundSettingsRows: View {
             }
             self.importing = nil
         }
+        .onChange(of:sounds.volume) { volume = $0 }
     }
 }

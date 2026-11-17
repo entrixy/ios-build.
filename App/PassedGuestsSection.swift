@@ -43,6 +43,7 @@ private struct PassedGuestCard: View {
     let message: () -> Void
     let remove: () -> Void
     @State private var expanded = false
+    @State private var showingQR = false
     var body: some View {
         VStack(alignment:.leading,spacing:8) {
             Button { withAnimation(.easeInOut(duration:0.18)) { expanded.toggle() } } label: {
@@ -60,11 +61,17 @@ private struct PassedGuestCard: View {
                 HStack(spacing:0) {
                     GuestIconButton("gearshape",label:ProductText.string("guests_edit_desc"),action:edit)
                     GuestIconButton("doc.on.doc",label:ProductText.string("btn_copy")) { UIPasteboard.general.string = record.link?.url }.disabled(record.link == nil)
+                    GuestIconButton("qrcode",label:"QR") { showingQR = true }.disabled(record.link == nil)
+                    if let link = record.link {
+                        ShareLink(item:link.url) { Image(systemName:"square.and.arrow.up").font(.system(size:22)).frame(maxWidth:.infinity,minHeight:48) }
+                            .buttonStyle(.plain).accessibilityLabel(ProductText.string("guests_share_chooser"))
+                    }
                     GuestIconButton("envelope",label:ProductText.string("msg_send_icon_desc"),action:message).disabled(!record.parts.contains(where:{ $0.childID != nil }))
                     GuestIconButton("trash",label:ProductText.string("btn_delete"),destructive:true,action:remove)
                 }.frame(maxWidth:.infinity)
             }
         }.padding(16).background(Color(uiColor:.secondarySystemGroupedBackground),in:RoundedRectangle(cornerRadius:20))
+            .sheet(isPresented:$showingQR) { if let link = record.link { LinkQRCodeSheet(text:link.url) } }
     }
 }
 
@@ -72,62 +79,7 @@ private struct PassedGuestCard: View {
 /// Each metadata edit remains durable before its request. A partial/uncertain
 /// response keeps the sheet and saved state available for reconciliation.
 private struct PassedObjectsEditor: View {
-    @EnvironmentObject private var app: AppModel
-    @Environment(\.dismiss) private var dismiss
     @ObservedObject var manager: PassManager
     let accessID: UUID
-    @State private var selected: [String:Set<Int>] = [:]
-    @State private var loaded = false
-    @State private var saving = false
-    private var record: PassedAccess? { app.passedAccess.first(where:{ $0.id == accessID }) }
-    var body: some View {
-        NavigationStack {
-            Form {
-                if let record {
-                    Section { Text(record.label).font(.headline); Text(passedAccessStatus(record)).font(.footnote).foregroundStyle(Brand.secondaryInk) }
-                    ForEach(record.parts.indices,id:\.self) { index in
-                        let part = record.parts[index]
-                        Section {
-                            if let guest = app.guests.first(where:{ $0.id == part.sourceID }) {
-                                ForEach(guest.objects) { object in
-                                    let number = object.numberID, allow = manager.snapshots[guest.id]?.allowance[number]
-                                    let checked = selected[part.sourceID]?.contains(number) == true
-                                    let current = part.objects[String(number)] != nil
-                                    let canAdd = !guest.paused && (allow?.canPass == true || (current && (allow?.depth ?? 0) > 0 && allow?.nativeOnly == false))
-                                    Button {
-                                        if checked { selected[part.sourceID]?.remove(number) }
-                                        else { selected[part.sourceID,default:[]].insert(number) }
-                                    } label: {
-                                        HStack(spacing:12) { Image(systemName:checked ? "checkmark.square.fill" : "square"); Text(object.label).frame(maxWidth:.infinity,alignment:.leading) }.foregroundStyle(Brand.ink).frame(minHeight:48).contentShape(Rectangle())
-                                    }.buttonStyle(.plain).disabled((!checked && !canAdd) || part.pendingEdit != nil || [.draft,.revoking,.revoked].contains(part.state))
-                                }
-                            } else { Text("Исходный ключ удалён с этого iPhone").foregroundStyle(Brand.secondaryInk) }
-                        }
-                    }
-                    Section {
-                        if let message = manager.message { Text(message).font(.footnote).foregroundStyle(Brand.secondaryInk) }
-                        if record.parts.contains(where:{ $0.state == .draft }) {
-                            Button("Продолжить передачу") { Task { await manager.continueCreating(accessID) } }.buttonStyle(SecondaryActionStyle()).actionListRow()
-                        }
-                        Button(ProductText.string("btn_save")) { Task { await save() } }.buttonStyle(PrimaryActionStyle()).actionListRow().disabled(record.parts.contains(where:{ $0.pendingEdit != nil }))
-                    }
-                }
-            }.disabled(saving || manager.busy || app.busy || app.ownerBusy)
-                .navigationTitle(ProductText.string("guests_access_title")).navigationBarTitleDisplayMode(.inline)
-                .sheetDismissFooter(disabled:saving || manager.busy) { dismiss() }
-                .task {
-                    if !loaded { loaded = true; for part in record?.parts ?? [] { selected[part.sourceID] = Set(part.objects.keys.compactMap(Int.init)) } }
-                    await manager.reload()
-                }
-        }
-    }
-    private func save() async {
-        guard let initial = record else { return }
-        saving = true; defer { saving = false }
-        for part in initial.parts {
-            let desired = selected[part.sourceID] ?? []
-            if desired != Set(part.objects.keys.compactMap(Int.init)), !(await manager.editObjects(accessID,sourceID:part.sourceID,numberIDs:desired)) { return }
-        }
-        dismiss()
-    }
+    var body: some View { PassAccessForm(manager:manager,accessID:accessID) }
 }

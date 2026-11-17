@@ -28,11 +28,14 @@ struct GuestObjectAccessEditor: View {
     @Environment(\.dismiss) private var dismiss
     let title: String
     @Binding var value: KeyObjectAccess
+    var showNative = true
+    var maxDepth = 5
+    var maxPool = 50
     var body: some View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: 20) {
-                    GuestAccessFields(value: $value)
+                    GuestAccessFields(value:$value,showNative:showNative,maxDepth:maxDepth,maxPool:maxPool)
                     Button(ProductText.string("btn_ok")) { dismiss() }.buttonStyle(PrimaryActionStyle())
                 }.padding(DesignMetrics.pageInset)
             }.background(Color(uiColor: .systemGroupedBackground)).navigationTitle(title).navigationBarTitleDisplayMode(.inline)
@@ -143,31 +146,41 @@ struct GuestInvocationEditor: View {
 /// Same controls for per-object access and Guests / Presets.
 struct GuestAccessFields: View {
     @Binding var value: KeyObjectAccess
+    var showNative = true
+    var maxDepth = 5
+    var maxPool = 50
     private func change(native: Bool? = nil, depth: Int? = nil, pool: Int? = nil) {
-        if let next = try? KeyObjectAccess(nativeOnly: native ?? value.nativeOnly, depth: depth ?? value.depth, pool: pool ?? value.pool) { value = next }
+        if let next = try? KeyObjectAccess(nativeOnly:native ?? value.nativeOnly,depth:min(maxDepth,max(0,depth ?? value.depth)),pool:min(maxPool,max(1,pool ?? value.pool))) { value = next }
     }
     var body: some View {
-        VStack(alignment: .leading, spacing: 16) {
-                    Toggle(isOn: Binding(get: { value.nativeOnly }, set: { change(native: $0) })) {
-                        VStack(alignment: .leading, spacing: 5) {
-                            Text(ProductText.string("guests_native_only"))
-                            Text(ProductText.string("guests_native_only_hint")).font(.footnote).foregroundStyle(Brand.secondaryInk)
-                        }
+        VStack(alignment:.leading,spacing:16) {
+            if showNative {
+                Toggle(isOn:Binding(get:{ value.nativeOnly },set:{ change(native:$0) })) {
+                    VStack(alignment:.leading,spacing:5) {
+                        Text(ProductText.string("guests_native_only"))
+                        Text(ProductText.string("guests_native_only_hint")).font(.footnote).foregroundStyle(Brand.secondaryInk)
                     }
-                    Toggle(isOn: Binding(get: { value.depth > 0 }, set: { change(depth: $0 ? 1 : 0) })) {
-                        VStack(alignment: .leading, spacing: 5) {
-                            Text(ProductText.string("guests_allow_delegate"))
-                            Text(ProductText.string("guests_allow_delegate_hint")).font(.footnote).foregroundStyle(Brand.secondaryInk)
-                        }
+                }
+            }
+            if maxDepth < 1 { Text(ProductText.string("delegate_stops_here")).foregroundStyle(Brand.secondaryInk) }
+            else {
+                Toggle(isOn:Binding(get:{ value.depth > 0 },set:{ change(depth:$0 ? 1 : 0) })) {
+                    VStack(alignment:.leading,spacing:5) {
+                        Text(ProductText.string("guests_allow_delegate"))
+                        Text(ProductText.string("guests_allow_delegate_hint")).font(.footnote).foregroundStyle(Brand.secondaryInk)
                     }
-                    if value.depth > 0 {
-                        Stepper(value: Binding(get: { value.depth }, set: { change(depth: $0) }), in: 1...5) { Text(String(value.depth)) }
-                        VStack(alignment: .leading, spacing: 5) {
+                }
+                if value.depth > 0 {
+                    Stepper(value:Binding(get:{ value.depth },set:{ change(depth:$0) }),in:1...maxDepth) { Text(String(value.depth)) }
+                    if maxPool > 1 {
+                        VStack(alignment:.leading,spacing:5) {
                             Text(ProductText.string("guests_pass_pool"))
                             Text(ProductText.string("guests_pass_pool_hint")).font(.footnote).foregroundStyle(Brand.secondaryInk)
                         }
-                        Stepper(value: Binding(get: { value.pool }, set: { change(pool: $0) }), in: 1...50) { Text(String(value.pool)) }
+                        Stepper(value:Binding(get:{ value.pool },set:{ change(pool:$0) }),in:1...maxPool) { Text(String(value.pool)) }
                     }
-        }
+                }
+            }
+        }.onAppear { change() }
     }
 }

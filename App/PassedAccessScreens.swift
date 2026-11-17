@@ -30,69 +30,120 @@ private struct PassedAccessContent: View {
         .sheet(isPresented: $adding) { PassAccessForm(manager: manager) }
     }
 }
+private struct PassObjectOption: Identifiable {
+    let source: SavedGuest
+    let object: GuestObject
+    let allowance: PassAllowance
+    let existing: Bool
+    var id: String { source.id + "|" + object.id }
+    var maximumDepth: Int { max(0,allowance.depth - 1) }
+    var maximumPool: Int { max(1,allowance.poolLeft - (existing ? 0 : 1)) }
+}
 struct PassAccessForm: View {
     @EnvironmentObject private var app: AppModel
     @Environment(\.dismiss) private var dismiss
     @ObservedObject var manager: PassManager
-    @State private var server = ""
+    var accessID: UUID? = nil
     @State private var label = ""
     @State private var welcome = ""
-    @State private var selected: [String: [Int: KeyObjectAccess]] = [:]
-    private var servers: [String] { Array(Set(app.guests.map { $0.invite.server })).sorted() }
-    private func settings(_ source: String, _ number: Int) -> KeyObjectAccess { selected[source]?[number] ?? (try! KeyObjectAccess(depth: 0, pool: 1)) }
-    private func change(_ source: String, _ number: Int, depth: Int? = nil, pool: Int? = nil) {
-        if let value = try? KeyObjectAccess(depth: depth ?? settings(source, number).depth, pool: pool ?? settings(source, number).pool) { selected[source, default: [:]][number] = value }
+    @State private var selected: [String:[Int:KeyObjectAccess]] = [:]
+    @State private var editingAccess: PassObjectOption?
+    @State private var loaded = false
+    @State private var saving = false
+    private var record: PassedAccess? { app.passedAccess.first { $0.id == accessID } }
+    private var lockedHost: String? {
+        record?.server ?? selected.keys.first.flatMap { id in app.guests.first { $0.id == id }?.invite.server }
+    }
+    private var options: [PassObjectOption] {
+        var seen = Set<String>(), result: [PassObjectOption] = []
+        for guest in app.guests {
+            for object in guest.objects {
+                let current = record?.parts.contains { $0.sourceID == guest.id && $0.objects[String(object.numberID)] != nil } == true
+                guard let allow = manager.snapshots[guest.id]?.allowance[object.numberID], allow.depth > 0,
+                      allow.poolLeft > 0 || current else { continue }
+                let key = guest.invite.server + "|" + (object.kind == "ble" ? "b" : "n") + "|" + String(object.numberID)
+                if seen.insert(key).inserted { result.append(PassObjectOption(source:guest,object:object,allowance:allow,existing:current)) }
+            }
+        }
+        return result
+    }
+    private var hosts: [String] { var values: [String] = []; for option in options where !values.contains(option.source.invite.server) { values.append(option.source.invite.server) }; return values }
+    private func value(_ option: PassObjectOption) -> KeyObjectAccess { selected[option.source.id]?[option.object.numberID] ?? (try! KeyObjectAccess(nativeOnly:option.allowance.nativeOnly,depth:0,pool:min(3,option.maximumPool))) }
+    private func toggle(_ option: PassObjectOption) {
+        guard !option.source.paused, lockedHost == nil || lockedHost == option.source.invite.server else { return }
+        if selected[option.source.id]?[option.object.numberID] != nil {
+            selected[option.source.id]?.removeValue(forKey:option.object.numberID)
+            if selected[option.source.id]?.isEmpty == true { selected.removeValue(forKey:option.source.id) }
+        } else { selected[option.source.id,default:[:]][option.object.numberID] = value(option) }
     }
     var body: some View {
         NavigationStack {
             Form {
                 Section {
-                    Picker("Сервер", selection: $server) { ForEach(servers, id: \.self) { Text($0).tag($0) } }
-                    AppField("Имя получателя") {
-                        TextField("Имя получателя", text: $label)
+                    AppField(ProductText.string("guests_name_label")) {
+                        TextField(ProductText.string("guests_default_name"),text:$label).textInputAutocapitalization(.words)
+                            .onChange(of:label) { label = String($0.replacingOccurrences(of:"\n",with:"").replacingOccurrences(of:"\r",with:"").prefix(128)) }
                     }
-                    AppField("Приветствие") {
-                        TextField("Приветствие", text: $welcome, axis: .vertical)
-                    }
+                    if accessID == nil { AppField(ProductText.string("guests_welcome_label")) { TextField(ProductText.string("guests_welcome_hint"),text:$welcome,axis:.vertical).lineLimit(2...5) } }
                 }
-                ForEach(Array(app.guests.filter { $0.invite.server == server }.enumerated()), id: \.element.id) { index, guest in
-                    Section("Полученный ключ \(index + 1)") {
-                        ForEach(guest.objects.filter { $0.kind != "ble" }) { object in
-                            if let allow = manager.snapshots[guest.id]?.allowance[object.numberID], allow.canPass {
-                                let chosen = selected[guest.id]?[object.numberID] != nil
-                                Button {
-                                    if chosen { selected[guest.id]?.removeValue(forKey: object.numberID); if selected[guest.id]?.isEmpty == true { selected.removeValue(forKey: guest.id) } }
-                                    else { change(guest.id, object.numberID) }
-                                } label: {
-                                    HStack { Text(object.label); Spacer(); Image(systemName: chosen ? "checkmark.circle.fill" : "circle") }.foregroundStyle(Brand.ink)
-                                }.disabled(guest.paused)
-                                if chosen {
-                                    Stepper("Уровней ниже получателя: \(settings(guest.id, object.numberID).depth)", value: Binding(get: { settings(guest.id, object.numberID).depth }, set: { change(guest.id, object.numberID, depth: $0) }), in: 0...max(0, allow.depth - 1))
-                                    if settings(guest.id, object.numberID).depth > 0 {
-                                        Stepper("Ключей ниже по цепочке: \(settings(guest.id, object.numberID).pool)", value: Binding(get: { settings(guest.id, object.numberID).pool }, set: { change(guest.id, object.numberID, pool: $0) }), in: 1...max(1, allow.poolLeft - 1))
-                                    }
-                                }
-                            }
-                        }
-                        if guest.paused { Text("Исходный ключ приостановлен").foregroundStyle(Brand.secondaryInk) }
-                    }
+                Section { Text(ProductText.string("guests_objects_allowed")).font(.subheadline).foregroundStyle(Brand.secondaryInk) }
+                ForEach(hosts,id:\.self) { host in
+                    Section {
+                        ForEach(options.filter { $0.source.invite.server == host }) { option in row(option) }
+                    } header: { if hosts.count > 1 { Text(host) } }
+                }
+                if let message = manager.message { Section { Text(message).font(.footnote).foregroundStyle(Brand.secondaryInk) } }
+                if let record, record.parts.contains(where:{ $0.state == .draft }) {
+                    Section { Button("Продолжить передачу") { Task { await manager.continueCreating(record.id) } }.buttonStyle(SecondaryActionStyle()).actionListRow() }
                 }
                 Section {
-                    Button("Обновить права передачи") { Task { await manager.reload() } }.buttonStyle(SecondaryActionStyle())
-                    if let message = manager.message { Text(message).foregroundStyle(Brand.secondaryInk) }
-                    Button {
-                        Task { if await manager.create(label: label, welcome: welcome, objects: selected) != nil { dismiss() } }
-                    } label: { ActionButtonLabel(title: "Создать ссылку передачи", busy: manager.busy) }.buttonStyle(PrimaryActionStyle())
-                        .disabled(selected.isEmpty || label.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
-                } footer: { Text("Доступны только объекты, которые владелец разрешил передавать. Получатель создаст собственный ключ; владельцы подтвердят его связку.") }
-            }
-            .disabled(manager.busy || app.busy || app.ownerBusy)
-            .navigationTitle("Передать доступ").navigationBarTitleDisplayMode(.inline)
-            .sheetDismissFooter(disabled: manager.busy || app.busy || app.ownerBusy) { dismiss() }
-
-            .task { if server.isEmpty { server = servers.first ?? "" }; await manager.reload() }
-            .onChange(of: server) { _ in selected = [:] }
+                    Button { Task { await save() } } label: { ActionButtonLabel(title:ProductText.string(accessID == nil ? "delegate_create" : "btn_save"),busy:saving || manager.busy) }
+                        .buttonStyle(PrimaryActionStyle()).actionListRow()
+                        .disabled(selected.isEmpty || record?.parts.contains(where:{ $0.pendingEdit != nil || $0.state == .draft }) == true)
+                }
+            }.disabled(saving || manager.busy || app.busy || app.ownerBusy || !app.canManageGuestAccess)
+                .navigationTitle(ProductText.string(accessID == nil ? "delegate_create" : "guests_access_title")).navigationBarTitleDisplayMode(.inline)
+                .sheetDismissFooter(disabled:saving || manager.busy) { dismiss() }
+                .sheet(item:$editingAccess) { option in
+                    GuestObjectAccessEditor(title:option.object.label,value:Binding(get:{ value(option) },set:{ selected[option.source.id,default:[:]][option.object.numberID] = $0 }),showNative:false,maxDepth:option.maximumDepth,maxPool:option.maximumPool)
+                }
+                .task {
+                    if !loaded { loaded = true; if let record { label = record.label; for part in record.parts { selected[part.sourceID] = Dictionary(uniqueKeysWithValues:part.objects.compactMap { id,value in Int(id).map { ($0,value) } }) } } }
+                    await manager.reload()
+                }
         }
+    }
+    private func row(_ option: PassObjectOption) -> some View {
+        let checked = selected[option.source.id]?[option.object.numberID] != nil
+        let other = lockedHost != nil && lockedHost != option.source.invite.server
+        return HStack(spacing:8) {
+            Button { toggle(option) } label: {
+                HStack(spacing:12) { Image(systemName:checked ? "checkmark.square.fill" : "square"); Text(option.object.label).frame(maxWidth:.infinity,alignment:.leading) }
+                    .foregroundStyle(other ? Brand.secondaryInk : Brand.ink).frame(minHeight:52).contentShape(Rectangle())
+            }.buttonStyle(.plain).disabled(other || option.source.paused)
+                .accessibilityIdentifier("pass-object-" + option.id)
+            if checked {
+                Button { editingAccess = option } label: { Image(systemName:"person.badge.key").font(.system(size:22)).frame(width:48,height:48) }
+                    .buttonStyle(SecondaryActionStyle()).accessibilityLabel(ProductText.string("guests_access_title"))
+            }
+        }
+    }
+    private func save() async {
+        guard !saving, !selected.isEmpty else { return }; saving = true; defer { saving = false }
+        let name = label.trimmingCharacters(in:.whitespacesAndNewlines)
+        if let initial = record {
+            let sources = Set(initial.parts.map(\.sourceID)).union(selected.keys)
+            for source in sources.sorted() {
+                let desired = selected[source] ?? [:]
+                let current = app.passedAccess.first(where:{ $0.id == initial.id })?.parts.first(where:{ $0.sourceID == source })?.objects ?? [:]
+                let encoded = Dictionary(uniqueKeysWithValues:desired.map { (String($0.key),$0.value) })
+                if encoded != current, !(await manager.editObjects(initial.id,sourceID:source,numberIDs:Set(desired.keys),access:desired)) { return }
+            }
+            guard var latest = app.passedAccess.first(where:{ $0.id == initial.id }) else { return }
+            latest.label = name.isEmpty ? ProductText.string("guests_default_name") : name
+            do { try app.savePassedAccess(latest) } catch { app.errorMessage = "Не удалось сохранить имя гостя."; return }
+            dismiss()
+        } else if await manager.create(label:name.isEmpty ? ProductText.string("guests_default_name") : name,welcome:welcome.trimmingCharacters(in:.whitespacesAndNewlines),objects:selected) != nil { dismiss() }
     }
 }
 struct PassedAccessDetail: View {
@@ -176,10 +227,10 @@ struct EditPassedObjects: View {
         NavigationStack {
             Form {
                 Section("Объекты получателя") {
-                    ForEach(guest?.objects.filter { $0.kind != "ble" } ?? []) { object in
+                    ForEach(guest?.objects ?? []) { object in
                         let allow = manager.snapshots[sourceID]?.allowance[object.numberID]
                         let existing = part?.objects[String(object.numberID)] != nil
-                        let canAdd = allow?.canPass == true || (existing && (allow?.depth ?? 0) > 0 && allow?.nativeOnly == false)
+                        let canAdd = allow?.canPass == true || (existing && (allow?.depth ?? 0) > 0)
                         Button {
                             if selected.contains(object.numberID) { selected.remove(object.numberID) } else { selected.insert(object.numberID) }
                         } label: {

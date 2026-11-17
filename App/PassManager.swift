@@ -67,7 +67,7 @@ final class PassManager: ObservableObject {
             }
             guard let server = sources.first?.invite.server, sources.allSatisfy({ $0.invite.server == server }) else { throw BackupFailure.conflictingAccess }
             for guest in sources { try await sync(guest) }
-            let record = try PassedAccess(server: server, label: label, welcome: welcome, objects: objects, snapshots: snapshots)
+            let record = try PassedAccess(server:server,label:label,welcome:welcome,objects:objects,snapshots:snapshots,from:app.ownerGuestDefaults.ownerName)
             try app.savePassedAccess(record)
             savedID = record.id
             try await submitUnsent(record.id)
@@ -106,7 +106,7 @@ final class PassManager: ObservableObject {
             try await sync(guest)
         }
     }
-    func editObjects(_ id: UUID, sourceID: String, numberIDs: Set<Int>) async -> Bool {
+    func editObjects(_ id: UUID, sourceID: String, numberIDs: Set<Int>,access: [Int:KeyObjectAccess]? = nil) async -> Bool {
         guard !busy, app.canManageGuestAccess else { return false }
         busy = true; message = nil
         defer { busy = false }
@@ -115,20 +115,32 @@ final class PassManager: ObservableObject {
             guard let guest = app.guests.first(where: { $0.id == sourceID && !$0.paused }) else { throw BackupFailure.noAccess }
             try await sync(guest)
             guard var record = app.passedAccess.first(where: { $0.id == id }), let group = record.group,
-                  let index = record.parts.firstIndex(where: { $0.sourceID == sourceID }),
-                  record.parts[index].pendingEdit == nil,
-                  ![.revoking, .revoked, .draft].contains(record.parts[index].state),
+                  guest.invite.server == record.server, access == nil || Set(access!.keys) == numberIDs,
                   let snapshot = snapshots[sourceID] else { throw BackupFailure.busy }
+            if !record.parts.contains(where:{ $0.sourceID == sourceID }) {
+                guard !numberIDs.isEmpty else { return true }
+                let settings = try access ?? Dictionary(uniqueKeysWithValues:numberIDs.map { ($0,try KeyObjectAccess(depth:0,pool:1)) })
+                try record.addPart(sourceID:sourceID,objects:settings,snapshot:snapshot)
+                try app.savePassedAccess(record)
+                try await submitUnsent(id)
+                return app.passedAccess.first(where:{ $0.id == id })?.parts.first(where:{ $0.sourceID == sourceID }).map { $0.state != .draft } ?? false
+            }
+            guard let index = record.parts.firstIndex(where: { $0.sourceID == sourceID }),
+                  record.parts[index].pendingEdit == nil,
+                  ![.revoking, .revoked, .draft].contains(record.parts[index].state) else { throw BackupFailure.busy }
             let part = record.parts[index]
             var desired: [String: KeyObjectAccess] = [:]
             var objects: [[String: Any]] = []
             for number in numberIDs.sorted() {
-                guard let allow = snapshot.allowance[number], allow.depth > 0, !allow.nativeOnly else { throw BackupFailure.noAccess }
+                guard let allow = snapshot.allowance[number], allow.depth > 0 else { throw BackupFailure.noAccess }
                 let old = part.objects[String(number)]
-                let settings = try old ?? KeyObjectAccess(depth: 0, pool: 1)
-                guard settings.depth < allow.depth, old != nil || allow.poolLeft > 0 else { throw BackupFailure.noAccess }
+                let requested = try access?[number] ?? old ?? KeyObjectAccess(depth:0,pool:1)
+                let settings = try KeyObjectAccess(nativeOnly:allow.nativeOnly,depth:requested.depth,pool:requested.pool)
+                try settings.validate()
+                guard settings.depth < allow.depth, old != nil || allow.poolLeft > 0,
+                      settings == old || settings.pool <= max(1,allow.poolLeft - (old == nil ? 1 : 0)) else { throw BackupFailure.noAccess }
                 desired[String(number)] = settings
-                objects.append(old != nil && part.childID != nil ? ["id": number] : settings.json(id: number))
+                objects.append(old == settings && part.childID != nil ? ["id": number] : settings.json(id: number))
             }
             record.parts[index].pendingEdit = desired; record.parts[index].editSent = true
             try app.savePassedAccess(record)
@@ -148,7 +160,8 @@ final class PassManager: ObservableObject {
             guard app.canManageGuestAccess else { throw BackupFailure.busy }
             _ = try await api.delegate(invite: guest.invite, fingerprint: app.backupFingerprint(server: record.server), operation: operation, body: body)
             try await sync(guest)
-            return true
+            guard let confirmed = app.passedAccess.first(where:{ $0.id == id })?.parts.first(where:{ $0.sourceID == sourceID }) else { return false }
+            return confirmed.pendingEdit == nil
         } catch { message = "Изменение объектов не подтверждено. Сохранённые данные не заменены; обновите передачу перед новым изменением."; return false }
     }
     func revoke(_ id: UUID, retry: Bool = false) async {

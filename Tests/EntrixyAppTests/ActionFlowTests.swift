@@ -16,9 +16,9 @@ final class ActionFlowTests: XCTestCase {
         SecItemDelete([kSecClass as String: kSecClassGenericPassword, kSecAttrService as String: service] as CFDictionary)
         super.tearDown()
     }
-    @MainActor private func fixture(template: [String: Any] = [:]) async throws -> (AppModel, RecordingController, SavedGuest, GuestObject) {
+    @MainActor private func fixture(template: [String: Any] = [:],imported: AndroidIncomingAutomation? = nil) async throws -> (AppModel, RecordingController, SavedGuest, GuestObject) {
         let invite = try GuestInvite.parse("https://example.invalid/key#AAECAwQFBgcICQoLDA0ODxAREhMUFRYX" + String(repeating: "A", count: 43))
-        let guest = SavedGuest(invite: invite)
+        let guest = SavedGuest(invite:invite,androidAutomation:imported.map { ["7":$0] })
         let store = KeychainStore(service: service)
         try store.save(SavedState(identity: Data(repeating: 53, count: 32), guests: [guest]))
         let model = AppModel(storage: store)
@@ -32,6 +32,19 @@ final class ActionFlowTests: XCTestCase {
         try model.attachTestController(controller, guestID: guest.id, bundle: JSONSerialization.data(withJSONObject: bundle), snapshot: snapshot)
         try await model.receiveTestController(Data(#"{"type":"devices_online","device_ids":[9]}"#.utf8), guestID: guest.id)
         return (model, controller, guest, try XCTUnwrap(model.guests.first?.objects.first))
+    }
+    @MainActor func testImportedAndroidPINChoiceIsAppliedOnlyAfterFreshBundleAndPersistsWithoutSending() async throws {
+        let local = try AutomationTemplate(data:Data(#"{"auth_on":true,"auth":"pin"}"#.utf8))
+        let seed = try AndroidIncomingAutomation(local:local,previousOwner:AutomationTemplate())
+        let (model,controller,guest,object) = try await fixture(template:["auth_l":"suggest"],imported:seed)
+        defer { model.suspend() }
+        let intent = try XCTUnwrap(model.actionIntent(guestID:guest.id,object:object))
+        XCTAssertEqual(intent.policy.authentication,"pin")
+        XCTAssertTrue(model.guests[0].androidAutomation?.isEmpty == true)
+        await model.execute(intent)
+        XCTAssertTrue(controller.sent.isEmpty); XCTAssertTrue(model.journal.isEmpty)
+        let saved = try XCTUnwrap(KeychainStore(service:service).load()?.guests.first)
+        XCTAssertEqual(saved.automation?[object.id]?.effective.authMode,"pin"); XCTAssertEqual(saved.invite,guest.invite)
     }
     @MainActor func testPressChallengeResultAndJournalSurviveRelaunchWithoutReplay() async throws {
         let (model, controller, guest, object) = try await fixture()

@@ -24,8 +24,9 @@ struct IOSBackupPayload: Codable {
     /// export. Original archives remain preserved separately for unmapped data.
     let androidGuests: [AndroidGuestMigration]?
     let selectedOwnerServer: String?
+    let eventSounds: EventSoundBackup?
     let objectPreferences: ObjectCatalogPreferences?
-    init(state: SavedState, created: Date = Date(), androidGuests: [AndroidGuestMigration]? = nil) {
+    init(state: SavedState, created: Date = Date(), androidGuests: [AndroidGuestMigration]? = nil,eventSounds: EventSoundBackup? = nil) {
         app = "entrixy-ios"; version = 1; self.created = created; sourceIdentity = state.identity
         owners = state.owners ?? []; guests = state.guests
         journal = (state.journal ?? []).filter(\.isAction)
@@ -40,6 +41,7 @@ struct IOSBackupPayload: Codable {
         companies = state.companies
         androidArchives = state.androidArchives
         selectedOwnerServer = state.selectedOwnerServer
+        self.eventSounds = eventSounds
         self.androidGuests = androidGuests ?? state.androidPendingGuests?.map { source in
             var exported = source
             // This pending identity was already moved to the exporting iPhone.
@@ -57,9 +59,10 @@ struct IOSBackupPayload: Codable {
         let hash = document.archiveID
         let provenance = Data(stride(from:0,to:64,by:2).map { UInt8(hash.dropFirst($0).prefix(2),radix:16)! })
         let state = SavedState(identity:provenance,guests:[],owners:owners,ownerGuestDefaults:try document.guestDefaults(),companies:try document.companies(),androidArchives:[document],selectedOwnerServer:try document.primaryServer())
-        self.init(state:state,created:document.created,androidGuests:migrations)
+        self.init(state:state,created:document.created,androidGuests:migrations,eventSounds:try document.eventSoundBackup())
     }
     func validate() throws {
+        try eventSounds?.validate()
         if let host = selectedOwnerServer { guard try GuestInvite.normalizeServer(host) == host else { throw BackupFailure.invalidPayload } }
         try ownerGuestDefaults?.validate()
         try KnownCompany.validateDirectory(companies ?? [])
@@ -145,9 +148,11 @@ final class BackupManager: ObservableObject {
     private unowned let app: AppModel
     private let guestMover: GuestMigrationTransport
     private let refreshAfterRestore: Bool
+    private let sounds: AppSoundCenter
     var hasPendingRestore: Bool { app.backupPlan() != nil }
-    init(app: AppModel, guestMover: GuestMigrationTransport = GuestAPI(), refreshAfterRestore: Bool = true) {
+    init(app: AppModel, guestMover: GuestMigrationTransport = GuestAPI(), refreshAfterRestore: Bool = true,sounds: AppSoundCenter? = nil) {
         self.app = app; self.guestMover = guestMover; self.refreshAfterRestore = refreshAfterRestore
+        self.sounds = sounds ?? .shared
         updateProgress()
     }
     func makePresentation() -> BackupPresentation { BackupPresentation(app:app,manager:self) }
@@ -158,7 +163,7 @@ final class BackupManager: ObservableObject {
         defer { busy = false }
         let state = try app.backupState()
         guard !(state.owners ?? []).isEmpty || !state.guests.isEmpty || !(state.passedAccess ?? []).isEmpty || !(state.androidPendingGuests ?? []).isEmpty else { throw BackupFailure.noAccess }
-        let payload = IOSBackupPayload(state: state)
+        let payload = IOSBackupPayload(state:state,eventSounds:try sounds.backupMaterial())
         try payload.validate()
         let bytes = try JSONEncoder().encode(payload)
         let encrypted = try await Task.detached(priority: .userInitiated) { try BackupEnvelope.seal(bytes, password: password) }.value
@@ -182,6 +187,7 @@ final class BackupManager: ObservableObject {
         }
         try payload.validate()
         guard try JSONEncoder().encode(payload).count <= BackupEnvelope.maxPayloadSize else { throw BackupFailure.invalidPayload }
+        if let material = payload.eventSounds { try AppSoundCenter.validateBackup(material) }
         try app.validateRestoreConflicts(payload)
         preview = payload
     }
@@ -200,8 +206,11 @@ final class BackupManager: ObservableObject {
         busy = true; message = nil
         defer { busy = false; app.endBackupRestore(refresh: refreshAfterRestore); updateProgress() }
         guard var plan = app.backupPlan() else { return }
+        var audioStage: AppSoundCenter.RestoreStage?
+        defer { if let audioStage { sounds.discardUnusedRestore(audioStage) } }
         do {
             try app.validateRestoreConflicts(plan.payload)
+            if let material = plan.payload.eventSounds { audioStage = try sounds.prepareRestore(material) }
             // Re-check remaining owners on every explicit resume as well.
             for owner in plan.payload.owners where owner.credentials != nil && !plan.restoredOwners.contains(owner.server) {
                 try await app.claimBackupOwner(owner, dryRun: true)
@@ -233,11 +242,12 @@ final class BackupManager: ObservableObject {
                 let invite = try await guestMover.recover(identity:source.identity,bundleKey:source.bundleKey,recipient:source.recipient,fingerprint:newFingerprint)
                 guard invite == nil || invite?.id == source.id else { throw BackupFailure.invalidPayload }
                 plan.restoredAndroidGuests = (plan.restoredAndroidGuests ?? []) + [source.id]
-                if let invite { try app.activateBackupGuest(SavedGuest(invite:invite,requiresBLEExitOnRestore:true),plan:plan) }
+                if let invite { try app.activateBackupGuest(SavedGuest(invite:invite,requiresBLEExitOnRestore:true,androidAutomation:source.incomingAutomation),plan:plan) }
                 else { try app.activatePendingAndroidGuest(source,plan:plan) }
                 updateProgress()
             }
-            try app.finishBackupRestore(plan)
+            if let audioStage { try sounds.commitRestore(audioStage,commitAccess:{ try app.finishBackupRestore(plan) }) }
+            else { try app.finishBackupRestore(plan) }
             preview = nil
             message = app.androidPendingGuests.isEmpty
                 ? "Доступы перенесены на этот iPhone. Старый телефон больше не может использовать перенесённые привязки."

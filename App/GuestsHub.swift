@@ -279,15 +279,21 @@ private struct GuestQRSheet: View {
     let server: String
     let keyID: UUID
     var body: some View {
+        if let owner = model.owners.first(where:{ $0.server == server }), let key = owner.issuedKeys?.first(where:{ $0.id == keyID }), let link = try? key.link(server:server,masterKey:owner.masterKey,allowPaused:true) { LinkQRCodeSheet(text:link.absoluteString) }
+    }
+}
+
+struct LinkQRCodeSheet: View {
+    @Environment(\.dismiss) private var dismiss
+    let text: String
+    var body: some View {
         NavigationStack {
             ScrollView {
-                if let owner = model.owners.first(where:{ $0.server == server }), let key = owner.issuedKeys?.first(where:{ $0.id == keyID }), let link = try? key.link(server:server,masterKey:owner.masterKey,allowPaused:true) {
                     VStack(spacing:20) {
-                        InviteQRCode(text:link.absoluteString).onTapGesture { dismiss() }
+                        InviteQRCode(text:text).onTapGesture { dismiss() }
                         Text(ProductText.string("guests_qr_close")).font(.footnote).foregroundStyle(Brand.secondaryInk)
-                        Button(ProductText.string("btn_copy")) { UIPasteboard.general.string = link.absoluteString }.buttonStyle(SecondaryActionStyle())
+                        Button(ProductText.string("btn_copy")) { UIPasteboard.general.string = text }.buttonStyle(SecondaryActionStyle())
                     }.padding(DesignMetrics.pageInset)
-                }
             }.background(Color(uiColor:.systemGroupedBackground)).navigationTitle("QR").navigationBarTitleDisplayMode(.inline)
                 .sheetDismissFooter(ProductText.string("btn_close")) { dismiss() }
         }

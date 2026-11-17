@@ -9,6 +9,7 @@ public struct AndroidGuestMigration: Codable, Identifiable {
     public var oldFingerprint: String
     public let bundleKey: Data?
     public let recipient: BundleKeySeal.Recipient?
+    public let incomingAutomation: [String:AndroidIncomingAutomation]?
     public var id: String { identity.id }
     public init(document: AndroidBackupDocument, guest: AndroidBackupDocument.Guest) throws {
         guard try document.guests().contains(guest), let seed = try document.sourceSeed(required:true) else { throw GuestCrypto.Failure.invalidEnvelope }
@@ -16,6 +17,7 @@ public struct AndroidGuestMigration: Codable, Identifiable {
         label = guest.label; oldFingerprint = try MigrationFingerprint.android(seed:seed,server:guest.server)
         bundleKey = try document.invitation(for:guest)?.bundleKey
         recipient = try document.recipient(for:guest)
+        incomingAutomation = try document.incomingAutomation(localID:guest.localID)
         try validate()
     }
     public func validate() throws {
@@ -24,6 +26,7 @@ public struct AndroidGuestMigration: Codable, Identifiable {
               oldFingerprint.utf8.allSatisfy({ (48...57).contains($0) || (97...102).contains($0) }),
               bundleKey == nil || bundleKey?.count == 32 else { throw GuestCrypto.Failure.invalidEnvelope }
         if let recipient { try BundleKeySeal.validate(recipient) }
+        try AndroidIncomingAutomation.validate(incomingAutomation ?? [:])
     }
 }
 

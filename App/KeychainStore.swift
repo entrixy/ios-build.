@@ -13,8 +13,10 @@ struct SavedGuest: Codable, Identifiable {
     var automation: [String: IncomingAutomationConfiguration]? = nil
     var cameras: [String: ObjectCameraConfiguration]? = nil
     var requiresBLEExitOnRestore: Bool? = nil
+    var androidAutomation: [String:AndroidIncomingAutomation]? = nil
     var id: String { invite.id }
     func validateObjectSettings() throws {
+        try AndroidIncomingAutomation.validate(androidAutomation ?? [:])
         guard (automation ?? [:]).count <= 1000, (cameras ?? [:]).count <= 1000 else {
             throw GuestCrypto.Failure.invalidEnvelope
         }

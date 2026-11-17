@@ -265,6 +265,7 @@ private final class BLEOwnerStorage: StateStorage {
         let app = AppModel(storage: storage)
         let control = BLEOwnerControlModel(app: app, transport: central)
         XCTAssertTrue(app.owners[0].objects![0].ownerCardAvailable)
+        XCTAssertNotNil(app.ownerActionIntent(server:"fixture.invalid",objectID:object.id),"A paired offline owner must also be reachable from the real control-card action path")
         await control.execute(server: "fixture.invalid", objectID: object.id)
         XCTAssertEqual(central.channel.writes.count, 1)
         XCTAssertEqual(app.journal.first?.result, "Контроллер принял команду")

@@ -195,6 +195,19 @@ final class NavigationUITests: XCTestCase {
         // Form inspection never saves a key, sends a command or opens a camera.
     }
 
+    func testPassedAccessUsesObjectCheckboxAndBoundedAccessEditorWithoutServerPicker() {
+        let app = launch("delegating-guests")
+        let pass = app.buttons["pass-received-access"]
+        XCTAssertTrue(pass.waitForExistence(timeout:15)); pass.tap()
+        let object = app.buttons.matching(NSPredicate(format:"identifier BEGINSWITH %@","pass-object-")).firstMatch
+        XCTAssertTrue(object.waitForExistence(timeout:10)); XCTAssertFalse(app.pickers["Сервер"].exists)
+        object.tap(); app.buttons["Настройки доступа"].tap()
+        XCTAssertTrue(app.staticTexts["Получатель передать доступ дальше не сможет"].waitForExistence(timeout:10))
+        XCTAssertFalse(app.switches.matching(NSPredicate(format:"label CONTAINS %@","Только для приложения")).firstMatch.exists)
+        app.buttons["ОК"].tap(); app.buttons["Отмена"].tap()
+        assertBottom(app,["control","settings","guests","journal"])
+    }
+
     func testServerRowsAndCompactAccountDialogStayInSystemAndCancelWithoutRegistration() {
         let app = launch("empty")
         app.segmentedControls.buttons["Система"].tap()

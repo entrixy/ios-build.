@@ -5,9 +5,11 @@ import EntrixyCore
 private final class BackupStorage: StateStorage {
     var state: SavedState?
     var fails = false
+    var beforeSave: ((SavedState) throws -> Void)?
     init(_ state: SavedState) { self.state = state }
     func load() throws -> SavedState? { state }
     func save(_ state: SavedState) throws {
+        try beforeSave?(state)
         if fails { throw KeychainStore.Failure(status: -1) }
         self.state = state
     }
@@ -41,6 +43,57 @@ private final class BackupGuestMover: GuestMigrationTransport {
 @MainActor
 final class BackupTests: XCTestCase {
     private let targetIdentity = Data(repeating: 13, count: 32)
+    private func audioFixture() -> (AppSoundCenter,UserDefaults,URL,String) {
+        let suite = "com.entrixy.tests.backup-sounds." + UUID().uuidString
+        let defaults = UserDefaults(suiteName:suite)!
+        let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString,isDirectory:true)
+        return (AppSoundCenter(defaults:defaults,directory:directory),defaults,directory,suite)
+    }
+    func testEncryptedExportContainsActualAudioAndSoundPreferences() async throws {
+        let (sounds,defaults,directory,suite) = audioFixture()
+        defer { defaults.removePersistentDomain(forName:suite); try? FileManager.default.removeItem(at:directory) }
+        let sample = try Data(contentsOf:XCTUnwrap(sounds.defaultURL(.success)))
+        let material = try EventSoundBackup(volume:0.45,muted:["message"],samples:["success":sample])
+        let stage = try sounds.prepareRestore(material); try sounds.commitRestore(stage,commitAccess:{})
+        let store = BackupStorage(try source()), api = BackupOwnerAPI(), app = AppModel(storage:store,ownerAPI:api); defer { app.suspend() }
+        let manager = BackupManager(app:app,refreshAfterRestore:false,sounds:sounds)
+        let encrypted = try await manager.export(password:"test-password")
+        let decoded = try JSONDecoder().decode(IOSBackupPayload.self,from:BackupEnvelope.open(encrypted,password:"test-password"))
+        XCTAssertEqual(decoded.eventSounds,material); XCTAssertEqual(decoded.owners.map(\.masterKey),store.state?.owners?.map(\.masterKey))
+        XCTAssertTrue(api.calls.isEmpty)
+    }
+    func testCorruptAudioIsRejectedBeforeSavingPlanOrClaimingAnyOwner() async throws {
+        let (sounds,defaults,directory,suite) = audioFixture()
+        defer { defaults.removePersistentDomain(forName:suite); try? FileManager.default.removeItem(at:directory) }
+        sounds.setVolume(0.6); let before = try sounds.backupMaterial()
+        let corrupt = try EventSoundBackup(volume:0.2,muted:[],samples:["tap":Data("not audio".utf8)])
+        let payload = IOSBackupPayload(state:try source(),eventSounds:corrupt)
+        let bytes = try BackupEnvelope.seal(JSONEncoder().encode(payload),password:"test-password")
+        let store = BackupStorage(SavedState(identity:targetIdentity,guests:[])), api = BackupOwnerAPI(), app = AppModel(storage:store,ownerAPI:api); defer { app.suspend() }
+        let manager = BackupManager(app:app,refreshAfterRestore:false,sounds:sounds)
+        do { try await manager.inspect(bytes,password:"test-password"); XCTFail("invalid audio accepted") } catch { }
+        XCTAssertNil(manager.preview); XCTAssertNil(app.backupPlan()); XCTAssertTrue(api.calls.isEmpty)
+        XCTAssertEqual(store.state?.identity,targetIdentity); XCTAssertEqual(try sounds.backupMaterial(),before)
+    }
+    func testFailedFinalSaveRollsBackAudioAndResumeKeepsOwnerClaimCheckpoints() async throws {
+        let (sounds,defaults,directory,suite) = audioFixture()
+        defer { defaults.removePersistentDomain(forName:suite); try? FileManager.default.removeItem(at:directory) }
+        sounds.setVolume(0.7); let previous = try sounds.backupMaterial()
+        let sample = try Data(contentsOf:XCTUnwrap(sounds.defaultURL(.success)))
+        let material = try EventSoundBackup(volume:0.3,muted:["tap"],samples:["success":sample])
+        let payload = IOSBackupPayload(state:try source(),eventSounds:material)
+        let bytes = try BackupEnvelope.seal(JSONEncoder().encode(payload),password:"test-password")
+        let store = BackupStorage(SavedState(identity:targetIdentity,guests:[])), api = BackupOwnerAPI(), app = AppModel(storage:store,ownerAPI:api); defer { app.suspend() }
+        let manager = BackupManager(app:app,refreshAfterRestore:false,sounds:sounds)
+        try await manager.inspect(bytes,password:"test-password")
+        store.beforeSave = { state in if state.pendingRestore == nil { throw KeychainStore.Failure(status:-1) } }
+        await manager.restore()
+        XCTAssertEqual(app.backupPlan()?.restoredOwners.count,2); XCTAssertEqual(try sounds.backupMaterial(),previous)
+        let claims = api.calls.count
+        store.beforeSave = nil; await manager.restore()
+        XCTAssertEqual(api.calls.count,claims); XCTAssertNil(app.backupPlan()); XCTAssertEqual(try sounds.backupMaterial(),material)
+        XCTAssertEqual(store.state?.identity,targetIdentity)
+    }
     private func source(guests: Bool = false) throws -> SavedState {
         let credentials = try OwnerCredentials(deviceID: String(repeating: "a", count: 32), deviceSecret: String(repeating: "b", count: 64))
         var a = try OwnerAccount(server: "first.invalid"), b = try OwnerAccount(server: "second.invalid")

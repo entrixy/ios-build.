@@ -437,10 +437,10 @@ final class AppModel: ObservableObject {
     }
     func acceptRecoveredAndroidGuest(_ invite: GuestInvite) throws {
         guard canManageGuestAccess,
-              androidPendingGuests.contains(where:{ $0.id == invite.id }) else { throw BackupFailure.noAccess }
+              let source = androidPendingGuests.first(where:{ $0.id == invite.id }) else { throw BackupFailure.noAccess }
         let previous = androidPendingGuests
         androidPendingGuests.removeAll { $0.id == invite.id }
-        do { try save(guests + [SavedGuest(invite:invite,requiresBLEExitOnRestore:true)]) }
+        do { try save(guests + [SavedGuest(invite:invite,requiresBLEExitOnRestore:true,androidAutomation:source.incomingAutomation)]) }
         catch { androidPendingGuests = previous; throw error }
     }
     func removeImportedGuestRecovery(_ id: String) {
@@ -535,7 +535,9 @@ final class AppModel: ObservableObject {
             let raw = object.kind == "ble" ? (ble.first { ($0["id"] as? Int) == object.numberID }?["tpl"] as? [String: Any] ?? [:]) : (templates[String(object.numberID)] ?? [:])
             let fresh = try AutomationTemplate(data: JSONSerialization.data(withJSONObject: raw))
             if var previous = guest.automation?[object.id] { previous.receive(fresh); rules[object.id] = previous }
+            else if let imported = guest.androidAutomation?[String(object.numberID)] { rules[object.id] = try imported.receiving(fresh) }
             else { rules[object.id] = IncomingAutomationConfiguration(owner: fresh) }
+            guest.androidAutomation?.removeValue(forKey:String(object.numberID))
             if object.kind != "ble", streamIDs.contains(object.numberID), let row = cameraRows[String(object.numberID)] {
                 cameras[object.id] = try ObjectCameraConfiguration(wire: row)
             }
@@ -2137,8 +2139,9 @@ extension AppModel {
         ownerActionRejections.removeValue(forKey: objectID)
         do {
             guard foreground, canManageGuestAccess, !busy, !ownerBusy,
-                  let owner = owners.first(where: { $0.server == server && $0.ownershipLost != true }), !owner.registrationPending,
-                  let object = owner.objects?.first(where: { $0.id == objectID }), object.ownerCardAvailable, !owner.isMoving(objectID) else {
+                  let owner = owners.first(where: { $0.server == server && $0.ownershipLost != true }),
+                  let object = owner.objects?.first(where: { $0.id == objectID }),
+                  !owner.registrationPending || object.kind == "ble", object.ownerCardAvailable, !owner.isMoving(objectID) else {
                 throw ActionDenied.message("Объект сейчас недоступен.")
             }
             let policy = try OwnerManualPolicy(object.localPolicy, readiness: conditionReadiness(.owned(server: server, objectID: object.id)))
@@ -2659,7 +2662,9 @@ extension AppModel {
 
 extension AppModel {
     func ownerAccessIsUsable(_ host: String) -> Bool {
-        owners.contains { $0.server == host && $0.credentials != nil && $0.ownershipLost != true }
+        // A locally authenticated BLE pairing may work before server metadata
+        // registration finishes. Missing HTTP credentials are not an eviction.
+        owners.contains { $0.server == host && $0.ownershipLost != true }
     }
 
     /// Once this device learns that its claim was lost, offline owner secrets

@@ -917,3 +917,5 @@
 "ios_server_forget_busy" = "Finish the Bluetooth operation or object transfer between servers first.";
 "ios_server_ownership_lost" = "Owner access on this device is no longer valid. Restore it with an explicit access transfer.";
 "ios_server_loss_save_failed" = "Control of this server has stopped. This state could not be saved in protected storage.";
+
+"ios_backup_missing_sounds" = "Custom sounds without audio files in this backup: %1$d. These events will use default sounds; choose custom files in Settings → Sounds.";

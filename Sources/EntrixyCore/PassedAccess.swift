@@ -16,27 +16,29 @@ public struct PassedAccess: Codable, Identifiable, Equatable {
     }
     public let id: UUID
     public let server: String
-    public let label: String
+    public var label: String
     public let secret: Data
     public let welcomeCipher: String
     public var group: String?
     public var parts: [Part]
     public let created: Date
 
-    public init(server: String, label: String, welcome: String, objects: [String: [Int: KeyObjectAccess]], snapshots: [String: PassSnapshot]) throws {
+    public init(server: String, label: String, welcome: String, objects: [String: [Int: KeyObjectAccess]], snapshots: [String: PassSnapshot],from: String = "") throws {
         guard !label.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty, label.utf8.count <= 512,
-              welcome.utf8.count <= 2048, (1...16).contains(objects.count) else { throw GuestCrypto.Failure.invalidEnvelope }
+              welcome.utf8.count <= 2048, from.utf8.count <= 512, (1...16).contains(objects.count) else { throw GuestCrypto.Failure.invalidEnvelope }
         id = UUID(); self.server = try GuestInvite.normalizeServer(server); self.label = label.trimmingCharacters(in: .whitespacesAndNewlines)
         secret = GuestCrypto.randomBytes(count: 32); created = Date()
-        welcomeCipher = try GuestCrypto.encrypt(key: secret, plaintext: JSONSerialization.data(withJSONObject: ["from": "", "text": welcome], options: .sortedKeys))
+        welcomeCipher = try GuestCrypto.encrypt(key: secret, plaintext: JSONSerialization.data(withJSONObject: ["from": from, "text": welcome], options: .sortedKeys))
         parts = try objects.keys.sorted().map { source in
             guard let selected = objects[source], !selected.isEmpty, let snapshot = snapshots[source] else { throw GuestCrypto.Failure.invalidEnvelope }
+            var inherited: [String:KeyObjectAccess] = [:]
             for (id, settings) in selected {
                 try settings.validate()
-                guard let allow = snapshot.allowance[id], allow.canPass, !settings.nativeOnly,
+                guard let allow = snapshot.allowance[id], allow.canPass,
                       settings.depth < allow.depth, settings.pool <= max(1, allow.poolLeft - 1) else { throw GuestCrypto.Failure.invalidEnvelope }
+                inherited[String(id)] = try KeyObjectAccess(nativeOnly:allow.nativeOnly,depth:settings.depth,pool:settings.pool)
             }
-            return Part(sourceID: source, objects: Dictionary(uniqueKeysWithValues: selected.map { (String($0.key), $0.value) }),
+            return Part(sourceID: source, objects:inherited,
                 baselineGroups: Array(Set(snapshot.invitations.map(\.group) + snapshot.children.map(\.group))).sorted())
         }
     }
@@ -65,6 +67,20 @@ public struct PassedAccess: Codable, Identifiable, Equatable {
         var body: [String: Any] = ["objects": parts[index].objects.keys.sorted().map { parts[index].objects[$0]!.json(id: Int($0)!) }]
         if let group { body["grp"] = group } else { body["welcome_cipher"] = welcomeCipher }
         return try JSONSerialization.data(withJSONObject: body, options: .sortedKeys)
+    }
+    public mutating func addPart(sourceID: String,objects: [Int:KeyObjectAccess],snapshot: PassSnapshot) throws {
+        guard group != nil, parts.count < 16, !parts.contains(where:{ $0.sourceID == sourceID }), !sourceID.isEmpty,
+              !objects.isEmpty, objects.count <= 1000 else { throw GuestCrypto.Failure.invalidEnvelope }
+        var inherited: [String:KeyObjectAccess] = [:]
+        for (id,value) in objects {
+            try value.validate()
+            guard id > 0, let allow = snapshot.allowance[id], allow.canPass,
+                  value.depth < allow.depth, value.pool <= max(1,allow.poolLeft - 1) else { throw GuestCrypto.Failure.invalidEnvelope }
+            inherited[String(id)] = try KeyObjectAccess(nativeOnly:allow.nativeOnly,depth:value.depth,pool:value.pool)
+        }
+        var next = self
+        next.parts.append(Part(sourceID:sourceID,objects:inherited,baselineGroups:Array(Set(snapshot.invitations.map(\.group) + snapshot.children.map(\.group))).sorted()))
+        try next.validate(); self = next
     }
     public mutating func acceptCreateReply(_ data: Data, part index: Int) throws {
         guard parts.indices.contains(index), parts[index].sent,

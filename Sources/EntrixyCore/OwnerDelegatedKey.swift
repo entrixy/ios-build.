@@ -127,7 +127,7 @@ public extension OwnerAccount {
                 // another object, increase depth/pool or downgrade inherited app-only.
                 guard ids.allSatisfy({ id in
                     guard let inherited = parent.access[String(id)], let requested = limits[String(id)] else { return false }
-                    return inherited.depth > 0 && !requested.nativeOnly && !inherited.nativeOnly
+                    return inherited.depth > 0 && requested.nativeOnly == inherited.nativeOnly
                         && requested.depth < inherited.depth && requested.pool <= max(1, inherited.pool - 1)
                 }) else { continue }
                 var record: OwnerDelegatedKey
