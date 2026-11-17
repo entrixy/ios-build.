@@ -333,9 +333,9 @@ final class OwnerControlModel: ObservableObject {
               let press = json["press"] as? [String: Any],
               let callID = json["call_id"] as? String, !callID.isEmpty, callID.utf8.count <= 256 else { return nil }
         let expectedAction = webhookOnly ? (json["action"] as? String ?? "") : ""
-        guard press["action"] as? String == expectedAction else { return nil }
-        let nonce = try OwnerGuestPress.verify(press, publicKey: key.publicKey, server: server, numberID: number)
-        try app.consumeOwnerPress(server + ":" + key.id.uuidString + ":" + nonce)
+        let verified = try key.verifyPress(press,server:server,numberID:number,expectedAction:expectedAction)
+        let nonceScope = key.company == nil ? key.id.uuidString + ":" : ""
+        try app.consumeOwnerPress(server + ":" + nonceScope + verified.nonce)
         return OwnerPhoneRequest(server: server, callID: callID, objectID: object.id, keyID: key.id,
             press: press, needsConfirmation: json["type"] as? String == "confirm_request")
     }
@@ -359,6 +359,7 @@ final class OwnerControlModel: ObservableObject {
         }
         // A migrated key with no explicit local choice retains the earlier
         // iOS explicit-tap behavior. New form choices follow Android's reaction.
+        if object.kind == "call", preference?.reaction != "notify" { AppSoundCenter.shared.play(.incall) }
         if object.kind != "call" || request.needsConfirmation || preference == nil || preference?.reaction == "confirm" {
             phoneRequests.append(request); return
         }
@@ -424,9 +425,11 @@ final class OwnerControlModel: ObservableObject {
             let preference = owner.callPreference(guestID: request.keyID, numberID: number)
             guard preference?.reaction != "off", (!phoneBusy() || preference?.serveDuringCall == true),
                   !automatic || ["auto", "notify"].contains(preference?.reaction ?? "") else { return }
-            do { _ = try OwnerGuestPress.verify(request.press, publicKey: key.publicKey, server: server, numberID: number) }
+            do {
+                let verified = try key.verifyPress(request.press,server:server,numberID:number,expectedAction:"")
+                who = ProductText.string("journal_who_guest",key.label) + (verified.actor.map { " · " + $0 } ?? "")
+            }
             catch { await decline(request); app.errorMessage = "Запрос гостя устарел или больше не разрешён."; return }
-            who = ProductText.string("journal_who_guest", key.label)
             phoneRequests.removeAll { $0.id == request.id }
             if request.needsConfirmation {
                 guard let link = links[server], link.authenticated else { return }
@@ -465,7 +468,7 @@ final class OwnerControlModel: ObservableObject {
         if let request {
             guard request.server == server, request.objectID == objectID,
                   let key = try? owner.authorizedGuest(localID: request.keyID, numberID: number) else { return }
-            do { _ = try OwnerGuestPress.verify(request.press, publicKey: key.publicKey, server: server, numberID: number) }
+            do { _ = try key.verifyPress(request.press,server:server,numberID:number,expectedAction:request.press["action"] as? String ?? "") }
             catch { await decline(request); return }
             if request.needsConfirmation {
                 guard phoneRequests.contains(where: { $0.id == request.id }), let link = links[server], link.authenticated else { return }

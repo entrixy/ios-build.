@@ -52,6 +52,7 @@ struct RootView: View {
     @State private var userPickedTab = false
     @State private var adding = false
     @State private var input = ""
+    @State private var companyObjectFlow: KnownCompany?
     private let showAddKeyOnLaunch: Bool
     @Binding private var pendingURL: URL?
 
@@ -77,11 +78,20 @@ struct RootView: View {
             // NavigationStack can cover an outer safeAreaInset's hit targets.
             AppBottomNavigation(selection: $selectedTab, tabs: model.navigationState.tabs) { userPickedTab = true }
         }
-        .accessibilityHidden(model.objectRemovalTarget != nil || model.objectAvatarTarget != nil || model.ownerGuestRequestPending)
+        .accessibilityHidden(model.objectRemovalTarget != nil || model.objectAvatarTarget != nil || model.ownerGuestRequestPending || model.companyRequestID != nil || model.guestRemovalTarget != nil)
         .overlay {
             if let target = model.objectRemovalTarget { ObjectRemovalConfirmation(target: target) }
             else if let target = model.objectAvatarTarget { ObjectAvatarPicker(target: target) }
-            else { OwnerPhoneRequestDialog(control: model.ownerControl) }
+            else if let target = model.guestRemovalTarget { GuestRemovalDialog(target:target) }
+            else if let id = model.companyRequestID, let company = model.companies.first(where:{ $0.id == id }) {
+                CompanyRequestDialog(company:company) { granted,hasObjects in
+                    model.companyRequestID = nil
+                    if granted || hasObjects {
+                        model.companyGrantRequest = granted ? "" : company.id
+                        userPickedTab = true; selectedTab = .guests
+                    } else { companyObjectFlow = company }
+                }
+            } else { OwnerPhoneRequestDialog(control: model.ownerControl) }
         }
         .background(Color(uiColor: .systemGroupedBackground).ignoresSafeArea())
         .onChange(of: model.navigationState) { value in
@@ -101,11 +111,18 @@ struct RootView: View {
             if let url { pendingURL = nil; receiveURL(url) }
         }
         .sheet(isPresented: $adding) { KeyImportScreen(input: $input) }
+        .sheet(item:$companyObjectFlow) { company in
+            if model.owners.contains(where:{ $0.server == company.server && $0.credentials != nil }) { AddOwnerObjectScreen(server:company.server) }
+            else { AddOwnerServerScreen(initialServer:company.server) }
+        }
         .alert("Entrixy", isPresented: Binding(get: { model.errorMessage != nil && !adding }, set: { if !$0 && !adding { model.errorMessage = nil } })) {
             Button("Понятно") { model.errorMessage = nil }
         } message: { Text(model.errorMessage ?? "") }
     }
     private func receiveURL(_ url: URL) {
+        if let company = try? CompanyInvite.parse(url.absoluteString) {
+            Task { await model.receiveCompanyInvite(company) }; return
+        }
         do { input = try AccessLink.incomingText(url.absoluteString); adding = true }
         catch { model.errorMessage = "В этой ссылке не найден поддерживаемый ключ Entrixy." }
     }

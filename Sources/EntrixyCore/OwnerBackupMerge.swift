@@ -7,6 +7,7 @@ public extension OwnerAccount {
         try validate(); try source.validate()
         guard server == source.server, masterKey == source.masterKey, credentials == source.credentials else { throw GuestCrypto.Failure.invalidKey }
         var merged = self
+        merged.hostLabel = hostLabel ?? source.hostLabel
         merged.reservedGuestIDs = Array(Set((reservedGuestIDs ?? []) + (source.reservedGuestIDs ?? []))).sorted()
         func sameSecret(_ first: String?, _ second: String?) throws {
             if let first, let second {
@@ -84,6 +85,9 @@ public extension OwnerAccount {
         for incoming in source.issuedKeys ?? [] {
             if let index = issued.firstIndex(where: { $0.id == incoming.id }) {
                 var current = issued[index]
+                guard current.company?.companyID == incoming.company?.companyID else { throw GuestCrypto.Failure.invalidKey }
+                if let first = current.company?.publicKey, let second = incoming.company?.publicKey, first != second { throw GuestCrypto.Failure.invalidKey }
+                if current.company?.publicKey == nil { current.company?.publicKey = incoming.company?.publicKey }
                 let first = try current.secrets(masterKey: masterKey), second = try incoming.secrets(masterKey: masterKey)
                 guard first.userKey == second.userKey, first.bundleKey == second.bundleKey,
                       current.guestID == incoming.guestID, current.nativeOnly == incoming.nativeOnly,

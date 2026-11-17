@@ -61,7 +61,9 @@ struct StageTwoRoot: View {
                 .received(guestID: guest.id, objectID: "b:8"), .owned(server: owner.server, objectID: object.id),
                 .received(guestID: guest.id, objectID: "n:7")])
         }
-        _model = StateObject(wrappedValue: AppModel(storage: StageTwoStorage(state)))
+        let app = AppModel(storage: StageTwoStorage(state))
+        if route == .delegatingGuests { app.passManager = PassManager(app:app,api:StageTwoDelegationAPI()) }
+        _model = StateObject(wrappedValue: app)
     }
     var body: some View {
         RootView(initialTab: route.mainTab, showAddKey: route == .addKey)
@@ -77,5 +79,14 @@ struct StageTwoRoot: View {
                 if let bytes = try? JSONSerialization.data(withJSONObject: status) { try? bytes.write(to: path, options: .atomic) }
             }
     }
+}
+private struct StageTwoDelegationAPI: DelegationTransport {
+    func delegate(invite: GuestInvite,fingerprint: String,operation: DelegationOperation,body: Data) async throws -> Data {
+        guard operation == .list else { throw GuestCrypto.Failure.invalidEnvelope }
+        return Data(#"{"objects":[{"id":7,"depth":1,"pool_left":3,"native_only":0}],"children":[],"invites":[]}"#.utf8)
+    }
+    func delegationInfo(server: String,group: String) async throws -> Data { throw GuestCrypto.Failure.invalidEnvelope }
+    func redeemDelegation(_ pending: DelegationRedemption,fingerprint: String) async throws -> Data { throw GuestCrypto.Failure.invalidEnvelope }
+    func resolveDelegation(_ pending: DelegationRedemption,part: DelegationRedemption.Part,fingerprint: String) async throws -> GuestInvite? { throw GuestCrypto.Failure.invalidEnvelope }
 }
 #endif

@@ -69,21 +69,21 @@ final class NavigationUITests: XCTestCase {
     }
     func testOwnerAvailability() {
         let owner = launch("owner-guests")
-        XCTAssertTrue(owner.staticTexts["Выданных ключей пока нет"].waitForExistence(timeout: 15))
+        XCTAssertTrue(owner.segmentedControls.buttons["Пресеты"].waitForExistence(timeout: 15))
         assertBottom(owner, ["control", "settings", "guests", "journal"])
-        XCTAssertTrue(owner.buttons["Выдать ключ"].exists)
+        XCTAssertTrue(owner.buttons["issue-guest"].exists)
     }
     func testDelegatingGuestAvailabilityAndControlSwitch() {
         let guest = launch("delegating-guests")
-        XCTAssertTrue(guest.buttons["Передать полученный доступ"].waitForExistence(timeout: 15))
+        XCTAssertTrue(guest.buttons["pass-received-access"].waitForExistence(timeout: 15))
         assertBottom(guest, ["control", "settings", "guests", "journal"])
-        XCTAssertTrue(guest.buttons["Передать полученный доступ"].exists)
-        XCTAssertFalse(guest.buttons["Выдать ключ"].exists)
+        XCTAssertTrue(guest.buttons["pass-received-access"].exists)
+        XCTAssertFalse(guest.buttons["issue-guest"].exists)
         guest.buttons["main-tab-control"].tap()
         let card = guest.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", "Ворота во двор.")).firstMatch
         XCTAssertTrue(card.waitForExistence(timeout: 15))
         guest.buttons["main-tab-guests"].tap()
-        XCTAssertTrue(guest.buttons["Передать полученный доступ"].waitForExistence(timeout: 15))
+        XCTAssertTrue(guest.buttons["pass-received-access"].waitForExistence(timeout: 15))
     }
     func testReceivedObjectRenameAndHideKeepTheKey() {
         let app = launch("guest-expanded")
@@ -175,7 +175,7 @@ final class NavigationUITests: XCTestCase {
 
     func testGuestSettingsStayOnTheSelectedObjectRowWithoutIssuingAKey() {
         let app = launch("owner-guests")
-        app.buttons["Выдать ключ"].tap()
+        app.buttons["issue-guest"].tap()
         let object = app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH %@", "guest-object-owner:")).firstMatch
         XCTAssertTrue(object.waitForExistence(timeout: 10)); object.tap()
         XCTAssertTrue(app.buttons["Настройки реакции на звонок"].exists)
@@ -190,7 +190,8 @@ final class NavigationUITests: XCTestCase {
         XCTAssertTrue(app.switches.matching(NSPredicate(format: "label CONTAINS %@", "Разрешить передавать дальше")).firstMatch.exists)
         app.buttons["ОК"].firstMatch.tap()
         app.buttons["Отмена"].tap()
-        XCTAssertTrue(app.staticTexts["Выданных ключей пока нет"].waitForExistence(timeout: 10))
+        XCTAssertTrue(app.buttons["issue-guest"].waitForExistence(timeout: 10))
+        XCTAssertFalse(app.buttons.matching(NSPredicate(format:"identifier BEGINSWITH %@","guest-card-")).firstMatch.exists)
         // Form inspection never saves a key, sends a command or opens a camera.
     }
 

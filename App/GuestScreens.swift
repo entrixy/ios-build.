@@ -51,11 +51,12 @@ private struct GuestCatalogControlCard: View {
     @State private var actionIntent: ActionIntent?
     private var entry: CatalogObject { .received(guest, object) }
     var body: some View {
-        Button {
-            guard let intent = model.actionIntent(guestID: guest.id, object: object) else { return }
+        ObjectControlCard(automation:model.automation,entry:entry,accessibilityText:model.objectLabel(entry)+". "+model.objectActionTitle(guestID:guest.id,object:object),action:{
+            guard let intent = model.actionIntent(guestID: guest.id, object: object) else { return false }
             if intent.policy.confirmation || intent.policy.authentication != nil { actionIntent = intent }
             else { Task { await model.execute(intent) } }
-        } label: {
+            return true
+        }) {
             HStack(spacing: 16) {
                 CatalogStatusAvatar(entry: entry, control: model.ownerControl)
                 VStack(alignment: .leading, spacing: 6) {
@@ -70,11 +71,9 @@ private struct GuestCatalogControlCard: View {
                         Text(text).font(.subheadline).foregroundStyle(Brand.secondaryInk).fixedSize(horizontal: false, vertical: true)
                     }
                 }.frame(maxWidth: .infinity, alignment: .leading)
-            }.padding(16).background(.background, in: RoundedRectangle(cornerRadius: 22))
-        }.buttonStyle(CardActionStyle())
+            }
+        }
             .modifier(ActionRejectionFeedback(rejection: model.actionRejections[guest.id + "|" + object.id]))
-            .accessibilityLabel(model.objectLabel(entry) + ". " + model.objectActionTitle(guestID: guest.id, object: object))
-            .accessibilityHint("Выполнить действие с объектом")
             .sheet(item: $actionIntent) { ActionConfirmation(intent: $0) }
     }
 }
@@ -146,7 +145,7 @@ struct SettingsScreen: View {
                     }
                     Section { NavigationLink("Ожидаемые ключи") { DelegationInboxScreen() } }
                 case .sounds:
-                    Text("Настройки звуков ещё не перенесены в iOS.").foregroundStyle(Brand.secondaryInk)
+                    SoundSettingsRows()
                 case .system:
                     Section {
                         Button("Добавить сервер") { addingServer = true }.buttonStyle(SecondaryActionStyle()).actionListRow()

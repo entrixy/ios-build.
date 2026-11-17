@@ -25,7 +25,6 @@ import EntrixyCore
     func resume() {
         guard task == nil else { return }
         bleObserver.onAdvertisement = { [weak self] bytes,rssi in self?.receiveBLE(bytes,rssi:rssi) }
-        app.automationSensors.onLocation = { [weak self] location in self?.receive(location) }
         task = Task { [weak self] in
             while !Task.isCancelled {
                 guard let self else { return }
@@ -37,7 +36,8 @@ import EntrixyCore
     func suspend() {
         task?.cancel(); task = nil
         bleObserver.setEnabled(false); proximity = BLEProximityRuntime()
-        app.automationSensors.trackLocation(enabled:false,background:false); trackingLocation = false
+        if trackingLocation { app.automationSensors.trackLocation(enabled:false,background:false) }
+        trackingLocation = false
         readiness.removeAll()
         // A resumed session must observe a fresh outside entry. Neither stale
         // GPS/Wi-Fi nor a process restart is an automatic command retry.
@@ -50,9 +50,11 @@ import EntrixyCore
             timestampMS:Int64(max(0,location.timestamp.timeIntervalSince1970*1000))))
     }
     func inspect(_ target: ObjectReference, template: AutomationTemplate, isBLE: Bool, date: Date = Date()) -> AutomationReadiness {
-        let observed = app.automationSensors.networkObservedAt
-        let network = observed.map({ date.timeIntervalSince($0) >= 0 && date.timeIntervalSince($0) <= 15 }) == true
-            ? app.automationSensors.network : nil
+        var network: AutomationWiFiNetwork?
+        if template.wifiEnabled, let observed = app.automationSensors.networkObservedAt,
+           date.timeIntervalSince(observed) >= 0, date.timeIntervalSince(observed) <= 15 {
+            network = app.automationSensors.network
+        }
         var matches: Int?, required: Int?
         if template.wifiEnabled {
             if template.wifiMode == "connect" {
@@ -100,9 +102,10 @@ import EntrixyCore
         bleObserver.setEnabled(contexts.contains { $0.1.isBLE })
         let needsGeo = contexts.contains { $0.1.template.geoEnabled }
         if needsGeo != trackingLocation {
+            if needsGeo { app.automationSensors.onLocation = { [weak self] location in self?.receive(location) } }
             app.automationSensors.trackLocation(enabled:needsGeo,background:false); trackingLocation = needsGeo
         }
-        if Date().timeIntervalSince(lastNetworkRefresh) >= 10 {
+        if contexts.contains(where:{ $0.1.template.wifiEnabled }), Date().timeIntervalSince(lastNetworkRefresh) >= 10 {
             app.automationSensors.refreshNetwork(); lastNetworkRefresh = Date()
         }
         let targets = Set(entries.map(\.target))
@@ -149,11 +152,13 @@ extension AppModel {
         return conditionReadiness(target,date:date)?.satisfies(permit.template,at:date) == true
     }
     func noteAutomationAttempt(_ target: ObjectReference) {
+        noteCameraAction(target)
         guard let context = try? automationContext(.object(target)) else { return }
         automation.consume(target,route:context.template.geoMode == "route")
     }
     func conditionReadiness(_ target: ObjectReference, date: Date = Date()) -> AutomationReadiness? {
-        guard let context = try? automationContext(.object(target)) else { return nil }
+        guard let context = try? automationContext(.object(target)),
+              context.template.geoEnabled || context.template.wifiEnabled || context.template.timeEnabled || context.template.bleEnabled else { return nil }
         return automation.inspect(target,template:context.template,isBLE:context.isBLE,date:date)
     }
     func performAutomaticAction(_ entry: CatalogObject, readiness: AutomationReadiness) async {
@@ -172,6 +177,7 @@ extension AppModel {
                 do { try setBLEAutomationArmed(entry.target,armed:false) } catch { return }
             }
             automaticConsumedAt[entry.target] = readiness.evaluatedAt
+            AppSoundCenter.shared.play(.geo)
             if !context.isBLE { automation.consume(entry.target,route:readiness.routeMatched) }
             await execute(intent)
         case .received(let guest,let object):
@@ -181,6 +187,7 @@ extension AppModel {
                 do { try setBLEAutomationArmed(entry.target,armed:false) } catch { return }
             }
             automaticConsumedAt[entry.target] = readiness.evaluatedAt
+            AppSoundCenter.shared.play(.geo)
             if !context.isBLE { automation.consume(entry.target,route:readiness.routeMatched) }
             await execute(intent)
         }

@@ -4,6 +4,19 @@ public struct OwnerAuthorizedGuest {
     public let id: UUID
     public let label: String
     public let publicKey: Data
+    public var company: CompanyGrant? = nil
+    public var serverKeyID: Int? = nil
+    public var numberIDs: [Int] = []
+
+    public func verifyPress(_ press: [String:Any], server: String, numberID: Int, expectedAction: String,
+                            now: Int64 = Int64(Date().timeIntervalSince1970)) throws -> (nonce: String, actor: String?) {
+        if let company, let serverKeyID, let pinned = company.publicKey {
+            let proof = try CompanyPress.verify(press,publicKey:pinned,keyID:serverKeyID,numberID:numberID,numberIDs:numberIDs,expectedAction:expectedAction,now:now)
+            return ("o:" + proof.nonce,proof.actor)
+        }
+        guard company == nil, press["org"] == nil, press["action"] as? String == expectedAction else { throw GuestCrypto.Failure.invalidKey }
+        return (try OwnerGuestPress.verify(press,publicKey:publicKey,server:server,numberID:numberID,now:now),nil)
+    }
 }
 public extension OwnerAccount {
     func authorizedGuest(keyID: Int, numberID: Int) throws -> OwnerAuthorizedGuest? {
@@ -17,6 +30,11 @@ public extension OwnerAccount {
                 && (key.effectiveNumberIDs ?? key.numberIDs).contains(numberID)
         }
         if let root = issuedKeys?.first(where: { $0.id == localID }), rootAllowed(root) {
+            if let company = root.company {
+                guard let pinned = company.publicKey, pinned.count == 32,
+                      objects?.contains(where:{ $0.numberID == numberID && $0.kind == "call" }) == true else { return nil }
+                return OwnerAuthorizedGuest(id:root.id,label:root.label,publicKey:pinned,company:company,serverKeyID:root.keyID,numberIDs:root.effectiveNumberIDs ?? root.numberIDs)
+            }
             let pair = try root.secrets(masterKey: masterKey)
             return OwnerAuthorizedGuest(id: root.id, label: root.label,
                 publicKey: try GuestCrypto.signingKey(userKey: pair.userKey).publicKey.rawRepresentation)

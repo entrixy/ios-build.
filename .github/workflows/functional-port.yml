@@ -47,7 +47,7 @@ jobs:
             .local-checks/DerivedData/Build/Products/Debug-iphonesimulator/Entrixy.app \
             .local-checks/ReleaseDerivedData/Build/Products/Release-iphonesimulator/Entrixy.app
       - name: Verify native transactions without capture or UI automation
-        run: python3 scripts/test_simulator.py --only-native 2>&1 | tee .local-checks/ci/native-tests.log
+        run: python3 scripts/test_simulator.py --only-native --use-built-tests 2>&1 | tee .local-checks/ci/native-tests.log
       - name: Retain compilation evidence
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02

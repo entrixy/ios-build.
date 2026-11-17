@@ -2,59 +2,6 @@ import SwiftUI
 import CoreImage.CIFilterBuiltins
 import EntrixyCore
 
-struct OwnerGuestsScreen: View {
-    @EnvironmentObject private var model: AppModel
-    @State private var adding = false
-    var body: some View {
-        List {
-            if model.navigationState.canDelegate || !model.passedAccess.isEmpty {
-                Section { NavigationLink("Передать полученный доступ") { PassedAccessScreen() } }
-            }
-            if model.owners.filter({ !$0.registrationPending }).isEmpty && !model.navigationState.canDelegate {
-                Section {
-                    Text("Добавьте свой сервер и объекты в настройках, чтобы выдавать ключи гостям.").foregroundStyle(Brand.secondaryInk)
-                    NavigationLink("Мои серверы") { OwnerServersScreen() }
-                }
-            }
-            ForEach(model.owners.filter { !$0.registrationPending }) { owner in
-                Section(owner.server) {
-                    ForEach(owner.issuedKeys ?? []) { key in
-                        NavigationLink { OwnerKeyScreen(server: owner.server, keyID: key.id) } label: {
-                            VStack(alignment: .leading, spacing: 5) {
-                                Text(key.label).font(.headline)
-                                Text(ownerKeyStatus(key)).font(.subheadline).foregroundStyle(Brand.secondaryInk)
-                            }.padding(.vertical, 5)
-                        }
-                    }
-                    ForEach(owner.delegatedKeys ?? []) { key in
-                        NavigationLink { OwnerDelegatedKeyScreen(server: owner.server, keyID: key.id) } label: {
-                            VStack(alignment: .leading, spacing: 5) {
-                                Text(key.label).font(.headline)
-                                Text(ownerDelegatedStatus(key)).font(.subheadline).foregroundStyle(Brand.secondaryInk)
-                            }.padding(.vertical, 5)
-                        }
-                    }
-                    if (model.unverifiedOwnerDelegations[owner.server] ?? 0) > 0 {
-                        Text("Некоторые передачи ещё не подтверждены: нет проверенного поручительства или доступной цепочки владельца.").font(.subheadline).foregroundStyle(Brand.secondaryInk)
-                    }
-                    if !(owner.androidKeys ?? []).isEmpty {
-                        VStack(alignment: .leading, spacing: 8) {
-                            Text("Сохранённые ключи Android: \(owner.androidKeys?.count ?? 0)").font(.headline)
-                            Text("Секреты сохранены. Для восстановления нужно подтвердить связку и правила передачи; новые ключи автоматически не создаются.").font(.subheadline).foregroundStyle(Brand.secondaryInk)
-                            Button("Проверить данные сервера") { Task { await model.refreshOwners() } }.buttonStyle(SecondaryActionStyle()).disabled(model.ownerBusy)
-                        }.padding(.vertical, 5)
-                    }
-                    if (owner.issuedKeys ?? []).isEmpty && (owner.delegatedKeys ?? []).isEmpty && (owner.androidKeys ?? []).isEmpty { Text("Выданных ключей пока нет").foregroundStyle(Brand.secondaryInk) }
-                }
-            }
-        }
-        .navigationTitle("Гости")
-        .toolbar { if model.owners.contains(where: { !$0.registrationPending }) { ToolbarItem(placement: .primaryAction) { Button { adding = true } label: { Image(systemName: "plus").accessibilityLabel("Выдать ключ") }.disabled(model.ownerBusy) } } }
-        .refreshable { await model.refreshOwners() }
-        .sheet(isPresented: $adding) { IssueOwnerKeyScreen() }
-    }
-}
-
 func ownerKeyStatus(_ key: OwnerIssuedKey) -> String {
     if key.pending != nil { return key.sent ? "Ожидает подтверждения сервера" : "Запрос ещё не применён" }
     switch key.state {
@@ -77,22 +24,29 @@ struct IssueOwnerKeyScreen: View {
     @EnvironmentObject private var model: AppModel
     @Environment(\.dismiss) private var dismiss
     let editingKeyID: UUID?
+    private let companySelection: Bool
+    @State private var companyID: String
     @StateObject private var draft = GuestKeyDraft()
     @State private var server: String
     @State private var loaded = false
     @State private var label = ""
     @State private var welcome = ""
     @State private var task: GuestObjectTask?
-    init(serverPreset: String? = nil, editingKeyID: UUID? = nil, editAccessOnLaunch: Bool = false) {
+    init(serverPreset: String? = nil, editingKeyID: UUID? = nil, editAccessOnLaunch: Bool = false, companySelection: Bool = false, companyPreset: String? = nil) {
         self.editingKeyID = editingKeyID; _server = State(initialValue: serverPreset ?? "")
+        self.companySelection = companySelection; _companyID = State(initialValue:companyPreset ?? "")
     }
     private var owner: OwnerAccount? { model.owners.first { $0.server == server && !$0.registrationPending } }
+    private var editingKey: OwnerIssuedKey? { owner?.issuedKeys?.first(where:{ $0.id == editingKeyID }) }
+    private var forCompany: Bool { companySelection || editingKey?.company != nil }
+    private var company: KnownCompany? { model.companies.first { $0.id == companyID } }
     private func host(_ entry: CatalogObject) -> String {
         if case let .owned(account, _) = entry { return account.server }; return ""
     }
     private var rows: [CatalogObject] {
         let values = model.catalogObjects().filter {
             guard case let .owned(account, _) = $0, !account.registrationPending else { return false }
+            if forCompany, case let .owned(_,object) = $0 { return object.kind == "call" && account.server == server }
             return editingKeyID == nil || account.server == server
         }
         var hosts: [String] = []
@@ -105,21 +59,33 @@ struct IssueOwnerKeyScreen: View {
     private func eligible(_ object: OwnerObject) -> Bool {
         object.numberID != nil && object.pending == nil && object.available != false && (object.kind != "device" || object.wrappedSocketSecret != nil)
     }
-    private func access(_ number: Int) -> KeyObjectAccess { draft.access[number] ?? (try! KeyObjectAccess()) }
+    private func access(_ number: Int) -> KeyObjectAccess { draft.access[number] ?? (editingKeyID == nil ? model.ownerGuestDefaults.access : (try! KeyObjectAccess())) }
     private func toggle(_ account: OwnerAccount, _ object: OwnerObject) {
         guard let number = object.numberID, eligible(object), !account.isMoving(object.id) else { return }
-        if draft.selected.isEmpty, editingKeyID == nil, server != account.server {
+        if draft.selected.isEmpty, editingKeyID == nil, !forCompany, server != account.server {
             draft.access = [:]; draft.templates = [:]; draft.streams = [:]; draft.lifetimes = [:]; draft.calls = [:]
             server = account.server
         }
         guard server == account.server else { return }
         if draft.selected.contains(number) { draft.selected.remove(number) }
-        else { draft.selected.insert(number) }
+        else { draft.selected.insert(number); if draft.access[number] == nil { draft.access[number] = model.ownerGuestDefaults.access } }
     }
     var body: some View {
         NavigationStack {
             Form {
                 Section {
+                    if forCompany {
+                        if editingKeyID == nil {
+                            Picker(ProductText.string("guests_org_pick"),selection:$companyID) {
+                                Text(ProductText.string("guests_org_pick")).tag("")
+                                ForEach(model.companies) { Text($0.name).tag($0.id) }
+                            }.onChange(of:companyID) { _ in
+                                server = company?.server ?? ""; label = company?.name ?? ""; draft.selected = []
+                            }
+                        }
+                        if let company { CompanyGrantSummary(company:company) }
+                        else if let editingKey { Text(editingKey.label).font(.headline) }
+                    } else {
                     AppField(ProductText.string("guests_default_name")) {
                         TextField(ProductText.string("guests_default_name"), text: $label)
                             .onChange(of: label) { label = String($0.replacingOccurrences(of: "\n", with: "").replacingOccurrences(of: "\r", with: "").prefix(64)) }
@@ -128,6 +94,7 @@ struct IssueOwnerKeyScreen: View {
                         TextField(ProductText.string("guests_welcome_hint"), text: $welcome, axis: .vertical)
                             .onChange(of: welcome) { welcome = String($0.prefix(500)) }
                     }
+                    }
                 }
                 Section {
                     ForEach(rows) { entry in objectRow(entry) }
@@ -135,10 +102,10 @@ struct IssueOwnerKeyScreen: View {
                 } header: { Text(ProductText.string("guests_objects_allowed")) }
                 Section {
                     Button { Task { await save() } } label: {
-                        ActionButtonLabel(title: editingKeyID == nil ? "Выдать ключ" : ProductText.string("btn_save"), busy: model.ownerBusy)
-                    }.buttonStyle(PrimaryActionStyle()).actionListRow().disabled(model.ownerBusy || draft.selected.isEmpty || (editingKeyID != nil && label.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty))
+                        ActionButtonLabel(title: editingKeyID == nil ? ProductText.string(forCompany ? "guests_add_org" : "guests_add") : ProductText.string("btn_save"), busy: model.ownerBusy)
+                    }.buttonStyle(PrimaryActionStyle()).actionListRow().disabled(model.ownerBusy || draft.selected.isEmpty || (forCompany && editingKeyID == nil && company == nil) || (editingKeyID != nil && label.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty))
                 }
-            }.navigationTitle(editingKeyID == nil ? "Выдать ключ" : ProductText.string("guests_access_title"))
+            }.navigationTitle(editingKeyID == nil ? ProductText.string(forCompany ? "guests_add_org" : "guests_add") : ProductText.string("guests_access_title"))
                 .navigationBarTitleDisplayMode(.inline)
                 .sheetDismissFooter(disabled: model.ownerBusy) { dismiss() }
                 .task {
@@ -148,7 +115,11 @@ struct IssueOwnerKeyScreen: View {
                         do {
                             try draft.load(owner: owner, key: key)
                             label = key.label; welcome = try key.bundle(masterKey: owner.masterKey)["welcome"] as? String ?? ""
+                            if let grant = key.company { companyID = model.companies.first(where:{ $0.server == owner.server && $0.companyID == grant.companyID })?.id ?? ""; welcome = "" }
                         } catch { model.errorMessage = "Не удалось прочитать настройки ключа." }
+                    } else if companySelection {
+                        if companyID.isEmpty, model.companies.count == 1 { companyID = model.companies[0].id }
+                        server = company?.server ?? ""; label = company?.name ?? ""
                     }
                 }
                 .onDisappear { if task == nil, let editingKeyID { model.endEditingGuestKey(editingKeyID) } }
@@ -179,11 +150,13 @@ struct IssueOwnerKeyScreen: View {
                         if ["call", "webhook", "ble"].contains(object.kind) {
                             objectButton("hand.tap", label: ProductText.string("guests_call_cfg_desc")) { task = .invocation(entry.target) }
                         }
-                        objectButton("arrow.triangle.2.circlepath", label: ProductText.string("guests_automation_desc")) { task = .automation(entry.target) }
-                        objectButton("person.badge.key", label: ProductText.string("obj_access_desc")) { task = .access(entry.target) }
+                        if !forCompany {
+                            objectButton("arrow.triangle.2.circlepath", label: ProductText.string("guests_automation_desc")) { task = .automation(entry.target) }
+                            objectButton("person.badge.key", label: ProductText.string("obj_access_desc")) { task = .access(entry.target) }
+                        }
                     }
                 }
-                if selected, object.kind != "ble", let camera = object.localConfiguration?.camera, camera.enabled, !camera.url.isEmpty {
+                if !forCompany, selected, object.kind != "ble", let camera = object.localConfiguration?.camera, camera.enabled, !camera.url.isEmpty {
                     Toggle(ProductText.string("guests_grant_video"), isOn: Binding(get: { draft.streams[number] ?? true }, set: { draft.streams[number] = $0 }))
                         .font(.subheadline).padding(.leading, 30)
                 }
@@ -230,13 +203,15 @@ struct IssueOwnerKeyScreen: View {
         do {
             draft.syncSavedSettings(owner: owner)
             let configuration = try draft.configuration(owner: owner)
-            let rights = Dictionary(uniqueKeysWithValues: draft.selected.map { ($0, access($0)) })
+            let rights = try Dictionary(uniqueKeysWithValues: draft.selected.map { ($0, forCompany ? try KeyObjectAccess(depth:0,pool:1) : access($0)) })
             let before = Set(owner.issuedKeys?.map(\.id) ?? [])
             let previousCipher = owner.issuedKeys?.first(where: { $0.id == editingKeyID })?.bundleCipher
             let name = label.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? ProductText.string("guests_default_name") : label
             let result: Bool
             if let editingKeyID {
                 result = await model.editOwnerKey(server: server, keyID: editingKeyID, label: name, numberIDs: Array(draft.selected), welcome: welcome, confirmation: nil, access: rights, settings: configuration)
+            } else if forCompany {
+                result = await model.issueCompanyAccess(profileID:companyID,numberIDs:Array(draft.selected),calls:configuration.calls)
             } else {
                 result = await model.createOwnerKey(server: server, label: name, numberIDs: Array(draft.selected), welcome: welcome, nativeOnly: false, confirmation: false, access: rights, settings: configuration)
             }
@@ -262,7 +237,7 @@ struct OwnerKeyScreen: View {
     var showRevokeOnLaunch = false
     private var owner: OwnerAccount? { model.owners.first { $0.server == server } }
     private var key: OwnerIssuedKey? { owner?.issuedKeys?.first { $0.id == keyID } }
-    private var link: URL? { guard let owner, let key else { return nil }; return try? key.link(server: server, masterKey: owner.masterKey) }
+    private var link: URL? { guard let owner, let key else { return nil }; return try? key.link(server: server, masterKey: owner.masterKey, allowPaused:true) }
     var body: some View {
         List {
             if let key {

@@ -28,33 +28,11 @@ struct GuestObjectAccessEditor: View {
     @Environment(\.dismiss) private var dismiss
     let title: String
     @Binding var value: KeyObjectAccess
-    private func change(native: Bool? = nil, depth: Int? = nil, pool: Int? = nil) {
-        if let next = try? KeyObjectAccess(nativeOnly: native ?? value.nativeOnly, depth: depth ?? value.depth, pool: pool ?? value.pool) { value = next }
-    }
     var body: some View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: 20) {
-                    Toggle(isOn: Binding(get: { value.nativeOnly }, set: { change(native: $0) })) {
-                        VStack(alignment: .leading, spacing: 5) {
-                            Text(ProductText.string("guests_native_only"))
-                            Text(ProductText.string("guests_native_only_hint")).font(.footnote).foregroundStyle(Brand.secondaryInk)
-                        }
-                    }
-                    Toggle(isOn: Binding(get: { value.depth > 0 }, set: { change(depth: $0 ? 1 : 0) })) {
-                        VStack(alignment: .leading, spacing: 5) {
-                            Text(ProductText.string("guests_allow_delegate"))
-                            Text(ProductText.string("guests_allow_delegate_hint")).font(.footnote).foregroundStyle(Brand.secondaryInk)
-                        }
-                    }
-                    if value.depth > 0 {
-                        Stepper(value: Binding(get: { value.depth }, set: { change(depth: $0) }), in: 1...5) { Text(String(value.depth)) }
-                        VStack(alignment: .leading, spacing: 5) {
-                            Text(ProductText.string("guests_pass_pool"))
-                            Text(ProductText.string("guests_pass_pool_hint")).font(.footnote).foregroundStyle(Brand.secondaryInk)
-                        }
-                        Stepper(value: Binding(get: { value.pool }, set: { change(pool: $0) }), in: 1...50) { Text(String(value.pool)) }
-                    }
+                    GuestAccessFields(value: $value)
                     Button(ProductText.string("btn_ok")) { dismiss() }.buttonStyle(PrimaryActionStyle())
                 }.padding(DesignMetrics.pageInset)
             }.background(Color(uiColor: .systemGroupedBackground)).navigationTitle(title).navigationBarTitleDisplayMode(.inline)
@@ -159,5 +137,37 @@ struct GuestInvocationEditor: View {
             var draft = try OwnerObjectEdit(object: object, masterKey: owner.masterKey); draft.webhookMode = mode
             _ = await model.updateOwnerObject(server: server, objectID: objectID, draft: draft)
         } catch { model.errorMessage = "Не удалось изменить режим отправки." }
+    }
+}
+
+/// Same controls for per-object access and Guests / Presets.
+struct GuestAccessFields: View {
+    @Binding var value: KeyObjectAccess
+    private func change(native: Bool? = nil, depth: Int? = nil, pool: Int? = nil) {
+        if let next = try? KeyObjectAccess(nativeOnly: native ?? value.nativeOnly, depth: depth ?? value.depth, pool: pool ?? value.pool) { value = next }
+    }
+    var body: some View {
+        VStack(alignment: .leading, spacing: 16) {
+                    Toggle(isOn: Binding(get: { value.nativeOnly }, set: { change(native: $0) })) {
+                        VStack(alignment: .leading, spacing: 5) {
+                            Text(ProductText.string("guests_native_only"))
+                            Text(ProductText.string("guests_native_only_hint")).font(.footnote).foregroundStyle(Brand.secondaryInk)
+                        }
+                    }
+                    Toggle(isOn: Binding(get: { value.depth > 0 }, set: { change(depth: $0 ? 1 : 0) })) {
+                        VStack(alignment: .leading, spacing: 5) {
+                            Text(ProductText.string("guests_allow_delegate"))
+                            Text(ProductText.string("guests_allow_delegate_hint")).font(.footnote).foregroundStyle(Brand.secondaryInk)
+                        }
+                    }
+                    if value.depth > 0 {
+                        Stepper(value: Binding(get: { value.depth }, set: { change(depth: $0) }), in: 1...5) { Text(String(value.depth)) }
+                        VStack(alignment: .leading, spacing: 5) {
+                            Text(ProductText.string("guests_pass_pool"))
+                            Text(ProductText.string("guests_pass_pool_hint")).font(.footnote).foregroundStyle(Brand.secondaryInk)
+                        }
+                        Stepper(value: Binding(get: { value.pool }, set: { change(pool: $0) }), in: 1...50) { Text(String(value.pool)) }
+                    }
+        }
     }
 }

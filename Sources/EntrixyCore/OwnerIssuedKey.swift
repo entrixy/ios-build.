@@ -28,6 +28,8 @@ public struct OwnerIssuedKey: Codable, Identifiable, Equatable {
     public var streamAllowed: [Int]?
     public var bleTokenLifetimes: [String: UInt32]?
     public var callPreferences: [String: OwnerCallPreference]?
+    public var cloneSourceID: UUID?
+    public var company: CompanyGrant?
     public var objectSettingsToken: String?
     public var sent: Bool
 
@@ -65,8 +67,12 @@ public struct OwnerIssuedKey: Codable, Identifiable, Equatable {
     }
 
     public mutating func edit(owner: OwnerAccount, label: String, numberIDs: [Int], welcome: String, confirmation: Bool? = nil, access: [Int: KeyObjectAccess]? = nil, settings: OwnerKeyConfiguration? = nil) throws {
-        guard pending == nil, keyID != nil, state == .active || state == .paused,
+        guard pending == nil, keyID != nil, [.active,.paused,.restricted].contains(state),
               !label.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty, label.utf8.count <= 512 else { throw GuestCrypto.Failure.invalidEnvelope }
+        if company != nil {
+            try Self.checkCompanyScope(owner:owner,numberIDs:numberIDs)
+            guard welcome.isEmpty, access == nil || access?.values.allSatisfy({ !$0.nativeOnly && $0.depth == 0 && $0.pool == 1 }) == true else { throw GuestCrypto.Failure.invalidEnvelope }
+        }
         let pair = try secrets(masterKey: owner.masterKey)
         let existing = try bundle(masterKey: owner.masterKey)
         try settings?.validate(numberIDs: numberIDs)
@@ -83,6 +89,7 @@ public struct OwnerIssuedKey: Codable, Identifiable, Equatable {
         automationTemplates = chosenTemplates; streamAllowed = chosenStreams
         bleTokenLifetimes = (settings?.bleLifetimes ?? bleTokenLifetimes)?.filter { numberIDs.contains(Int($0.key) ?? -1) }
         callPreferences = (settings?.calls ?? callPreferences)?.filter { numberIDs.contains(Int($0.key) ?? -1) }
+        if company != nil { company?.labels = try Self.companyLabels(owner:owner,numberIDs:numberIDs) }
         pending = .keyEdit; sent = false
     }
 
@@ -167,7 +174,8 @@ public struct OwnerIssuedKey: Codable, Identifiable, Equatable {
         var bundle = existing
         bundle["obj_ids"] = selected.filter { $0.kind != "ble" }.compactMap(\.numberID).sorted(); bundle["ble"] = ble; bundle["obj_keys"] = keys; bundle["obj_keys_prev"] = previous; bundle["obj_epoch"] = epochs
         bundle["templates"] = templates; bundle["sock"] = sockets; bundle["welcome"] = welcome
-        if bundle["host_label"] == nil { bundle["host_label"] = "" }
+        if !inheritRestrictions, let name = owner.hostLabel { bundle["host_label"] = name }
+        else if bundle["host_label"] == nil { bundle["host_label"] = "" }
         if bundle["net_block"] == nil { bundle["net_block"] = [String]() }
         let oldStreams = existing["streams"] as? [Int]
         if existing["streams"] != nil && oldStreams == nil { throw GuestCrypto.Failure.invalidEnvelope }
@@ -197,6 +205,7 @@ public struct OwnerIssuedKey: Codable, Identifiable, Equatable {
     }
 
     public func validate(masterKey: Data) throws {
+        try company?.validate(numberIDs:numberIDs)
         guard (1...65535).contains(guestID), (!numberIDs.isEmpty || keyID != nil), numberIDs.allSatisfy({ $0 > 0 }),
               Set(numberIDs).count == numberIDs.count,
               pending == .keyEdit || effectiveNumberIDs == nil || Set(effectiveNumberIDs!).isSubset(of: Set(numberIDs)),
@@ -211,6 +220,7 @@ public struct OwnerIssuedKey: Codable, Identifiable, Equatable {
               Set((automationTemplates ?? [:]).keys).isSubset(of: Set(numberIDs.map(String.init))),
               Set(streamAllowed ?? []).isSubset(of: Set(numberIDs)),
               Set(streamAllowed ?? []).count == (streamAllowed ?? []).count else { throw GuestCrypto.Failure.invalidEnvelope }
+        guard cloneSourceID != id else { throw GuestCrypto.Failure.invalidEnvelope }
         if let objectSettingsToken { guard UUID(uuidString: objectSettingsToken) != nil else { throw GuestCrypto.Failure.invalidEnvelope } }
         try configuration.validate(numberIDs: numberIDs)
         let keys = try secrets(masterKey: masterKey)
@@ -241,11 +251,20 @@ public struct OwnerIssuedKey: Codable, Identifiable, Equatable {
             body = ["id": keyID]
         default: throw GuestCrypto.Failure.invalidEnvelope
         }
+        if let company, pending == .keyCreate || pending == .keyEdit {
+            try company.validate(numberIDs:numberIDs)
+            body["org_labels"] = company.labels
+            if pending == .keyCreate {
+                body["org_id"] = company.companyID
+                if let code = company.inviteCode { body["org_code"] = code }
+                body["native_only"] = false; body["delegate_depth"] = 0
+            }
+        }
         return try JSONSerialization.data(withJSONObject: body, options: .sortedKeys)
     }
 
-    public func link(server: String, masterKey: Data) throws -> URL {
-        guard state == .active, pending == nil, keyID != nil else { throw GuestCrypto.Failure.invalidKey }
+    public func link(server: String, masterKey: Data, allowPaused: Bool = false) throws -> URL {
+        guard company == nil, (state == .active || (allowPaused && [.paused,.restricted].contains(state))), pending == nil, keyID != nil else { throw GuestCrypto.Failure.invalidKey }
         let pair = try secrets(masterKey: masterKey)
         guard let url = URL(string: "https://\(try GuestInvite.normalizeServer(server))/key#\(pair.userKey)\(GuestCrypto.base64URL(pair.bundleKey))") else { throw GuestCrypto.Failure.invalidEnvelope }
         return url
@@ -271,6 +290,7 @@ public extension OwnerAccount {
                 let matches = snapshot.keyRows.filter { ($0["bundle_cipher"] as? String) == key.bundleCipher }
                 guard matches.count <= 1 else { throw GuestCrypto.Failure.invalidEnvelope }
                 if let row = matches.first {
+                    if let company = key.company { guard row["org_id"] as? Int == company.companyID else { throw GuestCrypto.Failure.invalidEnvelope } }
                     let id = try OwnerObject.replyID(row["id"])
                     let pair = try key.secrets(masterKey: masterKey)
                     let publicKey = GuestCrypto.base64URL(try GuestCrypto.signingKey(userKey: pair.userKey).publicKey.rawRepresentation)
@@ -284,6 +304,7 @@ public extension OwnerAccount {
             }
             if let id = key.keyID {
                 if let row = snapshot.keyRows.first(where: { ($0["id"] as? Int) == id }) {
+                    if let company = key.company { guard row["org_id"] as? Int == company.companyID else { throw GuestCrypto.Failure.invalidEnvelope } }
                     let allowed = try Self.allowedIDs(row)
                     let access = try KeyObjectAccess.decode(row["objects"])
                     if key.pending == .keyEdit && key.sent && row["bundle_cipher"] as? String == key.bundleCipher

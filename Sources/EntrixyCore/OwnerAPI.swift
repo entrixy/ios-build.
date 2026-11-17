@@ -4,6 +4,8 @@ import FoundationNetworking
 #endif
 
 public protocol OwnerTransport {
+    func companyInvite(server: String, code: String) async throws -> KnownCompany
+    func companyClaim(server: String, credentials: OwnerCredentials, code: String) async throws
     func live(server: String, credentials: OwnerCredentials, fingerprint: String) throws -> OwnerLiveTransport
     func register(server: String, accessCode: String) async throws -> OwnerCredentials
     func sync(server: String, credentials: OwnerCredentials, fingerprint: String) async throws -> Data
@@ -11,6 +13,8 @@ public protocol OwnerTransport {
 }
 
 public extension OwnerTransport {
+    func companyInvite(server: String, code: String) async throws -> KnownCompany { throw GuestCrypto.Failure.invalidEnvelope }
+    func companyClaim(server: String, credentials: OwnerCredentials, code: String) async throws { throw GuestCrypto.Failure.invalidEnvelope }
     func live(server: String, credentials: OwnerCredentials, fingerprint: String) throws -> OwnerLiveTransport { throw GuestCrypto.Failure.invalidEnvelope }
     func mutate(server: String, credentials: OwnerCredentials, fingerprint: String, operation: OwnerOperation, body: Data) async throws -> Data {
         throw GuestCrypto.Failure.invalidEnvelope
@@ -77,9 +81,20 @@ public final class OwnerAPI: OwnerTransport {
         return try await post(server: server, endpoint: operation.rawValue, body: fields)
     }
 
-    private func post(server: String, endpoint: String, body: [String: Any]) async throws -> Data {
+    public func companyInvite(server: String, code: String) async throws -> KnownCompany {
+        guard CompanyInvite.validCode(code) else { throw GuestCrypto.Failure.invalidEnvelope }
+        let data = try await post(server:server,endpoint:"company",body:["code":code],query:"a=invite")
+        guard let json = try JSONSerialization.jsonObject(with:data) as? [String:Any] else { throw GuestCrypto.Failure.invalidEnvelope }
+        return try KnownCompany(server:server,json:json,pendingCode:code)
+    }
+    public func companyClaim(server: String, credentials: OwnerCredentials, code: String) async throws {
+        try credentials.validate()
+        guard CompanyInvite.validCode(code) else { throw GuestCrypto.Failure.invalidEnvelope }
+        _ = try await post(server:server,endpoint:"company",body:["code":code,"device_id":credentials.deviceID,"device_secret":credentials.deviceSecret],query:"a=claim")
+    }
+    private func post(server: String, endpoint: String, body: [String: Any], query: String? = nil) async throws -> Data {
         let host = try GuestInvite.normalizeServer(server)
-        guard let url = URL(string: "https://\(host)/api/\(endpoint).php") else { throw Failure(status: 0, code: "invalid_server") }
+        guard let url = URL(string: "https://\(host)/api/\(endpoint).php" + (query.map { "?" + $0 } ?? "")) else { throw Failure(status: 0, code: "invalid_server") }
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")

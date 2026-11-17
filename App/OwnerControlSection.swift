@@ -43,11 +43,12 @@ struct OwnerCatalogControlCard: View {
     @State private var selected: OwnerActionIntent?
     private var entry: CatalogObject { .owned(owner, object) }
     var body: some View {
-        Button {
-            guard let intent = app.ownerActionIntent(server: owner.server, objectID: object.id) else { return }
+        ObjectControlCard(automation:app.automation,entry:entry,accessibilityText:app.objectLabel(entry)+". Управлять",action:{
+            guard let intent = app.ownerActionIntent(server: owner.server, objectID: object.id) else { return false }
             if intent.policy.confirmation || intent.policy.authentication != nil { selected = intent }
             else { Task { await app.execute(intent) } }
-        } label: {
+            return true
+        }) {
             HStack(spacing: 16) {
                 CatalogStatusAvatar(entry: entry, control: control)
                 VStack(alignment: .leading, spacing: 6) {
@@ -59,10 +60,9 @@ struct OwnerCatalogControlCard: View {
                     if let message = ble.messages[object.id] { Text(message).font(.subheadline).foregroundStyle(Brand.secondaryInk) }
                     if let message = control.messages[object.id] { Text(message).font(.subheadline).foregroundStyle(Brand.secondaryInk) }
                 }.frame(maxWidth: .infinity, alignment: .leading)
-            }.padding(16).background(.background, in: RoundedRectangle(cornerRadius: 22))
-        }.buttonStyle(CardActionStyle())
+            }
+        }
             .modifier(ActionRejectionFeedback(rejection: app.ownerActionRejections[object.id]))
-            .accessibilityLabel(app.objectLabel(entry) + ". Управлять")
             .sheet(item: $selected) { ActionConfirmation(ownerIntent: $0) }
     }
 }

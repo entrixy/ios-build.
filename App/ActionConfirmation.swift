@@ -66,6 +66,7 @@ struct ActionConfirmation: View {
                 .sheetDismissFooter(disabled: working) { dismiss() }
         }
             .task {
+                AppSoundCenter.shared.play(.confirm)
                 #if DEBUG && targetEnvironment(simulator)
                 if ActionCaptureScenario.current == .codeEntry {
                     code = "1234"

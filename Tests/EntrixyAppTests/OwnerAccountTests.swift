@@ -60,10 +60,10 @@ private final class RecordingOwnerAPI: OwnerTransport {
         case .hostClaim: return Data(#"{"ok":1,"claim":"moved"}"#.utf8)
         case .keyCreate:
             keyMutations += 1
-            guard keyRows.isEmpty else { throw GuestCrypto.Failure.invalidEnvelope }
-            keyRows = [["id": 17, "enabled": 1, "mode": "auto", "sign_pub": json["sign_pub"]!, "number_ids": json["number_ids"]!, "bundle_cipher": json["bundle_cipher"]!, "objects": json["objects"]!]]
+            let id = (keyRows.compactMap { $0["id"] as? Int }.max() ?? 16)+1
+            keyRows.append(["id":id,"enabled":1,"mode":"auto","sign_pub":json["sign_pub"]!,"number_ids":json["number_ids"]!,"bundle_cipher":json["bundle_cipher"]!,"objects":json["objects"]!])
             if loseKeyReply { throw URLError(.networkConnectionLost) }
-            return Data(#"{"id":17}"#.utf8)
+            return try JSONSerialization.data(withJSONObject:["id":id])
         case .keyMode:
             keyMutations += 1
             keyRows[0]["mode"] = json["mode"]
@@ -584,6 +584,57 @@ final class OwnerAccountTests: XCTestCase {
         XCTAssertEqual(model.owners[0].issuedKeys![0].grantedAccess?["7"], tighter)
         XCTAssertEqual(api.keyMutations, 2)
         XCTAssertTrue(model.journal.isEmpty)
+    }
+
+    @MainActor func testNewGuestPresetsDoNotRewriteIssuedACLAndNameIsOnlyInEncryptedBundle() async throws {
+        let storage = OwnerMemoryStorage(), api = RecordingOwnerAPI()
+        let model = AppModel(storage:storage,ownerAPI:api)
+        defer { model.suspend() }
+        _ = await model.addOwner(server:"owner.invalid",accessCode:"")
+        _ = await model.createOwnerObject(server:"owner.invalid",label:"Ворота",kind:"webhook",phone:"",url:"https://relay.invalid/open",secret:"private",claimCode:"")
+        var defaults = OwnerGuestDefaults(); defaults.ownerName = "PRIVATE_OWNER_NAME"
+        defaults.access = try KeyObjectAccess(nativeOnly:true,depth:2,pool:6)
+        XCTAssertTrue(model.saveGuestDefaults(defaults))
+        api.beforeMutation = { _,body in XCTAssertFalse(String(decoding:body,as:UTF8.self).contains("PRIVATE_OWNER_NAME")) }
+        let issued = await model.createOwnerKey(server:"owner.invalid",label:"Гость",numberIDs:[7],welcome:"",nativeOnly:false,confirmation:false)
+        XCTAssertTrue(issued)
+        let owner = model.owners[0], key = try XCTUnwrap(owner.issuedKeys?.first)
+        XCTAssertEqual(key.grantedAccess?["7"],defaults.access)
+        XCTAssertEqual(try key.bundle(masterKey:owner.masterKey)["host_label"] as? String,defaults.ownerName)
+        defaults.access = try KeyObjectAccess()
+        XCTAssertTrue(model.saveGuestDefaults(defaults))
+        XCTAssertEqual(model.owners[0].issuedKeys?.first?.grantedAccess,key.grantedAccess)
+        XCTAssertEqual(model.owners[0].issuedKeys?.first?.bundleCipher,key.bundleCipher)
+        defaults.ownerName = "Новое имя"; XCTAssertTrue(model.saveGuestDefaults(defaults))
+        XCTAssertEqual(model.owners[0].issuedKeys?.first?.wrappedSecrets,key.wrappedSecrets)
+        XCTAssertNotNil(model.owners[0].bundleRefreshQueue?[key.id.uuidString])
+        XCTAssertEqual(storage.state?.ownerGuestDefaults,defaults)
+        XCTAssertTrue(model.journal.isEmpty)
+    }
+    @MainActor func testCloneIsDurableBeforeWireAndAnUncertainCopyCannotBeIssuedTwice() async throws {
+        let storage = OwnerMemoryStorage(), api = RecordingOwnerAPI()
+        let model = AppModel(storage:storage,ownerAPI:api)
+        defer { model.suspend() }
+        _ = await model.addOwner(server:"owner.invalid",accessCode:"")
+        _ = await model.createOwnerObject(server:"owner.invalid",label:"Ворота",kind:"webhook",phone:"",url:"https://relay.invalid/open",secret:"private",claimCode:"")
+        _ = await model.createOwnerKey(server:"owner.invalid",label:"Гость",numberIDs:[7],welcome:"Привет",nativeOnly:false,confirmation:false)
+        let source = try XCTUnwrap(model.owners[0].issuedKeys?.first)
+        api.beforeMutation = { operation,_ in
+            if operation == .keyCreate { XCTAssertEqual(storage.state?.owners?[0].issuedKeys?.count,2); XCTAssertTrue(storage.state?.owners?[0].issuedKeys?.last?.sent == true) }
+        }
+        api.loseKeyReply = true
+        await model.cloneOwnerKey(server:"owner.invalid",keyID:source.id)
+        let pending = try XCTUnwrap(model.owners[0].issuedKeys?.last)
+        XCTAssertEqual(api.keyMutations,2); XCTAssertEqual(pending.cloneSourceID,source.id)
+        XCTAssertFalse(model.canCloneOwnerKey(server:"owner.invalid",keyID:source.id))
+        await model.cloneOwnerKey(server:"owner.invalid",keyID:source.id)
+        XCTAssertEqual(api.keyMutations,2)
+        await model.refreshOwners()
+        let acknowledged = try XCTUnwrap(model.owners[0].issuedKeys?.last)
+        XCTAssertNil(acknowledged.pending); XCTAssertEqual(acknowledged.wrappedSecrets,pending.wrappedSecrets)
+        XCTAssertNotEqual(acknowledged.wrappedSecrets,source.wrappedSecrets)
+        XCTAssertTrue(model.canCloneOwnerKey(server:"owner.invalid",keyID:source.id))
+        XCTAssertEqual(api.keyMutations,2); XCTAssertTrue(model.journal.isEmpty)
     }
 
     @MainActor func testOwnerDelegatedBundlePersistsBeforeUploadAndRecoversLostReplyWithoutReissue() async throws {

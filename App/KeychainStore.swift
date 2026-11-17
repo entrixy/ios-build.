@@ -46,6 +46,8 @@ struct SavedState: Codable {
     var appEntryBiometricEnabled: Bool? = nil
     var objectPreferences: ObjectCatalogPreferences? = nil
     var bleAutomationDisarmed: Set<String>? = nil
+    var ownerGuestDefaults: OwnerGuestDefaults? = nil
+    var companies: [KnownCompany]? = nil
 }
 
 /// One local, device-only Keychain item. Read/decode failures never mean “new installation”.
@@ -84,6 +86,8 @@ struct KeychainStore: StateStorage {
     private func validateOwners(_ state: SavedState) throws {
         guard (state.bleAutomationDisarmed ?? []).count <= 2000,
               (state.bleAutomationDisarmed ?? []).allSatisfy({ !$0.isEmpty && $0.utf8.count <= 1024 }) else { throw Failure(status:errSecDecode) }
+        try state.ownerGuestDefaults?.validate()
+        try KnownCompany.validateDirectory(state.companies ?? [])
         try state.objectPreferences?.validate()
         try state.pendingRestore?.validate()
         let received = state.receivedDelegations ?? []

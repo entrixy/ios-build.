@@ -125,7 +125,7 @@ send and delayed socket challenge. A consumed candidate/lost reply is not replay
 BLE proximity was subsequently connected as described below. Background
 execution is not implemented by this foreground worker.
 Ambient Wi-Fi scan rules remain unmet on iOS; the current network is not invented
-as an ambient scan result. Nineteen new core tests pass (203 total); three hosted
+as an ambient scan result. Twenty-three new core tests pass (207 total); three hosted
 sources check automatic POST direction, one attempt, changed/expired proof and
 storage failure. Apple/runtime validation of this addition is still pending.
 
@@ -154,9 +154,63 @@ proof transaction now also asserts durable latch storage. These additions still
 require their exact-source Apple run and physical controller tests. No capture
 or real controller actuation was performed.
 
+## Camera card follow-on (source)
+
+ActionCard now uses one common owner/guest compound card: the main action remains
+independently tappable; a camera icon sits at the right and opens the picture
+inside that same card. Always/call/nearby policies open it once and respect manual
+collapse. Camera permission/configuration comes only from the selected owner's
+private settings or that incoming key's allowed camera bundle. Hidden, paused or
+removed incoming objects cannot display a camera.
+
+HTTP images and multipart JPEG use a bounded native loader, original Android
+Basic/Bearer/custom-header authentication and timestamp/public-hash placeholders.
+Multipart JPEG respects segment lengths, so EXIF thumbnails cannot truncate the
+outer frame. Camera secrets cannot follow cross-origin or TLS-downgrade redirects.
+Actual frames are decoded/downsampled; invalid bodies, HTTP/TLS errors and first
+frame timeouts produce the existing Android stream messages, without endless
+placeholders. Leaving the card/background cancels loading/playback. Native public
+AVPlayer handles unauthenticated HLS/MP4. RTSP/RTMP/DASH/other codecs and authenticated
+video still need their supported media integration; these are not represented as
+working video paths. Four core tests pass (207 total), and four hosted sources
+exercise scoped HTTP headers, real bytes/decoding, denied responses and multipart.
+No new screenshot or live camera/server request was made for this checkpoint.
+
+## Event sounds follow-on (source)
+
+Settings/Sounds now follows the same nine Android event rows and order, with
+10% default master volume, actual preview, enabled switch, private file import
+and reset. All eleven original Android MP3 resources are copied byte for byte;
+no sounds are synthesized or substituted. Invalid imports preserve the old
+custom file; unavailable custom audio falls back to its original sample.
+
+The same player handles card taps, confirmation, incoming guest calls, automatic
+triggers, biometry, authenticated new messages and actual success/error results.
+It mixes respectfully with iOS audio. Local call notifications use a bounded CAF
+render of the selected sound/gain, and honor mute/zero volume. Three hosted test
+sources cover actual bundled decoding, persistence/import rollback, and mute/
+volume-bounded local notification audio. Their Apple execution is pending.
+
+## Guest defaults and cloning follow-on (source)
+
+Presets data is now protected and included in iOS backups: a 40-character owner
+name goes only into encrypted host_label, and default object access is applied
+when selecting an object for a NEW guest. Changing the default leaves existing
+ACLs and guest identities untouched. A name change queues immutable-version
+bundle refreshes, preserving in-flight request material and current token expiry.
+
+An explicit clone now has a fresh signing/bundle key and controller DID in its
+first request, retaining narrowed access, original force rules/network bans,
+per-object choices and welcome. A pending uncertain clone blocks another clone
+of the same source until reconciliation, which retains its prepared identity.
+Explicit read-only sharing of an existing paused link does not reactivate it.
+Three core tests pass (210 total); two hosted sources cover private/default
+scope and lost-clone-response recovery. The main Android Guests card/tabs/
+company UI is still being ported; this is not a completed Guests screen claim.
+
 ## Actual verification
 
-Linux Swift6.0.3 + swift-crypto: 203 core tests, zero failures, including immutable
+Linux Swift6.0.3 + swift-crypto: 210 core tests, zero failures, including immutable
 in-flight bundle requests, scoped templates, force bounds, overnight windows,
 private camera material, stale edit rejection, durable device registration,
 avatar rollback, per-key local override isolation and the Android phone-webhook
@@ -184,6 +238,16 @@ This predates the guest-object settings follow-on above: [run44073814465](https:
 and91 hosted tests with zero failures. This predates migration, delegated auto-fulfillment
 and the new runtime source. Their own Apple results remain separate.
 
+Public0fd8f39d83a33a83783a32c0004729c76fce4234 (native0013921),
+[run44078176150](https://github.com/entrixy/ios-build./actions/runs/44078176150),
+passed197 Apple core, Debug/Release/isolation and99 hosted tests with zero failures,
+including all three new automatic-route failure/replay tests. It predates the
+passive-BLE/camera/sound/defaults follow-ons. Public9014ccd/nativea3ad116,
+[run44081255143](https://github.com/entrixy/ios-build./actions/runs/44081255143),
+subsequently passed203 Apple core, Debug/Release/isolation and101 hosted tests,
+including actual fake-radio automatic-write/latch/relaunch checks. No physical
+controller was actuated. Camera/sound/default additions have their own pending run.
+
 This does NOT establish native interactions, device operation or App Store readiness. The separate ci/functional-port workflow builds Debug/test
 bundles and Release with fixture isolation, without taking screenshots or actuating hardware. It then runs hosted native
 transaction tests on an isolated simulator, without UI automation. Its exact-source result is recorded afterward.
@@ -195,12 +259,46 @@ transaction tests on an isolated simulator, without UI automation. Its exact-sou
 - Background/permission behavior and physical acceptance of passive BLE on iPhone.
 - Verify the new BLE registry move on Apple and real server/controller routes;
   finish remaining guest transfer/product routes.
-- Live camera presentation,
-  complete per-guest permissions/TTL and corresponding Android product routes.
+- Complete authenticated/video codec camera integration and test the new card
+  loader on Apple; finish remaining Android guest/company product routes.
 - Remaining 62-node gaps documented in IOS_STRUCTURE/ANDROID_IOS_PARITY: company,
-  global settings/help/language/sounds, restore and device/release integration.
+  global settings/help/language, restore and device/release integration; native
+  execution and backup treatment of new sound preferences/custom files.
 - Native functional tests of all changed routes, one final coherent capture batch,
   review and publication, physical device/controller checks, signing and review.
 
 The new editor source is not a claim that the full settings block or application
 is finished. Old successful UI tests validate only their original source.
+
+## Guests hub and companies — source checkpoint 17 November
+
+The working Guests root now follows GuestsScreen.kt: People / Companies / Presets,
+expandable root-key cards with settings, clone, QR, share, message, pause and delete
+in Android order; delegated keys contribute the count below their root instead
+of becoming separate owner cards. Received-access cards and their create action
+are inline below the owner tabs. Per-object and preset access fields share one
+component. Owner name/default rights use the previously protected defaults model.
+
+Company links/QRs are server-scoped, stored before a same-server arrival claim,
+and never register an owner or automatically grant access. Company issue/edit is
+call-only with depth zero, explicit public object labels and pinned signing keys.
+Profile refresh cannot replace a pin already used by an issued key. Company
+requests verify Ed25519 over the exact original signed body and bind key_ref,
+actor, object and the 600-second window; omitted objects require a singleton
+scope. The durable nonce ledger retains 25 minutes as Android does. Actuation
+still uses the protected existing call flow and records only a real attempt.
+Unknown existing company keys and merged-create replies cannot adopt a new local
+signing identity. Directory/pins survive protected storage and iOS backups;
+removal waits for confirmed access revocation. Logos are shown only for proven
+trusted-server profiles and loaded without redirects/cookies or direct company
+site checks.
+
+Linux Swift core: 215 tests, zero failures. App/hosted/UI source parses; localized
+labels and diff whitespace pass. Five new hosted scenarios cover arrival scope,
+storage failure, ambiguous create, pinned-key rotation/revoke, duplicate merge,
+and signed actor/replay. These new native scenarios and changed UI routes have
+NOT yet executed on Apple at this checkpoint; the exact-source CI follows this
+commit. Functional-port CI also includes the earlier built-test reuse change.
+No new screenshots or website publication. UI appearance and physical operation
+still require their separate acceptance. Remaining video/background/restore/
+global settings and device/signing work above is not marked complete.
