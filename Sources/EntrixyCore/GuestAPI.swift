@@ -39,6 +39,7 @@ public final class GuestAPI: GuestMigrationTransport, DelegationTransport, Guest
         configuration.timeoutIntervalForResource = 30
         configuration.httpCookieStorage = nil
         configuration.urlCache = nil
+        ServerSessionPolicy.shared.configure(configuration)
         session = URLSession(configuration: configuration, delegate: NoRedirects(), delegateQueue: nil)
     }
 

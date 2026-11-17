@@ -109,6 +109,12 @@ struct ObjectSettingsRows: View {
                         Button { task = .automation(entry.target) } label: {
                             Image(systemName: "arrow.triangle.2.circlepath").font(.title3).frame(maxWidth: .infinity)
                         }.buttonStyle(SecondaryActionStyle()).accessibilityLabel(ProductText.string("automation_icon_desc"))
+                        if entry.isOwned && entry.kind == "ble" {
+                            Button { model.bleInformationTarget = entry.target } label: {
+                                Image(systemName:"info.circle").font(.title3).frame(maxWidth:.infinity)
+                            }.buttonStyle(SecondaryActionStyle()).accessibilityLabel(ProductText.string("set_info"))
+                                .accessibilityIdentifier("object-info-" + entry.target.id)
+                        }
                         Button(role: .destructive) { model.objectRemovalTarget = entry.target } label: {
                             Image(systemName: "trash").font(.title3).frame(maxWidth: .infinity)
                         }.buttonStyle(SecondaryActionStyle())
@@ -139,13 +145,48 @@ struct ObjectSettingsRows: View {
         }
         .task {
             #if DEBUG && targetEnvironment(simulator)
-            if let route = StageTwoCapture.current, [StageTwoCapture.ownerExpanded, .guestExpanded].contains(route), let first = entries.first {
+            if let route = StageTwoCapture.current, [StageTwoCapture.ownerExpanded, .guestExpanded, .ownerBLEObjects].contains(route), let first = entries.first {
                 expanded.insert(first.target)
             }
             #endif
         }
     }
 
+}
+
+/// SettingsScreen.infoBleId: same owner-only fields and no invented readings.
+struct BLEInformationDialog: View {
+    @EnvironmentObject private var model: AppModel
+    let target: ObjectReference
+    var body: some View {
+        AppDialogSurface {
+            TimelineView(.periodic(from:.now,by:1)) { timeline in
+                VStack(alignment:.leading,spacing:16) {
+                    Text(model.catalogObject(target).map { model.objectLabel($0) } ?? ProductText.string("set_info"))
+                        .font(.title3.bold()).accessibilityAddTraits(.isHeader)
+                    if let entry = model.catalogObject(target), case .owned(let owner,_) = entry,
+                       model.ownerAccessIsUsable(owner.server), let info = model.bleInformation[target] {
+                        KeyValueRow(title:ProductText.string("ble_info_battery"),value:"\(info.batteryPercent)%")
+                        KeyValueRow(title:ProductText.string("ble_info_hw"),value:hardware(info.hardwareModel))
+                        KeyValueRow(title:ProductText.string("ble_info_fw"),value:"v\(info.firmwareMajor).\(info.firmwareMinor)")
+                        KeyValueRow(title:ProductText.string("ble_info_sleep"),value:info.sleepSeconds.map { $0 == 0 ? ProductText.string("ble_info_sleep_none") : ProductText.string("ble_info_sleep_fmt",Int($0)) } ?? ProductText.string("ble_info_sleep_none"))
+                        KeyValueRow(title:ProductText.string("ble_info_state"),value:status(info.statusFlags))
+                        Text(ProductText.string("ble_info_updated_fmt",max(0,Int(timeline.date.timeIntervalSince(info.observedAt)))))
+                            .font(.footnote).foregroundStyle(Brand.secondaryInk)
+                    } else { Text(ProductText.string("ble_info_no_data")).font(.body) }
+                    Button(ProductText.string("btn_close")) { model.bleInformationTarget = nil }.buttonStyle(SecondaryActionStyle())
+                }
+            }
+        }
+    }
+    private func hardware(_ value: UInt8) -> String {
+        switch value { case 0: return "Generic / unknown"; case 1: return "ESP32-C3"; case 2: return "ESP32-S3"; case 3: return "ESP32-C6"; default: return "Custom (#\(value))" }
+    }
+    private func status(_ value: UInt8) -> String {
+        let fields: [(UInt8,String)] = [(1,"relay"),(2,"lowbat"),(4,"clock"),(8,"tamper"),(16,"ntp")]
+        let flags = fields.filter { value & $0.0 != 0 }.map { ProductText.string("ble_info_flag_" + $0.1) }
+        return flags.isEmpty ? ProductText.string("ble_info_state_ok") : flags.joined(separator:", ")
+    }
 }
 
 private extension CatalogObject {

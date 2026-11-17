@@ -122,7 +122,7 @@ import EntrixyCore
             }
             // Android consumes a route seen while editing/on another tab, so
             // switching back later does not unexpectedly open the old arrival.
-            if (!working && !context.isBLE) || editors > 0 || app.actionPrompt != nil || app.objectRemovalTarget != nil || app.objectAvatarTarget != nil {
+            if (!working && !context.isBLE) || editors > 0 || app.actionPrompt != nil || app.bleInformationTarget != nil || app.objectRemovalTarget != nil || app.objectAvatarTarget != nil {
                 if result.routeMatched { consume(entry.target,route:true) }
                 continue
             }
@@ -159,7 +159,7 @@ extension AppModel {
     func performAutomaticAction(_ entry: CatalogObject, readiness: AutomationReadiness) async {
         guard canManageGuestAccess, !busy, !ownerBusy, actionPrompt == nil,
               codePrompt == nil, serverPrompt == nil, !backupPromptPending,
-              objectRemovalTarget == nil, objectAvatarTarget == nil, !ownerGuestRequestPending,
+              objectRemovalTarget == nil, objectAvatarTarget == nil, bleInformationTarget == nil, !ownerGuestRequestPending,
               companyRequestID == nil, guestRemovalTarget == nil,
               let context = try? automationContext(.object(entry.target)), context.template == readiness.template,
               (automaticConsumedAt[entry.target].map { readiness.evaluatedAt > $0 } ?? true),
@@ -201,8 +201,10 @@ extension AppModel {
         case .owned(let owner,let object):
             guard ownerAccessIsUsable(owner.server), object.kind == "ble", object.ownerCardAvailable, !owner.isMoving(object.id),
                   let wrapped = object.wrappedBLESecret, let did = object.bleDeviceID else { throw BLETransportFailure.cancelled }
-            let observation = try AuthenticatedBLEObservation.owner(payload:payload,secret:GuestCrypto.decrypt(key:owner.masterKey,envelope:wrapped))
+            let secret = try GuestCrypto.decrypt(key:owner.masterKey,envelope:wrapped)
+            let observation = try AuthenticatedBLEObservation.owner(payload:payload,secret:secret)
             guard observation.deviceID == did else { throw BLETransportFailure.invalidValue }
+            if let info = try? BLEDeviceInformation(payload:payload,ownerSecret:secret) { bleInformation[entry.target] = info }
             return observation
         case .received(let guest,let object):
             guard !guest.paused, object.kind == "ble", let cache = guest.bleCache else { throw BLETransportFailure.cancelled }

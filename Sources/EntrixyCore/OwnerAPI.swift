@@ -46,6 +46,7 @@ public final class OwnerAPI: OwnerTransport {
         configuration.httpCookieStorage = nil
         configuration.httpShouldSetCookies = false
         configuration.urlCache = nil
+        ServerSessionPolicy.shared.configure(configuration)
         session = URLSession(configuration: configuration, delegate: NoRedirects(), delegateQueue: nil)
     }
     deinit { session.invalidateAndCancel() }

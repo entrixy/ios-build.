@@ -9,9 +9,9 @@
 Apple-прогон относится к `fe9e8e1`: core240/native140, Debug/Release/isolation
 без ошибок. Более новые компактные диалоги и автотриггеры с подтверждением/PIN
 имеют только syntax/source проверки и ожидают Apple. Более поздний ARM UI-прогон
-`a70c33a`: 14 из 15 прошли, включая compact confirm/PIN; исправление оставшегося
-a11y-селектора аватара и новый claim-переход ждут UI16. Текущий protocol core245
-прошёл Linux; новая функциональная Apple-проверка ещё ожидается.
+`d1f89b7` прошёл все16 UI-кейсов, включая аватар/compact confirm/PIN/factory claim;
+Core245 Apple/Debug также прошли. Новый BLE Info и код в редакторе ждут UI17.
+Текущий core248 прошёл Linux; полная новая native146 проверка ещё ожидается.
 Строка с подключённым маршрутом не означает визуальную или аппаратную приёмку.
 Полные исходники и доказательства: [FUNCTIONAL_PORT.md](FUNCTIONAL_PORT.md).
 Ниже таблицы сохранены исторические результаты каталога от 16 ноября.
@@ -63,7 +63,7 @@ a11y-селектора аватара и новый claim-переход жду
 | O01 | Общий список | ObjectSettingsRows + ObjectCatalogPreferences | Один смешанный список; onMove сохраняет порядок; стандартный режим изменения порядка iOS. |
 | O02 | Свой обычный объект, раскрытие | ObjectSettingsRows → OwnerObjectEditor / AutomationEditor | Редактор типа, автонастройки, удаление; новая UI-проверка переходов ещё ожидается. |
 | O03 | Входящий обычный объект, раскрытие | ReceivedObjectNameScreen / AutomationEditor / hideReceivedObject | Локальное имя/скрытие и scoped incoming three-way overrides, force bounds; ключ/соседние объекты сохраняются. |
-| O04 | Свой BLE, раскрытие | OwnerObjectEditor / AutomationEditor / BLEPermissionsScreen | Автонастройки и durable перенос сервера подключены; отдельная панель advertisement info ещё отсутствует. |
+| O04 | Свой BLE, раскрытие | OwnerObjectEditor / AutomationEditor / BLEPermissionsScreen | Автонастройки, durable перенос сервера и отдельная owner Info после AutoMode подключены; новый Info-source ожидает Apple/UI. |
 | O05 | Входящий BLE, раскрытие | ReceivedObjectNameScreen / AutomationEditor / hideReceivedObject | Scoped incoming BLE overrides и локальное представление; signed grant/expiry/revocation guards сохраняются. |
 | O06 | Добавить объект | AddCatalogObjectScreen → AddOwnerObjectScreen | Четыре типа в порядке Android; используется выбранный сервер, регистрация только при Save. Pending registration не отправляется заново вслепую. |
 | O07 | Создать call | AddOwnerObjectScreen / ObjectPhoneContactPicker | Телефон и системный выбор контакта; iOS handoff просит системное подтверждение, автоматический сброс звонка недоступен. |
@@ -74,7 +74,7 @@ a11y-селектора аватара и новый claim-переход жду
 | O12 | Поделиться устройством | DeviceCredentialsSheet / ownerDeviceCredentials | ENTX-DEV, QR/copy/share сохранённых credentials; явное missing-credentials состояние. |
 | O13 | Привязать приложение к device | OwnerObjectEditor.deviceFields / ownerSocketBindingCode | ENTX-BIND создаётся и сохраняется перед показом, копирование без пересоздания объекта; физический конфигуратор не проверен. |
 | O14 | Редактор своего BLE | OwnerObjectEditor / OwnerBLEMove / moveBLEObject | Durable create-target/delete-source/local merge; исходные UUID/secret/pairing и порядок сохраняются, неоднозначный ответ не дублирует создание. |
-| O15 | Информация BLE | Нет production route | Нужны полученные advertisement info и возраст; не заполнять выдуманными данными. |
+| O15 | Информация BLE | BLEInformationDialog / BLEDeviceInformation / owner observer | Authenticated owner v3/v4 battery/status/fw/hw/sleep/age; явное no-data для legacy/без наблюдения. Core248 Linux прошёл; новая UI17/Apple проверка pending. |
 | O16 | Удаление своего объекта | ObjectSettingsRows → deleteOwnerObject | Существующий durable delete/reconcile и BLE revocations сохраняются. |
 | O17 | Аватар объекта | ObjectAvatarPicker / ObjectAvatarImage / saveObjectAvatar | 8 исходных пресетов и PhotosPicker/crop/JPEG; owner encrypted upload и incoming local override. UI-открытие аватара в последнем прогоне упало, исправление ожидает проверки. |
 | O18 | Камера: настройки | ObjectCameraFields / ObjectCameraConfiguration | Stream/snapshot/auth/showWhen, частные параметры и per-key entitlement; real camera/device acceptance остаётся. |

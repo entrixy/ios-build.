@@ -768,3 +768,116 @@ actual scoped automationContext template and asserts geo/confirm/auth survived
 the merge before evaluating evidence. Production equality guards, PIN assertions,
 no-send-before-approval and duplicate challenge assertions remain unchanged.
 Syntax/diff pass; the complete corrected suite still needs a fresh actual result.
+
+
+## Owned BLE information — current follow-up source
+
+Read SettingsScreen.kt owned BLE row (Settings, AutoMode, Info, Delete), its full
+infoBleId dialog and BleScanReceiver/BleCrypto metadata decoding before this change.
+The owned BLE expanded row now includes Info after automation, before deletion.
+The common compact dialog uses the object's label and shows battery, hardware,
+firmware nibbles, sleep, status flags and actual observation age. With no verified
+metadata it shows Android's no-data message, never a fabricated 0% or firmware.
+No info action is added to guest BLE rows: the encrypted telemetry is owner-only.
+
+BLEDeviceInformation authenticates/decrypts the existing v3/v4 optional fields;
+legacy16/17-byte advertisements cannot create readings. The actual passive owner
+observer populates an in-memory scoped (host/object) cache only after matching
+DID/owner/state validation; no scan/FIRE/pair/register operation is performed by
+opening Info. Cache entries for removed/lost/mismatched objects are discarded on
+owner save. No telemetry enters SavedState/backups or becomes proximity authority.
+Background closes the dialog; an open modal cannot trigger another automatic
+command. The shared button styles, original avatars and flat navigation remain.
+
+Three new independent frozen-vector tests passed within actual Linux248/zero
+(log ble-information-core.log); complete Swift frontend parse and diff checks pass.
+One UI SOURCE case covers Info -> no data -> Close -> same row/tabs without a
+radio session. Latest expected UI17, native146 unchanged; Apple typing/runtime
+of these new fields still pending. No physical controller or product capture used.
+
+
+AutomationEditor's local code-setup flow now uses the same compact AppDialogSurface
+instead of opening another full-height navigation form. Shared filled Cancel/Save,
+field labels, digit filtering and Android forgotten-code warning are preserved;
+cancel still invokes the existing finishCodeSetup policy/force guards. Typed code
+clears on leaving/scene inactivity; saving still uses the protected model API.
+Syntax/diff checks pass, actual Apple/layout verification is pending. No new core
+behavior or extra runtime test is claimed by this presentation-only follow-up.
+
+
+## Actual complete sixteen-case UI pass
+
+Public7630c622512eea3b33f0458f6010cb0e95ffc57e/native d1f89b7,
+[run44134044615](https://github.com/entrixy/ios-build./actions/runs/44134044615),
+job134218585629 actually passed Apple245 core, Debug test build and all16 UI cases
+(442.107 seconds, zero failures). Avatar Button selection/tap, all eight original
+presets, upload-button presence and cancellation passed. Real photo selection or
+upload was not performed by that test. Factory claim code/origin/cancel and compact
+card confirmation/code setup also passed. No new product PNG batch was generated.
+This source predates BLE Information/late dialog completion cleanup/code setup
+inside AutomationEditor. A latest-source UI17 follow-up is required for those.
+
+The earlier functional publicbbad08b/nativea70c33a additionally completed core240,
+Debug, Release/isolation and all141 hosted native tests (55.706 seconds, zero
+failures) in run44131228346/job134208518844. Do not combine the two source results
+into a claim that the newest entire app has passed every check.
+
+
+## Later complete functional passes
+
+Publicb0a88bb5c6bf6d6a4fad33d92a8f979fc13b9d1e/native384132a,
+run44135507897/job134223819556 ACTUALSUCCESS: Apple245 core, Debug,
+Release/isolation and146 hosted tests (51.131s, zero failures). The corrected
+received guest confirm/PIN/duplicate-challenge case passed. Publicb10f1d7b25e8c51344aae6e5bd3f0b0ede452fed/nativefd82582,
+run44137608867/job134231365669 then ACTUALLYPASSED Apple248 core, Debug,
+Release/isolation and146 hosted tests (24.936s, zero failures), including owner
+BLE information compilation. It predates the compact automation code-setup change.
+UI17 on public88d3652/native d876de8 remains pending in run44138620969.
+
+## Network privacy foundation — not an enabled product feature yet
+
+Read Android NetRoute.kt, Prefs blocked_wifi/blocked_wifi_g_* encoding, Vault's
+net_block and all current Core OwnerAPI/GuestAPI HTTP/WSS creation points. Added
+PrivacyNetwork with exact encrypted wire keys s/b and case-insensitive SSID OR
+BSSID matching; unknown Wi-Fi fails closed. ServerNetworkDecision separates system,
+explicitly authorized cellular and blocked routes. iOS16's unavailable constrained
+URLSession proxy configuration must never silently become a default connection
+when restrictions exist. A bounded authenticated CONNECT parser preserves opaque
+TLS bytes and rejects body/header smuggling, invalid authorities and missing caps.
+ServerSessionPolicy is a locked composition hook for the TWO Core server clients;
+it is currently uninstalled/no-op. Camera/phone-webhook sessions are not changed.
+
+Actual Linux259 zero at17:53:24UTC, including11 new policy/parser cases; Swift all
+sources parse and diff pass. THESE ARE FOUNDATIONS ONLY: no app proxy, persistence,
+privacy UI or encrypted-bundle propagation is enabled. Existing net_block guards
+remain unchanged and must not be relaxed until the complete route is enforced.
+No new cellular connection, report upload, screenshot or server mutation occurred.
+
+Apple primary references consulted for the planned public transport boundary:
+https://developer.apple.com/documentation/network/proxyconfiguration
+https://developer.apple.com/documentation/foundation/urlsessionconfiguration/proxyconfigurations
+https://developer.apple.com/documentation/network/nwparameters/requiredinterfacetype
+Apple DocC platform metadata confirms proxy configuration is iOS17+, not iOS16.
+ProxyConfiguration.allowFailover defaults false; maintain that boundary. HTTPS TLS
+must remain with URLSession through an opaque local CONNECT tunnel, never a private
+AVURLAsset/session header key or TLS certificate bypass. Device/cellular/roaming
+behavior is still unverified; do not imply an available public roaming detector.
+
+
+Network privacy follow-up SOURCE: ServerPrivacyProxy now implements an isolated,
+authenticated loopback CONNECT transport with public ProxyConfiguration on iOS17.
+It requires TCP cellular on a cellular decision and prohibits Wi-Fi/wired fallback;
+URLSession keeps end-to-end TLS/certificate validation. Auth/policy rejection opens
+no upstream. Existing default-interface tunnels close when a rule tightens. Bounded
+headers/connections/32KiB buffers, idle/connect deadlines and TCP half-closes apply;
+no HTTP body/secret logging or interception, no retry on failure. Five hosted
+SOURCE tests exercise real loopback byte forwarding, invalid capability/deny,
+closing existing normal tunnels, no fallback on refused cellular and actual public
+URLSession proxy authentication before TLS failure against a deliberately non-TLS
+echo fixture. These use injected LOOPBACK connectors, never a real cellular radio.
+They are not physical-cellular/DNS/roaming/WSS acceptance. Swift parse/diff pass;
+SDK typing/runtime pending. The component remains UNWIRED in the live app: no
+legacy net_block guard was relaxed, no privacy setting falsely enabled. Next
+required work is protected own/received rules, encrypted-bundle propagation, live
+session lifecycle/guard composition (including iOS16 fail-closed), and matching UI.
+Expected next hosted151/core259 are SOURCE counts pending Apple.

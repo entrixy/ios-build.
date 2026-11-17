@@ -51,12 +51,16 @@ struct AutomationEditor: View {
             }.background(Color(uiColor: .systemGroupedBackground))
                 .navigationTitle(title).navigationBarTitleDisplayMode(.inline)
                 .sheetDismissFooter(text("btn_close")) { dismiss() }
-                .sheet(isPresented: $codeSetup, onDismiss: finishCodeSetup) { AutomationCodeSetup() }
                 .task {
                     if let c = context, c.template.authEnabled, (!c.issued || c.isBLE), !model.hasActionCode { codeSetup = true }
                     model.automationSensors.refreshNetwork()
                 }
         }
+        .accessibilityHidden(codeSetup)
+        .overlay {
+            if codeSetup { AutomationCodeSetup { codeSetup = false } }
+        }
+        .onChange(of:codeSetup) { if !$0 { finishCodeSetup() } }
         .onAppear { model.automation.beginEditing() }
         .onDisappear { model.automation.endEditing() }
     }
@@ -324,33 +328,44 @@ private struct AutomationTimeFields: View {
 
 private struct AutomationCodeSetup: View {
     @EnvironmentObject private var model: AppModel
-    @Environment(\.dismiss) private var dismiss
+    @Environment(\.scenePhase) private var scenePhase
+    let close: () -> Void
     @State private var code = ""
     @State private var repeated = ""
     @State private var working = false
     @State private var message: String?
     var body: some View {
-        NavigationStack {
-            Form {
-                Section {
-                    Text(ProductText.string("code_setup_hint"))
-                    AppField(ProductText.string("code_field")) { SecureField("",text:$code).keyboardType(.numberPad) }
-                    AppField(ProductText.string("code_field_repeat")) { SecureField("",text:$repeated).keyboardType(.numberPad) }
-                    Text(ProductText.string("code_forgot_warning")).font(.footnote).foregroundStyle(Brand.secondaryInk)
-                }
-                Section {
-                    Button(ProductText.string("code_set")) {
+        AppDialogSurface {
+            VStack(alignment:.leading,spacing:16) {
+                Text(ProductText.string("code_title")).font(.title3.bold()).accessibilityAddTraits(.isHeader)
+                Text(ProductText.string("code_setup_hint")).font(.subheadline).foregroundStyle(Brand.secondaryInk)
+                field(ProductText.string("code_field"),value:$code)
+                field(ProductText.string("code_field_repeat"),value:$repeated)
+                Text(ProductText.string("code_forgot_warning")).font(.footnote).foregroundStyle(AppPalette.destructive)
+                if let message { Text(message).font(.footnote).foregroundStyle(AppPalette.destructive) }
+                HStack(spacing:12) {
+                    Button(ProductText.string("btn_cancel"),action:close).buttonStyle(SecondaryActionStyle())
+                    Button {
+                        guard !working, model.canManageGuestAccess else { return }
                         working = true
                         Task {
-                            defer { working = false }
-                            do { try await model.setActionCode(code); dismiss() }
+                            defer { working = false; code = ""; repeated = "" }
+                            do { try await model.setActionCode(code); close() }
                             catch { message = "Не удалось сохранить код. Прежние данные сохранены." }
                         }
-                    }.buttonStyle(PrimaryActionStyle()).actionListRow().disabled(code != repeated || !(4...8).contains(code.count))
+                    } label: { ActionButtonLabel(title:ProductText.string("btn_save"),busy:working) }
+                        .buttonStyle(PrimaryActionStyle()).disabled(code != repeated || !(4...8).contains(code.count))
                 }
-                if let message { Text(message).foregroundStyle(.red) }
-            }.disabled(working).navigationTitle(ProductText.string("code_title")).navigationBarTitleDisplayMode(.inline)
-                .sheetDismissFooter(disabled:working) { dismiss() }
+            }.disabled(working || !model.canManageGuestAccess)
+        }
+        .onDisappear { code = ""; repeated = "" }
+        .onChange(of:scenePhase) { if $0 != .active { code = ""; repeated = "" } }
+    }
+    private func field(_ title: String,value: Binding<String>) -> some View {
+        AppField(title) {
+            SecureField(title,text:value).keyboardType(.numberPad).textContentType(.password)
+                .padding(14).background(Color(uiColor:.tertiarySystemFill),in:RoundedRectangle(cornerRadius:12))
+                .onChange(of:value.wrappedValue) { value.wrappedValue = String($0.filter { $0.isASCII && $0.isNumber }.prefix(8)) }
         }
     }
 }

@@ -32,6 +32,8 @@ final class AppModel: ObservableObject {
     @Published private(set) var guests: [SavedGuest] = []
     @Published var objectRemovalTarget: ObjectReference?
     @Published var objectAvatarTarget: ObjectReference?
+    @Published var bleInformationTarget: ObjectReference?
+    @Published var bleInformation: [ObjectReference: BLEDeviceInformation] = [:]
     @Published var ownerGuestRequestPending = false
     lazy var automationSensors = AutomationSensors()
     lazy var automation = AutomationCoordinator(app: self)
@@ -65,8 +67,12 @@ final class AppModel: ObservableObject {
         actionPrompt = nil; executingActionPrompt = request
         confirmedAutomaticPromptID = request.automatic ? request.id : nil
         defer {
-            confirmedAutomaticPromptID = nil; executingActionPrompt = nil
-            if request.automatic { automaticPermits.removeValue(forKey:request.target) }
+            // A background/resume boundary may have replaced this execution.
+            // Its late completion cannot clear a newer prompt's proof/state.
+            if executingActionPrompt?.id == request.id {
+                confirmedAutomaticPromptID = nil; executingActionPrompt = nil
+                if request.automatic { automaticPermits.removeValue(forKey:request.target) }
+            }
         }
         switch request { case .guest(let intent): await execute(intent); case .owner(let intent): await execute(intent) }
     }
@@ -537,6 +543,11 @@ final class AppModel: ObservableObject {
         try preferences.validate()
         try storage.save(SavedState(identity: identity, guests: guests, journal: journal, actionCode: actionCode, owners: updated, usedOwnerPresses: usedOwnerPresses, pendingRestore: pendingRestore, delegations: delegations, passedAccess: passedAccess, receivedDelegations: receivedDelegations, incomingMessages: incomingMessages, outgoingMessages: outgoingMessages, delegatedJournalLedger: delegatedJournalLedger, appLockEnabled: appLockEnabled, appEntryBiometricEnabled: appEntryBiometricEnabled, objectPreferences: preferences, bleAutomationDisarmed: bleAutomationDisarmed, ownerGuestDefaults: ownerGuestDefaults, companies: companies, androidArchives: androidArchives, androidPendingGuests: androidPendingGuests, selectedOwnerServer: selectedOwnerServer))
         owners = updated
+        bleInformation = bleInformation.filter { target,info in
+            guard case let .owned(server,id) = target,
+                  let owner = updated.first(where:{ $0.server == server && $0.ownershipLost != true }) else { return false }
+            return owner.objects?.contains(where:{ $0.id == id && $0.bleDeviceID == info.deviceID }) == true
+        }
         if objectPreferences != preferences { objectPreferences = preferences }
         scheduleOwnerSettingsRefresh()
     }
@@ -1547,6 +1558,7 @@ final class AppModel: ObservableObject {
     }
 
     func suspend() {
+        bleInformationTarget = nil
         if let prompt = actionPrompt { dismissActionPrompt(prompt.id) }
         confirmedAutomaticPromptID = nil; executingActionPrompt = nil
         codePrompt = nil

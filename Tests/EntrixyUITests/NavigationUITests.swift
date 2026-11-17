@@ -88,6 +88,17 @@ final class NavigationUITests: XCTestCase {
         XCTAssertTrue(app.staticTexts["Пока нет объектов"].exists)
         XCTAssertFalse(app.buttons["main-tab-guests"].exists)
     }
+    func testOwnedBLEInformationUsesSeparateActionAndDoesNotInventUnobservedReadings() {
+        let app = launch("owner-ble-objects")
+        let info = app.buttons.matching(NSPredicate(format:"identifier BEGINSWITH %@","object-info-owner:")).firstMatch
+        XCTAssertTrue(info.waitForExistence(timeout:10)); info.tap()
+        XCTAssertTrue(app.staticTexts.matching(NSPredicate(format:"label BEGINSWITH %@","Данных пока нет")).firstMatch.waitForExistence(timeout:10))
+        XCTAssertFalse(app.staticTexts["Заряд батареи"].exists)
+        XCTAssertFalse(app.staticTexts["0%"].exists)
+        app.buttons["Закрыть"].tap()
+        XCTAssertTrue(info.waitForExistence(timeout:10))
+        assertBottom(app,["control","settings","guests","journal"])
+    }
     func testGuestNestedBackAndRootSwitch() {
         let app = launch("guest-keys")
         assertBottom(app, ["control", "settings", "journal"])
