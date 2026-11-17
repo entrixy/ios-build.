@@ -35,8 +35,11 @@ The user requires the functional port before a new screenshot batch. Do not subs
 The current working source adds the Android object fields, device registration and
 credentials, individual automation settings and custom avatars. Core tests pass
 on Linux; Apple compilation/runtime of these additions is tracked separately in
-[functional port progress](docs/FUNCTIONAL_PORT.md). Automation execution, BLE
-moving, camera playback and the remaining product flows are still incomplete.
+[functional port progress](docs/FUNCTIONAL_PORT.md). Foreground automatic execution, durable BLE registry migration and verified passive
+BLE proximity are now in source. Scoped JPEG/MJPEG/native video presentation and
+original Android event sound settings are also connected. Exact-source Apple
+checks are tracked separately; background execution, additional authenticated
+video codecs, companies and other remaining product flows are still incomplete.
 
 ## Historical milestone notes
 
