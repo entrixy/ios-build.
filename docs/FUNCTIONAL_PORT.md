@@ -476,3 +476,44 @@ integration source case checks imported PIN through the real protected snapshot/
 policy path without sending an action; two migration cases now assert pending and
 recovered preferences. Expected latest hosted135 pending Apple execution, not a
 pass claim. No new UI or screenshot was introduced by this restore-only change.
+
+
+## Received-access passing form — current source
+
+Reviewed Android PassOnSection.kt completely before replacing the legacy form.
+Create/edit now share one form: name/default Guest, initial encrypted welcome,
+allowed objects grouped by host, checkbox left and access icon right. The first
+selected object locks the host; no invented server picker, per-key headings,
+inline rights steppers or permanent refresh button. Duplicate objects use the
+first eligible source as Android does. BLE is included through the already-tested
+owner descendant-token path; no copied parent physical identity. Per-object
+rights reuse GuestAccessFields with inherited app-only hidden and depth/pool bounded
+by the fresh parent allowance. Existing parts and additional same-server source
+parts are saved before requests; ambiguous creates retain the same group secret
+and reconcile before a repeat. Existing per-object rights can be edited explicitly,
+and a local name change preserves the welcome/link/recipient identities. Sender
+name is inside the encrypted initial welcome, as in Android. Passed cards now have
+settings/copy/QR/share/message/delete in source order; QR uses the shared native
+component also used by issued owner keys.
+
+Authoritative clarification from PassOnSection.kt and api/key_delegate.php /
+lib/key_objects.php: app-only prohibits browser control, not passing from a native
+client. Native passing inherits the parent's exact flag; guest UI cannot change it.
+Previously the iOS passing/owner-chain code rejected every app-only descendant.
+It now permits valid native chains and still refuses a child row that downgrades
+(or otherwise changes) the locally issued flag. Fresh depth/pool and signed-vouch
+checks remain. New core cases cover inheritance, inability to downgrade, adding a
+source part without replacing secret/welcome, and sender privacy. Hosted cases
+cover save-before-wire/lost additional-part replies and explicit ACL edits bounded
+by fresh rights. One UI source case covers the same checkbox/access layout without
+creating a key. These additions have not yet run on Apple.
+
+Actual Linux235 core tests zero, Swift parse/diff checks pass. Latest expected
+hosted137 and UI15 are SOURCE counts, not runtime evidence. Publicb003/native3b165a4
+Apple core231 passed, Debug failed at BackupPresentation.swift:185 because the
+missing-audio warning was placed outside the preview scope. Moved it into the
+actual decrypted review view; no guards or assertions removed. Follow-up Apple
+verification must confirm the fix and the new passing code. A separate ci/ui-review
+branch now runs the existing native UI suite, without captures or a second hosted
+unit run. Standard functional branches retain Debug, Release/isolation and native
+checks. No new product PNGs or website changes until the functional batch is ready.

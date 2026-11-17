@@ -3,6 +3,39 @@ import XCTest
 @testable import EntrixyCore
 
 final class PassedAccessTests: XCTestCase {
+    func testAppOnlyCanBePassedNativelyButItsRestrictionIsInherited() throws {
+        let source = try invite()
+        let snapshot = try PassSnapshot.decode(Data(#"{"objects":[{"id":7,"depth":2,"pool_left":8,"native_only":1}],"invites":[],"children":[]}"#.utf8))
+        XCTAssertTrue(try XCTUnwrap(snapshot.allowance[7]).canPass)
+        var record = try PassedAccess(server:source.server,label:"Гость",welcome:"",objects:[source.id:[7:KeyObjectAccess(nativeOnly:false,depth:1,pool:3)]],snapshots:[source.id:snapshot])
+        XCTAssertEqual(record.parts[0].objects["7"]?.nativeOnly,true)
+        record.group = group
+        try record.addPart(sourceID:"another-key",objects:[7:KeyObjectAccess(depth:0,pool:1)],snapshot:snapshot)
+        XCTAssertEqual(record.parts[1].objects["7"]?.nativeOnly,true)
+    }
+    func testAdditionalPartKeepsTheExistingGroupSecretAndEncryptedWelcome() throws {
+        let source = try invite()
+        var record = try record(); record.parts[0].sent = true
+        try record.reconcile(snapshot(invites:[part()]),sourceID:source.id)
+        let secret = record.secret, welcome = record.welcomeCipher
+        try record.addPart(sourceID:"second-key-same-server",objects:[7:KeyObjectAccess(depth:1,pool:3)],snapshot:snapshot())
+        XCTAssertEqual(record.parts.count,2); XCTAssertEqual(record.group,group); XCTAssertEqual(record.secret,secret); XCTAssertEqual(record.welcomeCipher,welcome)
+        XCTAssertFalse(record.parts[1].sent); XCTAssertThrowsError(try record.createRequest(part:1))
+        record.parts[1].sent = true
+        let body = try JSONSerialization.jsonObject(with:record.createRequest(part:1)) as! [String:Any]
+        XCTAssertEqual(body["grp"] as? String,group); XCTAssertNil(body["welcome_cipher"])
+        XCTAssertThrowsError(try record.addPart(sourceID:"third-key",objects:[7:KeyObjectAccess(depth:2,pool:3)],snapshot:snapshot()))
+        XCTAssertEqual(record.parts.count,2)
+    }
+    func testSenderNameIsOnlyInsideEncryptedWelcomeAndLocalRenameKeepsLinkMaterial() throws {
+        let source = try invite()
+        var record = try PassedAccess(server:source.server,label:"Получатель",welcome:"Привет",objects:[source.id:[7:KeyObjectAccess(depth:0,pool:1)]],snapshots:[source.id:snapshot()],from:"Хозяин")
+        let plain = try JSONSerialization.jsonObject(with:GuestCrypto.decrypt(key:record.secret,envelope:record.welcomeCipher)) as! [String:Any]
+        XCTAssertEqual(plain["from"] as? String,"Хозяин"); XCTAssertEqual(plain["text"] as? String,"Привет")
+        let secret = record.secret, cipher = record.welcomeCipher
+        record.label = "Другое имя"; try record.validate()
+        XCTAssertEqual(record.secret,secret); XCTAssertEqual(record.welcomeCipher,cipher)
+    }
     private let group = String(repeating: "B", count: 22), code = String(repeating: "C", count: 22)
     private func invite() throws -> GuestInvite { try GuestInvite.parse("https://sender.invalid/key#AAECAwQFBgcICQoLDA0ODxAREhMUFRYX" + String(repeating: "A", count: 43)) }
     private func snapshot(invites: [[String: Any]] = [], children: [[String: Any]] = []) throws -> PassSnapshot {

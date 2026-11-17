@@ -182,9 +182,6 @@ struct BackupFlowHost: View {
     private var importFields: some View {
         VStack(alignment:.leading,spacing:14) {
             Text(ProductText.string("ios_backup_transfer_hint")).font(.footnote).foregroundStyle(Brand.secondaryInk)
-            if let sounds = preview.eventSounds, !sounds.unavailableSamples.isEmpty {
-                Text(ProductText.string("ios_backup_missing_sounds",sounds.unavailableSamples.count)).font(.footnote).foregroundStyle(Brand.secondaryInk)
-            }
             password("backup_pass_label",value:$flow.password)
             if let feedback = flow.feedback { Text(feedback).font(.footnote).foregroundStyle(AppPalette.destructive) }
             HStack(spacing:12) {
@@ -198,6 +195,9 @@ struct BackupFlowHost: View {
             Text(preview.created.formatted(date:.abbreviated,time:.shortened)).font(.footnote).foregroundStyle(Brand.secondaryInk)
             Text(ProductText.string("ios_backup_contents",preview.owners.count,preview.guests.count + (preview.androidGuests ?? []).count))
             Text(ProductText.string("ios_backup_transfer_hint")).font(.footnote).foregroundStyle(Brand.secondaryInk)
+            if let sounds = preview.eventSounds, !sounds.unavailableSamples.isEmpty {
+                Text(ProductText.string("ios_backup_missing_sounds",sounds.unavailableSamples.count)).font(.footnote).foregroundStyle(Brand.secondaryInk)
+            }
             HStack(spacing:12) {
                 Button(ProductText.string("btn_cancel")) { flow.cancel() }.buttonStyle(SecondaryActionStyle())
                 Button(ProductText.string("ios_backup_transfer")) { Task { await flow.restore() } }.buttonStyle(PrimaryActionStyle())

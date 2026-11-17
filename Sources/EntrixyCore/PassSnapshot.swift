@@ -5,7 +5,7 @@ public struct PassAllowance: Equatable {
     public let depth: Int
     public let poolLeft: Int
     public let nativeOnly: Bool
-    public var canPass: Bool { depth > 0 && poolLeft > 0 && !nativeOnly }
+    public var canPass: Bool { depth > 0 && poolLeft > 0 }
 }
 public struct PassInvitation {
     public let code: String

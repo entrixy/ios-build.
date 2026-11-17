@@ -3,6 +3,19 @@ import XCTest
 @testable import EntrixyCore
 
 final class OwnerDelegatedKeyTests: XCTestCase {
+    func testNativeOnlyDelegationIsAcceptedOnlyWhenItKeepsTheLocallyIssuedRestriction() throws {
+        var owner = try owner(), root = try XCTUnwrap(owner.issuedKeys?.first)
+        let native = try KeyObjectAccess(nativeOnly:true,depth:2,pool:8)
+        root.grantedAccess = ["7":native]; root.access = ["7":native]; owner.issuedKeys = [root]
+        let recipient = BundleKeySeal.makeRecipient()
+        var child = try row(owner:owner,recipient:recipient)
+        child["objects"] = [try KeyObjectAccess(nativeOnly:false,depth:1,pool:3).json(id:7)]
+        XCTAssertEqual(try owner.reconcileDelegatedKeys(snapshot([child])),1)
+        XCTAssertTrue((owner.delegatedKeys ?? []).isEmpty)
+        child["objects"] = [try KeyObjectAccess(nativeOnly:true,depth:1,pool:3).json(id:7)]
+        XCTAssertEqual(try owner.reconcileDelegatedKeys(snapshot([child])),0)
+        XCTAssertEqual(owner.delegatedKeys?.first?.access["7"]?.nativeOnly,true)
+    }
     private let childUser = "ICEiIyQlJicoKSorLC0uLzAxMjM0NTY3"
     private func owner() throws -> OwnerAccount {
         var owner = try OwnerAccount(server: "owner.invalid")

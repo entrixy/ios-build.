@@ -21,6 +21,7 @@ private final class PassAPIStub: DelegationTransport {
     var afterCreate: (() -> Void)?
     var beforeRevoke: (() -> Void)?
     var onVouch: (([String: Any]) throws -> Void)?
+    var beforeEdit: (([String:Any]) -> Void)?
     func delegationInfo(server: String, group: String) async throws -> Data { throw BackupFailure.invalidPayload }
     func redeemDelegation(_ pending: DelegationRedemption, fingerprint: String) async throws -> Data { throw BackupFailure.invalidPayload }
     func resolveDelegation(_ pending: DelegationRedemption, part: DelegationRedemption.Part, fingerprint: String) async throws -> GuestInvite? { throw BackupFailure.invalidPayload }
@@ -38,6 +39,7 @@ private final class PassAPIStub: DelegationTransport {
             return try JSONSerialization.data(withJSONObject: ["grp": group, "code": code])
         case .edit:
             edits += 1
+            beforeEdit?(json)
             let objects = json["objects"] as! [[String: Any]]
             if objects.isEmpty { children = [] }
             else {
@@ -66,6 +68,44 @@ private final class PassAPIStub: DelegationTransport {
 
 @MainActor
 final class PassManagerTests: XCTestCase {
+    func testAdditionalSourcePartSavesBeforeWireAndLostReplyRecoversWithoutAnotherCreate() async throws {
+        let first = try invite(), second = try GuestInvite.parse("https://sender.invalid/key#ICEiIyQlJicoKSorLC0uLzAxMjM0NTY3" + String(repeating:"A",count:43))
+        let api = PassAPIStub(), storage = PassMemoryStorage(first)
+        storage.state?.guests.append(SavedGuest(invite:second))
+        let app = AppModel(storage:storage), manager = PassManager(app:app,api:api); defer { app.suspend() }
+        let created = await manager.create(label:"Получатель",welcome:"private welcome",objects:[first.id:[7:try KeyObjectAccess(depth:0,pool:1)]])
+        let id = try XCTUnwrap(created), old = try XCTUnwrap(app.passedAccess.first)
+        storage.fail = true
+        let failedSave = await manager.editObjects(id,sourceID:second.id,numberIDs:[7],access:[7:try KeyObjectAccess(depth:0,pool:2)])
+        XCTAssertFalse(failedSave); XCTAssertEqual(api.creates,1); XCTAssertEqual(app.passedAccess[0].parts.count,1)
+        storage.fail = false; api.loseCreateReply = true
+        api.beforeCreate = { XCTAssertEqual(storage.state?.passedAccess?.first?.parts.last?.sent,true); XCTAssertEqual(storage.state?.passedAccess?.first?.secret,old.secret) }
+        let uncertain = await manager.editObjects(id,sourceID:second.id,numberIDs:[7],access:[7:try KeyObjectAccess(depth:0,pool:2)])
+        XCTAssertFalse(uncertain); XCTAssertEqual(api.creates,2); XCTAssertEqual(app.passedAccess[0].parts.count,2)
+        let restarted = AppModel(storage:storage), resumed = PassManager(app:restarted,api:api); defer { restarted.suspend() }
+        await resumed.reload(); await resumed.continueCreating(id)
+        XCTAssertEqual(api.creates,2); XCTAssertEqual(restarted.passedAccess[0].secret,old.secret); XCTAssertEqual(restarted.passedAccess[0].welcomeCipher,old.welcomeCipher)
+        XCTAssertEqual(restarted.passedAccess[0].parts.last?.state,.available); XCTAssertEqual(restarted.passedAccess[0].link?.url,old.link?.url)
+    }
+    func testChangedPerObjectRightsAreSentExplicitlyAndCannotExceedFreshParentBounds() async throws {
+        let invite = try invite(), api = PassAPIStub(), storage = PassMemoryStorage(try self.invite())
+        let app = AppModel(storage:storage), manager = PassManager(app:app,api:api); defer { app.suspend() }
+        let created = await manager.create(label:"Получатель",welcome:"",objects:[invite.id:[7:try KeyObjectAccess(depth:0,pool:1)]])
+        let id = try XCTUnwrap(created), record = try XCTUnwrap(app.passedAccess.first)
+        api.invitations[0]["status"] = "redeemed"
+        api.children = [["id":18,"grp":api.group,"vouched":1,"ready":1,"number_ids":[7],"objects":[try KeyObjectAccess(depth:0,pool:1).json(id:7)]]]
+        await manager.reload()
+        let desired = try KeyObjectAccess(depth:1,pool:3)
+        api.beforeEdit = { body in
+            let row = (body["objects"] as! [[String:Any]])[0]
+            XCTAssertEqual(row["depth"] as? Int,1); XCTAssertEqual(row["pool"] as? Int,3)
+            XCTAssertEqual(storage.state?.passedAccess?.first?.parts[0].pendingEdit?["7"],desired)
+        }
+        let changed = await manager.editObjects(id,sourceID:invite.id,numberIDs:[7],access:[7:desired])
+        XCTAssertTrue(changed); XCTAssertEqual(api.edits,1); XCTAssertEqual(app.passedAccess[0].parts[0].objects["7"],desired)
+        let tooWide = await manager.editObjects(id,sourceID:invite.id,numberIDs:[7],access:[7:try KeyObjectAccess(depth:0,pool:9)])
+        XCTAssertFalse(tooWide); XCTAssertEqual(api.edits,1); XCTAssertEqual(app.passedAccess[0].secret,record.secret); XCTAssertNil(app.passedAccess[0].parts[0].pendingEdit)
+    }
     private func invite() throws -> GuestInvite { try GuestInvite.parse("https://sender.invalid/key#AAECAwQFBgcICQoLDA0ODxAREhMUFRYX" + String(repeating: "A", count: 43)) }
     func testDelegatedRequestsPersistWithNoInventedResultAndDoNotReturnAfterClearOrFailedSave() async throws {
         let invite = try invite(), api = PassAPIStub(), storage = PassMemoryStorage(try self.invite())
