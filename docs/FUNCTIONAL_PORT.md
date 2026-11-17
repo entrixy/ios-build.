@@ -597,3 +597,11 @@ was followed by actual Linux240 zero at16:27:27UTC with the expansion-bound case
 Owned camera views stop exposing a context on known ownership loss. The loopback
 peer check includes IPv4-mapped IPv6 loopback; remote non-loopback peers remain
 rejected. All latest Swift parse/diff checks pass; Apple SDK/runtime still pending.
+
+
+A separate ci/ui-review-arm branch selects macOS15 Apple Silicon for the same UI
+assertions. Earlier catalogue UI had passed on ARM after Intel Accessibility setup
+failed; the present Intel UI run is retained for its real outcome. This is an
+alternate runner, not changed assertions or a capture rerun. Ordinary functional
+branches still use Intel Debug/Release/native. Do not infer an ARM pass from the
+old catalogue source; the new exact-source run is tracked separately.
