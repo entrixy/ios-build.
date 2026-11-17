@@ -821,3 +821,110 @@ The earlier functional publicbbad08b/nativea70c33a additionally completed core24
 Debug, Release/isolation and all141 hosted native tests (55.706 seconds, zero
 failures) in run44131228346/job134208518844. Do not combine the two source results
 into a claim that the newest entire app has passed every check.
+
+
+## Later complete functional passes
+
+Publicb0a88bb5c6bf6d6a4fad33d92a8f979fc13b9d1e/native384132a,
+run44135507897/job134223819556 ACTUALSUCCESS: Apple245 core, Debug,
+Release/isolation and146 hosted tests (51.131s, zero failures). The corrected
+received guest confirm/PIN/duplicate-challenge case passed. Publicb10f1d7b25e8c51344aae6e5bd3f0b0ede452fed/nativefd82582,
+run44137608867/job134231365669 then ACTUALLYPASSED Apple248 core, Debug,
+Release/isolation and146 hosted tests (24.936s, zero failures), including owner
+BLE information compilation. It predates the compact automation code-setup change.
+UI17 on public88d3652/native d876de8 remains pending in run44138620969.
+
+## Network privacy foundation — not an enabled product feature yet
+
+Read Android NetRoute.kt, Prefs blocked_wifi/blocked_wifi_g_* encoding, Vault's
+net_block and all current Core OwnerAPI/GuestAPI HTTP/WSS creation points. Added
+PrivacyNetwork with exact encrypted wire keys s/b and case-insensitive SSID OR
+BSSID matching; unknown Wi-Fi fails closed. ServerNetworkDecision separates system,
+explicitly authorized cellular and blocked routes. iOS16's unavailable constrained
+URLSession proxy configuration must never silently become a default connection
+when restrictions exist. A bounded authenticated CONNECT parser preserves opaque
+TLS bytes and rejects body/header smuggling, invalid authorities and missing caps.
+ServerSessionPolicy is a locked composition hook for the TWO Core server clients;
+it is currently uninstalled/no-op. Camera/phone-webhook sessions are not changed.
+
+Actual Linux259 zero at17:53:24UTC, including11 new policy/parser cases; Swift all
+sources parse and diff pass. THESE ARE FOUNDATIONS ONLY: no app proxy, persistence,
+privacy UI or encrypted-bundle propagation is enabled. Existing net_block guards
+remain unchanged and must not be relaxed until the complete route is enforced.
+No new cellular connection, report upload, screenshot or server mutation occurred.
+
+Apple primary references consulted for the planned public transport boundary:
+https://developer.apple.com/documentation/network/proxyconfiguration
+https://developer.apple.com/documentation/foundation/urlsessionconfiguration/proxyconfigurations
+https://developer.apple.com/documentation/network/nwparameters/requiredinterfacetype
+Apple DocC platform metadata confirms proxy configuration is iOS17+, not iOS16.
+ProxyConfiguration.allowFailover defaults false; maintain that boundary. HTTPS TLS
+must remain with URLSession through an opaque local CONNECT tunnel, never a private
+AVURLAsset/session header key or TLS certificate bypass. Device/cellular/roaming
+behavior is still unverified; do not imply an available public roaming detector.
+
+
+Network privacy follow-up SOURCE: ServerPrivacyProxy now implements an isolated,
+authenticated loopback CONNECT transport with public ProxyConfiguration on iOS17.
+It requires TCP cellular on a cellular decision and prohibits Wi-Fi/wired fallback;
+URLSession keeps end-to-end TLS/certificate validation. Auth/policy rejection opens
+no upstream. Existing default-interface tunnels close when a rule tightens. Bounded
+headers/connections/32KiB buffers, idle/connect deadlines and TCP half-closes apply;
+no HTTP body/secret logging or interception, no retry on failure. Five hosted
+SOURCE tests exercise real loopback byte forwarding, invalid capability/deny,
+closing existing normal tunnels, no fallback on refused cellular and actual public
+URLSession proxy authentication before TLS failure against a deliberately non-TLS
+echo fixture. These use injected LOOPBACK connectors, never a real cellular radio.
+They are not physical-cellular/DNS/roaming/WSS acceptance. Swift parse/diff pass;
+SDK typing/runtime pending. The component remains UNWIRED in the live app: no
+legacy net_block guard was relaxed, no privacy setting falsely enabled. Next
+required work is protected own/received rules, encrypted-bundle propagation, live
+session lifecycle/guard composition (including iOS16 fail-closed), and matching UI.
+Expected next hosted151/core259 are SOURCE counts pending Apple.
+
+
+Session-lifecycle follow-up SOURCE: both server Core clients now use a locked
+ServerHTTPSession holder. Installing/changing policy rebuilds sessions and cancels
+old HTTP/WSS tasks without resubmission. Requests take the session before checking
+the latest authorization, so a later change cancels that retained session rather
+than granting a newly replaced one from a stale check. HTTP, metadata, initial
+snapshot and both live sockets pass the same preflight. Three new actual Linux
+Core cases verify no request under deny, the same client after removal, WSS/initial
+snapshot preflight, and cancellation of a held request with no duplicate send.
+Complete Linux262 zero (server-session-policy-core.log), syntax/diff pass. The
+live app still installs no routing policy; persistence/UI/bundle propagation and
+full Apple execution of this follow-up remain pending. Legacy net_block rejection
+has not been relaxed.
+
+
+## Actual later UI17 result and rename synchronization follow-up
+
+Public88d365270bf993f63442d3431915ea1ae89d65c3/native d876de8,
+run44138620969/job134234929889 passed Apple248 core/Debug, then executed17 UI
+cases:16passed/1failed (509.845s). Owned BLE Info no-data/close, avatar, compact
+confirmation/PIN and factory claim all actually passed. The old rename/hide case
+failed after Save when tapping Control: XCTest reported an unhittable {-1,-1}
+point and the final hierarchy still showed the original Settings row. This same
+case had passed on the earlier sixteen-case source. It did not assert the typed
+value or saved label before switching tabs, so this is not proof of a storage bug.
+
+Received-object name input now disables autocorrection, offers Done and dismisses
+the keyboard on submission/save; line breaks are stripped consistently with owner
+names. The UI test asserts exact Yard input, waits for that actual row label and
+all bottom-tab hit targets before switching, then retains all existing Control/
+hide/key-preservation checks. No assertion removed and no blind repeat of the
+same scenario. Source parse/diff pass; actual retest and diagnostic PNG inspection
+are pending. New product screenshot batch/gallery still unchanged.
+
+
+Isolated proxy publicb48ee49/nativef008db3 run44143833623/job134253459314
+actually passed Apple259 core, then Debug test-bundle compilation failed at
+ServerPrivacyProxyTests.swift156: an await was inside XCTAssertTrue's synchronous
+autoclosure. Moved only the awaited response into a local variable before the
+same assertion. No native proxy cases ran in that attempt; retry on corrected
+complete source is still required. The public API transport remains uninstalled.
+The UI17 failure PNG was actually inspected privately: original guest Settings
+row/name/expanded actions, with no keyboard or rename form. It does not identify
+whether typing or commit failed. The new exact input/saved-row assertions pinpoint
+that boundary; the name draft also initializes once and freezes before resigning
+focus, so presentation updates cannot overwrite an active edit.

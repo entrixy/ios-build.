@@ -30,7 +30,7 @@ public final class GuestAPI: GuestMigrationTransport, DelegationTransport, Guest
         public let code: String
         public init(status: Int, code: String) { self.status = status; self.code = code }
     }
-    private let session: URLSession
+    private let sessions: ServerHTTPSession
 
     public convenience init() { self.init(configuration: .ephemeral) }
 
@@ -39,10 +39,8 @@ public final class GuestAPI: GuestMigrationTransport, DelegationTransport, Guest
         configuration.timeoutIntervalForResource = 30
         configuration.httpCookieStorage = nil
         configuration.urlCache = nil
-        session = URLSession(configuration: configuration, delegate: NoRedirects(), delegateQueue: nil)
+        sessions = ServerHTTPSession(configuration:configuration)
     }
-
-    deinit { session.invalidateAndCancel() }
 
     public func post(invite: GuestInvite, fingerprint: String, endpoint: String,
                       body: Data, useInvitationKey: Bool = false) async throws -> Data {
@@ -113,6 +111,8 @@ public final class GuestAPI: GuestMigrationTransport, DelegationTransport, Guest
     }
 
     private func send(_ request: URLRequest) async throws -> Data {
+        guard let url = request.url else { throw Failure(status:0,code:"invalid_server") }
+        let session = try sessions.session(for:url)
         let (data, response) = try await session.data(for: request)
         guard let http = response as? HTTPURLResponse else { throw Failure(status: 0, code: "invalid_response") }
         guard data.count <= 1_048_576 else { throw Failure(status: http.statusCode, code: "response_too_large") }
@@ -212,7 +212,7 @@ public final class GuestAPI: GuestMigrationTransport, DelegationTransport, Guest
         guard let url = URL(string: "wss://\(try GuestInvite.normalizeServer(invite.server))/ws") else {
             throw Failure(status: 0, code: "invalid_server")
         }
-        let socket = session.webSocketTask(with: url)
+        let socket = try sessions.session(for:url).webSocketTask(with:url)
         socket.maximumMessageSize = 1_048_576
         socket.resume()
         let deadline = Task {
@@ -248,6 +248,6 @@ public final class GuestAPI: GuestMigrationTransport, DelegationTransport, Guest
     public func live(invite: GuestInvite, fingerprint: String) throws -> GuestLiveSession {
         let server = try GuestInvite.normalizeServer(invite.server)
         guard let url = URL(string: "wss://\(server)/ws") else { throw Failure(status: 0, code: "invalid_server") }
-        return GuestLiveSession(socket: session.webSocketTask(with: url), invite: invite, fingerprint: fingerprint)
+        return GuestLiveSession(socket:try sessions.session(for:url).webSocketTask(with:url),invite:invite,fingerprint:fingerprint)
     }
 }

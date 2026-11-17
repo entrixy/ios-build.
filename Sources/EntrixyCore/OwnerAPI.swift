@@ -38,7 +38,7 @@ public final class OwnerAPI: OwnerTransport {
         public let status: Int
         public let code: String
     }
-    private let session: URLSession
+    private let sessions: ServerHTTPSession
     public convenience init() { self.init(configuration: .ephemeral) }
     init(configuration: URLSessionConfiguration) {
         configuration.timeoutIntervalForRequest = 20
@@ -46,15 +46,13 @@ public final class OwnerAPI: OwnerTransport {
         configuration.httpCookieStorage = nil
         configuration.httpShouldSetCookies = false
         configuration.urlCache = nil
-        session = URLSession(configuration: configuration, delegate: NoRedirects(), delegateQueue: nil)
+        sessions = ServerHTTPSession(configuration:configuration)
     }
-    deinit { session.invalidateAndCancel() }
-
     public func live(server: String, credentials: OwnerCredentials, fingerprint: String) throws -> OwnerLiveTransport {
         try credentials.validate()
         guard fingerprint.count == 64, fingerprint.allSatisfy({ $0.isASCII && $0.isHexDigit }),
               let url = URL(string: "wss://\(try GuestInvite.normalizeServer(server))/ws") else { throw GuestCrypto.Failure.invalidEnvelope }
-        return OwnerLiveSession(socket: session.webSocketTask(with: url), credentials: credentials, fingerprint: fingerprint)
+        return OwnerLiveSession(socket:try sessions.session(for:url).webSocketTask(with:url),credentials:credentials,fingerprint:fingerprint)
     }
 
     public func register(server: String, accessCode: String = "") async throws -> OwnerCredentials {
@@ -76,6 +74,7 @@ public final class OwnerAPI: OwnerTransport {
         let host = try GuestInvite.normalizeServer(server)
         guard let url = URL(string:"https://\(host)/api/meta.php") else { throw GuestCrypto.Failure.invalidEnvelope }
         do {
+            let session = try sessions.session(for:url)
             let (data,_) = try await session.data(from:url)
             guard data.count <= 4_194_304, let json = try JSONSerialization.jsonObject(with:data) as? [String:Any] else { throw GuestCrypto.Failure.invalidEnvelope }
             let protocolInfo = json["protocol"] as? [String:Any]
@@ -149,6 +148,7 @@ public final class OwnerAPI: OwnerTransport {
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         request.httpBody = try JSONSerialization.data(withJSONObject: body, options: .sortedKeys)
+        let session = try sessions.session(for:url)
         let (data, response) = try await session.data(for: request)
         guard let http = response as? HTTPURLResponse else { throw Failure(status: 0, code: "invalid_response") }
         guard data.count <= 4_194_304 else { throw Failure(status: http.statusCode, code: "response_too_large") }

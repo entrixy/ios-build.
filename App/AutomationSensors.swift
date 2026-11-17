@@ -21,6 +21,7 @@ struct AutomationWiFiNetwork: Equatable {
     private var requests: [CheckedContinuation<CLLocation, Error>] = []
     private var requestTimeout: Task<Void, Never>?
     private var tracking = false
+    private var backgroundTrackingRequested = false
 
     override init() {
         super.init()
@@ -57,6 +58,7 @@ struct AutomationWiFiNetwork: Equatable {
 
     func trackLocation(enabled: Bool, background: Bool) {
         tracking = enabled
+        backgroundTrackingRequested = enabled && background
         if !enabled { manager.stopUpdatingLocation(); manager.stopMonitoringSignificantLocationChanges(); return }
         guard manager.authorizationStatus == .authorizedAlways || manager.authorizationStatus == .authorizedWhenInUse else { return }
         manager.allowsBackgroundLocationUpdates = background && manager.authorizationStatus == .authorizedAlways
@@ -75,7 +77,7 @@ struct AutomationWiFiNetwork: Equatable {
         switch manager.authorizationStatus {
         case .authorizedAlways, .authorizedWhenInUse:
             if !requests.isEmpty { manager.requestLocation() }
-            if tracking { trackLocation(enabled: true, background: true) }
+            if tracking { trackLocation(enabled: true, background: backgroundTrackingRequested) }
             refreshNetwork()
         case .denied, .restricted: finishLocation(.failure(CLError(.denied)))
         default: break
