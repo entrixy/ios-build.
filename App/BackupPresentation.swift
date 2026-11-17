@@ -182,6 +182,9 @@ struct BackupFlowHost: View {
     private var importFields: some View {
         VStack(alignment:.leading,spacing:14) {
             Text(ProductText.string("ios_backup_transfer_hint")).font(.footnote).foregroundStyle(Brand.secondaryInk)
+            if let sounds = preview.eventSounds, !sounds.unavailableSamples.isEmpty {
+                Text(ProductText.string("ios_backup_missing_sounds",sounds.unavailableSamples.count)).font(.footnote).foregroundStyle(Brand.secondaryInk)
+            }
             password("backup_pass_label",value:$flow.password)
             if let feedback = flow.feedback { Text(feedback).font(.footnote).foregroundStyle(AppPalette.destructive) }
             HStack(spacing:12) {

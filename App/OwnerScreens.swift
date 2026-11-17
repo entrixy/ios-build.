@@ -1,91 +1,23 @@
 import SwiftUI
 import EntrixyCore
 
+/// Kept for existing recovery routes; System embeds the same server rows.
 struct OwnerServersScreen: View {
     @EnvironmentObject private var model: AppModel
-    @State private var adding = false
     var body: some View {
-        List {
-            Section {
-                ForEach(model.owners) { owner in
-                    VStack(alignment: .leading, spacing: 10) {
-                        Text(owner.server).font(.headline)
-                        if owner.registrationPending {
-                            Text(model.ownerMessages[owner.server] ?? "Регистрация была отправлена, но её результат не подтверждён. Повторная регистрация не выполняется.")
-                                .font(.subheadline).foregroundStyle(Brand.secondaryInk)
-                            if model.canSaveOwnerAccess(owner.server) {
-                                Button("Сохранить доступ") { Task { await model.retrySavingOwnerAccess(owner.server) } }.buttonStyle(PrimaryActionStyle())
-                                    .disabled(model.ownerBusy)
-                            }
-                        } else {
-                            NavigationLink("Настроить объекты") { OwnerObjectsScreen(server: owner.server) }
-                            if let snapshot = model.ownerSnapshots[owner.server] {
-                                Text("Объектов: \(snapshot.objectCount) · Выданных ключей: \(snapshot.guestKeyCount)")
-                                    .font(.subheadline).foregroundStyle(Brand.secondaryInk)
-                            }
-                            if let date = owner.lastSynced {
-                                Text("Обновлено: \(date.formatted(date: .abbreviated, time: .shortened))")
-                                    .font(.caption).foregroundStyle(Brand.secondaryInk)
-                            }
-                            if let message = model.ownerMessages[owner.server] {
-                                Text(message).font(.subheadline).foregroundStyle(Brand.secondaryInk)
-                            }
-                        }
-                    }.padding(.vertical, 6)
-                }
-                Button { adding = true } label: { Label("Добавить сервер", systemImage: "plus") }
-                    .disabled(!model.storageReady || model.ownerBusy)
-            } header: { Text("Мои серверы") }
-            footer: { Text("На каждом сервере сохраняется отдельный доступ владельца. Полученные от других людей ключи находятся в настройках на вкладке «Ключи».") }
-        }
-        .navigationTitle("Мои серверы").navigationBarTitleDisplayMode(.inline)
-        .refreshable { await model.refreshOwners() }
-        .task { await model.refreshOwners() }
-        .sheet(isPresented: $adding) { AddOwnerServerScreen() }
+        List { ServerSettingsSection() }.scrollContentBackground(.hidden).compactListSections()
+            .background(Color(uiColor:.systemGroupedBackground))
+            .navigationTitle(ProductText.string("server_section")).navigationBarTitleDisplayMode(.inline)
+            .refreshable { await model.refreshOwners() }
     }
 }
 
+/// Existing debug/company callers share the real editor instead of a second form.
 struct AddOwnerServerScreen: View {
-    @EnvironmentObject private var model: AppModel
     @Environment(\.dismiss) private var dismiss
-    @State private var server: String
-    init(initialServer: String = "entrixy.com") { _server = State(initialValue: initialServer) }
-    @State private var accessCode = ""
-    var body: some View {
-        NavigationStack {
-            Form {
-                Section {
-                    AppField("Адрес сервера") {
-                        TextField("Адрес сервера", text: $server)
-                            .keyboardType(.URL).textInputAutocapitalization(.never).autocorrectionDisabled()
-                    }
-                    AppField("Код сервера, если нужен") {
-                        SecureField("Код сервера, если нужен", text: $accessCode)
-                            .textInputAutocapitalization(.never).autocorrectionDisabled()
-                    }
-                } header: { Text("Сервер Entrixy") }
-                footer: { Text("Добавление создаст доступ владельца на этом сервере и сохранит его в защищённом хранилище iPhone.") }
-                Section {
-                    Button {
-                        Task {
-                            if await model.addOwner(server: server, accessCode: accessCode) { dismiss() }
-                        }
-                    } label: {
-                        ActionButtonLabel(title: "Добавить сервер", busy: model.ownerBusy)
-                    }
-                    .buttonStyle(PrimaryActionStyle())
-                    .actionListRow()
-                    .disabled(model.ownerBusy || !model.storageReady || server.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
-                }
-            }
-            .navigationTitle("Добавить сервер").navigationBarTitleDisplayMode(.inline)
-            .sheetDismissFooter(disabled: model.ownerBusy) { dismiss() }
-
-            .alert("Entrixy", isPresented: Binding(get: { model.errorMessage != nil }, set: { if !$0 { model.errorMessage = nil } })) {
-                Button("Понятно") { model.errorMessage = nil }
-            } message: { Text(model.errorMessage ?? "") }
-        }
-    }
+    @State private var prompt: ServerSettingsPrompt
+    init(initialServer: String = "entrixy.com") { _prompt = State(initialValue:ServerSettingsPrompt(action:.configure(nil,initial:initialServer))) }
+    var body: some View { ServerSettingsDialog(prompt:prompt,completion:{ dismiss() }) }
 }
 
 struct OwnerObjectsScreen: View {
@@ -227,7 +159,11 @@ struct AddOwnerObjectScreen: View {
             if let owner = model.owners.first(where: { $0.server == server }), owner.registrationPending {
                 Section {
                     Text(model.ownerMessages[server] ?? "Доступ владельца ещё не подтверждён.").foregroundStyle(Brand.secondaryInk)
-                    NavigationLink("Проверить доступ владельца") { OwnerServersScreen() }
+                    Button(ProductText.string("server_edit")) {
+                        finish(nil)
+                        model.settingsRequest = .system
+                        model.serverPrompt = ServerSettingsPrompt(action:.configure(server,initial:server))
+                    }.buttonStyle(SecondaryActionStyle()).actionListRow()
                 }
             }
             Section {

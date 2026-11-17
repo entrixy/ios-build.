@@ -1,5 +1,6 @@
 import XCTest
 import AVFoundation
+import EntrixyCore
 @testable import Entrixy
 
 @MainActor final class AppSoundTests: XCTestCase {
@@ -8,6 +9,36 @@ import AVFoundation
         let defaults = UserDefaults(suiteName:suite)!
         let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString,isDirectory:true)
         return (AppSoundCenter(defaults:defaults,directory:directory.appendingPathComponent("custom"),notificationDirectory:directory.appendingPathComponent("notification")),defaults,directory,suite)
+    }
+    func testAudioBackupRestoresExactSamplesAndPreferencesAcrossRelaunch() throws {
+        let (sounds,defaults,directory,suite) = fixture()
+        defer { defaults.removePersistentDomain(forName:suite); try? FileManager.default.removeItem(at:directory) }
+        let original = try Data(contentsOf:XCTUnwrap(sounds.defaultURL(.success)))
+        let material = try EventSoundBackup(volume:0.35,muted:["message","incall"],samples:["success":original])
+        let stage = try sounds.prepareRestore(material)
+        XCTAssertEqual(sounds.volume,0.1,accuracy:0.00001); XCTAssertTrue(sounds.custom.isEmpty)
+        var committed = false
+        try sounds.commitRestore(stage,commitAccess:{ committed = true }); sounds.discardUnusedRestore(stage)
+        XCTAssertTrue(committed); XCTAssertEqual(try sounds.backupMaterial(),material)
+        let reloaded = AppSoundCenter(defaults:defaults,directory:directory.appendingPathComponent("custom"),notificationDirectory:directory.appendingPathComponent("notification"))
+        XCTAssertEqual(try reloaded.backupMaterial(),material)
+        XCTAssertNotNil(reloaded.notificationSound(.success)); XCTAssertNil(reloaded.notificationSound(.message))
+    }
+    func testCorruptSampleAndFailedAccessCommitPreservePreviouslySelectedSound() throws {
+        let (sounds,defaults,directory,suite) = fixture()
+        defer { defaults.removePersistentDomain(forName:suite); try? FileManager.default.removeItem(at:directory) }
+        sounds.setVolume(0.7); sounds.setEnabled(.tap,false)
+        let before = try sounds.backupMaterial()
+        let corrupt = try EventSoundBackup(volume:0.2,muted:[],samples:["tap":Data("not audio".utf8)])
+        XCTAssertThrowsError(try sounds.prepareRestore(corrupt)); XCTAssertEqual(try sounds.backupMaterial(),before)
+        let original = try Data(contentsOf:XCTUnwrap(sounds.defaultURL(.success)))
+        let material = try EventSoundBackup(volume:0.25,muted:[],samples:["success":original])
+        let stage = try sounds.prepareRestore(material)
+        XCTAssertThrowsError(try sounds.commitRestore(stage,commitAccess:{ throw CocoaError(.fileWriteUnknown) }))
+        sounds.discardUnusedRestore(stage)
+        XCTAssertEqual(try sounds.backupMaterial(),before)
+        let reloaded = AppSoundCenter(defaults:defaults,directory:directory.appendingPathComponent("custom"),notificationDirectory:directory.appendingPathComponent("notification"))
+        XCTAssertEqual(try reloaded.backupMaterial(),before)
     }
     func testAllNineOriginalEventResourcesAreBundledAndDecodable() throws {
         let (sounds,defaults,directory,suite) = fixture()

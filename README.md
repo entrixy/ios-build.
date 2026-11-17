@@ -4,7 +4,19 @@ Native iOS port of the full Android client, not an expansion of Entrixy Open.
 The existing full client defines expected behavior and the server wire formats.
 This repository is private working source; no new distribution license is assigned.
 
-## Current implementation and verification — 16 November 2026
+## Current implementation and verification — 17 November 2026
+
+The active task is the full Android port, followed by one reviewed native screenshot
+batch. It remains incomplete. The gallery still shows the previous 19-frame catalogue.
+Latest completed Apple snapshot: native `eec6bb2`, public
+`8fa9d3eb2bf255cfecdac7f639574a3f5b2ee4f2`,
+[run 44103675450](https://github.com/entrixy/ios-build./actions/runs/44103675450):
+219 core tests, Debug/test bundles, Release/isolation and 120 hosted native tests
+passed. This includes header/help/languages, entry-code and backup presentation.
+It excludes the subsequent server-settings block; UI tests/captures were not run.
+Exact implementation boundaries and pending checks: [FUNCTIONAL_PORT.md](docs/FUNCTIONAL_PORT.md).
+
+### Historical catalogue checkpoint — 16 November 2026
 
 [Android structure](docs/ANDROID_STRUCTURE.md) records the full product tree and
 all 83 Kotlin files. [iOS structure](docs/IOS_STRUCTURE.md) maps all 62 nodes to

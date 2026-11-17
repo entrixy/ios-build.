@@ -181,18 +181,7 @@ struct AddCatalogObjectScreen: View {
     var completion: ((ObjectReference?) -> Void)? = nil
     private func finish(_ target: ObjectReference?) { completion?(target); dismiss() }
     var body: some View {
-        if model.owners.filter({ !$0.registrationPending }).isEmpty {
-            AddOwnerObjectScreen(server: model.owners.first?.server ?? "entrixy.com", completion: finish)
-        } else if let owner = model.owners.first(where: { !$0.registrationPending }), model.owners.filter({ !$0.registrationPending }).count == 1 {
-            AddOwnerObjectScreen(server: owner.server, completion: finish)
-        } else {
-            NavigationStack {
-                List(model.owners.filter { !$0.registrationPending }) { owner in
-                    NavigationLink(owner.server) { AddOwnerObjectScreen(server: owner.server, embedded: true, completion: finish) }
-                }.navigationTitle("Сервер объекта").navigationBarTitleDisplayMode(.inline)
-                    .sheetDismissFooter(disabled: model.ownerBusy) { dismiss() }
-            }
-        }
+        AddOwnerObjectScreen(server:model.selectedOwnerServer,completion:finish)
     }
 }
 

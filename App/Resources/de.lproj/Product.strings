@@ -908,3 +908,14 @@
 "ios_backup_transfer_hint" = "Die Serverbindungen aus der Sicherung werden auf dieses iPhone übertragen. Bestehende widersprüchliche Zugänge bleiben unverändert. Entrixy-Code und Biometrie werden auf diesem Gerät separat eingerichtet.";
 "ios_backup_transfer" = "Übertragen";
 "ios_backup_check" = "Prüfen";
+
+"ios_server_save_failed" = "Could not save server settings. The previous settings were kept.";
+"ios_server_registration_uncertain" = "The registration result is unknown. Registration is blocked to preserve existing access.";
+"ios_server_account_uncertain" = "The account change is not confirmed. Refresh server data to check the result.";
+"ios_server_save_access" = "Save access";
+"ios_server_forget_body" = "Objects and issued keys on %1$@ will be removed from this iPhone. Server data and guest access remain. A backup is needed to restore the previous owner access. Received keys remain on this phone.";
+"ios_server_forget_busy" = "Finish the Bluetooth operation or object transfer between servers first.";
+"ios_server_ownership_lost" = "Owner access on this device is no longer valid. Restore it with an explicit access transfer.";
+"ios_server_loss_save_failed" = "Control of this server has stopped. This state could not be saved in protected storage.";
+
+"ios_backup_missing_sounds" = "Custom sounds without audio files in this backup: %1$d. These events will use default sounds; choose custom files in Settings → Sounds.";

@@ -8,6 +8,13 @@ public extension OwnerAccount {
         guard server == source.server, masterKey == source.masterKey, credentials == source.credentials else { throw GuestCrypto.Failure.invalidKey }
         var merged = self
         merged.hostLabel = hostLabel ?? source.hostLabel
+        merged.serverSettings = serverSettings ?? source.serverSettings
+        if ownershipLost == true || source.ownershipLost == true { merged.ownershipLost = true }
+        else { merged.ownershipLost = ownershipLost ?? source.ownershipLost }
+        if credentials == nil {
+            if registrationPhase == .sent || source.registrationPhase == .sent { merged.registrationPhase = .sent }
+            else if registrationPhase == nil || source.registrationPhase == nil { merged.registrationPhase = nil }
+        }
         merged.reservedGuestIDs = Array(Set((reservedGuestIDs ?? []) + (source.reservedGuestIDs ?? []))).sorted()
         func sameSecret(_ first: String?, _ second: String?) throws {
             if let first, let second {

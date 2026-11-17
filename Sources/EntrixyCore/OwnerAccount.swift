@@ -21,12 +21,16 @@ public struct OwnerAccount: Codable, Identifiable, Equatable {
     public var hostLabel: String?
     public var lastSynced: Date?
     public var bundleRefreshQueue: [String: String]?
+    public var registrationPhase: OwnerRegistrationPhase?
+    public var serverSettings: OwnerServerSettings?
+    public var ownershipLost: Bool?
     public var id: String { server }
     public var registrationPending: Bool { credentials == nil }
 
     public init(server: String) throws {
         self.server = try GuestInvite.normalizeServer(server)
         masterKey = GuestCrypto.randomBytes(count: 32)
+        registrationPhase = .prepared
     }
 
     public init(importing server: String, masterKey: Data, credentials: OwnerCredentials?) throws {
@@ -35,6 +39,7 @@ public struct OwnerAccount: Codable, Identifiable, Equatable {
     }
 
     public func validate() throws {
+        try serverSettings?.validate()
         guard server == (try GuestInvite.normalizeServer(server)), masterKey.count == 32 else {
             throw GuestCrypto.Failure.invalidEnvelope
         }
@@ -120,6 +125,8 @@ public struct OwnerSnapshot {
     public let keyRows: [[String: Any]]
     public let objectCount: Int
     public let guestKeyCount: Int
+    public let accountSpecified: Bool
+    public let accountEmail: String?
 
     public static func decode(_ data: Data) throws -> OwnerSnapshot {
         guard let body = try JSONSerialization.jsonObject(with: data) as? [String: Any],
@@ -145,6 +152,12 @@ public struct OwnerSnapshot {
         for row in keys {
             guard let id = positiveID(row["id"]), ids.insert(id).inserted else { throw GuestCrypto.Failure.invalidEnvelope }
         }
-        return OwnerSnapshot(rows: numbers, keyRows: keys, objectCount: numbers.count, guestKeyCount: keys.count)
+        let accountSpecified = body["account"] != nil
+        var email: String?
+        if let raw = body["account"], !(raw is NSNull) {
+            guard let value = raw as? String, value.utf8.count <= 512, !value.contains("\r"), !value.contains("\n") else { throw GuestCrypto.Failure.invalidEnvelope }
+            email = value.isEmpty ? nil : value
+        }
+        return OwnerSnapshot(rows: numbers, keyRows: keys, objectCount: numbers.count, guestKeyCount: keys.count,accountSpecified:accountSpecified,accountEmail:email)
     }
 }

@@ -195,6 +195,21 @@ final class NavigationUITests: XCTestCase {
         // Form inspection never saves a key, sends a command or opens a camera.
     }
 
+    func testServerRowsAndCompactAccountDialogStayInSystemAndCancelWithoutRegistration() {
+        let app = launch("empty")
+        app.segmentedControls.buttons["Система"].tap()
+        let add = app.buttons["server-add"]
+        for _ in 0..<6 { if add.isHittable { break }; app.swipeUp() }
+        XCTAssertTrue(add.isHittable); XCTAssertTrue(app.buttons["server-select-entrixy.com"].exists)
+        add.tap()
+        let host = app.textFields["server-host"]
+        XCTAssertTrue(host.waitForExistence(timeout:10)); XCTAssertTrue(host.isEnabled)
+        XCTAssertTrue(app.textFields["Почта"].exists); XCTAssertTrue(app.secureTextFields["Пароль"].exists)
+        XCTAssertFalse(app.navigationBars.buttons["Отмена"].exists)
+        app.buttons["Отмена"].tap()
+        XCTAssertTrue(add.waitForExistence(timeout:10)); assertBottom(app,["settings","journal"])
+    }
+
     func testEntryLockSettingsUseCompactCodeDialogsAndWrongCodeCannotDisableLock() {
         let app = launch("empty")
         app.segmentedControls.buttons["Система"].tap()

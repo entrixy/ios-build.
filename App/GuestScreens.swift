@@ -118,7 +118,6 @@ struct SettingsScreen: View {
     @State private var showKey = false
     @State private var showCodeSettings = false
     @State private var addingKey = false
-    @State private var addingServer = false
     @State private var addingObject = false
     @State private var createdDevice: ObjectReference?
     @State private var showingCreatedDevice = false
@@ -172,12 +171,7 @@ struct SettingsScreen: View {
                     } header: { Text(ProductText.string("theme_section")) }
                     AppCodeSettingsSection()
                     BackupSettingsSection(flow:model.backupPresentation)
-                    Section {
-                        NavigationLink("Мои серверы") { OwnerServersScreen() }
-                    } header: { Text(ProductText.string("server_section")) }
-                    Section {
-                        Button(ProductText.string("server_add")) { addingServer = true }.buttonStyle(SecondaryActionStyle()).actionListRow()
-                    }
+                    ServerSettingsSection()
                     Section {
                         NavigationLink("Сообщения") { MessagesScreen() }
                         NavigationLink("Лицензии") { LicenseScreen() }
@@ -193,7 +187,6 @@ struct SettingsScreen: View {
                 if let guest = model.guests.first { KeyDetailScreen(guestID: guest.id) }
             }
             .sheet(isPresented: $addingKey) { KeyImportScreen(input: $keyInput) }
-            .sheet(isPresented: $addingServer) { AddOwnerServerScreen() }
             .sheet(isPresented: $addingObject, onDismiss: {
                 if case let .owned(server, id) = createdDevice,
                    (try? model.ownerDeviceCredentials(server: server, objectID: id)) != nil { showingCreatedDevice = true }
@@ -212,7 +205,7 @@ struct SettingsScreen: View {
                     selected = route.settingsTab
                     showKey = route == .keyDetail
                     showCodeSettings = route == .codeSettings
-                    addingServer = route == .addServer
+                    if route == .addServer { model.serverPrompt = ServerSettingsPrompt(action:.configure(nil,initial:"entrixy.com")) }
                     addingObject = route == .addObject
                 }
                 #endif

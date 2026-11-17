@@ -13,8 +13,10 @@ struct SavedGuest: Codable, Identifiable {
     var automation: [String: IncomingAutomationConfiguration]? = nil
     var cameras: [String: ObjectCameraConfiguration]? = nil
     var requiresBLEExitOnRestore: Bool? = nil
+    var androidAutomation: [String:AndroidIncomingAutomation]? = nil
     var id: String { invite.id }
     func validateObjectSettings() throws {
+        try AndroidIncomingAutomation.validate(androidAutomation ?? [:])
         guard (automation ?? [:]).count <= 1000, (cameras ?? [:]).count <= 1000 else {
             throw GuestCrypto.Failure.invalidEnvelope
         }
@@ -51,6 +53,7 @@ struct SavedState: Codable {
     var companies: [KnownCompany]? = nil
     var androidArchives: [AndroidBackupDocument]? = nil
     var androidPendingGuests: [AndroidGuestMigration]? = nil
+    var selectedOwnerServer: String? = nil
 }
 
 /// One local, device-only Keychain item. Read/decode failures never mean “new installation”.
@@ -87,6 +90,7 @@ struct KeychainStore: StateStorage {
     }
 
     private func validateOwners(_ state: SavedState) throws {
+        if let host = state.selectedOwnerServer { guard try GuestInvite.normalizeServer(host) == host else { throw Failure(status:errSecDecode) } }
         guard (state.bleAutomationDisarmed ?? []).count <= 2000,
               (state.bleAutomationDisarmed ?? []).allSatisfy({ !$0.isEmpty && $0.utf8.count <= 1024 }) else { throw Failure(status:errSecDecode) }
         try state.ownerGuestDefaults?.validate()

@@ -388,3 +388,91 @@ All source parses, localized string tables validate and whitespace checks pass.
 Two new hosted cases cover cancellation and an oversized provider file; their
 Apple execution is pending. This checkpoint does not establish live Files/Share,
 keyboard layout or UI acceptance. No screenshots were taken.
+
+
+## Server settings and owner account safety — current source, 17 November
+
+Android SettingsScreen.kt's server list is now inline in System, default host first,
+custom hosts sorted, current-host radio, scoped account email, aligned edit/trash
+icons and a neutral Add Server button. Editing uses the shared root AppDialogSurface,
+immutable existing host, access code, optional account credentials or linked-email
+unlink, and common filled Cancel/Save controls. No second server menu or object-
+creation chooser: new objects use the selected System server. iOS scopes existing
+connections by host and does not need Android's process-restart dialog.
+
+The Android API endpoints/fields are preserved: optional meta v1 compatibility,
+pwa_login, register_host account_token/access_code and host_account; password and
+account token exist only for the one operation, never protected state or backups.
+The server account/email and access code survive iOS backup and Android import.
+Registration preparation and SENT are durable before wire; a definitive access-code
+rejection allows an explicit same-master retry, while ambiguous/legacy sent state
+cannot register another owner. Account changes keep a durable pending intent until
+an authenticated account field confirms its exact target; absence is not unlink.
+
+Forget removes only the selected local owner/issued material, scoped unsaved state,
+order, outgoing messages and sessions; it sends no revoke/delete/register request.
+Received keys on the same host, other owners and actual journal history survive.
+It is blocked during Bluetooth operations or an unfinished cross-server move.
+Restoring old owner credentials requires a backup; simply registering again cannot
+promise recovery of anonymous server ownership. Original Android import archives
+remain protected for unmapped preferences, as for the rest of Android restoration.
+
+Known eviction/wrong-device/bad-fingerprint stops only that owner's live session,
+commands, guest phone requests and owner BLE FIRE/revocation/pairing. Denial stays
+in memory if persisting it fails; ordinary sync cannot reactivate it. Only a
+successful explicit backup claim can clear the flag. This does not change controller
+wire secrets or pretend that an offline phone can learn an unknown eviction.
+
+Local core225 tests zero and Swift frontend syntax passed. Nine new hosted cases
+(7 server state/API scenarios and 2 BLE loss-at-scan/nonce cases), and one new UI
+server-dialog inspection test are SOURCE ONLY until the next Apple run. Local
+syntax is not Xcode typechecking or UI acceptance. The prior native120 success
+belongs to nativeeec6bb2/public8fa9d3e, excluding this new block. All new screens
+still need actual iOS visual review. No screenshots or website publication yet.
+
+The supplied live PHP checkout has host_account.php but no pwa_login.php; account
+sign-in was tested with recorded HTTP fixtures only. Deployment of that Android
+endpoint and live account integration must be verified before claiming account
+sign-in works on that server. No real password/account/physical controller was used.
+
+
+## Event sound backup — next source checkpoint
+
+Encrypted iOS exports now include the actual user-selected audio bytes, master
+volume and nine event mute choices. Material has a strict event allowlist, no
+file paths, per-file and aggregate bounds, and iOS audio decoding before preview
+or any server claim. Restoring prepares a complete protected file generation
+before claims and validates it again before activation. A failed final access-
+state save rolls back the previous sound preferences/files and preserves owner
+claim checkpoints; resume never repeats completed owner moves. Legacy iOS copies
+without sound material keep current sound settings. Android app_volume/mute_event
+preferences are translated; content:// URIs without bytes are explicitly counted
+in preview as unavailable and use default samples until the user selects files.
+Original Android archives still retain unmapped URI source preferences.
+
+Actual local core228 tests zero; Swift frontend parse and seven Product tables
+(912 keys) pass. Five hosted sound/export/restore cases were added as SOURCE only;
+expected latest hosted134 pending actual Apple execution. Existing Android MP3s
+are unchanged; no audio was generated or replaced. This block has not been
+captured/published and does not complete App Store acceptance.
+
+
+## Android incoming automation restoration — next source checkpoint
+
+Original e2ee_in_tpl_<localKey>_<number> and previous-owner e2ee_in_tplo_* are
+translated separately and remain scoped to the exact migrated signing identity,
+including keys still awaiting the owner bundle. Immediate recovery, durable waiting
+recovery, and a later iOS backup retain these migration seeds. They expose no
+objects or action permission. A fresh authenticated bundle first supplies the
+actual object and current owner template; Android's existing three-way merger then
+preserves user edits and applies current force bounds. Missing previous-owner
+history stays unknown and follows Android's first-merge path. Consumed seeds are
+removed, and later edits use normal incoming configuration. Another guest/host's
+same numeric object cannot contribute a preference.
+
+Actual Linux core231 zero after correcting a missing source-seed TEST fixture;
+production archive validation was not weakened. Swift syntax passes. One new hosted
+integration source case checks imported PIN through the real protected snapshot/
+policy path without sending an action; two migration cases now assert pending and
+recovered preferences. Expected latest hosted135 pending Apple execution, not a
+pass claim. No new UI or screenshot was introduced by this restore-only change.
