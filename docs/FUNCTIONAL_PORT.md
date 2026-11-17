@@ -107,9 +107,56 @@ accounts and catalog preferences. Five hosted test sources cover completion,
 lost create/delete replies, rollback and failed local storage; these await Apple
 execution. Four corresponding core tests pass on Linux. No new capture was made.
 
+## Foreground rule runtime follow-on (source)
+
+GeoCorridorMatcher is ported from the actual Android 10.90 algorithm: 180-second
+bounded trajectory buffer, polyline projections, 25m span, speed/near-window
+checks, separate urban poor-accuracy evidence and three-fix 90m exit latch.
+Zone rules use the Android five-fix inverse-variance smoother, observed outside
+entry, ten-second dwell and 180-second rearm/cooldown. Timers without GPS cannot
+invent an exit; stale coordinates cannot authorize a physical command. Any/all
+and schedule calculations are shared with current-network observations.
+
+The coordinator is connected to production foreground Control. It consumes a
+route seen while editing/on another tab, keeps automatic commands open-only and
+uses the ordinary identity/policy/journal transactions. Code/confirmation gates
+remain manual. Policy and actual condition evidence are rechecked at the first
+send and delayed socket challenge. A consumed candidate/lost reply is not replayed.
+BLE proximity was subsequently connected as described below. Background
+execution is not implemented by this foreground worker.
+Ambient Wi-Fi scan rules remain unmet on iOS; the current network is not invented
+as an ambient scan result. Nineteen new core tests pass (203 total); three hosted
+sources check automatic POST direction, one attempt, changed/expired proof and
+storage failure. Apple/runtime validation of this addition is still pending.
+
+## Authenticated passive BLE follow-on (source)
+
+A separate service-filtered CoreBluetooth observer never connects or writes.
+Owner radio packets must pass the owner-secret MAC and, where present, the state
+MAC. Guest automatic proximity requires the scoped, unexpired grant's state MAC;
+a public DID/name alone cannot trigger it. Sleep-aware radio expiry, Android's
+5-second RSSI debounce/thresholds and an actual observed absence govern rearming.
+Unsigned old/guest sleep metadata cannot shorten that absence window.
+
+Automatic BLE stays armed through proximity until consumed once. Its disarmed
+latch is protected before GATT and again atomically with the final proof/journal;
+relaunch and restoration cannot repeat the old approach. Registry move carries
+the latch to the new server slot. Own GATT/background gaps do not count as a radio
+exit. Open/opening bistable state skips an automatic toggle; current authenticated
+state and all conditions are rechecked before FIRE. Manual/code-gated paths and
+expired/revoked grants retain their guards. Old guest firmware without a state
+MAC retains manual access, without invented authenticated passive proximity.
+
+Five new radio/core tests and one BLE-latch/runtime test pass locally (203 total).
+Two hosted sources check one automatic write and persistent relaunch latch,
+forged discovery rejection and pre-GATT storage failure; the original manual
+proof transaction now also asserts durable latch storage. These additions still
+require their exact-source Apple run and physical controller tests. No capture
+or real controller actuation was performed.
+
 ## Actual verification
 
-Linux Swift6.0.3 + swift-crypto: 184 core tests, zero failures, including immutable
+Linux Swift6.0.3 + swift-crypto: 203 core tests, zero failures, including immutable
 in-flight bundle requests, scoped templates, force bounds, overnight windows,
 private camera material, stale edit rejection, durable device registration,
 avatar rollback, per-key local override isolation and the Android phone-webhook
@@ -132,8 +179,10 @@ Public1abcf00cc741abbc302a01633870a926ac27a571 (native854796f),
 [run43959028455](https://github.com/entrixy/ios-build./actions/runs/43959028455),
 then passed176 Apple core tests, Debug/Release/isolation and88 hosted native tests
 with zero failures. Its app/test files are byte-identical to that native checkpoint.
-This predates the guest-object settings follow-on above: its180 Linux core tests
-and app/hosted/UI syntax parsing pass; Apple/native/UI execution remains pending.
+This predates the guest-object settings follow-on above: [run44073814465](https://github.com/entrixy/ios-build./actions/runs/44073814465)
+(public3f8ccb4/native2aa672b) then passed180 Apple core, Debug/Release/isolation
+and91 hosted tests with zero failures. This predates migration, delegated auto-fulfillment
+and the new runtime source. Their own Apple results remain separate.
 
 This does NOT establish native interactions, device operation or App Store readiness. The separate ci/functional-port workflow builds Debug/test
 bundles and Release with fixture isolation, without taking screenshots or actuating hardware. It then runs hosted native
@@ -141,10 +190,9 @@ transaction tests on an isolated simulator, without UI automation. Its exact-sou
 
 ## Remaining required implementation and acceptance
 
-- Keep existing conservative combined-condition guards until real observations
-  and runtime evaluation are connected.
-- Port actual automatic execution/rearm/session behavior and GeoCorridorMatcher;
-  background/permission behavior and passive authenticated BLE observations.
+- Validate the new foreground any/all runtime and socket revalidation on Apple;
+  complete its BLE/background and gated-notification paths.
+- Background/permission behavior and physical acceptance of passive BLE on iPhone.
 - Verify the new BLE registry move on Apple and real server/controller routes;
   finish remaining guest transfer/product routes.
 - Live camera presentation,

@@ -57,6 +57,8 @@ struct AutomationEditor: View {
                     model.automationSensors.refreshNetwork()
                 }
         }
+        .onAppear { model.automation.beginEditing() }
+        .onDisappear { model.automation.endEditing() }
     }
     private var title: String {
         guard let c = context else { return text("automation_icon_desc") }

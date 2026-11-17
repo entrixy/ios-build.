@@ -30,12 +30,13 @@ private struct OfflineWebhookOwnerAPI: OwnerTransport {
 }
 
 @MainActor final class PhoneWebhookControlTests: XCTestCase {
-    private func fixture() throws -> (WebhookStateStorage, AppModel, OwnerObject, RecordingPhoneWebhook) {
+    private func fixture(template: AutomationTemplate? = nil, toggles: Bool = false) throws -> (WebhookStateStorage, AppModel, OwnerObject, RecordingPhoneWebhook) {
         let storage = WebhookStateStorage()
         var owner = try OwnerAccount(server: "fixture.invalid")
         owner.credentials = try OwnerCredentials(deviceID: String(repeating:"a",count:32),deviceSecret:String(repeating:"b",count:64))
         var object = try OwnerObject(masterKey: owner.masterKey, label: "Webhook", kind: "webhook",
-            url: "http://relay.invalid/open", secret: "owner-only", webhookMode: "phone")
+            url: "http://relay.invalid/open", secret: "owner-only", webhookMode: "phone", webhookToggle: toggles)
+        object.localPolicy = try template?.data()
         object.numberID = 7; object.revision = 1; object.available = true; object.pending = nil
         owner.objects = [object]
         storage.state = SavedState(identity: Data(repeating: 24,count:32), guests: [], owners:[owner])
@@ -45,6 +46,60 @@ private struct OfflineWebhookOwnerAPI: OwnerTransport {
         app.ownerControl.resume()
         return (storage, app, object, sender)
     }
+    private func routeProof(at date: Date = Date()) -> (AutomationTemplate,AutomationReadiness) {
+        var template = AutomationTemplate()
+        template.geoEnabled = true; template.geoMode = "route"; template.geoLat = 0; template.geoLon = 0
+        template.corridors = [[AutomationGeoPoint(lat:160/111320,lon:0),AutomationGeoPoint(lat:0,lon:0)]]
+        var runtime = AutomationRuntime(sessionStarted:date.timeIntervalSince1970-60)
+        var proof: AutomationReadiness?
+        for (i,distance) in [120.0,90,60,40,20].enumerated() {
+            let time = date.addingTimeInterval(Double(i*10-40))
+            runtime.receive(AutomationLocationFix(latitude:distance/111320,longitude:0,accuracyM:5,timestampMS:Int64(time.timeIntervalSince1970*1000)))
+            proof = runtime.evaluate(key:"route",template:template,date:time)
+        }
+        return (template,proof!)
+    }
+    func testAutomaticRouteOpensOnlyOnceAndDoesNotChooseToggleForAnOpenOnlyTrigger() async throws {
+        let (template,proof) = routeProof()
+        XCTAssertTrue(proof.ready); XCTAssertTrue(proof.routeMatched)
+        let (storage,app,object,sender) = try fixture(template:template,toggles:true)
+        defer { app.suspend() }
+        sender.loseReply = true
+        sender.beforeSend = { XCTAssertEqual(storage.state?.journal?.count,1) }
+        let entry = CatalogObject.owned(app.owners[0],object)
+        await app.performAutomaticAction(entry,readiness:proof)
+        await app.performAutomaticAction(entry,readiness:proof)
+        XCTAssertEqual(sender.calls.count,1); XCTAssertEqual(app.journal.count,1)
+        XCTAssertEqual(app.journal.first?.who,ProductText.string("journal_who_geo"))
+        let body = try XCTUnwrap(JSONSerialization.jsonObject(with:sender.calls[0].1) as? [String:Any])
+        XCTAssertEqual(body["action"] as? String,"open")
+        XCTAssertTrue(app.automaticPermits.isEmpty)
+    }
+    func testAutomaticRouteCannotBypassChangedConfirmationOrExpiredEvidence() async throws {
+        let (template,proof) = routeProof(at:Date().addingTimeInterval(-4))
+        let (_,app,object,sender) = try fixture(template:template)
+        defer { app.suspend() }
+        await app.performAutomaticAction(.owned(app.owners[0],object),readiness:proof)
+        XCTAssertTrue(sender.calls.isEmpty)
+        var changed = template; changed.confirmEnabled = true
+        let (_,gated,gatedObject,gatedSender) = try fixture(template:changed)
+        defer { gated.suspend() }
+        let (_,fresh) = routeProof()
+        await gated.performAutomaticAction(.owned(gated.owners[0],gatedObject),readiness:fresh)
+        XCTAssertTrue(gatedSender.calls.isEmpty); XCTAssertTrue(gated.journal.isEmpty)
+    }
+    func testAutomaticRouteStorageFailurePreventsPOSTAndDoesNotRetryTheSameEvidence() async throws {
+        let (template,proof) = routeProof()
+        let (storage,app,object,sender) = try fixture(template:template)
+        defer { app.suspend() }
+        storage.failing = true
+        let entry = CatalogObject.owned(app.owners[0],object)
+        await app.performAutomaticAction(entry,readiness:proof)
+        storage.failing = false
+        await app.performAutomaticAction(entry,readiness:proof)
+        XCTAssertTrue(sender.calls.isEmpty); XCTAssertTrue(app.journal.isEmpty)
+    }
+
     func testLocalWebhookWorksWithoutOwnerServerAndPersistsAttemptBeforePOST() async throws {
         let (storage, app, object, sender) = try fixture()
         defer { app.ownerControl.suspend() }

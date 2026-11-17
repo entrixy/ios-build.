@@ -32,6 +32,8 @@ struct ControlScreen: View {
         }
         .searchable(text: $query, placement: .navigationBarDrawer(displayMode: .automatic), prompt: "Найти объект")
         .navigationTitle("Управление")
+        .onAppear { model.automation.setWorking(true) }
+        .onDisappear { model.automation.setWorking(false) }
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
                 Button(action: addKey) { Image(systemName: "plus") }

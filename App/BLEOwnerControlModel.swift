@@ -28,7 +28,7 @@ import EntrixyCore
               app.ownerManualActionAllowed(object, server: server, action: .toggle) else { return }
         busy = true; currentObject = objectID
         let current = UUID(); generation = current
-        defer { if generation == current { busy = false; currentObject = nil } }
+        defer { app.automation.resetBLEContinuity(); if generation == current { busy = false; currentObject = nil } }
         var channel: (any BLEChannel)?
         var actionKey: String?
         do {
@@ -46,6 +46,11 @@ import EntrixyCore
             guard let discovery = matching.first else {
                 messages[objectID] = "Свой контроллер с подтверждённой подписью не найден. Поднесите iPhone ближе и разбудите контроллер."
                 return
+            }
+            if app.automaticPermits[.owned(server:server,objectID:objectID)] != nil {
+                guard let bytes = discovery.manufacturerPayload else { throw BLETransportFailure.invalidValue }
+                let observation = try AuthenticatedBLEObservation.owner(payload:bytes,secret:secret)
+                if observation.openish { return }
             }
             let advertisement = discovery.manufacturerPayload.flatMap { try? BLECrypto.verifyAdvertisement($0, ownerSecret: secret) }
             app.noteBLESighting(.owned(server: server, objectID: objectID), sleepSeconds: advertisement?.sleepSeconds)
@@ -91,7 +96,7 @@ import EntrixyCore
         guard let wrapped = object?.wrappedBLESecret ?? pairing?.wrappedSecret else { return }
         busy = true; deliveryMessages[deviceID] = "Поиск контроллера…"
         let current = UUID(); generation = current
-        defer { if generation == current { busy = false } }
+        defer { app.automation.resetBLEContinuity(); if generation == current { busy = false } }
         var channel: (any BLEChannel)?
         do {
             let secret = try GuestCrypto.decrypt(key: owner.masterKey, envelope: wrapped)

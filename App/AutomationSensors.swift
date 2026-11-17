@@ -11,6 +11,7 @@ struct AutomationWiFiNetwork: Equatable {
 @MainActor final class AutomationSensors: NSObject, ObservableObject, @preconcurrency CLLocationManagerDelegate {
     @Published private(set) var location: CLLocation?
     @Published private(set) var network: AutomationWiFiNetwork?
+    private(set) var networkObservedAt: Date?
     @Published private(set) var locationAuthorization: CLAuthorizationStatus = .notDetermined
     @Published private(set) var locating = false
     @Published private(set) var message: String?
@@ -49,6 +50,7 @@ struct AutomationWiFiNetwork: Equatable {
         NEHotspotNetwork.fetchCurrent { [weak self] value in
             Task { @MainActor in
                 self?.network = value.map { AutomationWiFiNetwork(ssid: $0.ssid, bssid: $0.bssid.lowercased()) }
+                self?.networkObservedAt = Date()
             }
         }
     }

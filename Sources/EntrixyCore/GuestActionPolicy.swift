@@ -14,7 +14,7 @@ public struct GuestActionPolicy {
     /// Pinned through authentication and immediately before each physical FIRE.
     public let template: Data
 
-    public static func decodeBLE(bundle: Data, numberID: Int, epoch: UInt64, overrides: IncomingAutomationConfiguration? = nil) throws -> (policy: GuestActionPolicy, grant: BLEGuestGrant) {
+    public static func decodeBLE(bundle: Data, numberID: Int, epoch: UInt64, overrides: IncomingAutomationConfiguration? = nil, readiness: AutomationReadiness? = nil, date: Date = Date()) throws -> (policy: GuestActionPolicy, grant: BLEGuestGrant) {
         guard let contents = try JSONSerialization.jsonObject(with: bundle) as? [String: Any],
               let rows = contents["ble"] as? [[String: Any]],
               rows.count <= 1000 else { throw GuestCrypto.Failure.invalidEnvelope }
@@ -42,14 +42,18 @@ public struct GuestActionPolicy {
         let mode = template["mode"] as? String ?? "any"
         guard ["any", "all"].contains(mode) else { throw GuestCrypto.Failure.invalidEnvelope }
         let channels = try ["geo_on", "wifi_on", "time_on", "ble_on"].filter { try flag($0) }
-        if mode == "all" && channels.count > 1 { blocked = "Совместная проверка условий этого объекта пока не поддерживается на iOS." }
+        let conditionsTemplate = try AutomationTemplate(data: JSONSerialization.data(withJSONObject: template))
+        let observedBLE = !conditionsTemplate.bleEnabled || readiness?.observations.bleReady != nil
+        if mode == "all" && channels.count > 1 && (!observedBLE || readiness?.satisfies(conditionsTemplate, at: date) != true) {
+            blocked = blocked ?? (readiness == nil ? "Совместная проверка условий этого объекта пока не поддерживается на iOS." : "Условия автоматизации объекта сейчас не выполнены.")
+        }
         let confirmation = try flag("confirm_on") || flag("confirm")
         return (GuestActionPolicy(kind: "ble", deviceID: nil, credential: nil, serverWebhook: false,
             confirmation: confirmation, authentication: auth, toggles: true, blockedReason: blocked,
             template: try JSONSerialization.data(withJSONObject: template, options: .sortedKeys)), grant)
     }
 
-    public static func decode(bundle: Data, snapshot: Data, numberID: Int, overrides: IncomingAutomationConfiguration? = nil) throws -> GuestActionPolicy {
+    public static func decode(bundle: Data, snapshot: Data, numberID: Int, overrides: IncomingAutomationConfiguration? = nil, readiness: AutomationReadiness? = nil, date: Date = Date()) throws -> GuestActionPolicy {
         guard let b = try JSONSerialization.jsonObject(with: bundle) as? [String: Any],
               let s = try JSONSerialization.jsonObject(with: snapshot) as? [String: Any],
               let row = (s["numbers"] as? [[String: Any]])?.first(where: { $0["id"] as? Int == numberID }),
@@ -94,7 +98,10 @@ public struct GuestActionPolicy {
         guard ["any", "all"].contains(mode) else { throw GuestCrypto.Failure.invalidEnvelope }
         // Android allows manual override in ANY mode (and with only one channel).
         // Unsupported combined conditions must never turn into unconditional access.
-        if mode == "all" && channels.count > 1 { blocked = "Совместная проверка условий этого объекта пока не поддерживается на iOS." }
+        let conditionsTemplate = try AutomationTemplate(data: JSONSerialization.data(withJSONObject: template))
+        if mode == "all" && channels.count > 1 && readiness?.satisfies(conditionsTemplate, at: date) != true {
+            blocked = blocked ?? (readiness == nil ? "Совместная проверка условий этого объекта пока не поддерживается на iOS." : "Условия автоматизации объекта сейчас не выполнены.")
+        }
         if ["time_from", "time_to"].contains(where: { (row[$0] as? String).map { !$0.isEmpty } == true }) {
             blocked = "Временные ограничения этого объекта пока не поддерживаются на iOS."
         }
