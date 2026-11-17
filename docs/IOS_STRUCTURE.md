@@ -3,6 +3,19 @@
 Основание: [62 узла Android](ANDROID_STRUCTURE.md), Android 5615535. Это карта
 реального подключения и пробелов, а не объявление полного переноса.
 
+## Актуальная сверка — 17.11.2026
+
+Таблица ниже обновлена по source `6b42489`. Последний полный функциональный
+Apple-прогон относится к `fe9e8e1`: core240/native140, Debug/Release/isolation
+без ошибок. Более новые компактные диалоги и автотриггеры с подтверждением/PIN
+имеют только syntax/source проверки и ожидают Apple. Более поздний ARM UI-прогон
+`a70c33a`: 14 из 15 прошли, включая compact confirm/PIN; исправление оставшегося
+a11y-селектора аватара и новый claim-переход ждут UI16. Текущий protocol core245
+прошёл Linux; новая функциональная Apple-проверка ещё ожидается.
+Строка с подключённым маршрутом не означает визуальную или аппаратную приёмку.
+Полные исходники и доказательства: [FUNCTIONAL_PORT.md](FUNCTIONAL_PORT.md).
+Ниже таблицы сохранены исторические результаты каталога от 16 ноября.
+
 ## Слои и владение данными
 
 - App shell: RootView + AppNavigationState, единая нижняя панель и отдельные задачи.
@@ -14,7 +27,7 @@
   Save происходит до публикации изменения; отказ записи сохраняет прежний интерфейс.
 - Экраны задач: ObjectSettingsRows раскрывает действия; ObjectSettingsTask несёт
   точный target. OwnerObjectEditor изменяет owner object, ReceivedObjectNameScreen —
-  локальное имя. AddCatalogObjectScreen выбирает сервер; AddOwnerObjectScreen — тип,
+  локальное имя. AddCatalogObjectScreen использует выбранный в Системе сервер; AddOwnerObjectScreen — тип,
   BLEPairingScreen продолжает создание нового BLE-объекта. BLE никогда не приписывается
   к соседней карточке существующих ворот.
 - Защита/исполнение: AppModel создаёт замороженный ActionIntent/OwnerActionIntent,
@@ -24,7 +37,7 @@
   CatalogStatusAvatar показывает availability кругом на аватаре. Текст результата,
   причины отказа, pause и сообщения сохраняются в своих блоках. BLE observation
   имеет срок по sleep interval; без наблюдения доступность неизвестна. Нового
-  passive/background scanner этот этап не добавляет.
+  foreground passive scanner подключён; фон и физическое радио ещё не проверены.
 - Выдача/передача: OwnerIssuedKey/KeyObjectAccess и PassedAccess остаются владельцами
   персистентного scope. IncomingDepth даёт только видимость вкладки. Per-object
   templates владельца, выданного гостя и incoming должны оставаться разными областями.
@@ -34,74 +47,72 @@
 
 ## Полная раскладка узлов
 
-«Нет route/editor» означает реальный пробел; интерфейс не показывает работающую
-на вид кнопку вместо отсутствующего исполнителя. Этот этап подключает общий
-каталог и существующие операции. Полные автонастройки/компании/фон не объявляются
-реализованными из-за наличия этого документа или типов маршрутов.
+Маршруты указаны по рабочему коду; оставшиеся границы отделены от наличия UI.
+Фон, оборудование, live E2E и App Store требуют самостоятельной проверки.
 
 | Android ID | Узел | iOS feature / маршрут | Подключение и границы |
 | --- | --- | --- | --- |
 | C01 | Общий список карточек | ObjectCatalogModel → ControlScreen | Подключён общий порядок и visibility. |
-| C02 | Карточка действия | GuestCatalogControlCard / OwnerCatalogControlCard | Прямое действие; новые индикаторы. Полная готовность правил ещё не перенесена. |
+| C02 | Карточка действия | GuestCatalogControlCard / OwnerCatalogControlCard | Прямой тап, индикатор на аватаре, scoped policy; компактный ActionPrompt ожидает свежей Apple/UI-проверки. |
 | C03 | Ручной запуск | AppModel.actionIntent/ownerActionIntent → execute | Существующие guards/PIN/биометрия/one-shot сохраняются. |
-| C04 | Состояние контроллера | AppModel.objectAvailability → CatalogStatusAvatar | Сеть и свежие BLE observations раздельны; passive/background BLE scanner ещё отсутствует. |
+| C04 | Состояние контроллера | CatalogStatusAvatar / BLEPassiveObserver / BLEProximityRuntime | Свежие подписанные BLE observations и RSSI debounce в foreground; фон/реальное радио не подтверждены. |
 | C05 | Положение объекта | OwnerControlModel.positions / ActionLink.positions | Данные и выбор направления есть; углы-индикаторы ещё не перенесены. |
-| C06 | Камера в карточке | Нет production route | Нужны camera settings, guest stream entitlement, поток и состояния. |
-| C07 | Готовность автоматизации | GuestActionPolicy / OwnerManualPolicy | Неподдержанные условия блокируются; engine/editor/rearm не объявлены готовыми. |
+| C06 | Камера в карточке | ObjectControlCard / ObjectCameraStream / CameraVideoProxy | Поток в той же карточке, showWhen, scoped camera entitlement; JPEG/MJPEG/native HLS/MP4, auth bridge проверен транспортными тестами. Декодирование камеры/другие форматы не приняты. |
+| C07 | Готовность автоматизации | AutomationEditor / AutomationCoordinator / AutomationRuntime | Geo route/zone, текущий Wi-Fi/time/BLE, latch/rearm; неподдержанный Wi-Fi scan не имитируется. Gated auto source6b42489 ждёт Apple; фон не завершён. |
 | C08 | Подсказки/баннер | Нет полного production route | Разделить readiness ОС и promo cache/события. |
 | O01 | Общий список | ObjectSettingsRows + ObjectCatalogPreferences | Один смешанный список; onMove сохраняет порядок; стандартный режим изменения порядка iOS. |
-| O02 | Свой обычный объект, раскрытие | ObjectSettingsRows → OwnerObjectEditor | Раскрытие на месте, отдельные настройки/удаление. Полный набор типов и автонастройки — пробел. |
-| O03 | Входящий обычный объект, раскрытие | ObjectSettingsRows → ReceivedObjectNameScreen / hideReceivedObject | Локальное имя/скрытие реализованы; входящий редактор автонастроек отсутствует. |
-| O04 | Свой BLE, раскрытие | ObjectSettingsRows → OwnerObjectEditor / BLEPermissionsScreen | BLE различается типом; Info/move/automation ещё не подключены. |
-| O05 | Входящий BLE, раскрытие | ObjectSettingsRows → ReceivedObjectNameScreen / hideReceivedObject | Тот же local scope; не удаляет ключ. BLE incoming automation отсутствует. |
-| O06 | Добавить объект | AddCatalogObjectScreen → AddOwnerObjectScreen | Выбор owner server; четыре типа, BLE только через добавление. Первый объект открывает форму сразу, owner регистрируется при Save; pending registration не отправляется повторно. |
-| O07 | Создать call | AddOwnerObjectScreen → createOwnerObject(call) | Телефон есть; Contacts/hangup поля ещё не перенесены. |
-| O08 | Создать webhook | AddOwnerObjectScreen → createOwnerObject(webhook) | Есть server HTTPS; phone/webhook mode/toggle редакторы ещё не полные. |
-| O09 | Создать device | AddOwnerObjectScreen → createOwnerObject(device) | Claim есть; полный новый deviceRegister/credentials flow отсутствует. |
+| O02 | Свой обычный объект, раскрытие | ObjectSettingsRows → OwnerObjectEditor / AutomationEditor | Редактор типа, автонастройки, удаление; новая UI-проверка переходов ещё ожидается. |
+| O03 | Входящий обычный объект, раскрытие | ReceivedObjectNameScreen / AutomationEditor / hideReceivedObject | Локальное имя/скрытие и scoped incoming three-way overrides, force bounds; ключ/соседние объекты сохраняются. |
+| O04 | Свой BLE, раскрытие | OwnerObjectEditor / AutomationEditor / BLEPermissionsScreen | Автонастройки, durable перенос сервера и отдельная owner Info после AutoMode подключены; новый Info-source ожидает Apple/UI. |
+| O05 | Входящий BLE, раскрытие | ReceivedObjectNameScreen / AutomationEditor / hideReceivedObject | Scoped incoming BLE overrides и локальное представление; signed grant/expiry/revocation guards сохраняются. |
+| O06 | Добавить объект | AddCatalogObjectScreen → AddOwnerObjectScreen | Четыре типа в порядке Android; используется выбранный сервер, регистрация только при Save. Pending registration не отправляется заново вслепую. |
+| O07 | Создать call | AddOwnerObjectScreen / ObjectPhoneContactPicker | Телефон и системный выбор контакта; iOS handoff просит системное подтверждение, автоматический сброс звонка недоступен. |
+| O08 | Создать webhook | WebhookConfigurationFields / PhoneWebhookTransport | URL/secret, phone/server mode и toggle; HMAC, журнал до POST и отсутствие повтора после потерянного ответа проверены. |
+| O09 | Создать device | createOwnerObject(device) / deviceRegister / DeviceCredentialsSheet / DeviceClaimLink | Durable device registration и credentials; reply recovery без второй identity. Factory claim deep link подставляет код и исходный host (новый source, Apple/UI ещё pending). |
 | O10 | Создать BLE | AddOwnerObjectScreen(Bluetooth) → BLEPairingScreen → BLEPairingModel | Подключён реальный существующий pair executor; новые secrets/физические команды не симулируются. |
-| O11 | Редактор обычного объекта | OwnerObjectEditor → renameOwnerObject | Сейчас имя/пресеты/local manual policy; полных type-specific полей нет. |
-| O12 | Поделиться устройством | Нет production route | Нужны device credential QR/share и missing-credentials состояние. |
-| O13 | Привязать приложение к device | Нет production route | Нужны ENTX-BIND/configurator и публикация socket shares без пересоздания объекта. |
-| O14 | Редактор своего BLE | OwnerObjectEditor + OwnerObject(kind=ble) | Имя есть; move требует отдельной durable transaction и проверки контракта. |
-| O15 | Информация BLE | Нет production route | Нужны полученные advertisement info и возраст; не заполнять выдуманными данными. |
+| O11 | Редактор обычного объекта | OwnerObjectEditor / OwnerObject | Call/webhook/device поля и policy; защищённые параметры сохраняют исходный объект и ожидающие изменения. |
+| O12 | Поделиться устройством | DeviceCredentialsSheet / ownerDeviceCredentials | ENTX-DEV, QR/copy/share сохранённых credentials; явное missing-credentials состояние. |
+| O13 | Привязать приложение к device | OwnerObjectEditor.deviceFields / ownerSocketBindingCode | ENTX-BIND создаётся и сохраняется перед показом, копирование без пересоздания объекта; физический конфигуратор не проверен. |
+| O14 | Редактор своего BLE | OwnerObjectEditor / OwnerBLEMove / moveBLEObject | Durable create-target/delete-source/local merge; исходные UUID/secret/pairing и порядок сохраняются, неоднозначный ответ не дублирует создание. |
+| O15 | Информация BLE | BLEInformationDialog / BLEDeviceInformation / owner observer | Authenticated owner v3/v4 battery/status/fw/hw/sleep/age; явное no-data для legacy/без наблюдения. Core248 Linux прошёл; новая UI17/Apple проверка pending. |
 | O16 | Удаление своего объекта | ObjectSettingsRows → deleteOwnerObject | Существующий durable delete/reconcile и BLE revocations сохраняются. |
-| O17 | Аватар объекта | OwnerObjectEditor / ObjectAvatar / OwnerObjectAvatar | 8 оригинальных пресетов; production upload своей картинки ещё отсутствует. |
-| O18 | Камера: настройки | Нет production route | Хранение/редактор камеры, auth и выдача права требуют общего контракта с C06/G04. |
+| O17 | Аватар объекта | ObjectAvatarPicker / ObjectAvatarImage / saveObjectAvatar | 8 исходных пресетов и PhotosPicker/crop/JPEG; owner encrypted upload и incoming local override. UI-открытие аватара в последнем прогоне упало, исправление ожидает проверки. |
+| O18 | Камера: настройки | ObjectCameraFields / ObjectCameraConfiguration | Stream/snapshot/auth/showWhen, частные параметры и per-key entitlement; real camera/device acceptance остаётся. |
 | K01 | Полученные ключи | SettingsScreen.keys → KeyDetailScreen | Отдельная подвкладка; connection здесь остаётся информативным текстом. |
 | K02 | Добавить ключ | KeyImportScreen → AppModel.add | Paste/QR/photo + bind; повторный импорт возвращает hidden без замены identity. |
 | K03 | Удалить входящий ключ | AppModel.removeKey | Очищает и catalog overrides/order только этого guest scope. |
-| S01 | Звуки | Нет production route | Event sound settings/volume/picker/player — самостоятельная подсистема. |
+| S01 | Звуки | SoundSettingsRows / AppSoundCenter / EventSoundBackup | 9 исходных событий, оригинальные MP3, volume/mute/custom/reset/preview, actual audio bytes в backup; звук физического iPhone не принят. |
 | Y01 | Согласие на отчёты | Нет полного production route | Разделить crash consent и диагностические координаты. |
 | Y02 | Тема | SettingsScreen.system / appearance | Существующий выбор темы. |
-| Y03 | Код Entrixy | AppEntryLockSettings / AppEntryLockScreen / ActionConfirmation | Существующие код/биометрия/lock; не объединять entry unlock и authority одного intent. |
-| Y04 | Резервная копия | BackupScreen → BackupManager / BackupRestorePlan | Catalog preferences входят в export/merge; Android parser ещё не полностью подключён к restore UI. |
-| Y05 | Серверы | SettingsScreen.system → OwnerServersScreen / AddOwnerServerScreen | Owner registration/sync есть; account link/unlink/access code edit/forget остаются неполными. |
+| Y03 | Код Entrixy | AppCodeSettingsSection / AppCodeDialog / AppEntryLockScreen / ActionConfirmation | Защищённые изменения entry lock и отдельная авторизация intent; compact action dialogs source ждут проверки. |
+| Y04 | Резервная копия | BackupSettingsSection / BackupPresentation / BackupManager | Native/Android inspect, preview, encrypted export, claims/checkpoints, merge и напоминание; real cross-device migration не принят. |
+| Y05 | Серверы | ServerSettingsSection / ServerSettingsDialog / OwnerServerSettings | Inline список, selected host, access code/account link/unlink/local forget и owner-loss guards. Клиентские fixtures прошли, live pwa_login.php возвращает404. |
 | Y06 | Сети приватности | Нет production route; GuestActionPolicy guards | Не ослаблять неподдержанную network policy. |
 | Y07 | Подсказки ОС | Нет полного production route | Платформенные разрешения/готовность iPhone отдельно от Android OEM. |
 | Y08 | Разработчик | DEBUG captures/catalogues; production dev flow отсутствует | DEBUG routes изолированы от Release, не являются продуктовой dev вкладкой. |
-| G01 | Свои выданные доступы | OwnerGuestsScreen | Issued/delegated/forwarded пути есть; вкладки Люди/Компании/Преднастройки ещё неполны. |
-| G02 | Карточка гостя | OwnerKeyScreen / OwnerDelegatedKeyScreen | Существующие операции; полное раскрытие Android ещё не перенесено. |
-| G03 | Выдать гостю | IssueOwnerKeyScreen → OwnerIssuedKey / AppModel | Durable выдача; full per-object templates/type fields — пробел. |
-| G04 | Править существующий ключ | OwnerKeyScreen → editOwnerKey | Существующий edit с сохранением K_guest; камера и templates требуют дополнения. |
-| G05 | Доступ к одному объекту | KeyObjectAccess / IssueOwnerKeyScreen | Per-object depth/pool подключены. Native-only true пока отклоняется текущим iOS guard; не выдавать модель поля за готовый переключатель. Authority проверяется в Core/API. |
-| G06 | Автонастройки конкретного гостя | Нет production editor; GuestActionPolicy сохраняет guards | Отдельные (host,key,object) templates, owner/incoming разделены по контракту. |
-| G07 | Реакция владельца на запрос | OwnerControlModel.phoneRequests / dial / decline | Foreground запросы есть; редактор реакции per guest/object ещё отсутствует. |
-| G08 | Срок BLE-пропуска | OwnerKeyScreen / AppModel.renewOwnerBLEKey | Продление существует; отдельный per-guest TTL редактор Android ещё не перенесён. |
-| G09 | Pause/resume/revoke | AppModel key mode/revoke + BLEPermissionsScreen | Существующие signed revocations/reconcile; корпоративная ветвь отсутствует. |
+| G01 | Свои выданные доступы | GuestsHub.OwnerGuestsScreen | Android People/Companies/Presets, conditional tabs, scoped cards и передаваемые доступы подключены; полная UI/E2E-приёмка остаётся. |
+| G02 | Карточка гостя | GuestPersonCard / IssueOwnerKeyScreen / OwnerDelegatedKeyScreen | Раскрытие, редактирование/clone/QR/share/message/pause/delete; общая визуальная проверка всех состояний остаётся. |
+| G03 | Выдать гостю | IssueOwnerKeyScreen / GuestKeyDraft / OwnerIssuedKey | Черновик без server identity до Save; checkbox объектов, per-object invocations/templates/access/TTL/video. |
+| G04 | Править существующий ключ | IssueOwnerKeyScreen / editOwnerKey | Та же signing/bundle identity при редактировании; pending snapshot не затирает более новые локальные изменения. |
+| G05 | Доступ к одному объекту | GuestAccessFields / KeyObjectAccess / OwnerDelegatedKey | Depth/pool/native-only и точное наследование native flag; серверный app-only запрещает браузер, не native passing. |
+| G06 | Автонастройки конкретного гостя | GuestObjectSettings / AutomationEditor(.issued) / saveAutomation | Отдельные шаблоны host/key/object, root bounds и force; не смешиваются с owner/incoming настройками. |
+| G07 | Реакция владельца на запрос | GuestInvocationEditor / OwnerCallPreference / OwnerPhoneNotifications | Auto/confirm/notify/off и serveDuringCall; проверенные foreground guards, реальная доставка/звонок в фоне не приняты. |
+| G08 | Срок BLE-пропуска | BLETokenLifetimes / GuestObjectSettings / renewOwnerBLEKey | 11 TTL от1ч до30д; выбор не продлевает текущий токен, explicit renew сохраняет identity. |
+| G09 | Pause/resume/revoke | GuestPersonCard / GuestRemovalDialog / BLEPermissionsScreen | Pause/resume/revoke, durable signed BLE decisions; corporate keys тоже имеют scope, hardware delivery не принята. |
 | G10 | QR/share | InviteQRCode / системный ShareLink | Существующий QR/share ссылки-ключа. |
 | G11 | Сообщение | MessageScreens / MessageManager / SavedMessage | Существующие защищённые сообщения; единая Android message presentation ещё неполная. |
-| G12 | Компании | Нет production route | Company identity(host,id), trust/profile/claim и UI требуют отдельной feature. |
-| G13 | Преднастройки | Нет полного production route | Существующие ключи не менять при сохранении defaults для новых выдач. |
-| G14 | Передать ключ | PassedAccessScreen → PassManager | Существующий делегирующий путь, live allowance обязателен. |
-| G15 | Создать/править передаваемый ключ | PassedAccessScreen / PassManager / PassedAccess | Существующие группы/части/per-object allowance, требуются полный UX и E2E. |
-| G16 | Подтверждение цепочки | DelegationInbox / DelegationInboxScreen / OwnerDelegatedKey | Существующие подписи/vouch/fulfil/revocation checks. |
+| G12 | Компании | CompanyPresentation / KnownCompany / VerifiedCompanyPress | host/id + verified signing pin, profile/claim/grant UI; real server E2E и полная визуальная приёмка остаются. |
+| G13 | Преднастройки | GuestPresets / OwnerGuestDefaults | Defaults для новых ключей и scoped explicit clone; старые ключи не меняются при сохранении defaults. |
+| G14 | Передать ключ | PassedGuestsSection / PassAccessForm / PassManager | Полученный источник и свежий verified allowance, native-only наследуется; protected group/secret/identity сохраняются. |
+| G15 | Создать/править передаваемый ключ | PassAccessForm / PassedAccess / PassManager | Android name/welcome/grouped checkbox/access rows, один host, per-object ACL; дополнительные части сохраняются до wire, reply reconciliation без дубликата. |
+| G16 | Подтверждение цепочки | DelegationInbox / OwnerDelegatedKey / automatic bundle fulfilment | Подписи/vouch/full parent chain/scope до публикации сохранённой связки; live cross-platform E2E ещё не принят. |
 | J01 | Журнал действий | JournalScreen / JournalEntry / DelegatedJournalLedger | Action history и локальное отображаемое имя; не записывать UI sync. |
-| H01 | Помощь | LicenseScreen отдельно; Help route отсутствует | Нужно руководство/язык/версия/dev вход, не подменять лицензиями. |
+| H01 | Помощь | AppHeaderActions / HelpScreen / ProductText | Общая помощь и язык с исходными флагами, native lower navigation; оставшаяся L10n/полная проверка ссылок отдельно. |
 | E01 | Общие окна сети | RootView.errorMessage + inline action rejection | Общие ошибки отдельно от inline outcome; полный event coordinator ещё не реализован. |
-| E02 | Запрос гостя владельцу | OwnerPhoneRequestRows / OwnerControlModel | Существующий foreground approve/decline; notification/background пути отдельно. |
-| E03 | Автотриггер | Нет production route | Требуется automation runtime/event с target, countdown/auth/cancel, без повторной команды. |
+| E02 | Запрос гостя владельцу | OwnerPhoneRequestDialog / OwnerControlModel / OwnerPhoneNotifications | Компактный foreground approve/decline и 5sec cancelable notify; background/APNs/device-проверка остаётся. |
+| E03 | Автотриггер | AutomationCoordinator / ActionPrompt / executeActionPrompt | Единый foreground manual/automatic confirm/PIN/biometry, одно согласие на frozen intent, cancel consumes arrival; latest source6b42489 ещё не Apple-исполнен. |
 | E04 | Ключ принят/отклонён | KeyImportScreen / DelegationInboxScreen | Есть bind/errors/pending; полный readiness/welcome ещё не перенесён. |
-| E05 | Восстановление | BackupScreen / BackupManager | Существующий restore status; ServerRestore offer/reminder отдельные пробелы. |
+| E05 | Восстановление | BackupPresentation / BackupRestorePlan / backup reminder | Preview/restore/preflight/checkpoints/reminder подключены, системный файл sharing; реальный перенос между устройствами не принят. |
 | W01 | Виджет | Нет widget extension | Внешний intent должен проходить ту же policy/lock/target validation. |
 
 ## Приёмка этого изменения

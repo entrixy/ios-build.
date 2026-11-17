@@ -14,8 +14,11 @@ Latest completed functional Apple snapshot: native `fe9e8e1`, public
 240 core tests, Debug/test bundles, Release/isolation and 140 hosted native tests
 passed. This includes servers, sound/rule backups, received-access passing and
 authenticated HLS/MP4 transport. It does not prove actual camera decoding or hardware.
-The separate earlier UI run executed 14 tests: nine passed, five failed. Fixes to
-control identifiers, avatar hit area and test targeting await a fresh UI run.
+The later separate ARM UI run on native `a70c33a` executed 15 tests: fourteen
+passed, including compact card confirmation/PIN, and one avatar selector failed.
+Its concrete accessibility correction and factory-claim route await a 16-case UI
+run on public `7630c62`. Latest protocol source passed 245 tests on Linux; the
+newer automatic confirmation/PIN transaction tests are still awaiting Apple.
 Exact implementation boundaries and pending checks: [FUNCTIONAL_PORT.md](docs/FUNCTIONAL_PORT.md).
 
 ### Historical catalogue checkpoint — 16 November 2026

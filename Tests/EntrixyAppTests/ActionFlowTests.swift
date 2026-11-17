@@ -60,6 +60,54 @@ final class ActionFlowTests: XCTestCase {
         XCTAssertNil(relaunched.actionPrompt); XCTAssertTrue(relaunched.journal.isEmpty)
         relaunched.suspend()
     }
+    @MainActor func testAutomaticGuestConfirmationAndPINWaitForApprovalAndKeepChallengeBoundToOneArrival() async throws {
+        for gate in ["confirm","pin"] {
+            var template = AutomationTemplate()
+            template.geoEnabled = true; template.geoMode = "route"; template.geoLat = 0; template.geoLon = 0
+            template.corridors = [[AutomationGeoPoint(lat:160/111320,lon:0),AutomationGeoPoint(lat:0,lon:0)]]
+            template.confirmEnabled = gate == "confirm"; template.authEnabled = gate == "pin"
+            template.authMode = gate == "pin" ? "pin" : nil
+            let wire = try XCTUnwrap(JSONSerialization.jsonObject(with:template.data()) as? [String:Any])
+            let (model,controller,guest,object) = try await fixture(template:wire)
+            // Runtime evaluates the received three-way result, including owner
+            // bounds added by the merge, not the unmerged wire template.
+            template = try model.automationContext(.object(.received(guestID:guest.id,objectID:object.id))).template
+            XCTAssertTrue(template.geoEnabled)
+            XCTAssertEqual(template.confirmEnabled,gate == "confirm")
+            XCTAssertEqual(template.authEnabled,gate == "pin")
+            if gate == "pin" { try await model.setActionCode("1234") }
+            let now = Date()
+            var runtime = AutomationRuntime(sessionStarted:now.timeIntervalSince1970-60)
+            var proof: AutomationReadiness?
+            for (i,distance) in [120.0,90,60,40,20].enumerated() {
+                let time = now.addingTimeInterval(Double(i*10-40))
+                runtime.receive(AutomationLocationFix(latitude:distance/111320,longitude:0,accuracyM:5,timestampMS:Int64(time.timeIntervalSince1970*1000)))
+                proof = runtime.evaluate(key:"route",template:template,date:time)
+            }
+            let evidence = try XCTUnwrap(proof); XCTAssertTrue(evidence.ready)
+            await model.performAutomaticAction(.received(model.guests[0],object),readiness:evidence)
+            let prompt = try XCTUnwrap(model.actionPrompt)
+            guard case .guest(let intent) = prompt else { return XCTFail("Wrong prompt scope") }
+            await model.execute(intent)
+            XCTAssertTrue(controller.sent.isEmpty); XCTAssertTrue(model.journal.isEmpty)
+            if gate == "pin" {
+                let wrong = try await model.authorizeCode("0000",intent:intent)
+                XCTAssertFalse(wrong); XCTAssertTrue(controller.sent.isEmpty)
+                let correct = try await model.authorizeCode("1234",intent:intent)
+                XCTAssertTrue(correct)
+            }
+            await model.executeActionPrompt(prompt)
+            await model.executeActionPrompt(prompt)
+            XCTAssertNil(model.actionPrompt); XCTAssertTrue(model.automaticPermits.isEmpty)
+            XCTAssertEqual(controller.sent.count,1); XCTAssertEqual(model.journal.count,1)
+            XCTAssertEqual(model.journal.first?.who,ProductText.string("journal_who_geo"))
+            let challenge = try JSONSerialization.data(withJSONObject:["type":"sock_challenge","number_id":7,"command_id":"gated-"+gate,"nonce":Data(0..<16).base64EncodedString()])
+            try await model.receiveTestController(challenge,guestID:guest.id)
+            try await model.receiveTestController(challenge,guestID:guest.id)
+            XCTAssertEqual(controller.sent.count,2)
+            model.suspend()
+        }
+    }
     @MainActor func testPressChallengeResultAndJournalSurviveRelaunchWithoutReplay() async throws {
         let (model, controller, guest, object) = try await fixture()
         let challenge = try JSONSerialization.data(withJSONObject: ["type": "sock_challenge", "number_id": 7, "command_id": "test-1", "nonce": Data(0..<16).base64EncodedString()])

@@ -122,15 +122,11 @@ import EntrixyCore
             }
             // Android consumes a route seen while editing/on another tab, so
             // switching back later does not unexpectedly open the old arrival.
-            if (!working && !context.isBLE) || editors > 0 || app.actionPrompt != nil || app.objectRemovalTarget != nil || app.objectAvatarTarget != nil {
+            if (!working && !context.isBLE) || editors > 0 || app.actionPrompt != nil || app.bleInformationTarget != nil || app.objectRemovalTarget != nil || app.objectAvatarTarget != nil {
                 if result.routeMatched { consume(entry.target,route:true) }
                 continue
             }
             guard !sending, !app.busy, !app.ownerBusy, !app.blePairing.busy else { continue }
-            if context.template.authEnabled || context.template.confirmEnabled || context.template.requireConfirmation == true {
-                if context.isBLE { try? app.setBLEAutomationArmed(entry.target,armed:false) }
-                consume(entry.target,route:result.routeMatched); continue
-            }
             sending = true
             await app.performAutomaticAction(entry,readiness:result)
             sending = false
@@ -141,13 +137,12 @@ import EntrixyCore
 extension AppModel {
     func automaticPermitValid(_ target: ObjectReference, date: Date = Date()) -> Bool {
         guard let permit = automaticPermits[target] else { return false }
-        return automaticEvidenceValid(permit,target:target,date:date,maximumAge:2)
+        return automaticEvidenceValid(permit,target:target,date:date,maximumAge:actionPromptRetainsAutomaticEvidence(target) ? 30 : 2)
     }
     func automaticEvidenceValid(_ permit: AutomationReadiness, target: ObjectReference, date: Date = Date(), maximumAge: TimeInterval = 30) -> Bool {
         guard canManageGuestAccess, permit.ready, date >= permit.evaluatedAt,
               date.timeIntervalSince(permit.evaluatedAt) <= maximumAge,
-              let context = try? automationContext(.object(target)), context.template == permit.template,
-              !context.template.authEnabled, !context.template.confirmEnabled, context.template.requireConfirmation != true else { return false }
+              let context = try? automationContext(.object(target)), context.template == permit.template else { return false }
         if permit.routeMatched { return true }
         return conditionReadiness(target,date:date)?.satisfies(permit.template,at:date) == true
     }
@@ -162,13 +157,17 @@ extension AppModel {
         return automation.inspect(target,template:context.template,isBLE:context.isBLE,date:date)
     }
     func performAutomaticAction(_ entry: CatalogObject, readiness: AutomationReadiness) async {
-        guard canManageGuestAccess, !busy, !ownerBusy,
+        guard canManageGuestAccess, !busy, !ownerBusy, actionPrompt == nil,
+              codePrompt == nil, serverPrompt == nil, !backupPromptPending,
+              objectRemovalTarget == nil, objectAvatarTarget == nil, bleInformationTarget == nil, !ownerGuestRequestPending,
+              companyRequestID == nil, guestRemovalTarget == nil,
               let context = try? automationContext(.object(entry.target)), context.template == readiness.template,
               (automaticConsumedAt[entry.target].map { readiness.evaluatedAt > $0 } ?? true),
-              readiness.ready, Date().timeIntervalSince(readiness.evaluatedAt) <= 2,
-              !context.template.authEnabled, !context.template.confirmEnabled, context.template.requireConfirmation != true else { return }
+              readiness.ready, Date() >= readiness.evaluatedAt, Date().timeIntervalSince(readiness.evaluatedAt) <= 2 else { return }
+        let gated = context.template.authEnabled || context.template.confirmEnabled || context.template.requireConfirmation == true
         automaticPermits[entry.target] = readiness
-        defer { automaticPermits.removeValue(forKey:entry.target) }
+        var retainedForPrompt = false
+        defer { if !retainedForPrompt { automaticPermits.removeValue(forKey:entry.target) } }
         switch entry {
         case .owned(let owner,let object):
             guard let intent = ownerActionIntent(server:owner.server,objectID:object.id,automatic:true) else { return }
@@ -179,7 +178,8 @@ extension AppModel {
             automaticConsumedAt[entry.target] = readiness.evaluatedAt
             AppSoundCenter.shared.play(.geo)
             if !context.isBLE { automation.consume(entry.target,route:readiness.routeMatched) }
-            await execute(intent)
+            if gated { actionPrompt = .owner(intent); retainedForPrompt = true }
+            else { await execute(intent) }
         case .received(let guest,let object):
             guard let intent = actionIntent(guestID:guest.id,object:object,automatic:true) else { return }
             if context.isBLE {
@@ -189,7 +189,8 @@ extension AppModel {
             automaticConsumedAt[entry.target] = readiness.evaluatedAt
             AppSoundCenter.shared.play(.geo)
             if !context.isBLE { automation.consume(entry.target,route:readiness.routeMatched) }
-            await execute(intent)
+            if gated { actionPrompt = .guest(intent); retainedForPrompt = true }
+            else { await execute(intent) }
         }
     }
 }
@@ -200,8 +201,10 @@ extension AppModel {
         case .owned(let owner,let object):
             guard ownerAccessIsUsable(owner.server), object.kind == "ble", object.ownerCardAvailable, !owner.isMoving(object.id),
                   let wrapped = object.wrappedBLESecret, let did = object.bleDeviceID else { throw BLETransportFailure.cancelled }
-            let observation = try AuthenticatedBLEObservation.owner(payload:payload,secret:GuestCrypto.decrypt(key:owner.masterKey,envelope:wrapped))
+            let secret = try GuestCrypto.decrypt(key:owner.masterKey,envelope:wrapped)
+            let observation = try AuthenticatedBLEObservation.owner(payload:payload,secret:secret)
             guard observation.deviceID == did else { throw BLETransportFailure.invalidValue }
+            if let info = try? BLEDeviceInformation(payload:payload,ownerSecret:secret) { bleInformation[entry.target] = info }
             return observation
         case .received(let guest,let object):
             guard !guest.paused, object.kind == "ble", let cache = guest.bleCache else { throw BLETransportFailure.cancelled }
