@@ -31,7 +31,7 @@ import EntrixyCore
     }
     func pair(discoveryID: UUID, server: String, label: String) async {
         guard !busy, app.canManageGuestAccess, !app.ownerBusy,
-              let owner = app.owners.first(where: { $0.server == server }), owner.credentials != nil,
+              let owner = app.owners.first(where: { $0.server == server && $0.ownershipLost != true }), owner.credentials != nil,
               !(owner.blePairings ?? []).contains(where: { $0.peripheralID == discoveryID }) else { return }
         busy = true; message = "Подключение для привязки…"
         let current = UUID(); generation = current
@@ -41,7 +41,7 @@ import EntrixyCore
         do {
             let connection = try await transport.connect(discoveryID, pairing: true); channel = connection
             let peerPublic = try await connection.read(BLECrypto.pairPublicCharacteristic)
-            guard generation == current, app.canManageGuestAccess else { throw BLETransportFailure.cancelled }
+            guard generation == current, app.canManageGuestAccess, app.ownerAccessIsUsable(server) else { throw BLETransportFailure.cancelled }
             let reserved = Set((owner.blePairings ?? []).map(\.deviceID) + (owner.objects ?? []).compactMap(\.bleDeviceID))
             var deviceID: UInt32 = 0
             repeat { deviceID = GuestCrypto.randomBytes(count: 4).reduce(UInt32(0)) { ($0 << 8) | UInt32($1) } } while deviceID == 0 || reserved.contains(deviceID)
@@ -50,7 +50,7 @@ import EntrixyCore
             try app.saveBLEPairing(record, server: server); persisted = true
             try record.markSent()
             try app.saveBLEPairing(record, server: server)
-            guard generation == current, app.canManageGuestAccess else { throw BLETransportFailure.cancelled }
+            guard generation == current, app.canManageGuestAccess, app.ownerAccessIsUsable(server) else { throw BLETransportFailure.cancelled }
             try await connection.write(record.packet, to: BLECrypto.pairDoneCharacteristic)
             await connection.close(); channel = nil
             guard generation == current else { return }
@@ -63,7 +63,7 @@ import EntrixyCore
     }
     func sendPrepared(pairingID: UUID, server: String) async {
         guard !busy, app.canManageGuestAccess, !app.ownerBusy,
-              let owner = app.owners.first(where: { $0.server == server }),
+              let owner = app.owners.first(where: { $0.server == server && $0.ownershipLost != true }),
               var record = owner.blePairings?.first(where: { $0.id == pairingID }), record.phase == .prepared else { return }
         busy = true; message = "Продолжение сохранённой привязки…"
         let current = UUID(); generation = current
@@ -88,7 +88,7 @@ import EntrixyCore
     }
     func check(pairingID: UUID, server: String) async {
         guard !busy, app.canManageGuestAccess,
-              let owner = app.owners.first(where: { $0.server == server }),
+              let owner = app.owners.first(where: { $0.server == server && $0.ownershipLost != true }),
               var record = owner.blePairings?.first(where: { $0.id == pairingID }), record.phase != .prepared else { return }
         busy = true; message = "Проверка подписи контроллера…"
         let current = UUID(); generation = current

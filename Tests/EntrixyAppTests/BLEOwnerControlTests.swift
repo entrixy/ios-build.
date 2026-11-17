@@ -17,6 +17,7 @@ private final class BLEOwnerStorage: StateStorage {
     private let output: AsyncThrowingStream<UInt8, Error>.Continuation
     var writes: [Data] = []
     var beforeWrite: (() throws -> Void)?
+    var beforeNonce: (() -> Void)?
     var lostReply = false
     var hasResults = true
     var result: UInt8 = 0
@@ -30,7 +31,7 @@ private final class BLEOwnerStorage: StateStorage {
     }
     func enableResults() async throws -> Bool { hasResults }
     func read(_ characteristic: String) async throws -> Data {
-        XCTAssertEqual(characteristic, BLECrypto.nonceCharacteristic); return nonce
+        XCTAssertEqual(characteristic, BLECrypto.nonceCharacteristic); beforeNonce?(); return nonce
     }
     func write(_ data: Data, to characteristic: String) async throws {
         if characteristic == BLECrypto.revokeCharacteristic {
@@ -57,6 +58,27 @@ private final class BLEOwnerStorage: StateStorage {
     func stop() {}
 }
 @MainActor final class BLEOwnerControlTests: XCTestCase {
+    func testKnownOwnershipLossDuringScanCannotConnectOrFire() async throws {
+        let (storage,central,app,object,_) = try fixture()
+        app.bleControl = BLEOwnerControlModel(app:app,transport:central); defer { app.suspend() }
+        central.beforeReadReturn = { app.recordOwnerAccessLoss("fixture.invalid") }
+        await app.bleControl.execute(server:"fixture.invalid",objectID:object.id)
+        XCTAssertEqual(central.connects,0); XCTAssertTrue(central.channel.writes.isEmpty); XCTAssertTrue(app.journal.isEmpty)
+        XCTAssertFalse(app.ownerAccessIsUsable("fixture.invalid")); XCTAssertEqual(storage.state?.owners?.first?.ownershipLost,true)
+        XCTAssertTrue(app.controlObjects.isEmpty)
+    }
+    func testKnownOwnershipLossAfterNonceStillBlocksFireWhenSavingLossFails() async throws {
+        let (storage,central,app,object,_) = try fixture()
+        app.bleControl = BLEOwnerControlModel(app:app,transport:central); defer { app.suspend() }
+        central.channel.beforeNonce = { storage.failing = true; app.recordOwnerAccessLoss("fixture.invalid") }
+        await app.bleControl.execute(server:"fixture.invalid",objectID:object.id)
+        XCTAssertEqual(central.connects,1); XCTAssertTrue(central.channel.writes.isEmpty); XCTAssertTrue(app.journal.isEmpty)
+        XCTAssertFalse(app.ownerAccessIsUsable("fixture.invalid")); XCTAssertEqual(app.owners[0].ownershipLost,true)
+        storage.failing = false
+        XCTAssertTrue(app.selectOwnerServer("entrixy.com"))
+        let restarted = AppModel(storage:storage); defer { restarted.suspend() }
+        XCTAssertFalse(restarted.ownerAccessIsUsable("fixture.invalid")); XCTAssertNil(restarted.ownerActionIntent(server:"fixture.invalid",objectID:object.id))
+    }
     private func fixture(template: AutomationTemplate? = nil) throws -> (BLEOwnerStorage, OwnerBLECentral, AppModel, OwnerObject, Data) {
         let storage = BLEOwnerStorage(), central = OwnerBLECentral()
         var owner = try OwnerAccount(server: "https://fixture.invalid")

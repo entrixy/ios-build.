@@ -198,7 +198,7 @@ extension AppModel {
     func authenticatedBLEObservation(_ entry: CatalogObject, payload: Data) throws -> AuthenticatedBLEObservation {
         switch entry {
         case .owned(let owner,let object):
-            guard object.kind == "ble", object.ownerCardAvailable, !owner.isMoving(object.id),
+            guard ownerAccessIsUsable(owner.server), object.kind == "ble", object.ownerCardAvailable, !owner.isMoving(object.id),
                   let wrapped = object.wrappedBLESecret, let did = object.bleDeviceID else { throw BLETransportFailure.cancelled }
             let observation = try AuthenticatedBLEObservation.owner(payload:payload,secret:GuestCrypto.decrypt(key:owner.masterKey,envelope:wrapped))
             guard observation.deviceID == did else { throw BLETransportFailure.invalidValue }

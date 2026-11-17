@@ -106,6 +106,26 @@ final class OwnerControlModel: ObservableObject {
         }
     }
     func resume() { active = true; startMissing() }
+    func removeServer(_ server: String, unavailable: Bool = false) {
+        generations.removeValue(forKey:server); workers.removeValue(forKey:server)?.cancel()
+        if let link = links.removeValue(forKey:server) {
+            if let attempt = link.attempt { messages[attempt.objectID] = "Результат не получен. Автоматического повтора не будет." }
+            link.attempt?.timeout?.cancel(); link.live.close()
+        }
+        for target in Array(webhookTasks.keys) {
+            if case .owned(let host,_) = target, host == server {
+                webhookTasks.removeValue(forKey:target)?.cancel(); webhookPositionTasks.removeValue(forKey:target)?.cancel()
+                webhookPositionGeneration.removeValue(forKey:target)
+            }
+        }
+        for (id,request) in Array(notifyPhoneRequests) where request.server == server {
+            notifyPhoneTasks.removeValue(forKey:id)?.cancel(); notifyPhoneRequests.removeValue(forKey:id)
+            automaticPhoneRequests.remove(id); notices.remove(id:id)
+        }
+        phoneRequests.removeAll { $0.server == server }
+        positions.removeValue(forKey:server); onlineDevices.removeValue(forKey:server)
+        if unavailable { connections[server] = .unavailable } else { connections.removeValue(forKey:server) }
+    }
     func suspend() {
         active = false
         webhookTasks.values.forEach { $0.cancel() }
@@ -123,14 +143,15 @@ final class OwnerControlModel: ObservableObject {
     }
     private func startMissing() {
         guard active, app.canManageGuestAccess else { return }
-        for owner in app.owners where !owner.registrationPending && workers[owner.server] == nil {
+        for server in Array(workers.keys) where !app.ownerAccessIsUsable(server) { removeServer(server,unavailable:app.owners.contains { $0.server == server && $0.ownershipLost == true }) }
+        for owner in app.owners where !owner.registrationPending && owner.ownershipLost != true && workers[owner.server] == nil {
             let server = owner.server, generation = UUID()
             generations[server] = generation
             workers[server] = Task { [weak self] in
                 var delay: UInt64 = 1
                 while !Task.isCancelled {
                     guard let self, self.active, self.generations[server] == generation,
-                          let owner = self.app.owners.first(where: { $0.server == server }) else { return }
+                          let owner = self.app.owners.first(where: { $0.server == server && $0.ownershipLost != true }) else { return }
                     self.positions.removeValue(forKey: server)
                     self.onlineDevices.removeValue(forKey: server)
                     self.connections[server] = .connecting
@@ -221,7 +242,7 @@ final class OwnerControlModel: ObservableObject {
             return
         }
         if type == "evicted" || (type == "error" && ["auth", "wrong_device", "bad_fp"].contains(json["reason"] as? String ?? "")) {
-            connections[server] = .unavailable; link.live.close(); return
+            app.recordOwnerAccessLoss(server); connections[server] = .unavailable; link.live.close(); return
         }
         guard link.authenticated else { return }
         if type == "avatar_request", let number = json["number_id"] as? Int, number > 0,
@@ -322,7 +343,7 @@ final class OwnerControlModel: ObservableObject {
 
     private func verifiedPhoneRequest(_ json: [String: Any], server: String, webhookOnly: Bool = false) throws -> OwnerPhoneRequest? {
         guard app.canManageGuestAccess, app.ownerMessages[server] == nil,
-              let owner = app.owners.first(where: { $0.server == server }),
+              let owner = app.owners.first(where: { $0.server == server && $0.ownershipLost != true }),
               let synced = owner.lastSynced, Date().timeIntervalSince(synced) < 120,
               let number = json["number_id"] as? Int,
               let object = owner.objects?.first(where: { $0.numberID == number && $0.pending == nil && $0.available != false }),
@@ -341,7 +362,7 @@ final class OwnerControlModel: ObservableObject {
     }
     private func prunePhoneRequests() {
         phoneRequests = phoneRequests.filter { request in
-            guard let owner = app.owners.first(where: { $0.server == request.server }),
+            guard let owner = app.owners.first(where: { $0.server == request.server && $0.ownershipLost != true }),
                   let object = owner.objects?.first(where: { $0.id == request.objectID && $0.pending == nil && $0.available != false }),
                   let number = object.numberID,
                   (try? owner.authorizedGuest(localID: request.keyID, numberID: number)) != nil else { return false }

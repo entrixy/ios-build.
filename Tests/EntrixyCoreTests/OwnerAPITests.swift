@@ -44,6 +44,38 @@ final class OwnerAPITests: XCTestCase {
         }
         return try JSONSerialization.jsonObject(with: data) as! [String: Any]
     }
+    func testOptionalAccountUsesAndroidEndpointsWithoutSendingOwnerKeysOrFollowingAnotherHost() async throws {
+        OwnerStubProtocol.handler = { request in
+            XCTAssertEqual(request.url?.host,"owner.invalid")
+            let fields = try self.body(request)
+            switch request.url!.lastPathComponent {
+            case "pwa_login.php":
+                XCTAssertEqual(fields as? [String:String],["email":"me@example.test","password":"public-test-password"])
+                return (200,Data(#"{"token":"public-test-account-token"}"#.utf8))
+            case "register_host.php":
+                XCTAssertEqual(fields as? [String:String],["access_code":"public-code","account_token":"public-test-account-token"])
+                return (200,try JSONSerialization.data(withJSONObject:["device_id":self.id,"device_secret":self.secret,"account":true]))
+            default:
+                XCTAssertEqual(request.url?.path,"/api/host_account.php")
+                XCTAssertEqual(fields as? [String:String],["device_id":self.id,"device_secret":self.secret,"account_token":""])
+                return (200,Data(#"{"ok":1,"account":null}"#.utf8))
+            }
+        }
+        let client = api()
+        let token = try await client.accountLogin(server:"owner.invalid",email:"me@example.test",password:"public-test-password")
+        let credentials = try await client.register(server:"owner.invalid",accessCode:"public-code",accountToken:token)
+        let account = try await client.linkAccount(server:"owner.invalid",credentials:credentials,token:nil)
+        XCTAssertNil(account)
+    }
+    func testOwnerSuiteNegotiationRejectsAnExplicitMismatchAndKeepsLegacyFallback() async throws {
+        for (json,expected) in [(#"{"protocol":{"suites":["v2","v1"]}}"#,true),(#"{"protocol":{"suites":["v2"]}}"#,false)] {
+            OwnerStubProtocol.handler = { request in XCTAssertEqual(request.httpMethod,"GET"); XCTAssertEqual(request.url?.path,"/api/meta.php"); return (200,Data(json.utf8)) }
+            let supported = try await api().supportsOwnerSuite(server:"owner.invalid")
+            XCTAssertEqual(supported,expected)
+        }
+        OwnerStubProtocol.handler = { _ in throw URLError(.cannotConnectToHost) }
+        let legacy = try await api().supportsOwnerSuite(server:"owner.invalid"); XCTAssertTrue(legacy)
+    }
 
     func testRegistrationMatchesAndroidAndOmitsLocalSecrets() async throws {
         OwnerStubProtocol.handler = { request in

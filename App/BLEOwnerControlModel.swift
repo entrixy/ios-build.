@@ -21,7 +21,7 @@ import EntrixyCore
     }
     func execute(server: String, objectID: UUID) async {
         guard !busy, app.canManageGuestAccess,
-              let owner = app.owners.first(where: { $0.server == server }),
+              let owner = app.owners.first(where: { $0.server == server && $0.ownershipLost != true }),
               let object = owner.objects?.first(where: { $0.id == objectID }), object.kind == "ble",
               object.ownerCardAvailable,
               let wrapped = object.wrappedBLESecret, let deviceID = object.bleDeviceID,
@@ -35,7 +35,7 @@ import EntrixyCore
             let secret = try GuestCrypto.decrypt(key: owner.masterKey, envelope: wrapped)
             messages[objectID] = "Поиск контроллера поблизости…"
             let found = try await transport.scan(seconds: 5)
-            guard generation == current, app.canManageGuestAccess else { throw BLETransportFailure.cancelled }
+            guard generation == current, app.canManageGuestAccess, app.ownerAccessIsUsable(server) else { throw BLETransportFailure.cancelled }
             // Never connect by name alone. Owner-secret HMAC authenticates the
             // advertised DID, then a fresh GATT nonce is used for the one write.
             let matching = found.filter { discovery in
@@ -90,7 +90,7 @@ import EntrixyCore
     }
     func deliverDecisions(server: String, deviceID: UInt32) async {
         guard !busy, app.canManageGuestAccess,
-              let owner = app.owners.first(where: { $0.server == server }) else { return }
+              let owner = app.owners.first(where: { $0.server == server && $0.ownershipLost != true }) else { return }
         let object = ((owner.objects ?? []) + (owner.bleArchivedObjects ?? [])).first { $0.bleDeviceID == deviceID }
         let pairing = owner.blePairings?.first { $0.deviceID == deviceID && $0.phase == .confirmed }
         guard let wrapped = object?.wrappedBLESecret ?? pairing?.wrappedSecret else { return }
@@ -101,7 +101,7 @@ import EntrixyCore
         do {
             let secret = try GuestCrypto.decrypt(key: owner.masterKey, envelope: wrapped)
             let found = try await transport.scan(seconds: 5)
-            guard generation == current, app.canManageGuestAccess else { throw BLETransportFailure.cancelled }
+            guard generation == current, app.canManageGuestAccess, app.ownerAccessIsUsable(server) else { throw BLETransportFailure.cancelled }
             guard let discovery = found.first(where: { row in
                 guard let payload = row.manufacturerPayload, let verified = try? BLECrypto.verifyAdvertisement(payload, ownerSecret: secret) else { return false }
                 return verified.deviceID == deviceID
@@ -123,7 +123,7 @@ import EntrixyCore
         guard records.isEmpty || hasResults else { throw BLETransportFailure.unsupported }
         let started = uptime()
         for record in records.prefix(16) {
-            guard generation == current, app.canManageGuestAccess, uptime() - started < 20,
+            guard generation == current, app.canManageGuestAccess, app.ownerAccessIsUsable(server), uptime() - started < 20,
                   app.owners.first(where: { $0.server == server })?.bleRevocations?.contains(where: { $0.id == record.id && $0.version == record.version && $0.signature == record.signature }) == true,
                   try record.verify(ownerSecret: secret) else { throw BLETransportFailure.cancelled }
             try await connection.write(record.frame, to: BLECrypto.revokeCharacteristic)

@@ -51,6 +51,7 @@ public struct AndroidBackupDocument: Codable {
     public struct Owner: Codable, Equatable {
         public let server: String
         public let credentials: OwnerCredentials
+        public var email: String? = nil
     }
     public struct Guest: Codable, Equatable {
         public let localID: Int
@@ -132,7 +133,12 @@ public struct AndroidBackupDocument: Codable {
         } else {
             for row in rows {
                 guard let host = row["host"] as? String, let id = row["id"] as? String, let secret = row["secret"] as? String else { throw GuestCrypto.Failure.invalidEnvelope }
-                owners.append(Owner(server: try GuestInvite.normalizeServer(host), credentials: try OwnerCredentials(deviceID: id, deviceSecret: secret)))
+                var account = Owner(server:try GuestInvite.normalizeServer(host),credentials:try OwnerCredentials(deviceID:id,deviceSecret:secret))
+                if let email = row["email"], !(email is NSNull) {
+                    guard let value = email as? String, !value.isEmpty, value.utf8.count <= 512, !value.contains("\r"), !value.contains("\n") else { throw GuestCrypto.Failure.invalidEnvelope }
+                    account.email = value
+                }
+                owners.append(account)
             }
         }
         guard Set(owners.map(\.server)).count == owners.count else { throw GuestCrypto.Failure.invalidEnvelope }

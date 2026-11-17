@@ -23,6 +23,7 @@ struct IOSBackupPayload: Codable {
     /// Present only in a normalized Android import, never in a later iOS
     /// export. Original archives remain preserved separately for unmapped data.
     let androidGuests: [AndroidGuestMigration]?
+    let selectedOwnerServer: String?
     let objectPreferences: ObjectCatalogPreferences?
     init(state: SavedState, created: Date = Date(), androidGuests: [AndroidGuestMigration]? = nil) {
         app = "entrixy-ios"; version = 1; self.created = created; sourceIdentity = state.identity
@@ -38,6 +39,7 @@ struct IOSBackupPayload: Codable {
         ownerGuestDefaults = state.ownerGuestDefaults
         companies = state.companies
         androidArchives = state.androidArchives
+        selectedOwnerServer = state.selectedOwnerServer
         self.androidGuests = androidGuests ?? state.androidPendingGuests?.map { source in
             var exported = source
             // This pending identity was already moved to the exporting iPhone.
@@ -54,10 +56,11 @@ struct IOSBackupPayload: Codable {
         // per-server fingerprint and never use sourceIdentity for authorization.
         let hash = document.archiveID
         let provenance = Data(stride(from:0,to:64,by:2).map { UInt8(hash.dropFirst($0).prefix(2),radix:16)! })
-        let state = SavedState(identity:provenance,guests:[],owners:owners,ownerGuestDefaults:try document.guestDefaults(),companies:try document.companies(),androidArchives:[document])
+        let state = SavedState(identity:provenance,guests:[],owners:owners,ownerGuestDefaults:try document.guestDefaults(),companies:try document.companies(),androidArchives:[document],selectedOwnerServer:try document.primaryServer())
         self.init(state:state,created:document.created,androidGuests:migrations)
     }
     func validate() throws {
+        if let host = selectedOwnerServer { guard try GuestInvite.normalizeServer(host) == host else { throw BackupFailure.invalidPayload } }
         try ownerGuestDefaults?.validate()
         try KnownCompany.validateDirectory(companies ?? [])
         try AndroidBackupDocument.validateArchives(androidArchives ?? [])
@@ -135,6 +138,7 @@ final class BackupManager: ObservableObject {
     @Published private(set) var message: String?
     @Published private(set) var preview: IOSBackupPayload?
     @Published private(set) var exportData: Data?
+    private(set) var exportMaterialIDs = Set<String>()
     @Published private(set) var remainingOwners = 0
     @Published private(set) var remainingGuests = 0
     @Published private(set) var importMessages: [String:String] = [:]
@@ -146,6 +150,7 @@ final class BackupManager: ObservableObject {
         self.app = app; self.guestMover = guestMover; self.refreshAfterRestore = refreshAfterRestore
         updateProgress()
     }
+    func makePresentation() -> BackupPresentation { BackupPresentation(app:app,manager:self) }
 
     func export(password: String) async throws -> Data {
         guard !busy else { throw BackupFailure.busy }
@@ -158,6 +163,7 @@ final class BackupManager: ObservableObject {
         let bytes = try JSONEncoder().encode(payload)
         let encrypted = try await Task.detached(priority: .userInitiated) { try BackupEnvelope.seal(bytes, password: password) }.value
         exportData = encrypted
+        exportMaterialIDs = state.backupMaterialIDs
         return encrypted
     }
 
@@ -259,7 +265,7 @@ final class BackupManager: ObservableObject {
     func refreshImportedGuests() async {
         for source in app.androidPendingGuests { await recoverImportedGuest(source.id) }
     }
-    func clearExport() { exportData = nil }
+    func clearExport() { exportData = nil; exportMaterialIDs = [] }
     func report(_ error: Error) {
         switch error {
         case BackupEnvelope.Failure.passwordOrDamage: message = "Неверный пароль или файл повреждён. Доступы не изменялись."

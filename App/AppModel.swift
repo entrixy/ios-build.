@@ -12,6 +12,7 @@ final class AppModel: ObservableObject {
     @Published private(set) var actionRejections: [String: ActionTapRejection] = [:]
 
     @Published private(set) var owners: [OwnerAccount] = []
+    @Published private(set) var selectedOwnerServer = "entrixy.com"
     @Published private(set) var ownerBusy = false
     @Published private(set) var ownerSnapshots: [String: OwnerSnapshot] = [:]
     @Published private(set) var ownerMessages: [String: String] = [:]
@@ -44,6 +45,10 @@ final class AppModel: ObservableObject {
     @Published var companyRequestID: String?
     @Published var companyGrantRequest: String?
     @Published var guestRemovalTarget: GuestRemovalTarget?
+    @Published var codePrompt: AppCodePrompt?
+    @Published var backupPromptPending = false
+    @Published var serverPrompt: ServerSettingsPrompt?
+    @Published var settingsRequest: SettingsTab?
     @Published private(set) var bleAutomationDisarmed = Set<String>()
     @Published private(set) var cameraActivity: [ObjectReference: UInt64] = [:]
     func noteCameraAction(_ target: ObjectReference) { cameraActivity[target] = (cameraActivity[target] ?? 0) &+ 1 }
@@ -61,6 +66,7 @@ final class AppModel: ObservableObject {
     private var identity = Data()
     private var pendingRestore: BackupRestorePlan?
     lazy var backups = BackupManager(app: self)
+    lazy var backupPresentation = BackupPresentation(app:self,manager:backups)
     lazy var delegationInbox = DelegationInbox(app: self)
     lazy var passManager = PassManager(app: self)
     private lazy var bleTransport = CoreBluetoothTransport()
@@ -123,6 +129,7 @@ final class AppModel: ObservableObject {
             delegatedJournalLedger = state.delegatedJournalLedger ?? DelegatedJournalLedger()
             try delegatedJournalLedger.validate()
             owners = state.owners ?? []
+            selectedOwnerServer = try GuestInvite.normalizeServer(state.selectedOwnerServer ?? owners.first?.server ?? "entrixy.com")
             ownerGuestDefaults = state.ownerGuestDefaults ?? OwnerGuestDefaults()
             companies = state.companies ?? []
             androidArchives = state.androidArchives ?? []
@@ -180,7 +187,7 @@ final class AppModel: ObservableObject {
     private func save(_ updated: [SavedGuest], preferences: ObjectCatalogPreferences? = nil) throws {
         let preferences = preferences ?? objectPreferences
         try preferences.validate()
-        try storage.save(SavedState(identity: identity, guests: updated, journal: journal, actionCode: actionCode, owners: owners, usedOwnerPresses: usedOwnerPresses, pendingRestore: pendingRestore, delegations: delegations, passedAccess: passedAccess, receivedDelegations: receivedDelegations, incomingMessages: incomingMessages, outgoingMessages: outgoingMessages, delegatedJournalLedger: delegatedJournalLedger, appLockEnabled: appLockEnabled, appEntryBiometricEnabled: appEntryBiometricEnabled, objectPreferences: preferences, bleAutomationDisarmed: bleAutomationDisarmed, ownerGuestDefaults: ownerGuestDefaults, companies: companies, androidArchives: androidArchives, androidPendingGuests: androidPendingGuests))
+        try storage.save(SavedState(identity: identity, guests: updated, journal: journal, actionCode: actionCode, owners: owners, usedOwnerPresses: usedOwnerPresses, pendingRestore: pendingRestore, delegations: delegations, passedAccess: passedAccess, receivedDelegations: receivedDelegations, incomingMessages: incomingMessages, outgoingMessages: outgoingMessages, delegatedJournalLedger: delegatedJournalLedger, appLockEnabled: appLockEnabled, appEntryBiometricEnabled: appEntryBiometricEnabled, objectPreferences: preferences, bleAutomationDisarmed: bleAutomationDisarmed, ownerGuestDefaults: ownerGuestDefaults, companies: companies, androidArchives: androidArchives, androidPendingGuests: androidPendingGuests, selectedOwnerServer: selectedOwnerServer))
         guests = updated
         if objectPreferences != preferences { objectPreferences = preferences }
     }
@@ -192,7 +199,9 @@ final class AppModel: ObservableObject {
     }
 
     func makeOwnerLive(_ owner: OwnerAccount) throws -> OwnerLiveTransport {
-        guard storageReady, foreground, let credentials = owner.credentials else { throw GuestCrypto.Failure.invalidEnvelope }
+        guard storageReady, foreground, owner.ownershipLost != true,
+              owners.contains(where:{ $0.server == owner.server && $0.credentials == owner.credentials && $0.ownershipLost != true }),
+              let credentials = owner.credentials else { throw GuestCrypto.Failure.invalidEnvelope }
         return try ownerAPI.live(server: owner.server, credentials: credentials, fingerprint: GuestCrypto.hash(identity + Data(owner.server.utf8)))
     }
 
@@ -349,7 +358,7 @@ final class AppModel: ObservableObject {
         do { try save(guests) } catch { pendingRestore = previous; throw error }
     }
     func beginBackupRestore() throws {
-        guard storageReady, !ownerBusy, !busy else { throw BackupFailure.busy }
+        guard storageReady, foreground, !appLocked, !ownerBusy, !busy else { throw BackupFailure.busy }
         ownerBusy = true; busy = true
         let wasForeground = foreground
         ownerControl.suspend()
@@ -380,6 +389,9 @@ final class AppModel: ObservableObject {
         let existingIndex = updated.firstIndex(where: { $0.server == owner.server })
         do {
             var imported = try existingIndex.map { try updated[$0].mergingBackup(owner) } ?? owner
+            // activate follows a successful explicit host_claim in the durable
+            // restore plan. Ordinary sync can never clear known ownership loss.
+            if owner.credentials != nil { imported.ownershipLost = false }
             imported.lastSynced = nil
             if var objects = imported.objects {
                 for i in objects.indices { objects[i].available = false }
@@ -443,7 +455,7 @@ final class AppModel: ObservableObject {
         let previousPassed = passedAccess
         let previousReceived = receivedDelegations
         let previousIncoming = incomingMessages, previousOutgoing = outgoingMessages
-        let previousLedger = delegatedJournalLedger, previousDefaults = ownerGuestDefaults, previousCompanies = companies, previousArchives = androidArchives
+        let previousLedger = delegatedJournalLedger, previousDefaults = ownerGuestDefaults, previousCompanies = companies, previousArchives = androidArchives, previousServer = selectedOwnerServer
         let restoredPreferences = try objectPreferences.merging(plan.payload.objectPreferences)
         let restoredIncoming = try mergedIncoming(plan.payload.incomingMessages ?? [])
         let existing = Set(journal.map(\.id))
@@ -470,6 +482,7 @@ final class AppModel: ObservableObject {
             outgoingMessages.sort { $0.created > $1.created }; outgoingMessages = Array(outgoingMessages.prefix(100))
             if let ledger = plan.payload.delegatedJournalLedger { try delegatedJournalLedger.merge(ledger) }
             pendingRestore = nil
+            if let host = plan.payload.selectedOwnerServer { selectedOwnerServer = host }
             for company in plan.payload.companies ?? [] where !companies.contains(where:{ $0.id == company.id }) { companies.append(company) }
             try KnownCompany.validateDirectory(companies)
             for archive in plan.payload.androidArchives ?? [] where !androidArchives.contains(where:{ $0.archiveID == archive.archiveID }) { androidArchives.append(archive) }
@@ -487,14 +500,14 @@ final class AppModel: ObservableObject {
             pendingRestore = previousPlan; journal = previousJournal; usedOwnerPresses = previousPresses
             passedAccess = previousPassed; receivedDelegations = previousReceived
             incomingMessages = previousIncoming; outgoingMessages = previousOutgoing
-            delegatedJournalLedger = previousLedger; ownerGuestDefaults = previousDefaults; companies = previousCompanies; androidArchives = previousArchives; throw error
+            delegatedJournalLedger = previousLedger; ownerGuestDefaults = previousDefaults; companies = previousCompanies; androidArchives = previousArchives; selectedOwnerServer = previousServer; throw error
         }
     }
 
     private func saveOwners(_ updated: [OwnerAccount], preferences: ObjectCatalogPreferences? = nil) throws {
         let preferences = preferences ?? objectPreferences
         try preferences.validate()
-        try storage.save(SavedState(identity: identity, guests: guests, journal: journal, actionCode: actionCode, owners: updated, usedOwnerPresses: usedOwnerPresses, pendingRestore: pendingRestore, delegations: delegations, passedAccess: passedAccess, receivedDelegations: receivedDelegations, incomingMessages: incomingMessages, outgoingMessages: outgoingMessages, delegatedJournalLedger: delegatedJournalLedger, appLockEnabled: appLockEnabled, appEntryBiometricEnabled: appEntryBiometricEnabled, objectPreferences: preferences, bleAutomationDisarmed: bleAutomationDisarmed, ownerGuestDefaults: ownerGuestDefaults, companies: companies, androidArchives: androidArchives, androidPendingGuests: androidPendingGuests))
+        try storage.save(SavedState(identity: identity, guests: guests, journal: journal, actionCode: actionCode, owners: updated, usedOwnerPresses: usedOwnerPresses, pendingRestore: pendingRestore, delegations: delegations, passedAccess: passedAccess, receivedDelegations: receivedDelegations, incomingMessages: incomingMessages, outgoingMessages: outgoingMessages, delegatedJournalLedger: delegatedJournalLedger, appLockEnabled: appLockEnabled, appEntryBiometricEnabled: appEntryBiometricEnabled, objectPreferences: preferences, bleAutomationDisarmed: bleAutomationDisarmed, ownerGuestDefaults: ownerGuestDefaults, companies: companies, androidArchives: androidArchives, androidPendingGuests: androidPendingGuests, selectedOwnerServer: selectedOwnerServer))
         owners = updated
         if objectPreferences != preferences { objectPreferences = preferences }
         scheduleOwnerSettingsRefresh()
@@ -631,6 +644,7 @@ final class AppModel: ObservableObject {
     }
 
     func ownerManualActionAllowed(_ object: OwnerObject, server: String, action: GuestAction) -> Bool {
+        guard ownerAccessIsUsable(server) else { rejectOwnerAction(object.id, ProductText.string("ios_server_ownership_lost")); return false }
         do {
             let target = ObjectReference.owned(server:server,objectID:object.id)
             if object.kind == "ble", activeOwnerAction?.automatic == true {
@@ -671,7 +685,7 @@ final class AppModel: ObservableObject {
     }
 
     func saveBLEPairing(_ record: BLEPairingRecord, server: String) throws {
-        guard canManageGuestAccess, !ownerBusy, let index = owners.firstIndex(where: { $0.server == server }),
+        guard canManageGuestAccess, ownerAccessIsUsable(server), !ownerBusy, let index = owners.firstIndex(where: { $0.server == server }),
               owners[index].credentials != nil else { throw BackupFailure.busy }
         var updated = owners
         var records = updated[index].blePairings ?? []
@@ -729,21 +743,43 @@ final class AppModel: ObservableObject {
         do {
             // Save a reservation BEFORE sending. A lost reply survives process death.
             var reserved = try OwnerAccount(server:host); reserved.hostLabel = ownerGuestDefaults.ownerName
+            var settings = OwnerServerSettings(); settings.accessCode = accessCode
+            try settings.validate(); reserved.serverSettings = settings
             try saveOwners(owners + [reserved])
         } catch {
             errorMessage = "Не удалось сохранить сервер в защищённом хранилище. Регистрация не отправлялась."
             return false
         }
+        return await registerReservedOwner(host,accessCode:accessCode,accountToken:nil,suiteChecked:false)
+    }
+
+    private func registerReservedOwner(_ host: String,accessCode: String,accountToken: String?,suiteChecked: Bool) async -> Bool {
         do {
-            let credentials = try await ownerAPI.register(server: host, accessCode: accessCode)
+            if !suiteChecked, !(try await ownerAPI.supportsOwnerSuite(server:host)) { errorMessage = ProductText.string("server_suite_mismatch"); return false }
+            guard canManageGuestAccess, let index = owners.firstIndex(where:{ $0.server == host }), owners[index].canRegisterSafely else { return false }
+            var updated = owners
+            try updated[index].markRegistrationSent()
+            if updated[index].serverSettings?.pendingAccount != nil { updated[index].serverSettings?.pendingAccount?.sent = true }
+            try saveOwners(updated)
+            let credentials = try await ownerAPI.register(server:host,accessCode:accessCode,accountToken:accountToken)
             unsavedOwnerCredentials[host] = credentials
             try persistOwnerCredentials(host)
             await syncOwner(host)
             return true
         } catch {
-            ownerMessages[host] = unsavedOwnerCredentials[host] == nil
-                ? "Ответ о регистрации не получен или не подтверждён. Повторная регистрация заблокирована, чтобы не создать второго владельца."
-                : "Ответ получен, но сохранить доступ не удалось. Нажмите «Сохранить доступ», не закрывая приложение."
+            if let failure = error as? OwnerAPI.Failure, failure.code == "access_denied", (400..<500).contains(failure.status),
+               let index = owners.firstIndex(where:{ $0.server == host && $0.credentials == nil }) {
+                var updated = owners
+                do {
+                    try updated[index].rejectRegistration(); try saveOwners(updated)
+                    ownerMessages[host] = ProductText.string("server_access_denied"); errorMessage = ownerMessages[host]; return false
+                } catch { /* retain the sent reservation if the rejection cannot be saved */ }
+            }
+            if unsavedOwnerCredentials[host] != nil {
+                ownerMessages[host] = "Ответ получен, но сохранить доступ не удалось. Нажмите «Сохранить доступ», не закрывая приложение."
+            } else if owners.first(where:{ $0.server == host })?.canRegisterSafely == true {
+                ownerMessages[host] = ProductText.string("ios_server_save_failed")
+            } else { ownerMessages[host] = ProductText.string("ios_server_registration_uncertain") }
             errorMessage = ownerMessages[host]
             return false
         }
@@ -754,7 +790,9 @@ final class AppModel: ObservableObject {
               let index = owners.firstIndex(where: { $0.server == host }) else { return }
         var updated = owners
         updated[index].credentials = credentials
-        try saveOwners(updated)
+        updated[index].registrationPhase = nil
+        let previous = selectedOwnerServer; selectedOwnerServer = host
+        do { try saveOwners(updated) } catch { selectedOwnerServer = previous; throw error }
         unsavedOwnerCredentials.removeValue(forKey: host)
         ownerMessages.removeValue(forKey: host)
     }
@@ -770,16 +808,17 @@ final class AppModel: ObservableObject {
     }
 
     private func syncOwner(_ host: String, fulfillDelegations: Bool = true) async {
-        guard let credentials = owners.first(where: { $0.server == host })?.credentials else { return }
+        guard let credentials = owners.first(where: { $0.server == host && $0.ownershipLost != true })?.credentials else { return }
         do {
             let fingerprint = GuestCrypto.hash(identity + Data(host.utf8))
             let data = try await ownerAPI.sync(server: host, credentials: credentials, fingerprint: fingerprint)
             let snapshot = try OwnerSnapshot.decode(data)
             guard pendingRestore == nil else { return }
-            guard let index = owners.firstIndex(where: { $0.server == host }) else { return }
+            guard let index = owners.firstIndex(where: { $0.server == host && $0.ownershipLost != true && $0.credentials == credentials }) else { return }
             let previousObjects = owners[index].objects ?? []
             var updated = owners
             try updated[index].reconcileObjects(snapshot)
+            try updated[index].reconcileAccount(snapshot)
             updated[index].reservedGuestIDs = allReservedGuestIDs()
             try updated[index].reconcileAndroidKeys(snapshot)
             try updated[index].reconcileIssuedKeys(snapshot)
@@ -803,7 +842,8 @@ final class AppModel: ObservableObject {
             if fulfillDelegations { await fulfillVerifiedDelegations(server: host) }
         } catch {
             let code = (error as? OwnerAPI.Failure)?.code
-            ownerMessages[host] = ["evicted", "wrong_device"].contains(code ?? "")
+            if ["evicted", "wrong_device", "bad_fp"].contains(code ?? "") { recordOwnerAccessLoss(host) }
+            ownerMessages[host] = ["evicted", "wrong_device", "bad_fp"].contains(code ?? "")
                 ? "Доступ закреплён за другим устройством. Нужен явный перенос доступа."
                 : (code == "auth" ? "Сервер отклонил доступ владельца. Новая регистрация автоматически не создаётся."
                    : "Не удалось обновить данные сервера. Сохранённый доступ не изменён.")
@@ -1477,6 +1517,9 @@ final class AppModel: ObservableObject {
     }
 
     func suspend() {
+        codePrompt = nil
+        serverPrompt = nil
+        backupPresentation.cancel()
         automation.suspend(); automaticPermits.removeAll()
         ownerSettingsTask?.cancel(); ownerSettingsTask = nil; ownerSettingsTaskGeneration = nil
         delegationInbox.suspend()
@@ -2094,7 +2137,7 @@ extension AppModel {
         ownerActionRejections.removeValue(forKey: objectID)
         do {
             guard foreground, canManageGuestAccess, !busy, !ownerBusy,
-                  let owner = owners.first(where: { $0.server == server }), !owner.registrationPending,
+                  let owner = owners.first(where: { $0.server == server && $0.ownershipLost != true }), !owner.registrationPending,
                   let object = owner.objects?.first(where: { $0.id == objectID }), object.ownerCardAvailable, !owner.isMoving(objectID) else {
                 throw ActionDenied.message("Объект сейчас недоступен.")
             }
@@ -2274,6 +2317,10 @@ extension AppModel {
         do { try save(guests) } catch { actionCode = saved; throw error }
         authorizedIntent = nil
         return true
+    }
+    func verifySettingsCode(_ code: String) async throws -> Bool {
+        guard canManageGuestAccess else { return false }
+        return try await authorizeCode(code,authentication:"pin",requestID:nil)
     }
 }
 
@@ -2607,6 +2654,134 @@ extension AppModel {
         if armed { bleAutomationDisarmed.remove(target.id) } else { bleAutomationDisarmed.insert(target.id) }
         guard bleAutomationDisarmed != prior else { return }
         do { try save(guests) } catch { bleAutomationDisarmed = prior; throw error }
+    }
+}
+
+extension AppModel {
+    func ownerAccessIsUsable(_ host: String) -> Bool {
+        owners.contains { $0.server == host && $0.credentials != nil && $0.ownershipLost != true }
+    }
+
+    /// Once this device learns that its claim was lost, offline owner secrets
+    /// cannot keep authorizing commands. Keep the denial even if storage fails.
+    func recordOwnerAccessLoss(_ host: String) {
+        guard let index = owners.firstIndex(where:{ $0.server == host }), owners[index].ownershipLost != true else { return }
+        var updated = owners; updated[index].ownershipLost = true
+        owners = updated
+        ownerMessages[host] = ProductText.string("ios_server_ownership_lost")
+        ownerSnapshots.removeValue(forKey:host)
+        ownerControl.removeServer(host,unavailable:true)
+        automaticPermits = automaticPermits.filter { if case .owned(let server,_) = $0.key { return server != host }; return true }
+        do { try saveOwners(updated) }
+        catch { errorMessage = ProductText.string("ios_server_loss_save_failed") }
+    }
+
+    @discardableResult func forgetOwnerServer(_ host: String) -> Bool {
+        guard canManageGuestAccess, !ownerBusy, !busy, host != "entrixy.com",
+              host == selectedOwnerServer || owners.contains(where:{ $0.server == host }) else { return false }
+        let owner = owners.first(where:{ $0.server == host })
+        guard !bleControl.busy, !blePairing.busy, !bleGuestControl.busy,
+              !owners.contains(where:{ account in !(account.bleMoves ?? []).filter { account.server == host || $0.destination == host }.isEmpty }) else {
+            errorMessage = ProductText.string("ios_server_forget_busy"); return false
+        }
+        let priorServer = selectedOwnerServer, priorOutgoing = outgoingMessages, priorLatches = bleAutomationDisarmed
+        let targets = Set(((owner?.objects ?? []) + (owner?.bleArchivedObjects ?? [])).map { ObjectReference.owned(server:host,objectID:$0.id) })
+        var preferences = objectPreferences
+        preferences.order.removeAll { if case .owned(let server,_) = $0 { return server == host }; return false }
+        if selectedOwnerServer == host { selectedOwnerServer = "entrixy.com" }
+        outgoingMessages.removeAll { if case .owner(let server,_) = $0.target { return server == host }; return false }
+        bleAutomationDisarmed = bleAutomationDisarmed.filter { !$0.hasPrefix("owner:" + host + ":") }
+        do { try saveOwners(owners.filter { $0.server != host },preferences:preferences) }
+        catch {
+            selectedOwnerServer = priorServer; outgoingMessages = priorOutgoing; bleAutomationDisarmed = priorLatches
+            errorMessage = ProductText.string("ios_server_save_failed"); return false
+        }
+        // No registration, delete, revoke or other server request is sent.
+        ownerControl.removeServer(host)
+        ownerSnapshots.removeValue(forKey:host); ownerMessages.removeValue(forKey:host)
+        unverifiedOwnerDelegations.removeValue(forKey:host); unsavedOwnerCredentials.removeValue(forKey:host)
+        for object in (owner?.objects ?? []) + (owner?.bleArchivedObjects ?? []) {
+            ownerObjectMessages.removeValue(forKey:object.id); unsavedOwnerObjects.removeValue(forKey:object.id); ownerActionRejections.removeValue(forKey:object.id)
+        }
+        for key in owner?.issuedKeys ?? [] {
+            unsavedOwnerKeys.removeValue(forKey:key.id); ownerKeyMessages.removeValue(forKey:key.id); editingOwnerKeys.remove(key.id)
+        }
+        for key in owner?.delegatedKeys ?? [] { ownerDelegationMessages.removeValue(forKey:key.id) }
+        if activeOwnerAction?.server == host { activeOwnerAction = nil; authorizedIntent = nil }
+        automaticPermits = automaticPermits.filter { !targets.contains($0.key) }
+        automaticConsumedAt = automaticConsumedAt.filter { !targets.contains($0.key) }
+        bleVisibleUntil = bleVisibleUntil.filter { !targets.contains($0.key) }
+        return true
+    }
+
+    @discardableResult func selectOwnerServer(_ value: String) -> Bool {
+        guard canManageGuestAccess, !ownerBusy, !busy,
+              let host = try? GuestInvite.normalizeServer(value),
+              host == "entrixy.com" || owners.contains(where:{ $0.server == host && $0.credentials != nil && $0.ownershipLost != true }) else { return false }
+        let previous = selectedOwnerServer; selectedOwnerServer = host
+        do { try save(guests); return true }
+        catch { selectedOwnerServer = previous; errorMessage = ProductText.string("ios_server_save_failed"); return false }
+    }
+
+    func saveServerConfiguration(server: String,accessCode: String,email: String,password: String) async -> Bool {
+        guard canManageGuestAccess, !ownerBusy, !busy else { return false }
+        let host: String
+        do { host = try GuestInvite.normalizeServer(server) }
+        catch { errorMessage = ProductText.string("server_add_failed"); return false }
+        let mail = email.trimmingCharacters(in:.whitespacesAndNewlines)
+        guard mail.isEmpty == password.isEmpty else { errorMessage = ProductText.string("server_account_failed"); return false }
+        if owners.contains(where:{ $0.server == host && $0.ownershipLost == true }) { errorMessage = ProductText.string("ios_server_ownership_lost"); return false }
+        if let owner = owners.first(where:{ $0.server == host && $0.registrationPending }), !owner.canRegisterSafely {
+            errorMessage = ownerMessages[host] ?? ProductText.string("ios_server_registration_uncertain"); return false
+        }
+        ownerBusy = true; defer { ownerBusy = false }
+        do {
+            guard try await ownerAPI.supportsOwnerSuite(server:host) else { errorMessage = ProductText.string("server_suite_mismatch"); return false }
+            let token = mail.isEmpty ? nil : try await ownerAPI.accountLogin(server:host,email:mail,password:password)
+            guard canManageGuestAccess else { return false }
+            var updated = owners
+            if !updated.contains(where:{ $0.server == host }) {
+                var reserved = try OwnerAccount(server:host); reserved.hostLabel = ownerGuestDefaults.ownerName
+                updated.append(reserved)
+            }
+            let index = updated.firstIndex(where:{ $0.server == host })!
+            var settings = updated[index].serverSettings ?? OwnerServerSettings()
+            settings.accessCode = accessCode.trimmingCharacters(in:.whitespacesAndNewlines)
+            if token != nil { settings.pendingAccount = OwnerAccountLinkIntent(email:mail) }
+            try settings.validate(); updated[index].serverSettings = settings
+            try saveOwners(updated)
+            if owners[index].credentials == nil {
+                return await registerReservedOwner(host,accessCode:settings.accessCode,accountToken:token,suiteChecked:true)
+            }
+            if let token { return await changeServerAccount(host,email:mail,token:token) }
+            await syncOwner(host)
+            return true
+        } catch { errorMessage = ProductText.string(mail.isEmpty ? "server_add_failed" : "server_account_failed"); return false }
+    }
+
+    private func changeServerAccount(_ host: String,email: String?,token: String?) async -> Bool {
+        guard let index = owners.firstIndex(where:{ $0.server == host }), let credentials = owners[index].credentials else { return false }
+        do {
+            var updated = owners
+            var settings = updated[index].serverSettings ?? OwnerServerSettings()
+            var intent = OwnerAccountLinkIntent(email:email); intent.sent = true
+            settings.pendingAccount = intent; try settings.validate(); updated[index].serverSettings = settings
+            try saveOwners(updated)
+            let confirmed = try await ownerAPI.linkAccount(server:host,credentials:credentials,token:token)
+            guard confirmed?.lowercased() == email?.lowercased(),
+                  let current = owners.firstIndex(where:{ $0.server == host && $0.credentials == credentials }) else { throw GuestCrypto.Failure.invalidEnvelope }
+            updated = owners
+            updated[current].serverSettings?.accountEmail = confirmed
+            updated[current].serverSettings?.pendingAccount = nil
+            try saveOwners(updated)
+            await syncOwner(host)
+            return true
+        } catch { errorMessage = ProductText.string("ios_server_account_uncertain"); return false }
+    }
+    func unlinkServerAccount(_ host: String) async -> Bool {
+        guard canManageGuestAccess, !ownerBusy, !busy else { return false }
+        ownerBusy = true; defer { ownerBusy = false }
+        return await changeServerAccount(host,email:nil,token:nil)
     }
 }
 

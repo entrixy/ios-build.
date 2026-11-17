@@ -4,6 +4,10 @@ import FoundationNetworking
 #endif
 
 public protocol OwnerTransport {
+    func supportsOwnerSuite(server: String) async throws -> Bool
+    func accountLogin(server: String, email: String, password: String) async throws -> String
+    func linkAccount(server: String, credentials: OwnerCredentials, token: String?) async throws -> String?
+    func register(server: String, accessCode: String, accountToken: String?) async throws -> OwnerCredentials
     func companyInvite(server: String, code: String) async throws -> KnownCompany
     func companyClaim(server: String, credentials: OwnerCredentials, code: String) async throws
     func live(server: String, credentials: OwnerCredentials, fingerprint: String) throws -> OwnerLiveTransport
@@ -13,6 +17,13 @@ public protocol OwnerTransport {
 }
 
 public extension OwnerTransport {
+    func supportsOwnerSuite(server: String) async throws -> Bool { true }
+    func accountLogin(server: String, email: String, password: String) async throws -> String { throw GuestCrypto.Failure.invalidEnvelope }
+    func linkAccount(server: String, credentials: OwnerCredentials, token: String?) async throws -> String? { throw GuestCrypto.Failure.invalidEnvelope }
+    func register(server: String, accessCode: String, accountToken: String?) async throws -> OwnerCredentials {
+        guard accountToken == nil else { throw GuestCrypto.Failure.invalidEnvelope }
+        return try await register(server:server,accessCode:accessCode)
+    }
     func companyInvite(server: String, code: String) async throws -> KnownCompany { throw GuestCrypto.Failure.invalidEnvelope }
     func companyClaim(server: String, credentials: OwnerCredentials, code: String) async throws { throw GuestCrypto.Failure.invalidEnvelope }
     func live(server: String, credentials: OwnerCredentials, fingerprint: String) throws -> OwnerLiveTransport { throw GuestCrypto.Failure.invalidEnvelope }
@@ -47,13 +58,52 @@ public final class OwnerAPI: OwnerTransport {
     }
 
     public func register(server: String, accessCode: String = "") async throws -> OwnerCredentials {
-        let fields = accessCode.isEmpty ? [:] : ["access_code": accessCode]
+        try await register(server:server,accessCode:accessCode,accountToken:nil)
+    }
+    public func register(server: String, accessCode: String, accountToken: String?) async throws -> OwnerCredentials {
+        guard accessCode.utf8.count <= 8192, (accountToken?.utf8.count ?? 0) <= 32768 else { throw GuestCrypto.Failure.invalidEnvelope }
+        var fields = accessCode.isEmpty ? [:] : ["access_code": accessCode]
+        if let accountToken { guard !accountToken.isEmpty else { throw GuestCrypto.Failure.invalidEnvelope }; fields["account_token"] = accountToken }
         let data = try await post(server: server, endpoint: "register_host", body: fields)
         guard let body = try JSONSerialization.jsonObject(with: data) as? [String: Any],
               let id = body["device_id"] as? String, let secret = body["device_secret"] as? String else {
             throw Failure(status: 200, code: "invalid_registration")
         }
         return try OwnerCredentials(deviceID: id, deviceSecret: secret)
+    }
+
+    public func supportsOwnerSuite(server: String) async throws -> Bool {
+        let host = try GuestInvite.normalizeServer(server)
+        guard let url = URL(string:"https://\(host)/api/meta.php") else { throw GuestCrypto.Failure.invalidEnvelope }
+        do {
+            let (data,_) = try await session.data(from:url)
+            guard data.count <= 4_194_304, let json = try JSONSerialization.jsonObject(with:data) as? [String:Any] else { throw GuestCrypto.Failure.invalidEnvelope }
+            let protocolInfo = json["protocol"] as? [String:Any]
+            let suites = protocolInfo?["suites"] as? [String] ?? []
+            return suites.contains("v1")
+        } catch {
+            // Api.agreedSuite keeps the original v1 fallback for old/unavailable
+            // metadata. Actual signed requests still have to pass server auth.
+            return true
+        }
+    }
+    public func accountLogin(server: String, email: String, password: String) async throws -> String {
+        guard !email.isEmpty, email.utf8.count <= 512, !password.isEmpty, password.utf8.count <= 4096 else { throw GuestCrypto.Failure.invalidEnvelope }
+        let data = try await post(server:server,endpoint:"pwa_login",body:["email":email,"password":password])
+        guard let json = try JSONSerialization.jsonObject(with:data) as? [String:Any],
+              let token = json["token"] as? String, !token.isEmpty, token.utf8.count <= 32768 else { throw GuestCrypto.Failure.invalidEnvelope }
+        return token
+    }
+    public func linkAccount(server: String, credentials: OwnerCredentials, token: String?) async throws -> String? {
+        try credentials.validate()
+        guard (token?.utf8.count ?? 0) <= 32768 else { throw GuestCrypto.Failure.invalidEnvelope }
+        let data = try await post(server:server,endpoint:"host_account",body:["device_id":credentials.deviceID,"device_secret":credentials.deviceSecret,"account_token":token ?? ""])
+        guard let json = try JSONSerialization.jsonObject(with:data) as? [String:Any],
+              (json["ok"] as? NSNumber)?.boolValue == true, let account = json["account"] else { throw GuestCrypto.Failure.invalidEnvelope }
+        if account is NSNull { return nil }
+        guard let email = account as? String, !email.isEmpty, email.utf8.count <= 512,
+              !email.contains("\r"), !email.contains("\n") else { throw GuestCrypto.Failure.invalidEnvelope }
+        return email
     }
 
     public func sync(server: String, credentials: OwnerCredentials, fingerprint: String) async throws -> Data {

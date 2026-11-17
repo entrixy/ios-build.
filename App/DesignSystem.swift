@@ -103,7 +103,7 @@ extension View {
         else { self }
     }
 
-    func sheetDismissFooter(_ title: String = "Отмена", disabled: Bool = false,
+    func sheetDismissFooter(_ title: String = ProductText.string("btn_cancel"), disabled: Bool = false,
                             action: @escaping () -> Void) -> some View {
         modifier(SheetDismissFooter(title: title, disabled: disabled, action: action))
     }
@@ -168,7 +168,7 @@ struct AppConfirmationDialog: View {
                 Text(title).font(.title3.bold()).accessibilityAddTraits(.isHeader)
                 Text(message).font(.body).fixedSize(horizontal: false, vertical: true)
                 HStack(spacing: 12) {
-                    Button("Отмена", action: cancel).buttonStyle(SecondaryActionStyle())
+                    Button(ProductText.string("btn_cancel"), action: cancel).buttonStyle(SecondaryActionStyle())
                     Button(role: destructive ? .destructive : nil, action: confirm) { Text(actionTitle) }
                         .buttonStyle(PrimaryActionStyle())
                 }

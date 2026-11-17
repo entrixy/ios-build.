@@ -10,6 +10,16 @@ final class AndroidOwnerAdapterTests: XCTestCase {
             "created": 1_800_000_000, "device": "Public fixture", "count": entries.count, "entries": entries]))
     }
     private func json(_ value: Any) throws -> String { String(data: try JSONSerialization.data(withJSONObject: value), encoding: .utf8)! }
+    func testPerServerAccessCodeAndAccountEmailStayScopedWithoutSignInSecrets() throws {
+        let id = String(repeating:"a",count:32), secret = String(repeating:"b",count:64)
+        let accounts: [[String:Any]] = [["host":"first.invalid","id":id,"secret":secret,"email":"one@example.test"],["host":"second.invalid","id":id,"secret":secret,"email":"two@example.test"]]
+        let source = try document(["owner_accounts":json(accounts),"access_code_first.invalid":"first-code","access_code_second.invalid":"second-code"])
+        let owners = try AndroidOwnerAdapter.owners(from:source)
+        let first = try XCTUnwrap(owners.first { $0.server == "first.invalid" }), second = try XCTUnwrap(owners.first { $0.server == "second.invalid" })
+        XCTAssertEqual(first.serverSettings?.accountEmail,"one@example.test"); XCTAssertEqual(first.serverSettings?.accessCode,"first-code")
+        XCTAssertEqual(second.serverSettings?.accountEmail,"two@example.test"); XCTAssertEqual(second.serverSettings?.accessCode,"second-code")
+        XCTAssertEqual(first.credentials?.deviceID,id); XCTAssertNil(first.serverSettings?.pendingAccount); XCTAssertNil(first.registrationPhase)
+    }
     func testMultiServerAliasesObjectKeysSocketBLESecretsAndSignedRevokesSurviveTranslation() throws {
         let keyA = Data(repeating: 8, count: 32), keyB = Data(repeating: 9, count: 32)
         let bleSecret = Data(repeating: 10, count: 32), socket = Data(repeating: 11, count: 32)

@@ -24,7 +24,7 @@ enum CatalogObject: Identifiable {
         }
     }
     var canControl: Bool {
-        switch self { case let .owned(_, object): return object.ownerCardAvailable; case .received: return true }
+        switch self { case let .owned(owner, object): return owner.ownershipLost != true && object.ownerCardAvailable; case .received: return true }
     }
 }
 

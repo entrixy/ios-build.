@@ -342,3 +342,95 @@ its result to these later changes. No UI captures or publication were made.
 Remaining Android preferences such as incoming local automation overrides and
 passed-link presentation must still be mapped before claiming full backup parity;
 retaining their original archive is preservation, not a claim that they are active.
+
+## Header, help and entry-code presentation — source checkpoint
+
+Android MainActivity's Help / language actions are now at the right of the main
+header, with all seven original flags copied byte for byte at their source
+scales and recorded in asset-provenance.json. Help uses the same six sections and
+localized guide links (all seven return HTTPS 200). iOS permissions/call behavior
+and current foreground automation are described accurately; Android battery/OEM
+instructions and unverified background promises are not copied. Changing language
+rebuilds the visible navigation content while preserving the protected AppModel.
+This is not a claim that every remaining legacy hardcoded message is translated.
+
+System order starts with Android's theme choices, then the actual entry-code
+controls, then backup and servers. Code setup/change and protected lock/biometric
+transitions use the common compact dialog over RootView, no task branding or
+header cancellation. Existing model persistence, PBKDF/lockout and current-code
+checks remain authoritative. A new UI scenario sets a code, verifies wrong-code
+rejection when disabling entry lock, then disables it with the correct code.
+
+App/hosted/UI source parses, seven string tables validate without duplicate keys,
+21 flag resource hashes match Android and diff whitespace passes. Apple build,
+new native UI interactions and final visual acceptance of this checkpoint remain
+pending. Functional CI of the previous source is separate. Backup/server controls
+and remaining global settings still need the rest of their Android presentation
+and service flows. No new screenshots or gallery changes.
+
+## Backup presentation — working source
+
+System now has the Android-positioned Create / Restore actions directly after
+entry code. Passwords, file review, progress and result use the shared compact
+root dialog; Files and Share are native system presenters. The legacy standalone
+backup route reuses these same controls. Opening an .eib or .ekb document prepares
+that import UI after app unlock; it never restores automatically. Existing
+protected Backend/claim and conflict checks remain in BackupManager.
+
+Password cancellation writes no access state; file cancellation does not mark a
+backup saved. Reminders compare captured exported key material with current
+material rather than marking every journal/socket update stale. Large provider
+files are bounded before decryption. Backgrounding clears password fields and
+invalidates a pending presentation; an already-started migration keeps its durable
+checkpoints. Encrypted temporary share files are removed after sharing ends.
+
+All source parses, localized string tables validate and whitespace checks pass.
+Two new hosted cases cover cancellation and an oversized provider file; their
+Apple execution is pending. This checkpoint does not establish live Files/Share,
+keyboard layout or UI acceptance. No screenshots were taken.
+
+
+## Server settings and owner account safety — current source, 17 November
+
+Android SettingsScreen.kt's server list is now inline in System, default host first,
+custom hosts sorted, current-host radio, scoped account email, aligned edit/trash
+icons and a neutral Add Server button. Editing uses the shared root AppDialogSurface,
+immutable existing host, access code, optional account credentials or linked-email
+unlink, and common filled Cancel/Save controls. No second server menu or object-
+creation chooser: new objects use the selected System server. iOS scopes existing
+connections by host and does not need Android's process-restart dialog.
+
+The Android API endpoints/fields are preserved: optional meta v1 compatibility,
+pwa_login, register_host account_token/access_code and host_account; password and
+account token exist only for the one operation, never protected state or backups.
+The server account/email and access code survive iOS backup and Android import.
+Registration preparation and SENT are durable before wire; a definitive access-code
+rejection allows an explicit same-master retry, while ambiguous/legacy sent state
+cannot register another owner. Account changes keep a durable pending intent until
+an authenticated account field confirms its exact target; absence is not unlink.
+
+Forget removes only the selected local owner/issued material, scoped unsaved state,
+order, outgoing messages and sessions; it sends no revoke/delete/register request.
+Received keys on the same host, other owners and actual journal history survive.
+It is blocked during Bluetooth operations or an unfinished cross-server move.
+Restoring old owner credentials requires a backup; simply registering again cannot
+promise recovery of anonymous server ownership. Original Android import archives
+remain protected for unmapped preferences, as for the rest of Android restoration.
+
+Known eviction/wrong-device/bad-fingerprint stops only that owner's live session,
+commands, guest phone requests and owner BLE FIRE/revocation/pairing. Denial stays
+in memory if persisting it fails; ordinary sync cannot reactivate it. Only a
+successful explicit backup claim can clear the flag. This does not change controller
+wire secrets or pretend that an offline phone can learn an unknown eviction.
+
+Local core225 tests zero and Swift frontend syntax passed. Nine new hosted cases
+(7 server state/API scenarios and 2 BLE loss-at-scan/nonce cases), and one new UI
+server-dialog inspection test are SOURCE ONLY until the next Apple run. Local
+syntax is not Xcode typechecking or UI acceptance. The prior native120 success
+belongs to nativeeec6bb2/public8fa9d3e, excluding this new block. All new screens
+still need actual iOS visual review. No screenshots or website publication yet.
+
+The supplied live PHP checkout has host_account.php but no pwa_login.php; account
+sign-in was tested with recorded HTTP fixtures only. Deployment of that Android
+endpoint and live account integration must be verified before claiming account
+sign-in works on that server. No real password/account/physical controller was used.

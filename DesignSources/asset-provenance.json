@@ -73,5 +73,110 @@
     "asset": "icon-key",
     "source": "https://github.com/google/material-design-icons/blob/10ecc14790612ca8fd164e3f4ffe9c16fc50d5b7/src/communication/vpn_key/materialiconsoutlined/24px.svg",
     "sha256": "c5851000083b6a32aff7776edf27387e01751f7b8b21d85c07754e7a13ed6de8"
+  },
+  {
+    "asset": "flag-en-1x",
+    "source": "Android res/drawable-mdpi/flag_en.png",
+    "sha256": "f567e36bb953396d5b9775c3aa9e5b8421cad36ff033a7857e68c787458d87bb"
+  },
+  {
+    "asset": "flag-en-2x",
+    "source": "Android res/drawable-xhdpi/flag_en.png",
+    "sha256": "9d191ee39bff02ed5b96601906136818f63ea11310413d09b251246bea6f2f5a"
+  },
+  {
+    "asset": "flag-en-3x",
+    "source": "Android res/drawable-xxhdpi/flag_en.png",
+    "sha256": "3db9e6a1b3a9425b4a0a1ea03109294b0b53336fe70dd4117b0ef639089045fa"
+  },
+  {
+    "asset": "flag-zh-1x",
+    "source": "Android res/drawable-mdpi/flag_zh.png",
+    "sha256": "3678b81a33c99b83f6b879523161e89a8f35f57f0f538a28ce59dae6f4cb1405"
+  },
+  {
+    "asset": "flag-zh-2x",
+    "source": "Android res/drawable-xhdpi/flag_zh.png",
+    "sha256": "2749e588f0baa6ed4bd5199fe891cfb278d7216cba30fb30c090c0c477838012"
+  },
+  {
+    "asset": "flag-zh-3x",
+    "source": "Android res/drawable-xxhdpi/flag_zh.png",
+    "sha256": "752ac1b20541b8d2a0bea66c9c38c0fb2f258d41dac2d17639082d700341aa9f"
+  },
+  {
+    "asset": "flag-es-1x",
+    "source": "Android res/drawable-mdpi/flag_es.png",
+    "sha256": "88dc11376fe5d2c3853fbe4a1c35c24ac3698679e5bc2539cfae8c368eb31771"
+  },
+  {
+    "asset": "flag-es-2x",
+    "source": "Android res/drawable-xhdpi/flag_es.png",
+    "sha256": "90adaf62761ef6235626d177ebcf75a5457b9f98c8907f770eea8e9e5306d1f8"
+  },
+  {
+    "asset": "flag-es-3x",
+    "source": "Android res/drawable-xxhdpi/flag_es.png",
+    "sha256": "690f8674733ac3000607eedfb43c4627723e2f3645957853e54cf931fc628b65"
+  },
+  {
+    "asset": "flag-fr-1x",
+    "source": "Android res/drawable-mdpi/flag_fr.png",
+    "sha256": "f3cb69e7832357334c6f7a05416c6534fd706699d74c6521cc97e5401ec7b58c"
+  },
+  {
+    "asset": "flag-fr-2x",
+    "source": "Android res/drawable-xhdpi/flag_fr.png",
+    "sha256": "51920eec5d1bfbf5fa835d01919aec24af1b12beace2ad5b7dd0d22bc5951116"
+  },
+  {
+    "asset": "flag-fr-3x",
+    "source": "Android res/drawable-xxhdpi/flag_fr.png",
+    "sha256": "83b15c2328f7de31d4093694b41e8c4c0a19f7797618178cec635cc162fc16d0"
+  },
+  {
+    "asset": "flag-pt-1x",
+    "source": "Android res/drawable-mdpi/flag_pt.png",
+    "sha256": "1211ade747937b7e5ce507329597f13d70ee6b2c249ca556b21a9011ca361530"
+  },
+  {
+    "asset": "flag-pt-2x",
+    "source": "Android res/drawable-xhdpi/flag_pt.png",
+    "sha256": "6365aeeb254a44e473ef5cb0e154925f20fde5e3ae949ae52ba86f1491f245b2"
+  },
+  {
+    "asset": "flag-pt-3x",
+    "source": "Android res/drawable-xxhdpi/flag_pt.png",
+    "sha256": "786ec7bbbd241e33ee8828fd8c92706566e8db69fc821cf767fa275501994c69"
+  },
+  {
+    "asset": "flag-ru-1x",
+    "source": "Android res/drawable-mdpi/flag_ru.png",
+    "sha256": "a15012dcd6d9485c293ec392dbe0b889f19342787e827152083528b3f0124034"
+  },
+  {
+    "asset": "flag-ru-2x",
+    "source": "Android res/drawable-xhdpi/flag_ru.png",
+    "sha256": "29491593a20bffab091d645d1a60b4c8811a463727844b8f28a1abdcd565df32"
+  },
+  {
+    "asset": "flag-ru-3x",
+    "source": "Android res/drawable-xxhdpi/flag_ru.png",
+    "sha256": "f924fbd336a0332417cea8d68bbd839f7d10b05f1dc4ea969d2a75bac1c4b1d5"
+  },
+  {
+    "asset": "flag-de-1x",
+    "source": "Android res/drawable-mdpi/flag_de.png",
+    "sha256": "d65733a8a42a68dbd96162d0584146ba340ee1b7f735a54beb09ae8b0bec221f"
+  },
+  {
+    "asset": "flag-de-2x",
+    "source": "Android res/drawable-xhdpi/flag_de.png",
+    "sha256": "213af2df69e41f4a1d84982604a63d9493e3694e360ec4a2429b6f7ff7e001a2"
+  },
+  {
+    "asset": "flag-de-3x",
+    "source": "Android res/drawable-xxhdpi/flag_de.png",
+    "sha256": "a7d04fca4afb418b8a94ae8bc1beaf46c1d2f00e5162e6ee4a896e088e55f3fa"
   }
 ]

@@ -889,3 +889,31 @@
 "weekday_wed" = "Mié";
 "widget_config_empty" = "Primero añada un objeto en la aplicación";
 "widget_config_title" = "Elija un objeto";
+
+// Native iOS help and language accessibility.
+"ios_language" = "Idioma";
+"ios_help_auto" = "La apertura automática utiliza las condiciones de ubicación, Wi-Fi, hora y Bluetooth configuradas mientras Entrixy está abierto en la pestaña de control.";
+"ios_help_permissions" = "Permite las funciones que necesitan tus objetos en Ajustes del iPhone: Bluetooth, ubicación, cámara y notificaciones. Las llamadas requieren la confirmación de la app Teléfono.";
+
+// Entrixy code controls on iOS.
+"ios_entry_lock_hint" = "Se solicita al abrir la app y tras un minuto en segundo plano. Para desactivarlo se necesita el código Entrixy actual.";
+"ios_entry_bio_hint" = "Face ID o Touch ID puede desbloquear la app. Si cambian los datos biométricos, se necesita el código Entrixy y configurar de nuevo.";
+"ios_entry_bio_unavailable" = "Face ID o Touch ID no está configurado en este iPhone.";
+"ios_code_save_failed" = "No se pudo guardar el cambio. La protección anterior se mantiene.";
+
+// Native backup transfer presentation.
+"ios_backup_remaining" = "Servidores pendientes: %1$d; llaves recibidas: %2$d.";
+"ios_backup_continue" = "Continuar transferencia";
+"ios_backup_contents" = "Servidores propios: %1$d; llaves recibidas: %2$d.";
+"ios_backup_transfer_hint" = "Las vinculaciones de la copia se transferirán a este iPhone mediante los servidores. Los accesos existentes que entren en conflicto no se sustituirán. El código Entrixy local y la biometría se configuran por separado en este dispositivo.";
+"ios_backup_transfer" = "Transferir";
+"ios_backup_check" = "Comprobar";
+
+"ios_server_save_failed" = "Could not save server settings. The previous settings were kept.";
+"ios_server_registration_uncertain" = "The registration result is unknown. Registration is blocked to preserve existing access.";
+"ios_server_account_uncertain" = "The account change is not confirmed. Refresh server data to check the result.";
+"ios_server_save_access" = "Save access";
+"ios_server_forget_body" = "Objects and issued keys on %1$@ will be removed from this iPhone. Server data and guest access remain. A backup is needed to restore the previous owner access. Received keys remain on this phone.";
+"ios_server_forget_busy" = "Finish the Bluetooth operation or object transfer between servers first.";
+"ios_server_ownership_lost" = "Owner access on this device is no longer valid. Restore it with an explicit access transfer.";
+"ios_server_loss_save_failed" = "Control of this server has stopped. This state could not be saved in protected storage.";

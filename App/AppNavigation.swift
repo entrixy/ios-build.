@@ -21,11 +21,12 @@ extension AppModel {
 
 /// Single full-width surface shared by roots and their NavigationStack destinations.
 struct AppBottomNavigation: View {
+    @AppStorage("entrixy.language") private var language = ""
     @Binding var selection: AppTab
     var tabs: [AppTab] = [.control, .settings, .guests, .journal]
     var onSelect: () -> Void = {}
     private func label(_ tab: AppTab) -> String {
-        switch tab { case .control: return "Управление"; case .settings: return "Настройки"; case .guests: return "Гости"; case .journal: return "Журнал" }
+        switch tab { case .control: return ProductText.string("tab_actions"); case .settings: return ProductText.string("tab_settings"); case .guests: return ProductText.string("tab_guests"); case .journal: return ProductText.string("tab_journal") }
     }
     var body: some View {
         VStack(spacing: 0) {
@@ -43,6 +44,6 @@ struct AppBottomNavigation: View {
                         .accessibilityAddTraits(selection == tab ? .isSelected : [])
                 }
             }.padding(.horizontal, 8).padding(.top, 6).padding(.bottom, 4)
-        }.background(Color(uiColor: .secondarySystemGroupedBackground).ignoresSafeArea(edges: .bottom))
+        }.background(Color(uiColor: .secondarySystemGroupedBackground).ignoresSafeArea(edges: .bottom)).id(language)
     }
 }

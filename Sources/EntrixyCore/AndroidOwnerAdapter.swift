@@ -19,6 +19,10 @@ public enum AndroidOwnerAdapter {
         var result: [String: OwnerAccount] = [:]
         for source in accounts {
             var owner = try OwnerAccount(importing: source.server, masterKey: master, credentials: source.credentials)
+            var settings = OwnerServerSettings()
+            settings.accessCode = try document.string("access_code_" + source.server) ?? ""
+            settings.accountEmail = source.email
+            try settings.validate(); owner.serverSettings = settings
             owner.androidKeys = try document.ownerKeyMaterial(server: source.server, masterKey: master)
             result[source.server] = owner
         }
