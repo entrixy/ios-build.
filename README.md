@@ -8,12 +8,14 @@ This repository is private working source; no new distribution license is assign
 
 The active task is the full Android port, followed by one reviewed native screenshot
 batch. It remains incomplete. The gallery still shows the previous 19-frame catalogue.
-Latest completed Apple snapshot: native `eec6bb2`, public
-`8fa9d3eb2bf255cfecdac7f639574a3f5b2ee4f2`,
-[run 44103675450](https://github.com/entrixy/ios-build./actions/runs/44103675450):
-219 core tests, Debug/test bundles, Release/isolation and 120 hosted native tests
-passed. This includes header/help/languages, entry-code and backup presentation.
-It excludes the subsequent server-settings block; UI tests/captures were not run.
+Latest completed functional Apple snapshot: native `fe9e8e1`, public
+`76276e70ef82bb651f2f9cb87fb8b08746c0e8e6`,
+[run 44126465550](https://github.com/entrixy/ios-build./actions/runs/44126465550):
+240 core tests, Debug/test bundles, Release/isolation and 140 hosted native tests
+passed. This includes servers, sound/rule backups, received-access passing and
+authenticated HLS/MP4 transport. It does not prove actual camera decoding or hardware.
+The separate earlier UI run executed 14 tests: nine passed, five failed. Fixes to
+control identifiers, avatar hit area and test targeting await a fresh UI run.
 Exact implementation boundaries and pending checks: [FUNCTIONAL_PORT.md](docs/FUNCTIONAL_PORT.md).
 
 ### Historical catalogue checkpoint — 16 November 2026

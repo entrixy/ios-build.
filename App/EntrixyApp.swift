@@ -79,10 +79,11 @@ struct RootView: View {
             // NavigationStack can cover an outer safeAreaInset's hit targets.
             AppBottomNavigation(selection: $selectedTab, tabs: model.navigationState.tabs) { userPickedTab = true }
         }
-        .accessibilityHidden(model.objectRemovalTarget != nil || model.objectAvatarTarget != nil || model.ownerGuestRequestPending || model.companyRequestID != nil || model.guestRemovalTarget != nil || model.codePrompt != nil || model.backupPromptPending || model.serverPrompt != nil)
+        .accessibilityHidden(model.actionPrompt != nil || model.objectRemovalTarget != nil || model.objectAvatarTarget != nil || model.ownerGuestRequestPending || model.companyRequestID != nil || model.guestRemovalTarget != nil || model.codePrompt != nil || model.backupPromptPending || model.serverPrompt != nil)
         .overlay { BackupFlowHost(flow:model.backupPresentation) }
         .overlay {
-            if let prompt = model.serverPrompt { ServerSettingsDialog(prompt:prompt).id(prompt.id) }
+            if let prompt = model.actionPrompt { ActionConfirmation(request:prompt).id(prompt.id) }
+            else if let prompt = model.serverPrompt { ServerSettingsDialog(prompt:prompt).id(prompt.id) }
             else if let prompt = model.codePrompt { AppCodeDialog(request:prompt).id(prompt.id) }
             else if let target = model.objectRemovalTarget { ObjectRemovalConfirmation(target: target) }
             else if let target = model.objectAvatarTarget { ObjectAvatarPicker(target: target) }

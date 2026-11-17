@@ -40,12 +40,11 @@ struct OwnerCatalogControlCard: View {
     @ObservedObject var ble: BLEOwnerControlModel
     let owner: OwnerAccount
     let object: OwnerObject
-    @State private var selected: OwnerActionIntent?
     private var entry: CatalogObject { .owned(owner, object) }
     var body: some View {
         ObjectControlCard(automation:app.automation,entry:entry,accessibilityText:app.objectLabel(entry)+". Управлять",action:{
             guard let intent = app.ownerActionIntent(server: owner.server, objectID: object.id) else { return false }
-            if intent.policy.confirmation || intent.policy.authentication != nil { selected = intent }
+            if intent.policy.confirmation || intent.policy.authentication != nil { app.actionPrompt = .owner(intent) }
             else { Task { await app.execute(intent) } }
             return true
         }) {
@@ -63,6 +62,5 @@ struct OwnerCatalogControlCard: View {
             }
         }
             .modifier(ActionRejectionFeedback(rejection: app.ownerActionRejections[object.id]))
-            .sheet(item: $selected) { ActionConfirmation(ownerIntent: $0) }
     }
 }

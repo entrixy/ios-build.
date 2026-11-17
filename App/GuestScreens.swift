@@ -48,12 +48,11 @@ private struct GuestCatalogControlCard: View {
     @EnvironmentObject private var model: AppModel
     let guest: SavedGuest
     let object: GuestObject
-    @State private var actionIntent: ActionIntent?
     private var entry: CatalogObject { .received(guest, object) }
     var body: some View {
         ObjectControlCard(automation:model.automation,entry:entry,accessibilityText:model.objectLabel(entry)+". "+model.objectActionTitle(guestID:guest.id,object:object),action:{
             guard let intent = model.actionIntent(guestID: guest.id, object: object) else { return false }
-            if intent.policy.confirmation || intent.policy.authentication != nil { actionIntent = intent }
+            if intent.policy.confirmation || intent.policy.authentication != nil { model.actionPrompt = .guest(intent) }
             else { Task { await model.execute(intent) } }
             return true
         }) {
@@ -74,7 +73,6 @@ private struct GuestCatalogControlCard: View {
             }
         }
             .modifier(ActionRejectionFeedback(rejection: model.actionRejections[guest.id + "|" + object.id]))
-            .sheet(item: $actionIntent) { ActionConfirmation(intent: $0) }
     }
 }
 

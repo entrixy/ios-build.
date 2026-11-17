@@ -71,8 +71,11 @@ struct ObjectSettingsRows: View {
         ForEach(entries) { entry in
             VStack(alignment: .leading, spacing: 14) {
                 HStack(spacing: 12) {
-                    Button { model.objectAvatarTarget = entry.target } label: { CatalogAvatar(entry: entry, size: 56) }
-                        .buttonStyle(.plain).accessibilityLabel(ProductText.string("avatar_picker_title")).disabled(entry.deletionPending)
+                    Button { model.objectAvatarTarget = entry.target } label: {
+                        CatalogAvatar(entry:entry,size:56).frame(width:56,height:56).contentShape(Rectangle())
+                    }.buttonStyle(.plain).frame(width:56,height:56).contentShape(Rectangle())
+                        .accessibilityElement(children:.ignore).accessibilityLabel(ProductText.string("avatar_picker_title"))
+                        .accessibilityIdentifier("object-avatar-" + entry.target.id).disabled(entry.deletionPending)
                     Button {
                     withAnimation(.easeInOut(duration: 0.2)) {
                         if expanded.contains(entry.target) { expanded.remove(entry.target) }
@@ -102,6 +105,7 @@ struct ObjectSettingsRows: View {
                             Image(systemName: entry.isOwned ? "gearshape" : "pencil").font(.title3).frame(maxWidth: .infinity)
                         }.buttonStyle(SecondaryActionStyle())
                             .accessibilityLabel(entry.isOwned ? "Настройки" : "Название")
+                            .accessibilityIdentifier("object-edit-" + entry.target.id)
                         Button { task = .automation(entry.target) } label: {
                             Image(systemName: "arrow.triangle.2.circlepath").font(.title3).frame(maxWidth: .infinity)
                         }.buttonStyle(SecondaryActionStyle()).accessibilityLabel(ProductText.string("automation_icon_desc"))

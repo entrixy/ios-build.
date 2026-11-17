@@ -116,8 +116,7 @@ struct AddOwnerObjectScreen: View {
                     }.buttonStyle(.plain).accessibilityIdentifier("owner-object-type-" + value)
                         .accessibilityAddTraits(kind == value ? .isSelected : [])
                 }
-            } header: { Text(ProductText.string("add_object_type_title")) }
-                .accessibilityIdentifier("owner-object-kind")
+            } header: { Text(ProductText.string("add_object_type_title")).accessibilityIdentifier("owner-object-kind") }
             Section {
                 AppField(ProductText.string("add_object_name")) {
                     TextField(ProductText.string("add_object_name_placeholder"), text: $label)

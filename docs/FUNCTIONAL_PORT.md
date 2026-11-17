@@ -509,7 +509,7 @@ by fresh rights. One UI source case covers the same checkbox/access layout witho
 creating a key. These additions have not yet run on Apple.
 
 Actual Linux235 core tests zero, Swift parse/diff checks pass. Latest expected
-hosted137 and UI15 are SOURCE counts, not runtime evidence. Publicb003/native3b165a4
+hosted137 and UI14 are SOURCE counts, not runtime evidence. Publicb003/native3b165a4
 Apple core231 passed, Debug failed at BackupPresentation.swift:185 because the
 missing-audio warning was placed outside the preview scope. Moved it into the
 actual decrypted review view; no guards or assertions removed. Follow-up Apple
@@ -587,7 +587,7 @@ in that test, without changing assertions or production reconciliation. All five
 new sound/export/restore cases, actual imported PIN policy, both Android migration
 cases and explicit per-object ACL bounds passed in this exact Apple run. A full
 native pass still requires the corrected complete source run; these are individual
-case results, not a green-suite claim. UI15 is still pending on that source.
+case results, not a green-suite claim. The separate UI result for that source is recorded below.
 
 
 Latest source also bounds expanded HLS output to 4 MiB, resource expansion count
@@ -597,3 +597,103 @@ was followed by actual Linux240 zero at16:27:27UTC with the expansion-bound case
 Owned camera views stop exposing a context on known ownership loss. The loopback
 peer check includes IPv4-mapped IPv6 loopback; remote non-loopback peers remain
 rejected. All latest Swift parse/diff checks pass; Apple SDK/runtime still pending.
+
+
+A separate ci/ui-review-arm branch selects macOS15 Apple Silicon for the same UI
+assertions. Earlier catalogue UI had passed on ARM after Intel Accessibility setup
+failed; the present Intel UI run is retained for its real outcome. This is an
+alternate runner, not changed assertions or a capture rerun. Ordinary functional
+branches still use Intel Debug/Release/native. Do not infer an ARM pass from the
+old catalogue source; the new exact-source run is tracked separately.
+
+
+## Apple functional result and UI corrections — 17 November, 16:46 UTC
+
+Native fe9e8e1 / public76276e70ef82bb651f2f9cb87fb8b08746c0e8e6,
+[run44126465550](https://github.com/entrixy/ios-build./actions/runs/44126465550),
+job134191517562 actually passed Apple240 core, Debug/test bundles,
+Release/isolation and 140 hosted native tests (37.815 seconds, zero failures).
+Both paired-owner-before-HTTP-registration and additional-source lost-reply
+regressions passed. All three CameraVideoProxy tests passed with the real local
+listener and isolated remote responses. This is transport verification, not proof
+of actual camera decoding or physical controller/device acceptance.
+The older c19-only run44120544060 ended cancelled, not passed.
+
+Separate UI run44119347879/job134166101257 on publicd1d121b/native6fef9d0
+actually executed 14 tests: nine passed, five failed (1041.5 seconds). Unlike the
+historical Intel setup failure, this runner successfully started Accessibility
+and executed tests. Nine passes include received-passing and server form routes.
+Failed hierarchy inspection identified: an ancestor Section identifier overwrote
+four object-type button IDs; a Settings label matched both row and bottom tab;
+the avatar tap did not open its picker; and the code test targeted a labelled
+switch row rather than its nested UISwitch. Changes move the ancestor ID to its
+header, give object edit/avatar controls scoped IDs and an explicit 56pt avatar
+hit area, and target the real switch in the test. Existing order, size, all eight
+presets, upload/cancel and wrong/correct-code assertions remain. These changes
+have syntax/diff checks; their actual UI runtime is pending. No claim that the
+avatar change has already resolved the hit issue.
+
+UI failure attachment export now retains teardown keepAlways PNGs as well as
+issue attachments; the old --only-failures flag omitted actual screenshots.
+The downloaded old diagnostics contain hierarchies only, so no visual acceptance
+is inferred from them. No new product screenshot batch or website update occurred.
+
+
+## Compact card confirmation and PIN — follow-up source, Apple pending
+
+Read Android ActionCard.kt runAuthThenCall/confirmOpen and the complete CodeGate.kt
+before this change. Manual owner and guest card taps now request one root-level
+ActionPrompt with the original frozen intent. ActionConfirmation uses the common
+centered AppDialogSurface: object title, confirmation text or code fields, and
+equal filled Cancel/action controls. Code setup uses the same Code Entrixy labels
+and warning as Android/settings. No logo, navigation header or sheet footer is
+added to these dialogs. Biometrics retains the existing platform authentication.
+The original per-intent PIN/biometry, lockout, expiry, policy/direction checks and
+execute guards remain. Setup continues to require authenticating the action after
+saving a new code, preserving the existing iOS authority behavior.
+
+Underlying root controls are hidden from accessibility while the dialog is open.
+Foreground automation consumes but does not execute an arrival while a card
+dialog is open. Background clears the in-memory prompt; asynchronous completion
+checks the same prompt ID and foreground authority before performing the action.
+The prompt and typed code are never added to SavedState. Capture scenarios use
+the actual root presenter rather than a separate capture-only sheet.
+
+Swift frontend syntax and diff checks pass; these do not prove Apple typing or
+layout. One new hosted SOURCE test checks background invalidation/no command/
+no restored prompt. One UI SOURCE case checks actual card -> compact confirmation
+and code setup -> Cancel -> same Control tab, with all tabs restored. Its two
+routes do not resume live transports; telephone handoff is a recording false
+closure. Expected source counts now native141/UI15, pending actual execution.
+No new screenshots or website publication. Automatic triggers that require
+confirmation/authentication still consume without opening a prompt; this remaining
+runtime path is explicitly not declared implemented by the manual dialog change.
+
+
+## Foreground automatic confirmation/authentication — follow-up source
+
+Android ActionCard.runAuthThenCall uses the same confirmation/CodeGate for manual
+and automatic arrivals. Automatic foreground arrivals now retain their frozen
+intent in the same ActionPrompt rather than silently consuming a gated trigger.
+No HTTP/BLE command or journal action is produced by opening the dialog. A single
+explicit approval consumes the presented prompt before dispatch; direct execution
+of an automatic gated intent without that approval is rejected. Existing PIN or
+biometric authorization must still match that exact intent. An already-present
+modal prevents another trigger from replacing it. Cancellation consumes the
+arrival/latch, removes its permit and cannot reopen from the same evidence.
+
+Proofs are fresh within two seconds at proposal. While the matching dialog or its
+single execution owns the evidence, the maximum is thirty seconds; current policy,
+conditions and foreground authority are rechecked on authentication, dispatch and
+late socket challenge/BLE stages as before. Old/changed evidence cannot be turned
+into a manual command. Route triggers retain open-only direction. Background clears
+both pending/executing prompt state and all automatic permits; no prompt is saved
+or restored. No new background mode or OS permission is claimed by this change.
+
+Five new hosted SOURCE cases cover owner confirm/exactly once, cancellation,
+wrong/correct PIN, expiry/storage/background/policy changes before sending, and
+received guest confirm/PIN plus duplicate challenge binding. Existing automatic
+storage-failure, force/condition and no-replay tests remain. Syntax/diff checks
+pass; Apple execution of latest expected native146 is pending. Core unchanged240;
+UI source15 still awaits its exact-source runtime result. The previous manual-only
+limitation above is historical; this section supersedes that source boundary.
