@@ -42,7 +42,9 @@ def main():
             destination.mkdir(parents=True, exist_ok=True)
             try:
                 subprocess.run(['xcrun', 'xcresulttool', 'export', 'attachments',
-                    '--path', str(result), '--output-path', str(destination), '--only-failures'], timeout=90)
+                    # Test teardown PNGs are keepAlways attachments, not Xcode
+                    # issue attachments. --only-failures silently omitted them.
+                    '--path', str(result), '--output-path', str(destination)], timeout=90)
             except (OSError, subprocess.TimeoutExpired) as diagnostic_error:
                 print('Could not export failure attachments:', diagnostic_error, flush=True)
         raise

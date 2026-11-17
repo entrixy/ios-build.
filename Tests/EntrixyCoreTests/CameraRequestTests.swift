@@ -2,6 +2,14 @@ import XCTest
 @testable import EntrixyCore
 
 final class CameraRequestTests: XCTestCase {
+    func testInlineCredentialsAreRemovedFromPlayerAddressAndExplicitAuthorizationWins() throws {
+        var settings = config("https://user:password@camera.invalid/video.mp4")
+        let request = try CameraRequest(configuration:settings)
+        XCTAssertEqual(request.url.absoluteString,"https://camera.invalid/video.mp4")
+        XCTAssertEqual(request.headers["Authorization"],"Basic " + Data("user:password".utf8).base64EncodedString()); XCTAssertTrue(request.authenticated)
+        settings.authType = "bearer"; settings.authValue = "explicit-test-token"
+        XCTAssertEqual(try CameraRequest(configuration:settings).headers["Authorization"],"Bearer explicit-test-token")
+    }
     private func config(_ url: String = "https://camera.invalid/frame.jpg") -> ObjectCameraConfiguration {
         var config = ObjectCameraConfiguration(); config.enabled = true; config.url = url; return config
     }

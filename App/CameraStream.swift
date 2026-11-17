@@ -10,7 +10,7 @@ struct ObjectCameraContext: Equatable {
     let localKeyID: String
 }
 
-private final class CameraHTTPBoundary: NSObject, URLSessionTaskDelegate {
+final class CameraHTTPBoundary: NSObject, URLSessionTaskDelegate {
     let camera: CameraRequest
     init(_ camera: CameraRequest) { self.camera = camera }
     func urlSession(_ session: URLSession, task: URLSessionTask, willPerformHTTPRedirection response: HTTPURLResponse,
@@ -73,10 +73,12 @@ enum CameraStreamFailure: Error { case http(Int), format }
     private var observation: NSKeyValueObservation?
     private var generation = UUID()
     private let transport: CameraHTTPFrames
+    private var videoProxy: CameraVideoProxy?
     init(transport: CameraHTTPFrames = CameraHTTPFrames()) { self.transport = transport }
     func stop() {
         generation = UUID(); worker?.cancel(); worker = nil; timeout?.cancel(); timeout = nil
         observation = nil; player?.pause(); player = nil
+        videoProxy?.stop(); videoProxy = nil
     }
     func start(_ context: ObjectCameraContext) {
         stop(); loading = true; message = nil; image = nil
@@ -89,15 +91,20 @@ enum CameraStreamFailure: Error { case http(Int), format }
                 switch request.media {
                 case .otherVideo: throw CameraStreamFailure.format
                 case .nativeVideo:
-                    // Public AVFoundation playback. Authenticated video needs
-                    // a supported media loader; no undocumented header keys.
-                    guard !request.authenticated else { throw CameraStreamFailure.format }
-                    let item = AVPlayerItem(url:request.url)
+                    var address = request.url
+                    if request.authenticated {
+                        let bridge = try CameraVideoProxy(camera:request,configuration:self.transport.configuration)
+                        self.videoProxy = bridge
+                        bridge.failed = { [weak self] error in guard let self, self.generation == current else { return }; self.fail(Self.error(error)) }
+                        address = try await bridge.start()
+                    }
+                    guard self.generation == current, !Task.isCancelled else { return }
+                    let item = AVPlayerItem(url:address)
                     self.observation = item.observe(\.status,options:[.initial,.new]) { [weak self] item,_ in
                         Task { @MainActor in
                             guard let self, self.generation == current else { return }
                             if item.status == .readyToPlay { self.loading = false; self.timeout?.cancel() }
-                            else if item.status == .failed { self.fail(Self.error(item.error)) }
+                            else if item.status == .failed, self.message == nil { self.fail(Self.error(item.error)) }
                         }
                     }
                     self.player = AVPlayer(playerItem:item); self.player?.isMuted = true; self.player?.play()
@@ -133,7 +140,7 @@ enum CameraStreamFailure: Error { case http(Int), format }
             self.fail(ProductText.string("stream_timeout")); self.worker?.cancel(); self.player?.pause()
         }
     }
-    private func fail(_ text: String) { loading = false; message = text; timeout?.cancel() }
+    private func fail(_ text: String) { loading = false; message = text; timeout?.cancel(); videoProxy?.stop(); videoProxy = nil; player?.pause() }
     private static func error(_ error: Error?) -> String {
         guard let error else { return ProductText.string("stream_err_unknown") }
         if case CameraStreamFailure.http(let code) = error {
@@ -181,7 +188,7 @@ extension AppModel {
         guard canManageGuestAccess, objectIsVisible(target) else { return nil }
         switch target {
         case .owned(let server,let id):
-            guard let owner = owners.first(where:{ $0.server == server }), let object = owner.objects?.first(where:{ $0.id == id }),
+            guard let owner = owners.first(where:{ $0.server == server && $0.ownershipLost != true }), let object = owner.objects?.first(where:{ $0.id == id }),
                   let camera = object.localConfiguration?.camera, camera.enabled, !camera.url.isEmpty else { return nil }
             return ObjectCameraContext(configuration:camera,guestUserKey:nil,localKeyID:"0")
         case .received(let guestID,let objectID):

@@ -46,6 +46,7 @@ final class AppModel: ObservableObject {
     @Published var companyGrantRequest: String?
     @Published var guestRemovalTarget: GuestRemovalTarget?
     @Published var codePrompt: AppCodePrompt?
+    @Published var actionPrompt: ActionPrompt?
     @Published var backupPromptPending = false
     @Published var serverPrompt: ServerSettingsPrompt?
     @Published var settingsRequest: SettingsTab?
@@ -1519,6 +1520,7 @@ final class AppModel: ObservableObject {
     }
 
     func suspend() {
+        actionPrompt = nil
         codePrompt = nil
         serverPrompt = nil
         backupPresentation.cancel()
