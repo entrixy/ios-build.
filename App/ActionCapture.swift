@@ -891,14 +891,10 @@ struct ActionCaptureRoot: View {
             if !capture.scenario.usesTaskFooter && capture.intent == nil && capture.ownerIntent == nil { CaptureEnvironmentBadge() }
         }
         .environmentObject(capture.model)
-        .sheet(item: $capture.intent) { intent in
-            ActionConfirmation(intent: intent).environmentObject(capture.model)
-        }
-        .sheet(item: $capture.ownerIntent) { intent in
-            ActionConfirmation(ownerIntent: intent).environmentObject(capture.model)
-        }
         .task {
             await capture.prepare()
+            if let intent = capture.intent { capture.model.actionPrompt = .guest(intent) }
+            else if let intent = capture.ownerIntent { capture.model.actionPrompt = .owner(intent) }
             if capture.ready && capture.scenario.presentsPreparedTaskSheet { taskSheetPresented = true }
         }
     }

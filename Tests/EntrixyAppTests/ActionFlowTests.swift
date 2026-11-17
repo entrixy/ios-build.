@@ -46,6 +46,20 @@ final class ActionFlowTests: XCTestCase {
         let saved = try XCTUnwrap(KeychainStore(service:service).load()?.guests.first)
         XCTAssertEqual(saved.automation?[object.id]?.effective.authMode,"pin"); XCTAssertEqual(saved.invite,guest.invite)
     }
+    @MainActor func testPendingCardConfirmationIsDiscardedOnBackgroundWithoutSendingOrPersistingIt() async throws {
+        let (model,controller,guest,object) = try await fixture(template:["confirm_on":true])
+        let intent = try XCTUnwrap(model.actionIntent(guestID:guest.id,object:object))
+        model.actionPrompt = .guest(intent)
+        XCTAssertEqual(model.actionPrompt?.id,intent.id)
+        XCTAssertTrue(controller.sent.isEmpty); XCTAssertTrue(model.journal.isEmpty)
+        model.suspend()
+        XCTAssertNil(model.actionPrompt)
+        await model.execute(intent)
+        XCTAssertTrue(controller.sent.isEmpty); XCTAssertTrue(model.journal.isEmpty)
+        let relaunched = AppModel(storage:KeychainStore(service:service))
+        XCTAssertNil(relaunched.actionPrompt); XCTAssertTrue(relaunched.journal.isEmpty)
+        relaunched.suspend()
+    }
     @MainActor func testPressChallengeResultAndJournalSurviveRelaunchWithoutReplay() async throws {
         let (model, controller, guest, object) = try await fixture()
         let challenge = try JSONSerialization.data(withJSONObject: ["type": "sock_challenge", "number_id": 7, "command_id": "test-1", "nonce": Data(0..<16).base64EncodedString()])

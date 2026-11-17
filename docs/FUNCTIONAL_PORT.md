@@ -509,7 +509,7 @@ by fresh rights. One UI source case covers the same checkbox/access layout witho
 creating a key. These additions have not yet run on Apple.
 
 Actual Linux235 core tests zero, Swift parse/diff checks pass. Latest expected
-hosted137 and UI15 are SOURCE counts, not runtime evidence. Publicb003/native3b165a4
+hosted137 and UI14 are SOURCE counts, not runtime evidence. Publicb003/native3b165a4
 Apple core231 passed, Debug failed at BackupPresentation.swift:185 because the
 missing-audio warning was placed outside the preview scope. Moved it into the
 actual decrypted review view; no guards or assertions removed. Follow-up Apple
@@ -587,7 +587,7 @@ in that test, without changing assertions or production reconciliation. All five
 new sound/export/restore cases, actual imported PIN policy, both Android migration
 cases and explicit per-object ACL bounds passed in this exact Apple run. A full
 native pass still requires the corrected complete source run; these are individual
-case results, not a green-suite claim. UI15 is still pending on that source.
+case results, not a green-suite claim. The separate UI result for that source is recorded below.
 
 
 Latest source also bounds expanded HLS output to 4 MiB, resource expansion count
@@ -605,3 +605,66 @@ failed; the present Intel UI run is retained for its real outcome. This is an
 alternate runner, not changed assertions or a capture rerun. Ordinary functional
 branches still use Intel Debug/Release/native. Do not infer an ARM pass from the
 old catalogue source; the new exact-source run is tracked separately.
+
+
+## Apple functional result and UI corrections — 17 November, 16:46 UTC
+
+Native fe9e8e1 / public76276e70ef82bb651f2f9cb87fb8b08746c0e8e6,
+[run44126465550](https://github.com/entrixy/ios-build./actions/runs/44126465550),
+job134191517562 actually passed Apple240 core, Debug/test bundles,
+Release/isolation and 140 hosted native tests (37.815 seconds, zero failures).
+Both paired-owner-before-HTTP-registration and additional-source lost-reply
+regressions passed. All three CameraVideoProxy tests passed with the real local
+listener and isolated remote responses. This is transport verification, not proof
+of actual camera decoding or physical controller/device acceptance.
+The older c19-only run44120544060 ended cancelled, not passed.
+
+Separate UI run44119347879/job134166101257 on publicd1d121b/native6fef9d0
+actually executed 14 tests: nine passed, five failed (1041.5 seconds). Unlike the
+historical Intel setup failure, this runner successfully started Accessibility
+and executed tests. Nine passes include received-passing and server form routes.
+Failed hierarchy inspection identified: an ancestor Section identifier overwrote
+four object-type button IDs; a Settings label matched both row and bottom tab;
+the avatar tap did not open its picker; and the code test targeted a labelled
+switch row rather than its nested UISwitch. Changes move the ancestor ID to its
+header, give object edit/avatar controls scoped IDs and an explicit 56pt avatar
+hit area, and target the real switch in the test. Existing order, size, all eight
+presets, upload/cancel and wrong/correct-code assertions remain. These changes
+have syntax/diff checks; their actual UI runtime is pending. No claim that the
+avatar change has already resolved the hit issue.
+
+UI failure attachment export now retains teardown keepAlways PNGs as well as
+issue attachments; the old --only-failures flag omitted actual screenshots.
+The downloaded old diagnostics contain hierarchies only, so no visual acceptance
+is inferred from them. No new product screenshot batch or website update occurred.
+
+
+## Compact card confirmation and PIN — follow-up source, Apple pending
+
+Read Android ActionCard.kt runAuthThenCall/confirmOpen and the complete CodeGate.kt
+before this change. Manual owner and guest card taps now request one root-level
+ActionPrompt with the original frozen intent. ActionConfirmation uses the common
+centered AppDialogSurface: object title, confirmation text or code fields, and
+equal filled Cancel/action controls. Code setup uses the same Code Entrixy labels
+and warning as Android/settings. No logo, navigation header or sheet footer is
+added to these dialogs. Biometrics retains the existing platform authentication.
+The original per-intent PIN/biometry, lockout, expiry, policy/direction checks and
+execute guards remain. Setup continues to require authenticating the action after
+saving a new code, preserving the existing iOS authority behavior.
+
+Underlying root controls are hidden from accessibility while the dialog is open.
+Foreground automation consumes but does not execute an arrival while a card
+dialog is open. Background clears the in-memory prompt; asynchronous completion
+checks the same prompt ID and foreground authority before performing the action.
+The prompt and typed code are never added to SavedState. Capture scenarios use
+the actual root presenter rather than a separate capture-only sheet.
+
+Swift frontend syntax and diff checks pass; these do not prove Apple typing or
+layout. One new hosted SOURCE test checks background invalidation/no command/
+no restored prompt. One UI SOURCE case checks actual card -> compact confirmation
+and code setup -> Cancel -> same Control tab, with all tabs restored. Its two
+routes do not resume live transports; telephone handoff is a recording false
+closure. Expected source counts now native141/UI15, pending actual execution.
+No new screenshots or website publication. Automatic triggers that require
+confirmation/authentication still consume without opening a prompt; this remaining
+runtime path is explicitly not declared implemented by the manual dialog change.

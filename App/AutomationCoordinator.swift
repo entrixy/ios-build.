@@ -122,7 +122,7 @@ import EntrixyCore
             }
             // Android consumes a route seen while editing/on another tab, so
             // switching back later does not unexpectedly open the old arrival.
-            if (!working && !context.isBLE) || editors > 0 || app.objectRemovalTarget != nil || app.objectAvatarTarget != nil {
+            if (!working && !context.isBLE) || editors > 0 || app.actionPrompt != nil || app.objectRemovalTarget != nil || app.objectAvatarTarget != nil {
                 if result.routeMatched { consume(entry.target,route:true) }
                 continue
             }
