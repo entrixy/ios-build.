@@ -13,6 +13,7 @@ final class AppModel: ObservableObject {
 
     @Published private(set) var owners: [OwnerAccount] = []
     @Published private(set) var selectedOwnerServer = "entrixy.com"
+    @Published private(set) var networkPrivacy = try! NetworkPrivacyPreferences()
     @Published private(set) var ownerBusy = false
     @Published private(set) var ownerSnapshots: [String: OwnerSnapshot] = [:]
     @Published private(set) var ownerMessages: [String: String] = [:]
@@ -163,6 +164,11 @@ final class AppModel: ObservableObject {
             delegatedJournalLedger = state.delegatedJournalLedger ?? DelegatedJournalLedger()
             try delegatedJournalLedger.validate()
             owners = state.owners ?? []
+            if let privacy = state.networkPrivacy { networkPrivacy = privacy }
+            for owner in owners where owner.privacyNetworks != nil {
+                networkPrivacy = try networkPrivacy.merging(NetworkPrivacyPreferences(own:owner.privacyNetworks!))
+            }
+            try networkPrivacy.validate()
             selectedOwnerServer = try GuestInvite.normalizeServer(state.selectedOwnerServer ?? owners.first?.server ?? "entrixy.com")
             ownerGuestDefaults = state.ownerGuestDefaults ?? OwnerGuestDefaults()
             companies = state.companies ?? []
@@ -221,7 +227,7 @@ final class AppModel: ObservableObject {
     private func save(_ updated: [SavedGuest], preferences: ObjectCatalogPreferences? = nil) throws {
         let preferences = preferences ?? objectPreferences
         try preferences.validate()
-        try storage.save(SavedState(identity: identity, guests: updated, journal: journal, actionCode: actionCode, owners: owners, usedOwnerPresses: usedOwnerPresses, pendingRestore: pendingRestore, delegations: delegations, passedAccess: passedAccess, receivedDelegations: receivedDelegations, incomingMessages: incomingMessages, outgoingMessages: outgoingMessages, delegatedJournalLedger: delegatedJournalLedger, appLockEnabled: appLockEnabled, appEntryBiometricEnabled: appEntryBiometricEnabled, objectPreferences: preferences, bleAutomationDisarmed: bleAutomationDisarmed, ownerGuestDefaults: ownerGuestDefaults, companies: companies, androidArchives: androidArchives, androidPendingGuests: androidPendingGuests, selectedOwnerServer: selectedOwnerServer))
+        try storage.save(SavedState(identity: identity, guests: updated, journal: journal, actionCode: actionCode, owners: owners, usedOwnerPresses: usedOwnerPresses, pendingRestore: pendingRestore, delegations: delegations, passedAccess: passedAccess, receivedDelegations: receivedDelegations, incomingMessages: incomingMessages, outgoingMessages: outgoingMessages, delegatedJournalLedger: delegatedJournalLedger, appLockEnabled: appLockEnabled, appEntryBiometricEnabled: appEntryBiometricEnabled, objectPreferences: preferences, bleAutomationDisarmed: bleAutomationDisarmed, ownerGuestDefaults: ownerGuestDefaults, companies: companies, androidArchives: androidArchives, androidPendingGuests: androidPendingGuests, selectedOwnerServer: selectedOwnerServer, networkPrivacy: networkPrivacy))
         guests = updated
         if objectPreferences != preferences { objectPreferences = preferences }
     }
@@ -347,6 +353,7 @@ final class AppModel: ObservableObject {
     func validateRestoreConflicts(_ payload: IOSBackupPayload) throws {
         guard storageReady else { throw BackupFailure.invalidPayload }
         try payload.validate()
+        _ = try networkPrivacy.merging(payload.networkPrivacy)
         _ = try objectPreferences.merging(payload.objectPreferences)
         var mergedArchives = androidArchives
         for archive in payload.androidArchives ?? [] where !mergedArchives.contains(where:{ $0.archiveID == archive.archiveID }) { mergedArchives.append(archive) }
@@ -451,6 +458,8 @@ final class AppModel: ObservableObject {
         if let index = updated.firstIndex(where:{ $0.id == guest.id }) {
             guard updated[index].invite == guest.invite else { throw BackupFailure.conflictingAccess }
             updated[index].requiresBLEExitOnRestore = true
+            let current = try NetworkPrivacyPreferences(own:updated[index].privacyNetworks ?? [])
+            updated[index].privacyNetworks = try current.merging(NetworkPrivacyPreferences(own:guest.privacyNetworks ?? [])).own
         } else {
             var imported = guest
             imported.requiresBLEExitOnRestore = true
@@ -474,7 +483,7 @@ final class AppModel: ObservableObject {
               let source = androidPendingGuests.first(where:{ $0.id == invite.id }) else { throw BackupFailure.noAccess }
         let previous = androidPendingGuests
         androidPendingGuests.removeAll { $0.id == invite.id }
-        do { try save(guests + [SavedGuest(invite:invite,requiresBLEExitOnRestore:true,androidAutomation:source.incomingAutomation)]) }
+        do { try save(guests + [SavedGuest(invite:invite,requiresBLEExitOnRestore:true,androidAutomation:source.incomingAutomation,privacyNetworks:source.privacyNetworks)]) }
         catch { androidPendingGuests = previous; throw error }
     }
     func removeImportedGuestRecovery(_ id: String) {
@@ -485,6 +494,7 @@ final class AppModel: ObservableObject {
         catch { androidPendingGuests = previous; errorMessage = "Не удалось сохранить удаление ключа." }
     }
     func finishBackupRestore(_ plan: BackupRestorePlan) throws {
+        let previousNetworkPrivacy = networkPrivacy
         let previousPlan = pendingRestore, previousJournal = journal, previousPresses = usedOwnerPresses
         let previousPassed = passedAccess
         let previousReceived = receivedDelegations
@@ -507,6 +517,10 @@ final class AppModel: ObservableObject {
             if !passedAccess.contains(where: { $0.id == source.id || (source.group != nil && $0.server == source.server && $0.group == source.group) }) { passedAccess.append(source) }
         }
         do {
+            networkPrivacy = try networkPrivacy.merging(plan.payload.networkPrivacy)
+            for owner in owners where owner.privacyNetworks != nil {
+                networkPrivacy = try networkPrivacy.merging(NetworkPrivacyPreferences(own:owner.privacyNetworks!))
+            }
             for source in plan.payload.receivedDelegations ?? [] {
                 if let i = receivedDelegations.firstIndex(where: { $0.id == source.id }) { try receivedDelegations[i].merge(source) }
                 else { receivedDelegations.append(source) }
@@ -522,6 +536,7 @@ final class AppModel: ObservableObject {
             for archive in plan.payload.androidArchives ?? [] where !androidArchives.contains(where:{ $0.archiveID == archive.archiveID }) { androidArchives.append(archive) }
             try AndroidBackupDocument.validateArchives(androidArchives)
             var refreshedOwners = owners
+            for index in refreshedOwners.indices { try refreshedOwners[index].setPrivacyNetworks(networkPrivacy.own) }
             if let defaults = plan.payload.ownerGuestDefaults {
                 ownerGuestDefaults = defaults
                 for index in refreshedOwners.indices where refreshedOwners[index].hostLabel != defaults.ownerName {
@@ -531,6 +546,7 @@ final class AppModel: ObservableObject {
             }
             try saveOwners(refreshedOwners, preferences:restoredPreferences)
         } catch {
+            networkPrivacy = previousNetworkPrivacy
             pendingRestore = previousPlan; journal = previousJournal; usedOwnerPresses = previousPresses
             passedAccess = previousPassed; receivedDelegations = previousReceived
             incomingMessages = previousIncoming; outgoingMessages = previousOutgoing
@@ -541,7 +557,7 @@ final class AppModel: ObservableObject {
     private func saveOwners(_ updated: [OwnerAccount], preferences: ObjectCatalogPreferences? = nil) throws {
         let preferences = preferences ?? objectPreferences
         try preferences.validate()
-        try storage.save(SavedState(identity: identity, guests: guests, journal: journal, actionCode: actionCode, owners: updated, usedOwnerPresses: usedOwnerPresses, pendingRestore: pendingRestore, delegations: delegations, passedAccess: passedAccess, receivedDelegations: receivedDelegations, incomingMessages: incomingMessages, outgoingMessages: outgoingMessages, delegatedJournalLedger: delegatedJournalLedger, appLockEnabled: appLockEnabled, appEntryBiometricEnabled: appEntryBiometricEnabled, objectPreferences: preferences, bleAutomationDisarmed: bleAutomationDisarmed, ownerGuestDefaults: ownerGuestDefaults, companies: companies, androidArchives: androidArchives, androidPendingGuests: androidPendingGuests, selectedOwnerServer: selectedOwnerServer))
+        try storage.save(SavedState(identity: identity, guests: guests, journal: journal, actionCode: actionCode, owners: updated, usedOwnerPresses: usedOwnerPresses, pendingRestore: pendingRestore, delegations: delegations, passedAccess: passedAccess, receivedDelegations: receivedDelegations, incomingMessages: incomingMessages, outgoingMessages: outgoingMessages, delegatedJournalLedger: delegatedJournalLedger, appLockEnabled: appLockEnabled, appEntryBiometricEnabled: appEntryBiometricEnabled, objectPreferences: preferences, bleAutomationDisarmed: bleAutomationDisarmed, ownerGuestDefaults: ownerGuestDefaults, companies: companies, androidArchives: androidArchives, androidPendingGuests: androidPendingGuests, selectedOwnerServer: selectedOwnerServer, networkPrivacy: networkPrivacy))
         owners = updated
         bleInformation = bleInformation.filter { target,info in
             guard case let .owned(server,id) = target,
@@ -783,7 +799,7 @@ final class AppModel: ObservableObject {
         defer { ownerBusy = false }
         do {
             // Save a reservation BEFORE sending. A lost reply survives process death.
-            var reserved = try OwnerAccount(server:host); reserved.hostLabel = ownerGuestDefaults.ownerName
+            var reserved = try OwnerAccount(server:host); reserved.hostLabel = ownerGuestDefaults.ownerName; reserved.privacyNetworks = networkPrivacy.own
             var settings = OwnerServerSettings(); settings.accessCode = accessCode
             try settings.validate(); reserved.serverSettings = settings
             try saveOwners(owners + [reserved])
@@ -2792,7 +2808,7 @@ extension AppModel {
             guard canManageGuestAccess else { return false }
             var updated = owners
             if !updated.contains(where:{ $0.server == host }) {
-                var reserved = try OwnerAccount(server:host); reserved.hostLabel = ownerGuestDefaults.ownerName
+                var reserved = try OwnerAccount(server:host); reserved.hostLabel = ownerGuestDefaults.ownerName; reserved.privacyNetworks = networkPrivacy.own
                 updated.append(reserved)
             }
             let index = updated.firstIndex(where:{ $0.server == host })!

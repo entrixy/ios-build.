@@ -176,7 +176,10 @@ public struct OwnerIssuedKey: Codable, Identifiable, Equatable {
         bundle["templates"] = templates; bundle["sock"] = sockets; bundle["welcome"] = welcome
         if !inheritRestrictions, let name = owner.hostLabel { bundle["host_label"] = name }
         else if bundle["host_label"] == nil { bundle["host_label"] = "" }
-        if bundle["net_block"] == nil { bundle["net_block"] = [String]() }
+        if !inheritRestrictions, let networks = owner.privacyNetworks {
+            try PrivacyNetwork.validate(networks); bundle["net_block"] = networks.map(\.wire)
+        } else if bundle["net_block"] == nil { bundle["net_block"] = [String]() }
+        else { _ = try PrivacyNetwork.decode(bundle["net_block"]) }
         let oldStreams = existing["streams"] as? [Int]
         if existing["streams"] != nil && oldStreams == nil { throw GuestCrypto.Failure.invalidEnvelope }
         if let streamAllowed { guard Set(streamAllowed).isSubset(of: Set(numberIDs)) else { throw GuestCrypto.Failure.invalidEnvelope } }

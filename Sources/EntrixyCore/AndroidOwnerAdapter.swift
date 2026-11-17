@@ -128,9 +128,11 @@ public enum AndroidOwnerAdapter {
             for name in map.keys { guard let id = Int(name), (1...65535).contains(id) else { throw GuestCrypto.Failure.invalidEnvelope }; reserved.insert(id) }
         }
         let defaults = try document.guestDefaults()
+        let privacy = try document.networkPrivacyPreferences()
         for host in Array(result.keys) {
             result[host]!.reservedGuestIDs = reserved.sorted()
             result[host]!.hostLabel = defaults.ownerName
+            result[host]!.privacyNetworks = privacy.own
         }
         let owners = result.values.sorted { $0.server < $1.server }
         guard owners.count <= 100 else { throw GuestCrypto.Failure.invalidEnvelope }

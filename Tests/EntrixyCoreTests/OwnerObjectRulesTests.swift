@@ -81,4 +81,46 @@ final class OwnerObjectRulesTests: XCTestCase {
         XCTAssertEqual(restarted.issuedKeys?[0].bundleCipher, issued.bundleCipher)
     }
 
+    func testNetworkRuleChangesQueueActiveKeysWithoutReplacingAnInFlightRequest() throws {
+        var account = try owner()
+        var active = try key(account), revoked = try key(account)
+        active.pending = .keyEdit; active.sent = true
+        revoked.state = .revoked
+        account.issuedKeys = [active,revoked]
+        let request = try active.request(masterKey:account.masterKey)
+        let rule = try PrivacyNetwork(ssid:"Home")
+        try account.setPrivacyNetworks([rule])
+        XCTAssertEqual(account.privacyNetworks,[rule])
+        XCTAssertNotNil(account.bundleRefreshQueue?[active.id.uuidString])
+        XCTAssertNil(account.bundleRefreshQueue?[revoked.id.uuidString])
+        XCTAssertEqual(account.issuedKeys,[active,revoked])
+        XCTAssertEqual(try account.issuedKeys![0].request(masterKey:account.masterKey),request)
+        let queue = account.bundleRefreshQueue
+        try account.setPrivacyNetworks([rule])
+        XCTAssertEqual(account.bundleRefreshQueue,queue)
+        let restarted = try JSONDecoder().decode(OwnerAccount.self,from:JSONEncoder().encode(account))
+        XCTAssertEqual(restarted,account)
+    }
+    func testOwnNetworkRulesReplaceOnlyRootRestrictionsAndStayInsideTheEncryptedBundle() throws {
+        var account = try owner()
+        let inherited = try PrivacyNetwork(ssid:"Parent home")
+        let own = try PrivacyNetwork(ssid:"My home",bssid:"aa:bb:cc:dd:ee:ff")
+        func networks(_ owner: OwnerAccount,inherit: Bool = false) throws -> [PrivacyNetwork] {
+            let data = try OwnerIssuedKey.makeBundle(owner:owner,numberIDs:[7],guestID:42,welcome:"",confirmation:nil,
+                existing:["net_block":[inherited.wire]],inheritRestrictions:inherit)
+            let json = try XCTUnwrap(JSONSerialization.jsonObject(with:data) as? [String:Any])
+            return try PrivacyNetwork.decode(json["net_block"])
+        }
+        XCTAssertEqual(try networks(account),[inherited])
+        try account.setPrivacyNetworks([own])
+        XCTAssertEqual(try networks(account),[own])
+        XCTAssertEqual(try networks(account,inherit:true),[inherited])
+        var issued = try key(account); issued.pending = .keyEdit
+        XCTAssertEqual(try PrivacyNetwork.decode(issued.bundle(masterKey:account.masterKey)["net_block"]),[own])
+        XCTAssertFalse(String(decoding:try issued.request(masterKey:account.masterKey),as:UTF8.self).contains("My home"))
+        try account.setPrivacyNetworks([])
+        XCTAssertEqual(try networks(account),[])
+        XCTAssertEqual(try networks(account,inherit:true),[inherited])
+    }
+
 }

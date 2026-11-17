@@ -201,6 +201,10 @@ public extension OwnerAccount {
         var refreshes = source.bundleRefreshQueue ?? [:]
         for (key, token) in bundleRefreshQueue ?? [:] { refreshes[key] = token }
         merged.bundleRefreshQueue = refreshes
+        if privacyNetworks != nil || source.privacyNetworks != nil {
+            let privacy = try NetworkPrivacyPreferences(own:privacyNetworks ?? []).merging(NetworkPrivacyPreferences(own:source.privacyNetworks ?? []))
+            try merged.setPrivacyNetworks(privacy.own)
+        }
         try merged.validate()
         return merged
     }

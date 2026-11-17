@@ -26,6 +26,20 @@ final class OwnerBackupMergeTests: XCTestCase {
         XCTAssertEqual(merged.issuedKeys?.first?.wrappedSecrets, backup.issuedKeys?.first?.wrappedSecrets)
         XCTAssertEqual(try merged.mergingBackup(backup), merged)
     }
+    func testBackupCannotRemoveExistingNetworkRestrictionsOrReplaceSentKeyMaterial() throws {
+        var current = try source(), imported = current
+        current.privacyNetworks = [try PrivacyNetwork(ssid:"Current home")]
+        imported.privacyNetworks = [try PrivacyNetwork(ssid:"Imported home")]
+        current.issuedKeys![0].pending = .keyEdit; current.issuedKeys![0].sent = true
+        imported.issuedKeys = nil
+        let issued = current.issuedKeys![0]
+        let merged = try current.mergingBackup(imported)
+        XCTAssertEqual(merged.privacyNetworks?.map(\.ssid),["Current home","Imported home"])
+        XCTAssertEqual(merged.issuedKeys![0],issued)
+        XCTAssertNotNil(merged.bundleRefreshQueue?[issued.id.uuidString])
+        XCTAssertEqual(merged.masterKey,current.masterKey)
+        XCTAssertEqual(merged.credentials,current.credentials)
+    }
     func testDifferentPrivateObjectKeyAndConflictingGuestScopeAreRefusedBeforeMigration() throws {
         let backup = try source()
         var different = backup

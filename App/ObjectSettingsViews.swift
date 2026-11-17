@@ -203,19 +203,28 @@ private struct ReceivedObjectNameScreen: View {
     @Environment(\.dismiss) private var dismiss
     let target: ObjectReference
     @State private var label = ""
+    @State private var initialized = false
+    @FocusState private var editing: Bool
     var body: some View {
         NavigationStack {
             Form {
                 Section {
-                    AppField("Название") { TextField("Название", text: $label).onChange(of: label) { label = String($0.prefix(64)) } }
+                    AppField("Название") {
+                        TextField("Название",text:$label).autocorrectionDisabled().focused($editing).submitLabel(.done)
+                            .onSubmit { editing = false }
+                            .onChange(of:label) { label = String($0.replacingOccurrences(of:"\n",with:"").replacingOccurrences(of:"\r",with:"").prefix(64)) }
+                    }
                 } footer: { Text("Название изменится только на этом iPhone.") }
                 Section {
-                    Button("Сохранить") { if model.renameReceivedObject(target, label: label) { dismiss() } }
+                    Button("Сохранить") { let name = label; editing = false; if model.renameReceivedObject(target,label:name) { dismiss() } }
                         .buttonStyle(PrimaryActionStyle()).actionListRow().disabled(model.busy || model.catalogObject(target) == nil)
                 }
             }.navigationTitle("Название объекта").navigationBarTitleDisplayMode(.inline)
                 .sheetDismissFooter(disabled: model.busy) { dismiss() }
-                .task { if let entry = model.catalogObject(target) { label = model.objectLabel(entry) } }
+                .task {
+                    guard !initialized else { return }; initialized = true
+                    if let entry = model.catalogObject(target) { label = model.objectLabel(entry) }
+                }
         }
     }
 }

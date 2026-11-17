@@ -24,6 +24,7 @@ public struct OwnerAccount: Codable, Identifiable, Equatable {
     public var registrationPhase: OwnerRegistrationPhase?
     public var serverSettings: OwnerServerSettings?
     public var ownershipLost: Bool?
+    public var privacyNetworks: [PrivacyNetwork]?
     public var id: String { server }
     public var registrationPending: Bool { credentials == nil }
 
@@ -40,6 +41,7 @@ public struct OwnerAccount: Codable, Identifiable, Equatable {
 
     public func validate() throws {
         try serverSettings?.validate()
+        try PrivacyNetwork.validate(privacyNetworks ?? [])
         guard server == (try GuestInvite.normalizeServer(server)), masterKey.count == 32 else {
             throw GuestCrypto.Failure.invalidEnvelope
         }
