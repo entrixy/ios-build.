@@ -67,115 +67,185 @@ func ownerKeyStatus(_ key: OwnerIssuedKey) -> String {
     }
 }
 
+private enum GuestObjectTask: Identifiable {
+    case automation(ObjectReference), invocation(ObjectReference), access(ObjectReference)
+    var target: ObjectReference { switch self { case .automation(let t), .invocation(let t), .access(let t): return t } }
+    var id: String { switch self { case .automation: return "auto:" + target.id; case .invocation: return "call:" + target.id; case .access: return "access:" + target.id } }
+}
+
 struct IssueOwnerKeyScreen: View {
     @EnvironmentObject private var model: AppModel
     @Environment(\.dismiss) private var dismiss
     let editingKeyID: UUID?
-    init(serverPreset: String? = nil, editingKeyID: UUID? = nil, editAccessOnLaunch: Bool = false) {
-        self.editingKeyID = editingKeyID
-        _changeAccess = State(initialValue: editAccessOnLaunch)
-        _server = State(initialValue: serverPreset ?? "")
-    }
-    @State private var server = ""
+    @StateObject private var draft = GuestKeyDraft()
+    @State private var server: String
     @State private var loaded = false
-    @State private var changeConfirmation = false
-    @State private var changeAccess = false
-    @State private var access: [Int: KeyObjectAccess] = [:]
     @State private var label = ""
     @State private var welcome = ""
-    @State private var confirmation = true
-    @State private var selected = Set<Int>()
-    private var owners: [OwnerAccount] { model.owners.filter { !$0.registrationPending } }
-    private var owner: OwnerAccount? { owners.first { $0.server == server } }
-    private func eligible(_ object: OwnerObject) -> Bool { object.numberID != nil && object.pending == nil && object.available != false && (object.kind != "device" || object.wrappedSocketSecret != nil) }
-    private func settings(_ id: Int) -> KeyObjectAccess { access[id] ?? (try! KeyObjectAccess()) }
-    private var requestedAccess: [Int: KeyObjectAccess]? {
-        if editingKeyID != nil && !changeAccess { return nil }
-        return Dictionary(uniqueKeysWithValues: selected.map { ($0, settings($0)) })
+    @State private var task: GuestObjectTask?
+    init(serverPreset: String? = nil, editingKeyID: UUID? = nil, editAccessOnLaunch: Bool = false) {
+        self.editingKeyID = editingKeyID; _server = State(initialValue: serverPreset ?? "")
+    }
+    private var owner: OwnerAccount? { model.owners.first { $0.server == server && !$0.registrationPending } }
+    private func host(_ entry: CatalogObject) -> String {
+        if case let .owned(account, _) = entry { return account.server }; return ""
+    }
+    private var rows: [CatalogObject] {
+        let values = model.catalogObjects().filter {
+            guard case let .owned(account, _) = $0, !account.registrationPending else { return false }
+            return editingKeyID == nil || account.server == server
+        }
+        var hosts: [String] = []
+        for entry in values where !hosts.contains(host(entry)) { hosts.append(host(entry)) }
+        return hosts.flatMap { hostname in values.filter { host($0) == hostname } }
+    }
+    private func startsGroup(_ entry: CatalogObject) -> Bool {
+        Set(rows.map(host)).count > 1 && rows.first(where: { host($0) == host(entry) })?.id == entry.id
+    }
+    private func eligible(_ object: OwnerObject) -> Bool {
+        object.numberID != nil && object.pending == nil && object.available != false && (object.kind != "device" || object.wrappedSocketSecret != nil)
+    }
+    private func access(_ number: Int) -> KeyObjectAccess { draft.access[number] ?? (try! KeyObjectAccess()) }
+    private func toggle(_ account: OwnerAccount, _ object: OwnerObject) {
+        guard let number = object.numberID, eligible(object) else { return }
+        if draft.selected.isEmpty, editingKeyID == nil, server != account.server {
+            draft.access = [:]; draft.templates = [:]; draft.streams = [:]; draft.lifetimes = [:]; draft.calls = [:]
+            server = account.server
+        }
+        guard server == account.server else { return }
+        if draft.selected.contains(number) { draft.selected.remove(number) }
+        else { draft.selected.insert(number) }
     }
     var body: some View {
         NavigationStack {
             Form {
                 Section {
-                    Picker("Сервер", selection: $server) { ForEach(owners) { Text($0.server).tag($0.server) } }.disabled(editingKeyID != nil || model.ownerBusy)
-                    AppField("Имя гостя") {
-                        TextField("Имя гостя", text: $label)
+                    AppField(ProductText.string("guests_default_name")) {
+                        TextField(ProductText.string("guests_default_name"), text: $label)
+                            .onChange(of: label) { label = String($0.replacingOccurrences(of: "\n", with: "").replacingOccurrences(of: "\r", with: "").prefix(64)) }
                     }
-                    AppField("Приветствие гостю") {
-                        TextField("Приветствие гостю", text: $welcome, axis: .vertical)
+                    AppField(ProductText.string("guests_welcome_label")) {
+                        TextField(ProductText.string("guests_welcome_hint"), text: $welcome, axis: .vertical)
+                            .onChange(of: welcome) { welcome = String($0.prefix(500)) }
                     }
-                    if editingKeyID != nil { Toggle("Изменить подтверждение открытия", isOn: $changeConfirmation) }
-                    if editingKeyID == nil || changeConfirmation { Toggle("Подтверждать нажатие перед открытием", isOn: $confirmation) }
-                }
-                Section("Объекты гостя") {
-                    ForEach(owner?.objects ?? []) { object in
-                        if let id = object.numberID {
-                            Button {
-                                if selected.contains(id) { selected.remove(id) } else { selected.insert(id) }
-                            } label: {
-                                HStack {
-                                    VStack(alignment: .leading, spacing: 5) {
-                                        Text((try? object.metadata(masterKey: owner!.masterKey)["label"] as? String) ?? "Название недоступно")
-                                        if !eligible(object) { Text(object.kind == "device" && object.wrappedSocketSecret == nil ? "Сначала нужна защищённая настройка контроллера" : "Объект ожидает подтверждения").font(.caption).foregroundStyle(Brand.secondaryInk) }
-                                    }
-                                    Spacer()
-                                    Image(systemName: selected.contains(id) ? "checkmark.circle.fill" : "circle")
-                                }.foregroundStyle(Brand.ink)
-                            }.disabled(!eligible(object) || model.ownerBusy)
-                        }
-                    }
-                    if (owner?.objects ?? []).isEmpty { Text("Сначала добавьте объект в настройках").foregroundStyle(Brand.secondaryInk) }
                 }
                 Section {
-                    if editingKeyID != nil { Toggle("Изменить права передачи дальше", isOn: $changeAccess) }
-                    if editingKeyID == nil || changeAccess {
-                        ForEach(selected.sorted(), id: \.self) { id in
-                            VStack(alignment: .leading, spacing: 12) {
-                                Text((owner?.objects?.first(where: { $0.numberID == id })).flatMap { try? $0.metadata(masterKey: owner!.masterKey)["label"] as? String } ?? "Объект \(id)").font(.headline)
-                                Stepper("Уровней передачи: \(settings(id).depth)", value: Binding(get: { settings(id).depth }, set: { access[id] = try? KeyObjectAccess(depth: $0, pool: settings(id).pool) }), in: 0...5)
-                                if settings(id).depth > 0 {
-                                    Stepper("Ключей ниже по цепочке: \(settings(id).pool)", value: Binding(get: { settings(id).pool }, set: { access[id] = try? KeyObjectAccess(depth: settings(id).depth, pool: $0) }), in: 1...50)
-                                }
-                            }.padding(.vertical, 6)
-                        }
-                    }
-                } header: { Text("Передача доступа") }
-                footer: { Text("Ноль уровней запрещает передачу. Лимит ключей действует на всю цепочку ниже гостя для каждого объекта. Уменьшение прав может отозвать доступ у следующих получателей.") }
+                    ForEach(rows) { entry in objectRow(entry) }
+                    if rows.isEmpty { Text("Сначала добавьте объект в настройках").foregroundStyle(Brand.secondaryInk) }
+                } header: { Text(ProductText.string("guests_objects_allowed")) }
                 Section {
-                    Button {
-                        Task {
-                            let before = Set(owner?.issuedKeys?.map(\.id) ?? [])
-                            let result: Bool
-                            if let editingKeyID {
-                                result = await model.editOwnerKey(server: server, keyID: editingKeyID, label: label, numberIDs: Array(selected), welcome: welcome, confirmation: changeConfirmation ? confirmation : nil, access: requestedAccess)
-                            } else {
-                                result = await model.createOwnerKey(server: server, label: label, numberIDs: Array(selected), welcome: welcome, nativeOnly: false, confirmation: confirmation, access: requestedAccess)
-                            }
-                            let after = Set(owner?.issuedKeys?.map(\.id) ?? [])
-                            let pendingEdit = editingKeyID.flatMap { id in owner?.issuedKeys?.first(where: { $0.id == id })?.pending } != nil
-                            if result || pendingEdit || !after.subtracting(before).isEmpty { dismiss() }
-                        }
-                    } label: { ActionButtonLabel(title: editingKeyID == nil ? "Выдать ключ" : "Сохранить изменения", busy: model.ownerBusy) }
-                        .buttonStyle(PrimaryActionStyle()).actionListRow()
-                        .disabled(model.ownerBusy || selected.isEmpty || label.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
-                } footer: { Text("Ссылка даст выбранному гостю доступ только к отмеченным объектам. Передавайте её лично получателю.") }
-            }
-            .navigationTitle(editingKeyID == nil ? "Выдать ключ" : "Изменить ключ").navigationBarTitleDisplayMode(.inline)
-            .task {
-                guard !loaded else { return }; loaded = true
-                if server.isEmpty { server = owners.first?.server ?? "" }
-                if let editingKeyID, let owner, let key = owner.issuedKeys?.first(where: { $0.id == editingKeyID }) {
-                    label = key.label
-                    selected = Set(key.effectiveNumberIDs ?? key.numberIDs)
-                    access = Dictionary(uniqueKeysWithValues: (key.access ?? [:]).compactMap { k, v in Int(k).map { ($0, v) } })
-                    welcome = (try? key.bundle(masterKey: owner.masterKey)["welcome"] as? String) ?? ""
+                    Button { Task { await save() } } label: {
+                        ActionButtonLabel(title: editingKeyID == nil ? "Выдать ключ" : ProductText.string("btn_save"), busy: model.ownerBusy)
+                    }.buttonStyle(PrimaryActionStyle()).actionListRow().disabled(model.ownerBusy || draft.selected.isEmpty || (editingKeyID != nil && label.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty))
                 }
-            }
-            .onChange(of: server) { _ in selected = []; access = [:] }
-            .sheetDismissFooter(disabled: model.ownerBusy) { dismiss() }
-
-            .alert("Entrixy", isPresented: Binding(get: { model.errorMessage != nil }, set: { if !$0 { model.errorMessage = nil } })) { Button("Понятно") { model.errorMessage = nil } } message: { Text(model.errorMessage ?? "") }
+            }.navigationTitle(editingKeyID == nil ? "Выдать ключ" : ProductText.string("guests_access_title"))
+                .navigationBarTitleDisplayMode(.inline)
+                .sheetDismissFooter(disabled: model.ownerBusy) { dismiss() }
+                .task {
+                    guard !loaded else { return }; loaded = true
+                    if let editingKeyID, let owner, let key = owner.issuedKeys?.first(where: { $0.id == editingKeyID }) {
+                        model.beginEditingGuestKey(editingKeyID)
+                        do {
+                            try draft.load(owner: owner, key: key)
+                            label = key.label; welcome = try key.bundle(masterKey: owner.masterKey)["welcome"] as? String ?? ""
+                        } catch { model.errorMessage = "Не удалось прочитать настройки ключа." }
+                    }
+                }
+                .onDisappear { if task == nil, let editingKeyID { model.endEditingGuestKey(editingKeyID) } }
+                .sheet(item: $task, onDismiss: { if let owner { draft.syncSavedSettings(owner: owner) } }) { task in nested(task) }
+                .alert("Entrixy", isPresented: Binding(get: { model.errorMessage != nil }, set: { if !$0 { model.errorMessage = nil } })) {
+                    Button(ProductText.string("btn_ok")) { model.errorMessage = nil }
+                } message: { Text(model.errorMessage ?? "") }
         }
+    }
+    @ViewBuilder private func objectRow(_ entry: CatalogObject) -> some View {
+        if case let .owned(account, object) = entry, let number = object.numberID {
+            let selected = account.server == server && draft.selected.contains(number)
+            let locked = !draft.selected.isEmpty && server != account.server
+            VStack(alignment: .leading, spacing: 8) {
+                if startsGroup(entry) {
+                    Text(account.server).font(.footnote).foregroundStyle(Brand.secondaryInk)
+                }
+                HStack(spacing: 6) {
+                    Button { toggle(account, object) } label: {
+                        HStack(spacing: 10) {
+                            Image(systemName: selected ? "checkmark.square.fill" : "square")
+                            Text(model.objectLabel(entry)).lineLimit(1).frame(maxWidth: .infinity, alignment: .leading)
+                        }.foregroundStyle(Brand.ink).frame(minHeight: 48).contentShape(Rectangle())
+                    }.buttonStyle(.plain).disabled(locked || !eligible(object) || model.ownerBusy)
+                        .accessibilityIdentifier("guest-object-" + entry.target.id)
+                        .accessibilityAddTraits(selected ? .isSelected : [])
+                    if selected {
+                        if ["call", "webhook", "ble"].contains(object.kind) {
+                            objectButton("hand.tap", label: ProductText.string("guests_call_cfg_desc")) { task = .invocation(entry.target) }
+                        }
+                        objectButton("arrow.triangle.2.circlepath", label: ProductText.string("guests_automation_desc")) { task = .automation(entry.target) }
+                        objectButton("person.badge.key", label: ProductText.string("obj_access_desc")) { task = .access(entry.target) }
+                    }
+                }
+                if selected, object.kind != "ble", let camera = object.localConfiguration?.camera, camera.enabled, !camera.url.isEmpty {
+                    Toggle(ProductText.string("guests_grant_video"), isOn: Binding(get: { draft.streams[number] ?? true }, set: { draft.streams[number] = $0 }))
+                        .font(.subheadline).padding(.leading, 30)
+                }
+            }
+        }
+    }
+    private func objectButton(_ symbol: String, label: String, action: @escaping () -> Void) -> some View {
+        Button(action: action) { Image(systemName: symbol).frame(maxWidth: .infinity) }
+            .buttonStyle(SecondaryActionStyle()).frame(width: 48).accessibilityLabel(label)
+    }
+    @ViewBuilder private func nested(_ task: GuestObjectTask) -> some View {
+        if case let .owned(host, id) = task.target, let account = model.owners.first(where: { $0.server == host }),
+           let object = account.objects?.first(where: { $0.id == id }), let number = object.numberID {
+            let saved = editingKeyID.flatMap { keyID in account.issuedKeys?.first(where: { $0.id == keyID && $0.numberIDs.contains(number) }) }
+            switch task {
+            case .automation:
+                if let saved { AutomationEditor(destination: .issued(server: host, keyID: saved.id, objectID: id)) }
+                else { DraftGuestAutomationEditor(draft: draft, server: host, objectID: id) }
+            case .access:
+                GuestObjectAccessEditor(title: model.objectLabel(.owned(account, object)), value: Binding(get: { access(number) }, set: { draft.access[number] = $0 }))
+            case .invocation:
+                if object.kind == "ble" {
+                    GuestBLELifetimeEditor(label: model.objectLabel(.owned(account, object)), seconds: Binding(get: {
+                        if let keyID = saved?.id { return model.owners.first(where: { $0.server == host })?.issuedKeys?.first(where: { $0.id == keyID })?.bleTokenLifetimes?[String(number)] ?? BLETokenLifetime.defaultValue }
+                        return draft.lifetimes[number] ?? BLETokenLifetime.defaultValue
+                    }, set: { seconds in
+                        if let saved { if model.saveIssuedLifetime(server: host, keyID: saved.id, objectID: id, seconds: seconds) { draft.lifetimes[number] = seconds } }
+                        else { draft.lifetimes[number] = seconds }
+                    }))
+                } else {
+                    GuestInvocationEditor(server: host, objectID: id, preference: Binding(get: {
+                        if let keyID = saved?.id { return model.owners.first(where: { $0.server == host })?.issuedKeys?.first(where: { $0.id == keyID })?.callPreferences?[String(number)] ?? OwnerCallPreference() }
+                        return draft.calls[number] ?? OwnerCallPreference()
+                    }, set: { preference in
+                        if let saved { if model.saveIssuedCallPreference(server: host, keyID: saved.id, objectID: id, preference: preference) { draft.calls[number] = preference } }
+                        else { draft.calls[number] = preference }
+                    }))
+                }
+            }
+        }
+    }
+    private func save() async {
+        guard let owner else { return }
+        do {
+            draft.syncSavedSettings(owner: owner)
+            let configuration = try draft.configuration(owner: owner)
+            let access = Dictionary(uniqueKeysWithValues: draft.selected.map { ($0, access($0)) })
+            let before = Set(owner.issuedKeys?.map(\.id) ?? [])
+            let previousCipher = owner.issuedKeys?.first(where: { $0.id == editingKeyID })?.bundleCipher
+            let name = label.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? ProductText.string("guests_default_name") : label
+            let result: Bool
+            if let editingKeyID {
+                result = await model.editOwnerKey(server: server, keyID: editingKeyID, label: name, numberIDs: Array(draft.selected), welcome: welcome, confirmation: nil, access: access, settings: configuration)
+            } else {
+                result = await model.createOwnerKey(server: server, label: name, numberIDs: Array(draft.selected), welcome: welcome, nativeOnly: false, confirmation: false, access: access, settings: configuration)
+            }
+            let after = model.owners.first { $0.server == server }?.issuedKeys ?? []
+            if result || after.contains(where: { !before.contains($0.id) || ($0.id == editingKeyID && $0.bundleCipher != previousCipher && $0.pending != nil) }) {
+                if let editingKeyID { model.endEditingGuestKey(editingKeyID) }
+                dismiss()
+            }
+        } catch { model.errorMessage = "Не удалось сохранить настройки доступа." }
     }
 }
 

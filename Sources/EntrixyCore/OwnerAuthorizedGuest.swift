@@ -37,4 +37,10 @@ public extension OwnerAccount {
         }
         return nil
     }
+    func callPreference(guestID: UUID, numberID: Int) -> OwnerCallPreference? {
+        let rootID = issuedKeys?.first(where: { $0.id == guestID })?.id
+            ?? delegatedKeys?.first(where: { $0.id == guestID })?.rootID
+        return issuedKeys?.first(where: { $0.id == rootID })?.callPreferences?[String(numberID)]
+    }
+
 }

@@ -54,9 +54,35 @@ made for this checkpoint. The public 19-frame gallery is the previous catalogue.
   Server routing, network bans, controller credentials and token validity remain
   authoritative. Unsupported multi-condition gates still block execution.
 
+## Guest-object settings follow-on
+
+GuestsScreen.kt's new/edit key sheet now uses the common ordered object list:
+checkbox/name, invocation or BLE lifetime, automation, then object-access icon.
+Server groups occur once; choosing objects locks a new key to their owner server.
+Video permission stays under the selected camera-enabled row. Removed invented
+whole-key confirmation/permission-change toggles and separate permission section.
+Nested settings for a new guest use a local form draft and create no signing
+identity or server request before Save. Existing per-guest templates and TTL/call
+choices persist under that key; camera permission/object scope remain form drafts.
+Publication waits while an existing key form is open, so an old bundle in flight
+cannot swallow label/scope changes. Failed Save keeps the form when no mutation
+was prepared.
+
+Per-object app-only/depth/pool choices use the existing backend fields; app-only
+restricts browser access and does not prevent issuing/importing the native key.
+BLE TTL has Android's eleven 1-hour…30-day levels, applied only on explicit renewal;
+polling and ordinary edits preserve the current token expiry and identity.
+Call reactions are owner-private and follow a delegated key back to its root.
+Explicit new auto/notify choices hand off to iOS Phone; notification mode waits five
+seconds with cancellation, busy checks and one-use signature verification.
+Unconfigured older iOS keys retain explicit app approval. iOS always requires its
+phone confirmation and cannot dial from the background. App lock blocks management
+and automatic handoff. Webhook's invocation setting is the shared object mode,
+with Android's warning, not a meaningless per-guest call reaction.
+
 ## Actual verification
 
-Linux Swift6.0.3 + swift-crypto: 176 core tests, zero failures, including immutable
+Linux Swift6.0.3 + swift-crypto: 180 core tests, zero failures, including immutable
 in-flight bundle requests, scoped templates, force bounds, overnight windows,
 private camera material, stale edit rejection, durable device registration,
 avatar rollback, per-key local override isolation and the Android phone-webhook
@@ -74,6 +100,13 @@ This confirms the first version of the object/rule/avatar/phone-webhook source
 compiles with Xcode26.3. It did not execute hosted tests or UI interactions.
 Later effective-policy/recovery/editor changes require their own exact-source run.
 No screenshot or physical command was performed.
+
+Public1abcf00cc741abbc302a01633870a926ac27a571 (native854796f),
+[run43959028455](https://github.com/entrixy/ios-build./actions/runs/43959028455),
+then passed176 Apple core tests, Debug/Release/isolation and88 hosted native tests
+with zero failures. Its app/test files are byte-identical to that native checkpoint.
+This predates the guest-object settings follow-on above: its180 Linux core tests
+and app/hosted/UI syntax parsing pass; Apple/native/UI execution remains pending.
 
 This does NOT establish native interactions, device operation or App Store readiness. The separate ci/functional-port workflow builds Debug/test
 bundles and Release with fixture isolation, without taking screenshots or actuating hardware. It then runs hosted native

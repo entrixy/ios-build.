@@ -96,6 +96,14 @@ private final class RecordingOwnerAPI: OwnerTransport {
     }
 }
 
+@MainActor private final class RecordingPhoneNotices: OwnerPhoneNoticePosting {
+    var cancelled: ((String) -> Void)?
+    var shown: [String] = []
+    var removed: [String] = []
+    func show(id: String, guest: String, object: String) async -> Bool { shown.append(id); return true }
+    func remove(id: String) { removed.append(id) }
+}
+
 private final class RecordingOwnerChannel: OwnerLiveTransport {
     let frames: AsyncThrowingStream<Data, Error>
     private let continuation: AsyncThrowingStream<Data, Error>.Continuation
@@ -787,6 +795,64 @@ extension OwnerAccountTests {
         XCTAssertEqual(model.owners[0].objects?.first?.numberID, 7)
         XCTAssertNotNil(try model.ownerDeviceCredentials(server: "owner.invalid", objectID: id))
         XCTAssertEqual(api.mutations, 2)
+    }
+
+    @MainActor func testExplicitAutoCallChoiceHandsOffOnceAfterPersistingTheAttempt() async throws {
+        let storage = OwnerMemoryStorage(), api = RecordingOwnerAPI()
+        let model = AppModel(storage: storage, ownerAPI: api)
+        _ = await model.addOwner(server: "owner.invalid", accessCode: "")
+        _ = await model.createOwnerObject(server: "owner.invalid", label: "Ворота", kind: "call", phone: "+79990000000", url: "", secret: "", claimCode: "")
+        var config = OwnerKeyConfiguration(); config.calls["7"] = OwnerCallPreference()
+        _ = await model.createOwnerKey(server: "owner.invalid", label: "Гость", numberIDs: [7], welcome: "", nativeOnly: false, confirmation: false, settings: config)
+        let owner = model.owners[0], pair = try owner.issuedKeys![0].secrets(masterKey: owner.masterKey)
+        let frame = try GuestPress.frame(userKey: pair.userKey, host: owner.server, numberID: 7, wireAction: "")
+        let press = (try JSONSerialization.jsonObject(with: frame) as! [String:Any])["press"]!
+        let request: [String:Any] = ["type":"do_call","call_id":"auto-call","number_id":7,"user_key_id":17,"press":press]
+        let channel = RecordingOwnerChannel(); api.liveChannel = channel
+        var dialed = 0
+        let control = OwnerControlModel(app: model, dialer: { _ in
+            XCTAssertEqual(storage.state?.journal?.count,1); dialed += 1; return true
+        }, notices: RecordingPhoneNotices(), phoneBusy: { false })
+        defer { control.suspend() }
+        control.resume(); try await waitForOwner { control.connections[owner.server] == .connected }
+        channel.emit(request); channel.emit(request)
+        try await waitForOwner { dialed == 1 }
+        XCTAssertTrue(control.phoneRequests.isEmpty); XCTAssertEqual(model.journal.count,1)
+        XCTAssertEqual(model.journal[0].result,"Передано приложению «Телефон»")
+    }
+    @MainActor func testNotificationCancellationDeclinesGuestWithoutDialingOrFabricatingHistory() async throws {
+        let storage = OwnerMemoryStorage(), api = RecordingOwnerAPI(), notices = RecordingPhoneNotices()
+        let model = AppModel(storage: storage, ownerAPI: api)
+        _ = await model.addOwner(server: "owner.invalid", accessCode: "")
+        _ = await model.createOwnerObject(server: "owner.invalid", label: "Ворота", kind: "call", phone: "+79990000000", url: "", secret: "", claimCode: "")
+        var config = OwnerKeyConfiguration(), preference = OwnerCallPreference(); preference.reaction = "notify"; config.calls["7"] = preference
+        _ = await model.createOwnerKey(server: "owner.invalid", label: "Гость", numberIDs: [7], welcome: "", nativeOnly: false, confirmation: false, settings: config)
+        let owner = model.owners[0], pair = try owner.issuedKeys![0].secrets(masterKey: owner.masterKey)
+        let frame = try GuestPress.frame(userKey: pair.userKey, host: owner.server, numberID: 7, wireAction: "")
+        let press = (try JSONSerialization.jsonObject(with: frame) as! [String:Any])["press"]!
+        let channel = RecordingOwnerChannel(); api.liveChannel = channel
+        var dialed = 0
+        let control = OwnerControlModel(app: model, dialer: { _ in dialed += 1; return true }, notices: notices, phoneBusy: { false })
+        defer { control.suspend() }
+        control.resume(); try await waitForOwner { control.connections[owner.server] == .connected }
+        channel.emit(["type":"do_call","call_id":"notify-call","number_id":7,"user_key_id":17,"press":press])
+        try await waitForOwner { !notices.shown.isEmpty }
+        notices.cancelled?(try XCTUnwrap(notices.shown.first))
+        try await waitForOwner { channel.writes.contains { $0["status"] as? String == "declined" } }
+        XCTAssertEqual(dialed,0); XCTAssertTrue(model.journal.isEmpty)
+    }
+    @MainActor func testDraftSettingsDoNotGenerateGuestIdentityAndKeepOwnerObjectOrder() throws {
+        let draft = GuestKeyDraft()
+        var owner = try OwnerAccount(server: "owner.invalid")
+        var first = try OwnerObject(masterKey: owner.masterKey, label: "Ворота", kind: "call", phone: "+79990000000")
+        first.numberID = 7; first.pending = nil; first.available = true; owner.objects = [first]
+        draft.selected = [7]
+        var template = AutomationTemplate(); template.confirmEnabled = true; draft.templates[7] = template
+        let settings = try draft.configuration(owner: owner)
+        XCTAssertEqual(try AutomationTemplate(data: settings.automation["7"]).confirmEnabled,true)
+        XCTAssertNil(owner.issuedKeys)
+        XCTAssertEqual(owner.objects?.first?.id,first.id)
+        XCTAssertEqual(draft.selected,[7])
     }
 
 }

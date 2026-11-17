@@ -26,11 +26,12 @@ public struct OwnerIssuedKey: Codable, Identifiable, Equatable {
     public var accessNeedsReview: Bool?
     public var automationTemplates: [String: Data]?
     public var streamAllowed: [Int]?
+    public var bleTokenLifetimes: [String: UInt32]?
+    public var callPreferences: [String: OwnerCallPreference]?
     public var objectSettingsToken: String?
     public var sent: Bool
 
-    public init(owner: OwnerAccount, label: String, numberIDs: [Int], welcome: String, nativeOnly: Bool, confirmation: Bool, access: [Int: KeyObjectAccess]? = nil) throws {
-        guard !nativeOnly else { throw GuestCrypto.Failure.invalidKey }
+    public init(owner: OwnerAccount, label: String, numberIDs: [Int], welcome: String, nativeOnly: Bool, confirmation: Bool, access: [Int: KeyObjectAccess]? = nil, settings: OwnerKeyConfiguration? = nil) throws {
         guard !label.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty, label.utf8.count <= 512 else { throw GuestCrypto.Failure.invalidEnvelope }
         var used = Set((owner.issuedKeys ?? []).map(\.guestID))
         used.formUnion((owner.delegatedKeys ?? []).map(\.guestID))
@@ -42,12 +43,17 @@ public struct OwnerIssuedKey: Codable, Identifiable, Equatable {
         repeat { did = Int.random(in: 1...65535) } while used.contains(did)
         let userKey = GuestCrypto.base64URL(GuestCrypto.randomBytes(count: 24))
         let bundleKey = GuestCrypto.randomBytes(count: 32)
-        let bundle = try Self.makeBundle(owner: owner, numberIDs: numberIDs, guestID: did, welcome: welcome, confirmation: confirmation)
+        try settings?.validate(numberIDs: numberIDs)
+        let bundle = try Self.makeBundle(owner: owner, numberIDs: numberIDs, guestID: did, welcome: welcome,
+            confirmation: settings == nil ? confirmation : nil, automation: settings?.automation,
+            streamAllowed: settings?.streams, bleLifetimes: settings?.bleLifetimes)
+        automationTemplates = settings?.automation; streamAllowed = settings?.streams
+        bleTokenLifetimes = settings?.bleLifetimes; callPreferences = settings?.calls
         id = UUID(); self.label = label.trimmingCharacters(in: .whitespacesAndNewlines)
         self.numberIDs = numberIDs.sorted(); guestID = did; self.nativeOnly = nativeOnly
         wrappedSecrets = try GuestCrypto.encrypt(key: owner.masterKey, plaintext: JSONSerialization.data(withJSONObject: ["user_key": userKey, "bundle_key": GuestCrypto.base64URL(bundleKey)], options: .sortedKeys))
         bundleCipher = try GuestCrypto.encrypt(key: bundleKey, plaintext: bundle)
-        grantedAccess = try Self.checkedAccess(access ?? Dictionary(uniqueKeysWithValues: numberIDs.map { ($0, try! KeyObjectAccess()) }), numberIDs: numberIDs)
+        grantedAccess = try Self.checkedAccess(access ?? Dictionary(uniqueKeysWithValues: numberIDs.map { ($0, try! KeyObjectAccess(nativeOnly: nativeOnly)) }), numberIDs: numberIDs)
         if let access { requestedAccess = try Self.checkedAccess(access, numberIDs: numberIDs) }
         state = .draft; pending = .keyCreate; sent = false
     }
@@ -58,21 +64,25 @@ public struct OwnerIssuedKey: Codable, Identifiable, Equatable {
         return bundle
     }
 
-    public mutating func edit(owner: OwnerAccount, label: String, numberIDs: [Int], welcome: String, confirmation: Bool? = nil, access: [Int: KeyObjectAccess]? = nil) throws {
-        guard pending == nil, keyID != nil, state == .active || state == .paused, !nativeOnly,
+    public mutating func edit(owner: OwnerAccount, label: String, numberIDs: [Int], welcome: String, confirmation: Bool? = nil, access: [Int: KeyObjectAccess]? = nil, settings: OwnerKeyConfiguration? = nil) throws {
+        guard pending == nil, keyID != nil, state == .active || state == .paused,
               !label.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty, label.utf8.count <= 512 else { throw GuestCrypto.Failure.invalidEnvelope }
         let pair = try secrets(masterKey: owner.masterKey)
         let existing = try bundle(masterKey: owner.masterKey)
-        let chosenTemplates = automationTemplates?.filter { numberIDs.contains(Int($0.key) ?? -1) }
-        let chosenStreams = streamAllowed?.filter { numberIDs.contains($0) }
+        try settings?.validate(numberIDs: numberIDs)
+        let chosenTemplates = (settings?.automation ?? automationTemplates)?.filter { numberIDs.contains(Int($0.key) ?? -1) }
+        let chosenStreams = (settings?.streams ?? streamAllowed)?.filter { numberIDs.contains($0) }
         let bytes = try Self.makeBundle(owner: owner, numberIDs: numberIDs, guestID: guestID, welcome: welcome, confirmation: confirmation, existing: existing,
-            automation: chosenTemplates, streamAllowed: chosenStreams)
+            automation: chosenTemplates, streamAllowed: chosenStreams,
+            bleLifetimes: settings?.bleLifetimes ?? bleTokenLifetimes)
         let cipher = try GuestCrypto.encrypt(key: pair.bundleKey, plaintext: bytes)
         if let access { requestedAccess = try Self.checkedAccess(access, numberIDs: numberIDs) }
         self.label = label.trimmingCharacters(in: .whitespacesAndNewlines)
         self.numberIDs = numberIDs.sorted()
         bundleCipher = cipher
         automationTemplates = chosenTemplates; streamAllowed = chosenStreams
+        bleTokenLifetimes = (settings?.bleLifetimes ?? bleTokenLifetimes)?.filter { numberIDs.contains(Int($0.key) ?? -1) }
+        callPreferences = (settings?.calls ?? callPreferences)?.filter { numberIDs.contains(Int($0.key) ?? -1) }
         pending = .keyEdit; sent = false
     }
 
@@ -83,19 +93,19 @@ public struct OwnerIssuedKey: Codable, Identifiable, Equatable {
         let pair = try secrets(masterKey: owner.masterKey)
         let bytes = try Self.makeBundle(owner: owner, numberIDs: numberIDs, guestID: guestID,
             welcome: existing["welcome"] as? String ?? "", confirmation: nil, existing: existing, renewBLE: true,
-            automation: automationTemplates, streamAllowed: streamAllowed)
+            automation: automationTemplates, streamAllowed: streamAllowed, bleLifetimes: bleTokenLifetimes)
         bundleCipher = try GuestCrypto.encrypt(key: pair.bundleKey, plaintext: bytes)
         pending = .keyEdit; sent = false
     }
 
     private static func checkedAccess(_ access: [Int: KeyObjectAccess], numberIDs: [Int]) throws -> [String: KeyObjectAccess] {
-        guard Set(access.keys) == Set(numberIDs), access.values.allSatisfy({ !$0.nativeOnly }) else { throw GuestCrypto.Failure.invalidEnvelope }
+        guard Set(access.keys) == Set(numberIDs) else { throw GuestCrypto.Failure.invalidEnvelope }
         for value in access.values { try value.validate() }
         return Dictionary(uniqueKeysWithValues: access.map { (String($0.key), $0.value) })
     }
 
     static func makeBundle(owner: OwnerAccount, numberIDs: [Int], guestID: Int, welcome: String, confirmation: Bool?, existing: [String: Any] = [:], renewBLE: Bool = false,
-                           automation: [String: Data]? = nil, streamAllowed: [Int]? = nil, inheritRestrictions: Bool = false) throws -> Data {
+                           automation: [String: Data]? = nil, streamAllowed: [Int]? = nil, inheritRestrictions: Bool = false, bleLifetimes: [String: UInt32]? = nil) throws -> Data {
         guard !numberIDs.isEmpty, Set(numberIDs).count == numberIDs.count, welcome.utf8.count <= 4096 else { throw GuestCrypto.Failure.invalidEnvelope }
         let selected = (owner.objects ?? []).filter { numberIDs.contains($0.numberID ?? -1) }
         guard selected.count == numberIDs.count, selected.allSatisfy({ $0.pending == nil && $0.available != false }) else { throw GuestCrypto.Failure.invalidEnvelope }
@@ -135,7 +145,7 @@ public struct OwnerIssuedKey: Codable, Identifiable, Equatable {
                 if old?["tpl"] != nil && old?["tpl"] as? [String: Any] == nil { throw GuestCrypto.Failure.invalidEnvelope }
                 if let confirmation { template["confirm_on"] = confirmation; template.removeValue(forKey: "confirm") }
                 ble.append(try BLEBundle.row(object: object, masterKey: owner.masterKey, guestID: guestID,
-                    template: template, existing: old, renew: renewBLE))
+                    template: template, existing: old, renew: renewBLE, ttl: bleLifetimes?[String(number)] ?? BLETokenLifetime.defaultValue))
                 continue
             }
             guard ["phone", "webhook_url", "webhook_secret"].allSatisfy({ metadata[$0] == nil || metadata[$0] is NSNull }) else { throw GuestCrypto.Failure.invalidEnvelope }
@@ -202,7 +212,7 @@ public struct OwnerIssuedKey: Codable, Identifiable, Equatable {
               Set(streamAllowed ?? []).isSubset(of: Set(numberIDs)),
               Set(streamAllowed ?? []).count == (streamAllowed ?? []).count else { throw GuestCrypto.Failure.invalidEnvelope }
         if let objectSettingsToken { guard UUID(uuidString: objectSettingsToken) != nil else { throw GuestCrypto.Failure.invalidEnvelope } }
-        for data in (automationTemplates ?? [:]).values { _ = try AutomationTemplate(data: data) }
+        try configuration.validate(numberIDs: numberIDs)
         let keys = try secrets(masterKey: masterKey)
         _ = try GuestCrypto.decrypt(key: keys.bundleKey, envelope: bundleCipher)
     }
@@ -217,7 +227,7 @@ public struct OwnerIssuedKey: Codable, Identifiable, Equatable {
                     "sign_pub": GuestCrypto.base64URL(try GuestCrypto.signingKey(userKey: secrets.userKey).publicKey.rawRepresentation), "suite": "v1",
                     "number_ids": numberIDs, "ble_ids": [Int](), "bundle_cipher": bundleCipher,
                     "native_only": nativeOnly, "delegate_depth": requestedAccess?.values.map(\.depth).max() ?? 0, "force_when_busy": false,
-                    "objects": try numberIDs.map { try (requestedAccess?[String($0)] ?? KeyObjectAccess()).json(id: $0) }]
+                    "objects": try numberIDs.map { try (requestedAccess?[String($0)] ?? grantedAccess?[String($0)] ?? KeyObjectAccess(nativeOnly: nativeOnly)).json(id: $0) }]
         case .keyEdit:
             guard let keyID else { throw GuestCrypto.Failure.invalidEnvelope }
             // Omit unchanged settings: the API preserves them.
@@ -235,7 +245,7 @@ public struct OwnerIssuedKey: Codable, Identifiable, Equatable {
     }
 
     public func link(server: String, masterKey: Data) throws -> URL {
-        guard state == .active, pending == nil, keyID != nil, !nativeOnly else { throw GuestCrypto.Failure.invalidKey }
+        guard state == .active, pending == nil, keyID != nil else { throw GuestCrypto.Failure.invalidKey }
         let pair = try secrets(masterKey: masterKey)
         guard let url = URL(string: "https://\(try GuestInvite.normalizeServer(server))/key#\(pair.userKey)\(GuestCrypto.base64URL(pair.bundleKey))") else { throw GuestCrypto.Failure.invalidEnvelope }
         return url

@@ -6,9 +6,11 @@ struct AutomationEditor: View {
     @EnvironmentObject private var model: AppModel
     @Environment(\.dismiss) private var dismiss
     let destination: AutomationDestination
+    var contextOverride: AutomationSettingsContext? = nil
+    var saveOverride: ((AutomationTemplate) -> Bool)? = nil
     @State private var codeSetup = false
     @State private var message: String?
-    private var context: AutomationSettingsContext? { try? model.automationContext(destination) }
+    private var context: AutomationSettingsContext? { contextOverride ?? (try? model.automationContext(destination)) }
     private func text(_ key: String) -> String { ProductText.string(key) }
     var body: some View {
         NavigationStack {
@@ -118,9 +120,9 @@ struct AutomationEditor: View {
         Binding(get: { Double(min(maximum,max(minimum,c.template[keyPath: key]))) }, set: { value in change { $0[keyPath: key] = Int(value) } })
     }
     private func change(_ update: (inout AutomationTemplate) -> Void) {
-        guard let current = try? model.automationContext(destination) else { return }
+        guard let current = context else { return }
         var copy = current.template; update(&copy)
-        message = model.saveAutomation(current, template: copy) ? nil : "Не удалось сохранить изменение. Прежние настройки сохранены."
+        message = (saveOverride?(copy) ?? model.saveAutomation(current, template: copy)) ? nil : "Не удалось сохранить изменение. Прежние настройки сохранены."
     }
     private func finishCodeSetup() {
         guard !model.hasActionCode, let c = context, !(c.incoming && c.template.authLevel == .force) else { return }

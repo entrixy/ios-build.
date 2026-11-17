@@ -94,6 +94,8 @@ public extension OwnerAccount {
                 }
                 current.automationTemplates = current.automationTemplates ?? incoming.automationTemplates
                 current.streamAllowed = current.streamAllowed ?? incoming.streamAllowed
+                current.bleTokenLifetimes = current.bleTokenLifetimes ?? incoming.bleTokenLifetimes
+                current.callPreferences = current.callPreferences ?? incoming.callPreferences
                 current.objectSettingsToken = current.objectSettingsToken ?? incoming.objectSettingsToken
                 issued[index] = current
             } else {

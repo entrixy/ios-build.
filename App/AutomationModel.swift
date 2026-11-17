@@ -3,9 +3,11 @@ import EntrixyCore
 
 enum AutomationDestination: Identifiable, Hashable {
     case object(ObjectReference)
+    case draft(id: UUID, objectID: UUID)
     case issued(server: String, keyID: UUID, objectID: UUID)
     var id: String {
         switch self {
+        case .draft(let id, let object): return "draft:" + id.uuidString + ":" + object.uuidString
         case .object(let target): return "object:" + target.id
         case .issued(let server, let key, let object): return "issued:" + server + ":" + key.uuidString + ":" + object.uuidString
         }
@@ -28,6 +30,7 @@ struct AutomationSettingsContext {
 extension AppModel {
     func automationContext(_ destination: AutomationDestination) throws -> AutomationSettingsContext {
         switch destination {
+        case .draft: throw GuestCrypto.Failure.invalidEnvelope
         case .object(.owned(let server, let id)):
             guard let owner = owners.first(where: { $0.server == server }),
                   let object = owner.objects?.first(where: { $0.id == id }) else { throw GuestCrypto.Failure.invalidEnvelope }

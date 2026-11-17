@@ -22,6 +22,7 @@ final class AppModel: ObservableObject {
     @Published private(set) var unverifiedOwnerDelegations: [String: Int] = [:]
     private var unsavedOwnerKeys: [UUID: OwnerIssuedKey] = [:]
     private var unsavedOwnerObjects: [UUID: OwnerObject] = [:]
+    private var editingOwnerKeys = Set<UUID>()
     private var ownerBundleRetryAfter: [String: Date] = [:]
     private var ownerBundleRetryAttempts: [String: Int] = [:]
     private var ownerSettingsTask: Task<Void, Never>?
@@ -58,7 +59,7 @@ final class AppModel: ObservableObject {
     @Published private(set) var outgoingMessages: [OutgoingMessage] = []
     @Published private(set) var passedAccess: [PassedAccess] = []
     @Published private(set) var receivedDelegations: [ReceivedDelegation] = []
-    var canManageGuestAccess: Bool { storageReady && foreground && pendingRestore == nil }
+    var canManageGuestAccess: Bool { storageReady && foreground && !appLocked && pendingRestore == nil }
     @Published private(set) var delegations: [DelegationRedemption] = []
     private var usedOwnerPresses: [String: Date] = [:]
     private var delegatedJournalLedger = DelegatedJournalLedger()
@@ -771,6 +772,7 @@ final class AppModel: ObservableObject {
             let retryID = server + "|" + keyID
             if let next = ownerBundleRetryAfter[retryID], next > Date() { continue }
             let key = owners[index].issuedKeys![offset]
+            if editingOwnerKeys.contains(key.id) { continue }
             do {
                 var updated = owners
                 if key.state == .revoked || (key.pending == nil && key.objectSettingsToken == token) {
@@ -1040,14 +1042,14 @@ final class AppModel: ObservableObject {
         }
         return result.sorted()
     }
-    func createOwnerKey(server: String, label: String, numberIDs: [Int], welcome: String, nativeOnly: Bool, confirmation: Bool, access: [Int: KeyObjectAccess]? = nil) async -> Bool {
+    func createOwnerKey(server: String, label: String, numberIDs: [Int], welcome: String, nativeOnly: Bool, confirmation: Bool, access: [Int: KeyObjectAccess]? = nil, settings: OwnerKeyConfiguration? = nil) async -> Bool {
         guard storageReady, !ownerBusy, let index = owners.firstIndex(where: { $0.server == server && $0.credentials != nil }) else { return false }
         ownerBusy = true
         defer { ownerBusy = false }
         do {
             var authority = owners[index]
             authority.reservedGuestIDs = allReservedGuestIDs()
-            let key = try OwnerIssuedKey(owner: authority, label: label, numberIDs: numberIDs, welcome: welcome, nativeOnly: nativeOnly, confirmation: confirmation, access: access)
+            let key = try OwnerIssuedKey(owner: authority, label: label, numberIDs: numberIDs, welcome: welcome, nativeOnly: nativeOnly, confirmation: confirmation, access: access, settings: settings)
             var updated = owners
             updated[index].reservedGuestIDs = authority.reservedGuestIDs
             updated[index].issuedKeys = (updated[index].issuedKeys ?? []) + [key]
@@ -1060,7 +1062,7 @@ final class AppModel: ObservableObject {
     }
 
     private func keyObjectIDs(owner: OwnerAccount, keyID: UUID) -> [Int] { owner.issuedKeys?.first(where: { $0.id == keyID })?.numberIDs ?? [] }
-    func editOwnerKey(server: String, keyID: UUID, label: String, numberIDs: [Int], welcome: String, confirmation: Bool?, access: [Int: KeyObjectAccess]? = nil) async -> Bool {
+    func editOwnerKey(server: String, keyID: UUID, label: String, numberIDs: [Int], welcome: String, confirmation: Bool?, access: [Int: KeyObjectAccess]? = nil, settings: OwnerKeyConfiguration? = nil) async -> Bool {
         guard storageReady, !ownerBusy, let index = owners.firstIndex(where: { $0.server == server }),
               let offset = owners[index].issuedKeys?.firstIndex(where: { $0.id == keyID }) else { return false }
         ownerBusy = true
@@ -1073,7 +1075,8 @@ final class AppModel: ObservableObject {
             if !addedBLE.isEmpty { updated[index].scheduleBLERestoration(keyID: keyID, objectIDs: addedBLE) }
             let removedBLE = (owner.objects ?? []).filter { $0.kind == "ble" && keyObjectIDs(owner: owner, keyID: keyID).contains($0.numberID ?? -1) && !numberIDs.contains($0.numberID ?? -1) }
             if !removedBLE.isEmpty { try updated[index].queueBLEDecision(keyID: keyID, revoked: true, restrictingObjectIDs: Set(removedBLE.compactMap(\.numberID))) }
-            try updated[index].issuedKeys![offset].edit(owner: owner, label: label, numberIDs: numberIDs, welcome: welcome, confirmation: confirmation, access: access)
+            try updated[index].issuedKeys![offset].edit(owner: owner, label: label, numberIDs: numberIDs, welcome: welcome, confirmation: confirmation, access: access, settings: settings)
+            if settings != nil { updated[index].issuedKeys![offset].objectSettingsToken = updated[index].bundleRefreshQueue?[keyID.uuidString] }
             try saveOwners(updated)
             return await sendOwnerKey(server: server, keyID: keyID)
         } catch { errorMessage = "Не удалось подготовить изменение. Проверьте выбранные объекты и состояние ключа."; return false }
@@ -1146,6 +1149,7 @@ final class AppModel: ObservableObject {
             let current = updated[index].issuedKeys![offset]
             recovered.automationTemplates = current.automationTemplates
             recovered.streamAllowed = current.streamAllowed
+            recovered.bleTokenLifetimes = current.bleTokenLifetimes; recovered.callPreferences = current.callPreferences
             updated[index].issuedKeys![offset] = recovered
             try saveOwners(updated)
             unsavedOwnerKeys.removeValue(forKey: keyID)
@@ -2154,6 +2158,7 @@ extension AppModel {
             guard current.canEdit, try current.template.data() == context.template.data() else { throw GuestCrypto.Failure.invalidEnvelope }
             let bytes = try template.data()
             switch context.destination {
+            case .draft: return false
             case .object(.owned(let server, let id)):
                 guard let index = owners.firstIndex(where: { $0.server == server }),
                       let offset = owners[index].objects?.firstIndex(where: { $0.id == id }) else { return false }
@@ -2253,4 +2258,33 @@ extension AppModel {
             return false
         }
     }
+}
+
+extension AppModel {
+    @discardableResult func saveIssuedLifetime(server: String, keyID: UUID, objectID: UUID, seconds: UInt32) -> Bool {
+        guard canManageGuestAccess, let i = owners.firstIndex(where: { $0.server == server }),
+              let j = owners[i].issuedKeys?.firstIndex(where: { $0.id == keyID }),
+              let object = owners[i].objects?.first(where: { $0.id == objectID && $0.kind == "ble" }), let number = object.numberID else { return false }
+        do {
+            var updated = owners
+            try updated[i].issuedKeys![j].configureLifetime(numberID: number, seconds: seconds)
+            try saveOwners(updated); return true
+        } catch { errorMessage = "Не удалось сохранить срок действия. Текущий пропуск не изменён."; return false }
+    }
+    @discardableResult func saveIssuedCallPreference(server: String, keyID: UUID, objectID: UUID, preference: OwnerCallPreference) -> Bool {
+        guard canManageGuestAccess, let i = owners.firstIndex(where: { $0.server == server }),
+              let j = owners[i].issuedKeys?.firstIndex(where: { $0.id == keyID }),
+              let object = owners[i].objects?.first(where: { $0.id == objectID && $0.kind == "call" }), let number = object.numberID else { return false }
+        do {
+            var updated = owners
+            try updated[i].issuedKeys![j].configureCall(numberID: number, preference: preference)
+            try saveOwners(updated); return true
+        } catch { errorMessage = "Не удалось сохранить реакцию на вызов. Прежние настройки сохранены."; return false }
+    }
+}
+
+
+extension AppModel {
+    func beginEditingGuestKey(_ id: UUID) { editingOwnerKeys.insert(id) }
+    func endEditingGuestKey(_ id: UUID) { editingOwnerKeys.remove(id); scheduleOwnerSettingsRefresh() }
 }

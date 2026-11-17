@@ -1,6 +1,7 @@
 import Foundation
 import Combine
 import UIKit
+import CallKit
 import EntrixyCore
 
 struct OwnerPhoneRequest: Identifiable {
@@ -23,6 +24,11 @@ final class OwnerControlModel: ObservableObject {
     private unowned let app: AppModel
     private let dialer: @MainActor (URL) async -> Bool
     private let webhook: any PhoneWebhookSending
+    private let notices: any OwnerPhoneNoticePosting
+    private let phoneBusy: @MainActor () -> Bool
+    private var automaticPhoneRequests = Set<String>()
+    private var notifyPhoneTasks: [String: Task<Void, Never>] = [:]
+    private var notifyPhoneRequests: [String: OwnerPhoneRequest] = [:]
     private var webhookInFlight = Set<ObjectReference>()
     private var webhookTasks: [ObjectReference: Task<PhoneWebhookReply, Error>] = [:]
     private var webhookPositionTasks: [ObjectReference: Task<Void, Never>] = [:]
@@ -71,12 +77,22 @@ final class OwnerControlModel: ObservableObject {
         }
     }
 
-    init(app: AppModel, dialer: (@MainActor (URL) async -> Bool)? = nil, webhook: any PhoneWebhookSending = PhoneWebhookTransport()) {
+    init(app: AppModel, dialer: (@MainActor (URL) async -> Bool)? = nil, webhook: any PhoneWebhookSending = PhoneWebhookTransport(), notices: (any OwnerPhoneNoticePosting)? = nil,
+         phoneBusy: (@MainActor () -> Bool)? = nil) {
         self.app = app; self.webhook = webhook
+        self.notices = notices ?? OwnerPhoneNotifications()
+        self.phoneBusy = phoneBusy ?? { CXCallObserver().calls.contains { !$0.hasEnded } }
         self.dialer = dialer ?? { url in
             await withCheckedContinuation { continuation in
                 UIApplication.shared.open(url, options: [:]) { continuation.resume(returning: $0) }
             }
+        }
+        self.notices.cancelled = { [weak self] id in
+            guard let self else { return }
+            self.notifyPhoneTasks.removeValue(forKey: id)?.cancel()
+            self.automaticPhoneRequests.remove(id)
+            self.notices.remove(id: id)
+            if let request = self.notifyPhoneRequests.removeValue(forKey: id) { Task { await self.callStatus(request, status: "declined") } }
         }
         ownerChanges = app.$owners.sink { [weak self] _ in
             Task { @MainActor [weak self] in
@@ -92,6 +108,8 @@ final class OwnerControlModel: ObservableObject {
         webhookTasks.values.forEach { $0.cancel() }
         webhookPositionTasks.values.forEach { $0.cancel() }; webhookPositionTasks.removeAll(); webhookPositionGeneration.removeAll()
         acceptedWebhookRequests.removeAll()
+        for (id, task) in notifyPhoneTasks { task.cancel(); notices.remove(id: id) }
+        notifyPhoneTasks.removeAll(); notifyPhoneRequests.removeAll(); automaticPhoneRequests.removeAll()
         workers.values.forEach { $0.cancel() }; workers.removeAll(); generations.removeAll()
         for link in links.values {
             if let attempt = link.attempt { messages[attempt.objectID] = "Результат не получен. Автоматического повтора не будет." }
@@ -322,8 +340,47 @@ final class OwnerControlModel: ObservableObject {
         }
     }
     private func receivePhoneRequest(_ json: [String: Any], server: String) throws {
-        guard phoneRequests.count < 4, let request = try verifiedPhoneRequest(json, server: server) else { return }
-        phoneRequests.append(request)
+        guard phoneRequests.count + automaticPhoneRequests.count < 4,
+              let request = try verifiedPhoneRequest(json, server: server),
+              let owner = app.owners.first(where: { $0.server == server }),
+              let object = owner.objects?.first(where: { $0.id == request.objectID }), let number = object.numberID else { return }
+        let preference = owner.callPreference(guestID: request.keyID, numberID: number)
+        if object.kind == "call", preference?.reaction == "off" {
+            Task { await decline(request) }; return
+        }
+        // A migrated key with no explicit local choice retains the earlier
+        // iOS explicit-tap behavior. New form choices follow Android's reaction.
+        if object.kind != "call" || request.needsConfirmation || preference == nil || preference?.reaction == "confirm" {
+            phoneRequests.append(request); return
+        }
+        if object.kind == "call", phoneBusy(), preference?.serveDuringCall != true {
+            Task { await callStatus(request, status: "busy") }; return
+        }
+        automaticPhoneRequests.insert(request.id)
+        if preference?.reaction == "notify" {
+            notifyPhoneRequests[request.id] = request
+            let label = (try? object.metadata(masterKey: owner.masterKey)["label"] as? String) ?? ""
+            let guest = (try? owner.authorizedGuest(localID: request.keyID, numberID: number))?.label ?? ""
+            notifyPhoneTasks[request.id] = Task { [weak self] in
+                guard let self else { return }
+                guard await self.notices.show(id: request.id, guest: guest, object: label), self.active,
+                      self.automaticPhoneRequests.contains(request.id) else {
+                    self.automaticPhoneRequests.remove(request.id); self.notifyPhoneTasks.removeValue(forKey: request.id); self.notifyPhoneRequests.removeValue(forKey: request.id)
+                    await self.callStatus(request, status: "error"); return
+                }
+                await self.callStatus(request, status: "scheduled")
+                do { try await Task.sleep(nanoseconds: 5_000_000_000) } catch { return }
+                guard !Task.isCancelled, self.active, self.automaticPhoneRequests.contains(request.id) else { return }
+                self.notices.remove(id: request.id)
+                await self.dial(server: server, objectID: request.objectID, request: request)
+                self.notifyPhoneTasks.removeValue(forKey: request.id); self.notifyPhoneRequests.removeValue(forKey: request.id)
+            }
+        } else { Task { [weak self] in await self?.dial(server: server, objectID: request.objectID, request: request) } }
+    }
+    private func callStatus(_ request: OwnerPhoneRequest, status: String) async {
+        guard active, let link = links[request.server], link.authenticated,
+              let data = try? JSONSerialization.data(withJSONObject: ["type": "call_status", "call_id": request.callID, "status": status]) else { return }
+        try? await link.live.sendAction(data)
     }
     func approve(_ request: OwnerPhoneRequest) async {
         guard let object = app.owners.first(where: { $0.server == request.server })?.objects?.first(where: { $0.id == request.objectID }) else { return }
@@ -333,6 +390,7 @@ final class OwnerControlModel: ObservableObject {
 
     func decline(_ request: OwnerPhoneRequest) async {
         phoneRequests.removeAll { $0.id == request.id }
+        automaticPhoneRequests.remove(request.id); notifyPhoneTasks.removeValue(forKey: request.id)?.cancel(); notifyPhoneRequests.removeValue(forKey: request.id); notices.remove(id: request.id)
         guard let link = links[request.server], link.authenticated else { return }
         let body: [String: Any] = request.needsConfirmation
             ? ["type": "confirm_response", "call_id": request.callID, "accept": false]
@@ -350,9 +408,13 @@ final class OwnerControlModel: ObservableObject {
         if request == nil, !app.ownerManualActionAllowed(object, server: server, action: .open) { return }
         var who = "Я"
         if let request {
-            guard phoneRequests.contains(where: { $0.id == request.id }),
-                  let number = object.numberID,
+            let explicit = phoneRequests.contains(where: { $0.id == request.id })
+            let automatic = automaticPhoneRequests.remove(request.id) != nil
+            guard explicit || automatic, let number = object.numberID,
                   let key = try? owner.authorizedGuest(localID: request.keyID, numberID: number) else { return }
+            let preference = owner.callPreference(guestID: request.keyID, numberID: number)
+            guard preference?.reaction != "off", (!phoneBusy() || preference?.serveDuringCall == true),
+                  !automatic || ["auto", "notify"].contains(preference?.reaction ?? "") else { return }
             do { _ = try OwnerGuestPress.verify(request.press, publicKey: key.publicKey, server: server, numberID: number) }
             catch { await decline(request); app.errorMessage = "Запрос гостя устарел или больше не разрешён."; return }
             who = ProductText.string("journal_who_guest", key.label)
