@@ -13,18 +13,19 @@
 они не ограничивают текущую разрешённую работу. Полный результат ещё не готов.
 Актуальные функциональные границы и проверки — [FUNCTIONAL_PORT.md](FUNCTIONAL_PORT.md).
 
-Последняя полная функциональная Apple-проверка: native `fd82582`, public `b10f1d7`,
-[CI44137608867](https://github.com/entrixy/ios-build./actions/runs/44137608867):
-248 core, Debug/test bundles, Release/isolation и146 hosted native без ошибок.
-Более поздний native `c5e4a05` / public `a2960e9`,
-[UI CI44146147004](https://github.com/entrixy/ios-build./actions/runs/44146147004),
-прошёл Apple262 core, Debug и все17 UI-сценариев, включая точное сохранение имени,
-скрытие с сохранением ключа, BLE Info, аватары, compact confirm/PIN и factory claim.
-Новый изолированный транспорт сетевой приватности пока не включён: реальный
-runtime-прогон выявил два проблемных случая; исправления и сохранение правил в
-резервных копиях проходят отдельную проверку. Локальный Core267 прошёл.
-Физический импорт фото, камера/BLE, фон, оставшиеся product routes, signing и
-выпуск этим не подтверждены.
+Последняя полная функциональная Apple-проверка: native `633005e`, public `be2be6a`,
+[CI44150323650](https://github.com/entrixy/ios-build./actions/runs/44150323650):
+268 core, Debug/test bundles, Release/isolation и153 hosted native без ошибок,
+включая изолированный proxy и сохранение сетевых правил в резервных копиях.
+Более поздний native `1927187` / public `04154a7`,
+[UI CI44152754848](https://github.com/entrixy/ios-build./actions/runs/44152754848),
+прошёл Apple270 core, Debug и все17 UI-сценариев.
+Следующий source подключает защищённую маршрутизацию при обычном запуске и
+настройки домашней сети. Актуальные Apple native/UI19 ещё проверяются;
+Linux271 и syntax прошли. Серверный account endpoint восстановлен(site875d2b6),
+проверен negative HTTP contract; настоящий успешный login/link не принят.
+Физическая маршрутизация/DNS/roaming/VPN, камера/BLE, фон, остальные product
+routes, signing и выпуск этим не подтверждены.
 Новый полный набор PNG ещё не снят и не опубликован.
 На сайте остаются 19 прежних кадров `069d20b`; это не снимки текущего приложения.
 Физические устройства, фон, дополнительные видеоформаты, signing и App Store

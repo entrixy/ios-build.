@@ -14,6 +14,9 @@ struct EntrixyApp: App {
                 NativeDesignCatalog(page: page)
             } else if let scenario = ActionCaptureScenario.current {
                 ActionCaptureRoot(scenario: scenario)
+            } else if ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil || NSClassFromString("XCTestCase") != nil {
+                // Hosted unit tests compose their own isolated model/policy.
+                Color.clear
             } else {
                 LiveAppRoot()
             }
@@ -27,9 +30,14 @@ struct EntrixyApp: App {
 }
 
 private struct LiveAppRoot: View {
-    @StateObject private var model = AppModel()
+    @StateObject private var model: AppModel
     @Environment(\.scenePhase) private var phase
     @State private var pendingURL: URL?
+    init() {
+        // Keep router construction inside StateObject's deferred initializer.
+        // Rebuilding this View must not replace the retained model's global gate.
+        _model = StateObject(wrappedValue:AppModel(privacyRouter:ServerPrivacyRouter()))
+    }
     var body: some View {
         Group {
             if model.appLocked || model.entryRequiresUnlock() { AppEntryLockScreen() }
@@ -37,10 +45,10 @@ private struct LiveAppRoot: View {
         }
         .environmentObject(model)
         .background(AppPrivacyShield(enabled: model.appLockEnabled, covered: phase != .active).frame(width: 0, height: 0))
-        .task { model.checkEntryLock(); await model.resume() }
+        .task { model.checkEntryLock(); _ = await model.prepareServerRouting(); await model.resume() }
         .onOpenURL { pendingURL = $0 }
         .onChange(of: phase) { value in
-            if value == .active { model.checkEntryLock(); Task { await model.resume() } }
+            if value == .active { model.checkEntryLock(); Task { _ = await model.prepareServerRouting(); await model.resume() } }
             else if value == .background { model.entryDidBackground(); model.suspend() }
         }
     }
@@ -84,11 +92,12 @@ struct RootView: View {
             // NavigationStack can cover an outer safeAreaInset's hit targets.
             AppBottomNavigation(selection: $selectedTab, tabs: model.navigationState.tabs) { userPickedTab = true }
         }
-        .accessibilityHidden(model.actionPrompt != nil || model.bleInformationTarget != nil || model.objectRemovalTarget != nil || model.objectAvatarTarget != nil || model.ownerGuestRequestPending || model.companyRequestID != nil || model.guestRemovalTarget != nil || model.codePrompt != nil || model.backupPromptPending || model.serverPrompt != nil)
+        .accessibilityHidden(model.actionPrompt != nil || model.bleInformationTarget != nil || model.objectRemovalTarget != nil || model.objectAvatarTarget != nil || model.ownerGuestRequestPending || model.companyRequestID != nil || model.guestRemovalTarget != nil || model.codePrompt != nil || model.backupPromptPending || model.serverPrompt != nil || model.networkPrivacyPrompt != nil)
         .overlay { BackupFlowHost(flow:model.backupPresentation) }
         .overlay {
             if let prompt = model.actionPrompt { ActionConfirmation(request:prompt).id(prompt.id) }
             else if let prompt = model.serverPrompt { ServerSettingsDialog(prompt:prompt).id(prompt.id) }
+            else if let network = model.networkPrivacyPrompt { NetworkPrivacyDialog(network:network) }
             else if let prompt = model.codePrompt { AppCodeDialog(request:prompt).id(prompt.id) }
             else if let target = model.objectRemovalTarget { ObjectRemovalConfirmation(target: target) }
             else if let target = model.objectAvatarTarget { ObjectAvatarPicker(target: target) }

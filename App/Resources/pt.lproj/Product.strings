@@ -919,3 +919,13 @@
 "ios_server_loss_save_failed" = "Control of this server has stopped. This state could not be saved in protected storage.";
 
 "ios_backup_missing_sounds" = "Custom sounds without audio files in this backup: %1$d. These events will use default sounds; choose custom files in Settings → Sounds.";
+
+/* Protected server routing on iOS. */
+"ios_privacy_hint" = "O servidor vê o endereço da rede de ligação. Marque a sua rede Wi-Fi doméstica: a regra fica no telefone e é transmitida aos convidados dentro da chave cifrada.";
+"ios_privacy_transport" = "Com regras de redes domésticas, o iOS usa dados móveis em todas as ligações ao servidor, incluindo noutras redes Wi-Fi. Sem dados móveis ou permissão para os usar com Wi-Fi, as ligações ao servidor são bloqueadas. Bluetooth, chamadas diretas e webhooks locais deste iPhone funcionam de forma independente.";
+"ios_privacy_cellular" = "Dados móveis com Wi-Fi";
+"ios_privacy_cellular_hint" = "Esta permissão aplica-se apenas a este iPhone. O operador pode cobrar dados, incluindo em roaming. A permissão não é importada de cópias de segurança.";
+"ios_privacy_unavailable" = "A ligação móvel protegida não está disponível no iOS 16. Com regras de redes domésticas, as ligações ao servidor são bloqueadas. Bluetooth, chamadas diretas e webhooks locais deste iPhone funcionam de forma independente.";
+"ios_privacy_unknown_wifi" = "Não foi possível identificar a rede Wi-Fi atual. Ligue-se ao Wi-Fi e permita o acesso à localização.";
+"ios_privacy_wifi_permission" = "Permitir identificar a rede";
+"ios_privacy_blocked" = "As regras de redes domésticas bloqueiam a ligação ao servidor. Verifique os dados móveis e a permissão em Definições → Sistema → Rede doméstica.";

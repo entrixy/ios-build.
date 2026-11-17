@@ -19,15 +19,15 @@ struct CompanyAvatar: View {
             }
     }
 }
-private final class CompanyLogoLoader: NSObject, URLSessionTaskDelegate {
-    func urlSession(_ session: URLSession,task: URLSessionTask,willPerformHTTPRedirection response: HTTPURLResponse,newRequest request: URLRequest,completionHandler: @escaping (URLRequest?) -> Void) { completionHandler(nil) }
+enum CompanyLogoLoader {
     static func image(_ url: URL) async -> UIImage? {
         let configuration = URLSessionConfiguration.ephemeral
         configuration.httpCookieStorage = nil; configuration.httpShouldSetCookies = false
         configuration.timeoutIntervalForResource = 15; configuration.urlCache = nil
-        let session = URLSession(configuration:configuration,delegate:CompanyLogoLoader(),delegateQueue:nil)
-        defer { session.invalidateAndCancel() }
+        let boundary = ServerHTTPSession(configuration:configuration)
+        defer { boundary.invalidate() }
         do {
+            let session = try boundary.session(for:url)
             let (bytes,response) = try await session.bytes(from:url)
             guard let http = response as? HTTPURLResponse, http.statusCode == 200 else { return nil }
             var data = Data()

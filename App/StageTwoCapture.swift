@@ -12,6 +12,7 @@ enum StageTwoCapture: String, CaseIterable {
     case ownerConfirmation = "owner-confirmation", ownerCodeConfirmation = "owner-code-confirmation"
     case deviceClaim = "device-claim"
     case ownerBLEObjects = "owner-ble-objects"
+    case networkPrivacy = "network-privacy"
     static var current: Self? {
         let args = ProcessInfo.processInfo.arguments
         guard let i = args.firstIndex(of: "--stage-two"), args.indices.contains(i + 1) else { return nil }
@@ -20,7 +21,7 @@ enum StageTwoCapture: String, CaseIterable {
     var settingsTab: SettingsTab {
         switch self {
         case .guestKeys, .keyDetail, .addKey: return .keys
-        case .system, .codeSettings, .addServer: return .system
+        case .system, .codeSettings, .addServer, .networkPrivacy: return .system
         case .sounds: return .sounds
         default: return .objects
         }
@@ -70,7 +71,8 @@ struct StageTwoRoot: View {
                 .received(guestID: guest.id, objectID: "b:8"), .owned(server: owner.server, objectID: object.id),
                 .received(guestID: guest.id, objectID: "n:7")])
         }
-        let app = AppModel(storage: StageTwoStorage(state))
+        if route == .networkPrivacy { state.networkPrivacy = try! NetworkPrivacyPreferences(own:[PrivacyNetwork(ssid:"Home fixture")]) }
+        let app = AppModel(storage:StageTwoStorage(state),privacyRouter:route == .networkPrivacy ? ServerPrivacyRouter() : nil)
         if route == .ownerConfirmation || route == .ownerCodeConfirmation {
             // No resume/live factory or actual telephone handoff in these UI routes.
             app.ownerControl = OwnerControlModel(app:app,dialer:{ _ in false })

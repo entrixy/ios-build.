@@ -42,12 +42,12 @@ public final class ServerSessionPolicy: @unchecked Sendable {
 
 /// Owns one server client's session and invalidates old HTTP/WSS tasks on a
 /// privacy change. There is no resubmission or physical-action retry here.
-final class ServerHTTPSession: @unchecked Sendable {
+public final class ServerHTTPSession: @unchecked Sendable {
     private let lock = NSLock()
     private let configuration: URLSessionConfiguration
     private var current: URLSession
     private var observer: UUID?
-    init(configuration: URLSessionConfiguration) {
+    public init(configuration: URLSessionConfiguration) {
         self.configuration = configuration.copy() as! URLSessionConfiguration
         current = Self.build(self.configuration)
         observer = ServerSessionPolicy.shared.observeReset { [weak self] in self?.reset() }
@@ -56,12 +56,16 @@ final class ServerHTTPSession: @unchecked Sendable {
         if let observer { ServerSessionPolicy.shared.removeObserver(observer) }
         current.invalidateAndCancel()
     }
-    func session(for url: URL) throws -> URLSession {
+    public func session(for url: URL) throws -> URLSession {
         // Take the session first, then check the latest rule. If a rule changes
         // afterwards, that retained old session is the one reset/cancelled.
         lock.lock(); let value = current; lock.unlock()
         try ServerSessionPolicy.shared.check(url)
         return value
+    }
+    public func invalidate() {
+        lock.lock(); let value = current; lock.unlock()
+        value.invalidateAndCancel()
     }
     private func reset() {
         let replacement = Self.build(configuration)

@@ -14,6 +14,7 @@ final class AppModel: ObservableObject {
     @Published private(set) var owners: [OwnerAccount] = []
     @Published private(set) var selectedOwnerServer = "entrixy.com"
     @Published private(set) var networkPrivacy = try! NetworkPrivacyPreferences()
+    @Published var networkPrivacyPrompt: PrivacyNetwork?
     let privacyRouter: ServerPrivacyRouter?
     private var unsavedGuestNetworkRestrictions = Set<String>()
     @Published private(set) var ownerBusy = false
@@ -238,7 +239,7 @@ final class AppModel: ObservableObject {
             || (payload?.owners ?? []).contains { !($0.privacyNetworks ?? []).isEmpty }
             || (payload?.guests ?? []).contains(where:restricted)
             || (payload?.androidGuests ?? []).contains { !($0.privacyNetworks ?? []).isEmpty }
-        privacyRouter.update(restricted:blocked,cellularAuthorized:storageReady && networkPrivacy.cellularAuthorized)
+        privacyRouter.update(restricted:blocked,cellularAuthorized:storageReady && networkPrivacy.cellularAuthorized,forcedClosed:!storageReady)
     }
 
     private func rememberGuestNetworkRestrictions(bundle: Data,id: String) throws {
@@ -262,7 +263,9 @@ final class AppModel: ObservableObject {
         do {
             try preferences.validate()
             var updated = owners
-            for index in updated.indices { try updated[index].setPrivacyNetworks(preferences.own) }
+            if preferences.own != previous.own {
+                for index in updated.indices { try updated[index].setPrivacyNetworks(preferences.own) }
+            }
             networkPrivacy = preferences
             do { try saveOwners(updated) } catch { networkPrivacy = previous; throw error }
             return true
@@ -600,7 +603,9 @@ final class AppModel: ObservableObject {
             for archive in plan.payload.androidArchives ?? [] where !androidArchives.contains(where:{ $0.archiveID == archive.archiveID }) { androidArchives.append(archive) }
             try AndroidBackupDocument.validateArchives(androidArchives)
             var refreshedOwners = owners
-            for index in refreshedOwners.indices { try refreshedOwners[index].setPrivacyNetworks(networkPrivacy.own) }
+            for index in refreshedOwners.indices where !networkPrivacy.own.isEmpty || refreshedOwners[index].privacyNetworks != nil {
+                try refreshedOwners[index].setPrivacyNetworks(networkPrivacy.own)
+            }
             if let defaults = plan.payload.ownerGuestDefaults {
                 ownerGuestDefaults = defaults
                 for index in refreshedOwners.indices where refreshedOwners[index].hostLabel != defaults.ownerName {
@@ -876,6 +881,7 @@ final class AppModel: ObservableObject {
     }
 
     private func registerReservedOwner(_ host: String,accessCode: String,accountToken: String?,suiteChecked: Bool) async -> Bool {
+        var markedThisAttempt = false
         do {
             if !suiteChecked, !(try await ownerAPI.supportsOwnerSuite(server:host)) { errorMessage = ProductText.string("server_suite_mismatch"); return false }
             guard canManageGuestAccess, let index = owners.firstIndex(where:{ $0.server == host }), owners[index].canRegisterSafely else { return false }
@@ -883,12 +889,24 @@ final class AppModel: ObservableObject {
             try updated[index].markRegistrationSent()
             if updated[index].serverSettings?.pendingAccount != nil { updated[index].serverSettings?.pendingAccount?.sent = true }
             try saveOwners(updated)
+            markedThisAttempt = true
             let credentials = try await ownerAPI.register(server:host,accessCode:accessCode,accountToken:accountToken)
             unsavedOwnerCredentials[host] = credentials
             try persistOwnerCredentials(host)
             await syncOwner(host)
             return true
         } catch {
+            if (error as? GuestAPI.Failure)?.code == "network_policy_blocked",
+               let index = owners.firstIndex(where:{ $0.server == host && $0.credentials == nil }) {
+                var updated = owners
+                do {
+                    if markedThisAttempt {
+                        try updated[index].resetUnsentRegistration()
+                        try saveOwners(updated)
+                    }
+                    ownerMessages[host] = ProductText.string("ios_privacy_blocked"); errorMessage = ownerMessages[host]; return false
+                } catch { /* Keep the sent reservation if persistence fails. */ }
+            }
             if let failure = error as? OwnerAPI.Failure, failure.code == "access_denied", (400..<500).contains(failure.status),
                let index = owners.firstIndex(where:{ $0.server == host && $0.credentials == nil }) {
                 var updated = owners
@@ -1641,6 +1659,7 @@ final class AppModel: ObservableObject {
     }
 
     func suspend() {
+        networkPrivacyPrompt = nil
         bleInformationTarget = nil
         if let prompt = actionPrompt { dismissActionPrompt(prompt.id) }
         confirmedAutomaticPromptID = nil; executingActionPrompt = nil
@@ -1951,7 +1970,7 @@ final class AppModel: ObservableObject {
     }
 
     private func safeDiagnosticCode(_ code: String) -> String {
-        let allowed = GuestEvent.terminalReasons.union(["connection_failed", "storage_error", "paused", "network_policy_unsupported", "awaiting_owner", "server_error", "replay", "invalid_response", "rate_limited", "too_many_requests", "device_binding_failed", "event_overflow"])
+        let allowed = GuestEvent.terminalReasons.union(["connection_failed", "storage_error", "paused", "network_policy_unsupported", "network_policy_blocked", "awaiting_owner", "server_error", "replay", "invalid_response", "rate_limited", "too_many_requests", "device_binding_failed", "event_overflow"])
         return allowed.contains(code) ? code : "unknown_error"
     }
 
@@ -1963,6 +1982,7 @@ final class AppModel: ObservableObject {
         case "paused": return "Владелец приостановил действие ключа."
         case "awaiting_owner": return "Ожидаем подготовки ключа владельцем."
         case "network_policy_unsupported": return "У ключа есть сетевые ограничения. Поддержка этих условий ещё не подключена."
+        case "network_policy_blocked": return ProductText.string("ios_privacy_blocked")
         default: return "Не удалось получить данные. Ключ сохранён; попробуйте позже."
         }
     }

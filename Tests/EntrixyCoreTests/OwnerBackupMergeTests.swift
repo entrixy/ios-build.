@@ -40,6 +40,19 @@ final class OwnerBackupMergeTests: XCTestCase {
         XCTAssertEqual(merged.masterKey,current.masterKey)
         XCTAssertEqual(merged.credentials,current.credentials)
     }
+    func testLegacyEncryptedRestrictionsArePreservedWhenAnImportedEmptyListDoesNotKnowThem() throws {
+        var current = try source(), key = current.issuedKeys![0]
+        let secrets = try key.secrets(masterKey:current.masterKey)
+        var bundle = try key.bundle(masterKey:current.masterKey)
+        bundle["net_block"] = [["s":"Legacy home"]]
+        key.bundleCipher = try GuestCrypto.encrypt(key:secrets.bundleKey,plaintext:JSONSerialization.data(withJSONObject:bundle))
+        current.issuedKeys = [key]
+        var imported = current; imported.privacyNetworks = []
+        let merged = try current.mergingBackup(imported)
+        XCTAssertEqual(merged.privacyNetworks?.map(\.ssid),["Legacy home"])
+        XCTAssertEqual(merged.issuedKeys![0].bundleCipher,key.bundleCipher)
+        XCTAssertEqual(merged.issuedKeys![0].wrappedSecrets,key.wrappedSecrets)
+    }
     func testDifferentPrivateObjectKeyAndConflictingGuestScopeAreRefusedBeforeMigration() throws {
         let backup = try source()
         var different = backup

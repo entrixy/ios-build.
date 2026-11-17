@@ -16,6 +16,10 @@ private struct PrivacyNoOwnerAPI: OwnerTransport {
     func register(server: String,accessCode: String) async throws -> OwnerCredentials { throw BackupFailure.noAccess }
     func sync(server: String,credentials: OwnerCredentials,fingerprint: String) async throws -> Data { throw BackupFailure.noAccess }
 }
+private final class PrivacyNoController: GuestActionTransport {
+    func sendAction(_ frame: Data) async throws { XCTFail("No physical action is requested") }
+    func close() {}
+}
 
 @MainActor final class NetworkPrivacyStateTests: XCTestCase {
     private func state(_ name: String,cellular: Bool = false) throws -> SavedState {
@@ -50,5 +54,41 @@ private struct PrivacyNoOwnerAPI: OwnerTransport {
         XCTAssertFalse(app.networkPrivacy.cellularAuthorized); XCTAssertNil(app.backupPlan())
         let restarted = AppModel(storage:store,ownerAPI:PrivacyNoOwnerAPI()); defer { restarted.suspend() }
         XCTAssertEqual(restarted.networkPrivacy,app.networkPrivacy)
+    }
+    func testPendingRestoreRestrictionsAreActiveBeforeAnyMoveOrClaim() async throws {
+        let router = ServerPrivacyRouter()
+        defer { router.stop(); ServerSessionPolicy.shared.install({ _ in }) }
+        let store = PrivacyStateStorage(SavedState(identity:Data(repeating:23,count:32),guests:[]))
+        let app = AppModel(storage:store,ownerAPI:PrivacyNoOwnerAPI(),privacyRouter:router)
+        defer { app.suspend() }
+        let started = await router.start(); XCTAssertTrue(started); XCTAssertEqual(router.route,.system)
+        let plan = BackupRestorePlan(payload:IOSBackupPayload(state:try state("Imported")))
+        try app.saveBackupPlan(plan)
+        XCTAssertNotNil(store.state?.pendingRestore)
+        XCTAssertEqual(router.route,.blocked)
+        XCTAssertFalse(app.canManageGuestAccess)
+    }
+    func testFailedGuestRuleWriteStaysRestrictedAcrossUnrelatedSavesAndRecoversOnlyAfterAuthoritativeUpdate() async throws {
+        let router = ServerPrivacyRouter()
+        defer { router.stop(); ServerSessionPolicy.shared.install({ _ in }) }
+        var initial = try state("unused"); initial.networkPrivacy = nil; initial.guests[0].privacyNetworks = []
+        let store = PrivacyStateStorage(initial), app = AppModel(storage:store,ownerAPI:PrivacyNoOwnerAPI(),privacyRouter:router)
+        defer { app.suspend() }
+        let started = await router.start(); XCTAssertTrue(started); XCTAssertEqual(router.route,.system)
+        let guest = try XCTUnwrap(app.guests.first), controller = PrivacyNoController()
+        let snapshot = Data(#"{"numbers":[]}"#.utf8)
+        let restricted = Data(#"{"net_block":[{"s":"Owner home"}]}"#.utf8)
+        store.failSave = true
+        XCTAssertThrowsError(try app.attachTestController(controller,guestID:guest.id,bundle:restricted,snapshot:snapshot))
+        XCTAssertEqual(router.route,.blocked)
+        XCTAssertEqual(store.state?.guests[0].privacyNetworks,[])
+        store.failSave = false; app.clearJournal()
+        XCTAssertEqual(router.route,.blocked)
+        try app.attachTestController(controller,guestID:guest.id,bundle:restricted,snapshot:snapshot)
+        XCTAssertEqual(store.state?.guests[0].privacyNetworks?.map(\.ssid),["Owner home"])
+        XCTAssertEqual(router.route,.blocked)
+        try app.attachTestController(controller,guestID:guest.id,bundle:Data(#"{"net_block":[]}"#.utf8),snapshot:snapshot)
+        XCTAssertEqual(store.state?.guests[0].privacyNetworks,[])
+        XCTAssertEqual(router.route,.system)
     }
 }

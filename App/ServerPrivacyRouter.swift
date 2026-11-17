@@ -5,22 +5,25 @@ import EntrixyCore
 
 /// The production composition boundary for server HTTPS/WSS only. This router
 /// must be started before any live model request. Never routes camera/webhooks.
-/// Not attached to LiveAppRoot until the complete route has passed Apple checks.
+/// Installs a closed gate during initialization, before live model requests.
 @MainActor final class ServerPrivacyRouter: ObservableObject {
     private final class Gate: @unchecked Sendable {
         private let lock = NSLock()
         private var address: ServerPrivacyProxy.Address?
         private var ready = false
         private var restricted = false
-        func update(address: ServerPrivacyProxy.Address?,ready: Bool,restricted: Bool) {
-            lock.lock(); self.address = address; self.ready = ready; self.restricted = restricted; lock.unlock()
+        private var forcedClosed = false
+        private var routeBlocked = true
+        func restrict(_ blocked: Bool) { lock.lock(); routeBlocked = blocked; lock.unlock() }
+        func update(address: ServerPrivacyProxy.Address?,ready: Bool,restricted: Bool,forcedClosed: Bool) {
+            lock.lock(); self.address = address; self.ready = ready; self.restricted = restricted; self.forcedClosed = forcedClosed; lock.unlock()
         }
         func configure(_ configuration: URLSessionConfiguration) {
             lock.lock(); let address = address; lock.unlock()
             if #available(iOS 17.0,*),let address { address.configure(configuration) }
         }
         func authorize(_ url: URL) throws {
-            lock.lock(); let permitted = ready && (!restricted || address != nil); lock.unlock()
+            lock.lock(); let permitted = ready && !forcedClosed && !routeBlocked && (!restricted || address != nil); lock.unlock()
             guard permitted, ["https","wss"].contains(url.scheme?.lowercased() ?? "") else {
                 throw GuestAPI.Failure(status:0,code:"network_policy_blocked")
             }
@@ -36,11 +39,17 @@ import EntrixyCore
     private var cellularPath = false
     private var restricted = false
     private var cellularAuthorized = false
+    private var forcedClosed = false
     private var starting = false
     private var generation = UUID()
     private var installed = false
     private let connector: ServerPrivacyProxy.Connect?
-    init(connect: ServerPrivacyProxy.Connect? = nil) { connector = connect }
+    init(connect: ServerPrivacyProxy.Connect? = nil) {
+        connector = connect
+        let gate = gate
+        ServerSessionPolicy.shared.install({ gate.configure($0) },authorize:{ try gate.authorize($0) },networkPrivacyEnforced:true)
+        installed = true
+    }
     var supportsConstrainedRouting: Bool { if #available(iOS 17.0,*) { return true }; return false }
 
     func start() async -> Bool {
@@ -63,7 +72,7 @@ import EntrixyCore
                 address = value
             }
             ready = true
-            gate.update(address:address,ready:true,restricted:restricted)
+            gate.update(address:address,ready:true,restricted:restricted,forcedClosed:forcedClosed)
             ServerSessionPolicy.shared.resetSessions()
             let monitor = NWPathMonitor(); self.monitor = monitor
             monitor.pathUpdateHandler = { [weak self] path in
@@ -78,21 +87,22 @@ import EntrixyCore
         } catch {
             guard generation == attempt else { return false }
             proxy?.stop(); proxy = nil; address = nil
-            gate.update(address:nil,ready:false,restricted:restricted)
+            gate.update(address:nil,ready:false,restricted:restricted,forcedClosed:forcedClosed)
             route = .blocked
             message = "Не удалось подготовить защищённое подключение. Повторите попытку."
             return false
         }
     }
-    func update(restricted: Bool,cellularAuthorized: Bool) {
-        let changed = self.restricted != restricted || self.cellularAuthorized != cellularAuthorized
+    func update(restricted: Bool,cellularAuthorized: Bool,forcedClosed: Bool = false) {
+        let changed = self.restricted != restricted || self.cellularAuthorized != cellularAuthorized || self.forcedClosed != forcedClosed
         self.restricted = restricted; self.cellularAuthorized = cellularAuthorized
-        gate.update(address:address,ready:ready,restricted:restricted)
+        self.forcedClosed = forcedClosed
+        gate.update(address:address,ready:ready,restricted:restricted,forcedClosed:forcedClosed)
         recheck()
         if changed && installed { ServerSessionPolicy.shared.resetSessions() }
     }
     private var effectiveRoute: ServerNetworkRoute {
-        guard ready else { return .blocked }
+        guard ready, !forcedClosed else { return .blocked }
         guard restricted else { return .system }
         guard supportsConstrainedRouting else { return .blocked }
         // Public iOS TCP APIs cannot pin a tunnel to one SSID across Wi-Fi
@@ -102,13 +112,15 @@ import EntrixyCore
     }
     private func recheck() {
         route = effectiveRoute
+        gate.restrict(route == .blocked)
         proxy?.restrict(to:route)
     }
     func stop() {
         generation = UUID(); starting = false; ready = false
         monitor?.cancel(); monitor = nil
         proxy?.stop(); proxy = nil; address = nil; route = .blocked
-        gate.update(address:nil,ready:false,restricted:restricted)
+        gate.restrict(true)
+        gate.update(address:nil,ready:false,restricted:restricted,forcedClosed:forcedClosed)
         if installed { ServerSessionPolicy.shared.resetSessions() }
     }
 }

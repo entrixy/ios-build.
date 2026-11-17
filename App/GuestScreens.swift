@@ -164,12 +164,13 @@ struct SettingsScreen: View {
                                     Image(systemName:appearance == choice ? "largecircle.fill.circle" : "circle")
                                     Text(ProductText.string("theme_" + choice)).frame(maxWidth:.infinity,alignment:.leading)
                                 }.foregroundStyle(Brand.ink).frame(minHeight:44).contentShape(Rectangle())
-                            }.buttonStyle(.plain).accessibilityAddTraits(appearance == choice ? .isSelected : [])
+                            }.buttonStyle(.plain).accessibilityIdentifier("theme-"+choice).accessibilityAddTraits(appearance == choice ? .isSelected : [])
                         }
                     } header: { Text(ProductText.string("theme_section")) }
                     AppCodeSettingsSection()
                     BackupSettingsSection(flow:model.backupPresentation)
                     ServerSettingsSection()
+                    if model.privacyRouter != nil { NetworkPrivacySettingsSection(sensors:model.automationSensors) }
                     Section {
                         NavigationLink("Сообщения") { MessagesScreen() }
                         NavigationLink("Лицензии") { LicenseScreen() }

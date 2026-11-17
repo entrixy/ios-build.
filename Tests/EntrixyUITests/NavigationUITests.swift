@@ -51,6 +51,43 @@ final class NavigationUITests: XCTestCase {
         app.buttons["main-tab-journal"].tap()
         XCTAssertTrue(app.staticTexts["Журнал пуст. Здесь будут появляться вызовы."].waitForExistence(timeout: 5))
     }
+    func testHomeNetworkConsentAndRemovalUseSystemSectionAndPreserveReceivedKeys() {
+        let app = launch("network-privacy")
+        let row = app.descendants(matching:.any).matching(identifier:"privacy-cellular-consent").firstMatch
+        for _ in 0..<12 {
+            if row.exists {
+                let control = row.elementType == .switch ? row : row.switches.firstMatch
+                if control.exists && control.isHittable { break }
+            }
+            app.swipeUp()
+        }
+        XCTAssertTrue(row.waitForExistence(timeout:5))
+        let toggle = row.elementType == .switch ? row : row.switches.firstMatch
+        XCTAssertTrue(toggle.exists); XCTAssertTrue(toggle.isHittable); XCTAssertEqual(toggle.value as? String,"0")
+        toggle.tap()
+        let enabled = XCTNSPredicateExpectation(predicate:NSPredicate { _,_ in toggle.value as? String == "1" },object:toggle)
+        XCTAssertEqual(XCTWaiter.wait(for:[enabled],timeout:5),.completed)
+        let remove = app.buttons.matching(NSPredicate(format:"identifier BEGINSWITH %@","privacy-remove-")).firstMatch
+        for _ in 0..<8 { if remove.exists && remove.isHittable { break }; app.swipeUp() }
+        XCTAssertTrue(remove.exists); XCTAssertTrue(remove.isHittable); remove.tap()
+        let gone = XCTNSPredicateExpectation(predicate:NSPredicate { _,_ in !remove.exists },object:remove)
+        XCTAssertEqual(XCTWaiter.wait(for:[gone],timeout:5),.completed)
+        assertBottom(app,["control","settings","journal"])
+        app.segmentedControls.buttons["Ключи"].tap()
+        XCTAssertTrue(app.descendants(matching:.any).matching(NSPredicate(format:"identifier BEGINSWITH %@","received-key-")).firstMatch.waitForExistence(timeout:5))
+    }
+    func testOrdinaryEmptyStartupAndThemeChangeKeepTheLiveRootInteractive() {
+        let app = XCUIApplication()
+        app.launchArguments = ["-AppleLanguages","(ru)","-AppleLocale","ru_RU"]
+        app.launch(); activeApp = app
+        XCTAssertTrue(app.buttons["main-tab-settings"].waitForExistence(timeout:20))
+        assertBottom(app,["settings","journal"])
+        app.segmentedControls.buttons["Система"].tap()
+        XCTAssertTrue(app.buttons["theme-light"].waitForExistence(timeout:10)); app.buttons["theme-light"].tap()
+        assertBottom(app,["settings","journal"])
+        app.buttons["main-tab-journal"].tap()
+        XCTAssertTrue(app.staticTexts["Журнал пуст. Здесь будут появляться вызовы."].waitForExistence(timeout:5))
+    }
     func testCardConfirmationAndCodeSetupUseCompactDialogAndCancelWithoutLeavingControl() {
         for route in ["owner-confirmation","owner-code-confirmation"] {
             let app = launch(route)

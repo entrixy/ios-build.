@@ -202,7 +202,16 @@ public extension OwnerAccount {
         for (key, token) in bundleRefreshQueue ?? [:] { refreshes[key] = token }
         merged.bundleRefreshQueue = refreshes
         if privacyNetworks != nil || source.privacyNetworks != nil {
-            let privacy = try NetworkPrivacyPreferences(own:privacyNetworks ?? []).merging(NetworkPrivacyPreferences(own:source.privacyNetworks ?? []))
+            func existingRules(_ owner: OwnerAccount) throws -> [PrivacyNetwork] {
+                if let rules = owner.privacyNetworks { return rules }
+                var result = try NetworkPrivacyPreferences()
+                for key in owner.issuedKeys ?? [] where key.state != .revoked {
+                    let bundle = try key.bundle(masterKey:owner.masterKey)
+                    result = try result.merging(NetworkPrivacyPreferences(own:PrivacyNetwork.decode(bundle["net_block"])))
+                }
+                return result.own
+            }
+            let privacy = try NetworkPrivacyPreferences(own:existingRules(self)).merging(NetworkPrivacyPreferences(own:existingRules(source)))
             try merged.setPrivacyNetworks(privacy.own)
         }
         try merged.validate()

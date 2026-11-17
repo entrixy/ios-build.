@@ -132,7 +132,7 @@ public enum AndroidOwnerAdapter {
         for host in Array(result.keys) {
             result[host]!.reservedGuestIDs = reserved.sorted()
             result[host]!.hostLabel = defaults.ownerName
-            result[host]!.privacyNetworks = privacy.own
+            if document.entries["blocked_wifi"] != nil { result[host]!.privacyNetworks = privacy.own }
         }
         let owners = result.values.sorted { $0.server < $1.server }
         guard owners.count <= 100 else { throw GuestCrypto.Failure.invalidEnvelope }
