@@ -230,15 +230,15 @@ struct IssueOwnerKeyScreen: View {
         do {
             draft.syncSavedSettings(owner: owner)
             let configuration = try draft.configuration(owner: owner)
-            let access = Dictionary(uniqueKeysWithValues: draft.selected.map { ($0, access($0)) })
+            let rights = Dictionary(uniqueKeysWithValues: draft.selected.map { ($0, access($0)) })
             let before = Set(owner.issuedKeys?.map(\.id) ?? [])
             let previousCipher = owner.issuedKeys?.first(where: { $0.id == editingKeyID })?.bundleCipher
             let name = label.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? ProductText.string("guests_default_name") : label
             let result: Bool
             if let editingKeyID {
-                result = await model.editOwnerKey(server: server, keyID: editingKeyID, label: name, numberIDs: Array(draft.selected), welcome: welcome, confirmation: nil, access: access, settings: configuration)
+                result = await model.editOwnerKey(server: server, keyID: editingKeyID, label: name, numberIDs: Array(draft.selected), welcome: welcome, confirmation: nil, access: rights, settings: configuration)
             } else {
-                result = await model.createOwnerKey(server: server, label: name, numberIDs: Array(draft.selected), welcome: welcome, nativeOnly: false, confirmation: false, access: access, settings: configuration)
+                result = await model.createOwnerKey(server: server, label: name, numberIDs: Array(draft.selected), welcome: welcome, nativeOnly: false, confirmation: false, access: rights, settings: configuration)
             }
             let after = model.owners.first { $0.server == server }?.issuedKeys ?? []
             if result || after.contains(where: { !before.contains($0.id) || ($0.id == editingKeyID && $0.bundleCipher != previousCipher && $0.pending != nil) }) {
