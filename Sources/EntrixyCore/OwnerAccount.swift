@@ -18,6 +18,7 @@ public struct OwnerAccount: Codable, Identifiable, Equatable {
     public var bleRestorePending: [UUID]?
     public var blePairings: [BLEPairingRecord]?
     public var bleMoves: [OwnerBLEMove]?
+    public var hostLabel: String?
     public var lastSynced: Date?
     public var bundleRefreshQueue: [String: String]?
     public var id: String { server }
@@ -37,6 +38,7 @@ public struct OwnerAccount: Codable, Identifiable, Equatable {
         guard server == (try GuestInvite.normalizeServer(server)), masterKey.count == 32 else {
             throw GuestCrypto.Failure.invalidEnvelope
         }
+        if let hostLabel { guard hostLabel.count <= 40, !hostLabel.contains("\n"), !hostLabel.contains("\r") else { throw GuestCrypto.Failure.invalidEnvelope } }
         try credentials?.validate()
         let reserved = reservedGuestIDs ?? []
         guard reserved.count <= 65535, Set(reserved).count == reserved.count, reserved.allSatisfy({ (1...65535).contains($0) }) else { throw GuestCrypto.Failure.invalidEnvelope }
@@ -80,7 +82,13 @@ public struct OwnerAccount: Codable, Identifiable, Equatable {
         guard refreshes.count <= 1000, Set(refreshes.keys).isSubset(of: Set(keys.map { $0.id.uuidString })),
               refreshes.values.allSatisfy({ UUID(uuidString: $0) != nil }) else { throw GuestCrypto.Failure.invalidEnvelope }
         guard Set(keys.map(\.id)).count == keys.count, Set(keys.map(\.guestID)).count == keys.count else { throw GuestCrypto.Failure.invalidEnvelope }
-        for key in keys { try key.validate(masterKey: masterKey) }
+        for key in keys {
+            try key.validate(masterKey: masterKey)
+            if key.company != nil {
+                guard objects.filter({ key.numberIDs.contains($0.numberID ?? -1) }).allSatisfy({ $0.kind == "call" }),
+                      [key.grantedAccess,key.requestedAccess].compactMap({ $0 }).allSatisfy({ $0.values.allSatisfy({ !$0.nativeOnly && $0.depth == 0 && $0.pool == 1 }) }) else { throw GuestCrypto.Failure.invalidEnvelope }
+            }
+        }
         let delegated = delegatedKeys ?? []
         guard Set(delegated.map(\.id)).count == delegated.count,
               Set(keys.map(\.guestID) + delegated.map(\.guestID)).count == keys.count + delegated.count else { throw GuestCrypto.Failure.invalidEnvelope }

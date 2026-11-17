@@ -36,6 +36,14 @@ final class AppModel: ObservableObject {
     lazy var automation = AutomationCoordinator(app: self)
     var automaticPermits: [ObjectReference: AutomationReadiness] = [:]
     var automaticConsumedAt: [ObjectReference: Date] = [:]
+    @Published private(set) var ownerGuestDefaults = OwnerGuestDefaults()
+    @Published private(set) var companies: [KnownCompany] = []
+    private var androidArchives: [AndroidBackupDocument] = []
+    @Published private(set) var androidPendingGuests: [AndroidGuestMigration] = []
+    @Published private(set) var companyBusy = false
+    @Published var companyRequestID: String?
+    @Published var companyGrantRequest: String?
+    @Published var guestRemovalTarget: GuestRemovalTarget?
     @Published private(set) var bleAutomationDisarmed = Set<String>()
     @Published private(set) var cameraActivity: [ObjectReference: UInt64] = [:]
     func noteCameraAction(_ target: ObjectReference) { cameraActivity[target] = (cameraActivity[target] ?? 0) &+ 1 }
@@ -115,6 +123,16 @@ final class AppModel: ObservableObject {
             delegatedJournalLedger = state.delegatedJournalLedger ?? DelegatedJournalLedger()
             try delegatedJournalLedger.validate()
             owners = state.owners ?? []
+            ownerGuestDefaults = state.ownerGuestDefaults ?? OwnerGuestDefaults()
+            companies = state.companies ?? []
+            androidArchives = state.androidArchives ?? []
+            androidPendingGuests = state.androidPendingGuests ?? []
+            guard androidPendingGuests.count <= 1000, Set(androidPendingGuests.map(\.id)).count == androidPendingGuests.count,
+                  Set(androidPendingGuests.map(\.id)).isDisjoint(with:Set(state.guests.map(\.id))) else { throw BackupFailure.invalidPayload }
+            for source in androidPendingGuests { try source.validate() }
+            try AndroidBackupDocument.validateArchives(androidArchives)
+            try KnownCompany.validateDirectory(companies)
+            try ownerGuestDefaults.validate()
             let preferences = state.objectPreferences ?? ObjectCatalogPreferences()
             try preferences.validate()
             objectPreferences = preferences
@@ -162,7 +180,7 @@ final class AppModel: ObservableObject {
     private func save(_ updated: [SavedGuest], preferences: ObjectCatalogPreferences? = nil) throws {
         let preferences = preferences ?? objectPreferences
         try preferences.validate()
-        try storage.save(SavedState(identity: identity, guests: updated, journal: journal, actionCode: actionCode, owners: owners, usedOwnerPresses: usedOwnerPresses, pendingRestore: pendingRestore, delegations: delegations, passedAccess: passedAccess, receivedDelegations: receivedDelegations, incomingMessages: incomingMessages, outgoingMessages: outgoingMessages, delegatedJournalLedger: delegatedJournalLedger, appLockEnabled: appLockEnabled, appEntryBiometricEnabled: appEntryBiometricEnabled, objectPreferences: preferences, bleAutomationDisarmed: bleAutomationDisarmed))
+        try storage.save(SavedState(identity: identity, guests: updated, journal: journal, actionCode: actionCode, owners: owners, usedOwnerPresses: usedOwnerPresses, pendingRestore: pendingRestore, delegations: delegations, passedAccess: passedAccess, receivedDelegations: receivedDelegations, incomingMessages: incomingMessages, outgoingMessages: outgoingMessages, delegatedJournalLedger: delegatedJournalLedger, appLockEnabled: appLockEnabled, appEntryBiometricEnabled: appEntryBiometricEnabled, objectPreferences: preferences, bleAutomationDisarmed: bleAutomationDisarmed, ownerGuestDefaults: ownerGuestDefaults, companies: companies, androidArchives: androidArchives, androidPendingGuests: androidPendingGuests))
         guests = updated
         if objectPreferences != preferences { objectPreferences = preferences }
     }
@@ -181,7 +199,7 @@ final class AppModel: ObservableObject {
     func consumeOwnerPress(_ key: String) throws {
         guard usedOwnerPresses[key] == nil else { throw GuestCrypto.Failure.invalidEnvelope }
         let previous = usedOwnerPresses
-        usedOwnerPresses = usedOwnerPresses.filter { Date().timeIntervalSince($0.value) < 600 }
+        usedOwnerPresses = usedOwnerPresses.filter { Date().timeIntervalSince($0.value) < 1500 }
         guard usedOwnerPresses.count < 2048 else { usedOwnerPresses = previous; throw GuestCrypto.Failure.invalidEnvelope }
         usedOwnerPresses[key] = Date()
         do { try save(guests) } catch { usedOwnerPresses = previous; throw error }
@@ -286,6 +304,15 @@ final class AppModel: ObservableObject {
     func validateRestoreConflicts(_ payload: IOSBackupPayload) throws {
         guard storageReady else { throw BackupFailure.invalidPayload }
         try payload.validate()
+        _ = try objectPreferences.merging(payload.objectPreferences)
+        var mergedArchives = androidArchives
+        for archive in payload.androidArchives ?? [] where !mergedArchives.contains(where:{ $0.archiveID == archive.archiveID }) { mergedArchives.append(archive) }
+        try AndroidBackupDocument.validateArchives(mergedArchives)
+        var mergedCompanies = companies
+        for company in payload.companies ?? [] where !mergedCompanies.contains(where:{ $0.id == company.id }) { mergedCompanies.append(company) }
+        try KnownCompany.validateDirectory(mergedCompanies)
+        let existingIDs = Set(guests.map(\.id) + androidPendingGuests.map(\.id))
+        guard existingIDs.union(payload.guests.map(\.id)).union((payload.androidGuests ?? []).map(\.id)).count <= 1000 else { throw BackupFailure.invalidPayload }
         _ = try mergedIncoming(payload.incomingMessages ?? [])
         for item in payload.outgoingMessages ?? [] {
             if let existing = outgoingMessages.first(where: { $0.id == item.id }), existing.cipher != item.cipher || existing.target != item.target { throw BackupFailure.conflictingAccess }
@@ -297,6 +324,14 @@ final class AppModel: ObservableObject {
         }
         for source in payload.guests {
             if let current = guests.first(where: { $0.id == source.id }), current.invite != source.invite { throw BackupFailure.conflictingAccess }
+        }
+        for source in payload.androidGuests ?? [] {
+            if let current = guests.first(where:{ $0.id == source.id }), current.invite.bundleKey != source.bundleKey { throw BackupFailure.conflictingAccess }
+            if let current = androidPendingGuests.first(where:{ $0.id == source.id }) {
+                guard current.bundleKey == source.bundleKey,
+                      current.recipient?.privateKey == source.recipient?.privateKey,
+                      current.recipient?.publicKey == source.recipient?.publicKey else { throw BackupFailure.conflictingAccess }
+            }
         }
         for source in payload.receivedDelegations ?? [] {
             if var current = receivedDelegations.first(where: { $0.id == source.id }) {
@@ -367,8 +402,12 @@ final class AppModel: ObservableObject {
     }
     func activateBackupGuest(_ guest: SavedGuest, plan: BackupRestorePlan) throws {
         var updated = guests
-        if !updated.contains(where: { $0.id == guest.id }) {
+        if let index = updated.firstIndex(where:{ $0.id == guest.id }) {
+            guard updated[index].invite == guest.invite else { throw BackupFailure.conflictingAccess }
+            updated[index].requiresBLEExitOnRestore = true
+        } else {
             var imported = guest
+            imported.requiresBLEExitOnRestore = true
             imported.objects = []; imported.checkedAt = nil
             updated.append(imported)
         }
@@ -377,21 +416,43 @@ final class AppModel: ObservableObject {
         pendingRestore = plan
         do { try save(updated) } catch { pendingRestore = previous; bleAutomationDisarmed = priorLatches; throw error }
     }
+    func activatePendingAndroidGuest(_ source: AndroidGuestMigration,plan: BackupRestorePlan) throws {
+        guard !guests.contains(where:{ $0.id == source.id }) else { throw BackupFailure.conflictingAccess }
+        let previous = androidPendingGuests, previousPlan = pendingRestore
+        if !androidPendingGuests.contains(where:{ $0.id == source.id }) { androidPendingGuests.append(source) }
+        pendingRestore = plan
+        do { try save(guests) } catch { androidPendingGuests = previous; pendingRestore = previousPlan; throw error }
+    }
+    func acceptRecoveredAndroidGuest(_ invite: GuestInvite) throws {
+        guard canManageGuestAccess,
+              androidPendingGuests.contains(where:{ $0.id == invite.id }) else { throw BackupFailure.noAccess }
+        let previous = androidPendingGuests
+        androidPendingGuests.removeAll { $0.id == invite.id }
+        do { try save(guests + [SavedGuest(invite:invite,requiresBLEExitOnRestore:true)]) }
+        catch { androidPendingGuests = previous; throw error }
+    }
+    func removeImportedGuestRecovery(_ id: String) {
+        guard canManageGuestAccess, !busy else { return }
+        let previous = androidPendingGuests
+        androidPendingGuests.removeAll { $0.id == id }
+        do { try save(guests) }
+        catch { androidPendingGuests = previous; errorMessage = "Не удалось сохранить удаление ключа." }
+    }
     func finishBackupRestore(_ plan: BackupRestorePlan) throws {
         let previousPlan = pendingRestore, previousJournal = journal, previousPresses = usedOwnerPresses
         let previousPassed = passedAccess
         let previousReceived = receivedDelegations
         let previousIncoming = incomingMessages, previousOutgoing = outgoingMessages
-        let previousLedger = delegatedJournalLedger
+        let previousLedger = delegatedJournalLedger, previousDefaults = ownerGuestDefaults, previousCompanies = companies, previousArchives = androidArchives
         let restoredPreferences = try objectPreferences.merging(plan.payload.objectPreferences)
         let restoredIncoming = try mergedIncoming(plan.payload.incomingMessages ?? [])
         let existing = Set(journal.map(\.id))
         journal += plan.payload.journal.filter { $0.isAction && !existing.contains($0.id) }
         journal.sort { $0.date > $1.date }; journal = Array(journal.prefix(500))
-        for (key, date) in plan.payload.usedOwnerPresses where Date().timeIntervalSince(date) < 600 {
+        for (key, date) in plan.payload.usedOwnerPresses where Date().timeIntervalSince(date) < 1500 {
             usedOwnerPresses[key] = date
         }
-        usedOwnerPresses = usedOwnerPresses.filter { Date().timeIntervalSince($0.value) < 600 }
+        usedOwnerPresses = usedOwnerPresses.filter { Date().timeIntervalSince($0.value) < 1500 }
         guard usedOwnerPresses.count <= 2048 else {
             journal = previousJournal; usedOwnerPresses = previousPresses
             throw BackupFailure.busy
@@ -409,25 +470,41 @@ final class AppModel: ObservableObject {
             outgoingMessages.sort { $0.created > $1.created }; outgoingMessages = Array(outgoingMessages.prefix(100))
             if let ledger = plan.payload.delegatedJournalLedger { try delegatedJournalLedger.merge(ledger) }
             pendingRestore = nil
-            try save(guests, preferences: restoredPreferences)
+            for company in plan.payload.companies ?? [] where !companies.contains(where:{ $0.id == company.id }) { companies.append(company) }
+            try KnownCompany.validateDirectory(companies)
+            for archive in plan.payload.androidArchives ?? [] where !androidArchives.contains(where:{ $0.archiveID == archive.archiveID }) { androidArchives.append(archive) }
+            try AndroidBackupDocument.validateArchives(androidArchives)
+            var refreshedOwners = owners
+            if let defaults = plan.payload.ownerGuestDefaults {
+                ownerGuestDefaults = defaults
+                for index in refreshedOwners.indices where refreshedOwners[index].hostLabel != defaults.ownerName {
+                    refreshedOwners[index].hostLabel = defaults.ownerName
+                    for key in refreshedOwners[index].issuedKeys ?? [] { refreshedOwners[index].queueKeySettings(key.id) }
+                }
+            }
+            try saveOwners(refreshedOwners, preferences:restoredPreferences)
         } catch {
             pendingRestore = previousPlan; journal = previousJournal; usedOwnerPresses = previousPresses
             passedAccess = previousPassed; receivedDelegations = previousReceived
             incomingMessages = previousIncoming; outgoingMessages = previousOutgoing
-            delegatedJournalLedger = previousLedger; throw error
+            delegatedJournalLedger = previousLedger; ownerGuestDefaults = previousDefaults; companies = previousCompanies; androidArchives = previousArchives; throw error
         }
     }
 
     private func saveOwners(_ updated: [OwnerAccount], preferences: ObjectCatalogPreferences? = nil) throws {
         let preferences = preferences ?? objectPreferences
         try preferences.validate()
-        try storage.save(SavedState(identity: identity, guests: guests, journal: journal, actionCode: actionCode, owners: updated, usedOwnerPresses: usedOwnerPresses, pendingRestore: pendingRestore, delegations: delegations, passedAccess: passedAccess, receivedDelegations: receivedDelegations, incomingMessages: incomingMessages, outgoingMessages: outgoingMessages, delegatedJournalLedger: delegatedJournalLedger, appLockEnabled: appLockEnabled, appEntryBiometricEnabled: appEntryBiometricEnabled, objectPreferences: preferences, bleAutomationDisarmed: bleAutomationDisarmed))
+        try storage.save(SavedState(identity: identity, guests: guests, journal: journal, actionCode: actionCode, owners: updated, usedOwnerPresses: usedOwnerPresses, pendingRestore: pendingRestore, delegations: delegations, passedAccess: passedAccess, receivedDelegations: receivedDelegations, incomingMessages: incomingMessages, outgoingMessages: outgoingMessages, delegatedJournalLedger: delegatedJournalLedger, appLockEnabled: appLockEnabled, appEntryBiometricEnabled: appEntryBiometricEnabled, objectPreferences: preferences, bleAutomationDisarmed: bleAutomationDisarmed, ownerGuestDefaults: ownerGuestDefaults, companies: companies, androidArchives: androidArchives, androidPendingGuests: androidPendingGuests))
         owners = updated
         if objectPreferences != preferences { objectPreferences = preferences }
         scheduleOwnerSettingsRefresh()
     }
 
     private func updateGuestMaterial(_ guest: inout SavedGuest, objects: [GuestObject], bundle: Data, snapshot: Data) throws {
+        if guest.requiresBLEExitOnRestore == true, objects.contains(where:{ $0.kind == "ble" }) {
+            for object in objects where object.kind == "ble" { bleAutomationDisarmed.insert(ObjectReference.received(guestID:guest.id,objectID:object.id).id) }
+            guest.requiresBLEExitOnRestore = false
+        }
         guard let contents = try JSONSerialization.jsonObject(with: bundle) as? [String: Any] else { throw GuestCrypto.Failure.invalidEnvelope }
         let templates = contents["templates"] as? [String: [String: Any]] ?? [:]
         let ble = contents["ble"] as? [[String: Any]] ?? []
@@ -651,7 +728,8 @@ final class AppModel: ObservableObject {
         defer { ownerBusy = false }
         do {
             // Save a reservation BEFORE sending. A lost reply survives process death.
-            try saveOwners(owners + [try OwnerAccount(server: host)])
+            var reserved = try OwnerAccount(server:host); reserved.hostLabel = ownerGuestDefaults.ownerName
+            try saveOwners(owners + [reserved])
         } catch {
             errorMessage = "Не удалось сохранить сервер в защищённом хранилище. Регистрация не отправлялась."
             return false
@@ -1114,7 +1192,9 @@ final class AppModel: ObservableObject {
         do {
             var authority = owners[index]
             authority.reservedGuestIDs = allReservedGuestIDs()
-            let key = try OwnerIssuedKey(owner: authority, label: label, numberIDs: numberIDs, welcome: welcome, nativeOnly: nativeOnly, confirmation: confirmation, access: access, settings: settings)
+            let defaults = ownerGuestDefaults.access
+            let initialAccess = try access ?? Dictionary(uniqueKeysWithValues:numberIDs.map { ($0,try KeyObjectAccess(nativeOnly:nativeOnly || defaults.nativeOnly,depth:defaults.depth,pool:defaults.pool)) })
+            let key = try OwnerIssuedKey(owner: authority, label: label, numberIDs: numberIDs, welcome: welcome, nativeOnly: nativeOnly, confirmation: confirmation, access: initialAccess, settings: settings)
             var updated = owners
             updated[index].reservedGuestIDs = authority.reservedGuestIDs
             updated[index].issuedKeys = (updated[index].issuedKeys ?? []) + [key]
@@ -1258,7 +1338,11 @@ final class AppModel: ObservableObject {
                   let i = owners.firstIndex(where: { $0.server == server }),
                   let j = owners[i].issuedKeys?.firstIndex(where: { $0.id == keyID }) else { throw GuestCrypto.Failure.invalidEnvelope }
             updated = owners
-            if operation == .keyCreate { updated[i].issuedKeys![j].keyID = try OwnerObject.replyID(json["id"]) }
+            if operation == .keyCreate {
+                let replyID = try OwnerObject.replyID(json["id"])
+                guard !(updated[i].issuedKeys ?? []).contains(where:{ $0.id != keyID && $0.keyID == replyID }) else { throw GuestCrypto.Failure.invalidEnvelope }
+                try updated[i].issuedKeys![j].acceptCreationReply(json)
+            }
             else { guard (json["ok"] as? NSNumber)?.boolValue == true else { throw GuestCrypto.Failure.invalidEnvelope } }
             unsavedOwnerKeys[keyID] = updated[i].issuedKeys![j]
             try saveOwners(updated)
@@ -1287,6 +1371,11 @@ final class AppModel: ObservableObject {
         guard storageReady, !busy else { return false }
         do {
             let invite = try GuestInvite.parse(text)
+            if let source = androidPendingGuests.first(where:{ $0.id == invite.id }) {
+                guard let recovered = try await api.recover(identity:source.identity,bundleKey:invite.bundleKey,recipient:source.recipient,fingerprint:backupFingerprint(server:invite.server)) else { throw BackupFailure.pendingAccess }
+                try acceptRecoveredAndroidGuest(recovered)
+                await refresh(); return true
+            }
             if !guests.contains(where: { $0.id == invite.id }) {
                 // Persist credentials before binding, including when the bind response is lost.
                 try save(guests + [SavedGuest(invite: invite)])
@@ -1304,7 +1393,9 @@ final class AppModel: ObservableObject {
     }
 
     func refresh() async {
-        guard storageReady, foreground, !busy, !guests.isEmpty else { return }
+        guard storageReady, foreground, !busy else { return }
+        if !androidPendingGuests.isEmpty { await backups.refreshImportedGuests() }
+        guard !guests.isEmpty else { return }
         pauseGuestSessions()
         foreground = true
         errorMessage = nil
@@ -2516,5 +2607,122 @@ extension AppModel {
         if armed { bleAutomationDisarmed.remove(target.id) } else { bleAutomationDisarmed.insert(target.id) }
         guard bleAutomationDisarmed != prior else { return }
         do { try save(guests) } catch { bleAutomationDisarmed = prior; throw error }
+    }
+}
+
+extension AppModel {
+    func receiveCompanyInvite(_ invite: CompanyInvite) async {
+        guard canManageGuestAccess, !companyBusy, !ownerBusy, !busy else { return }
+        companyBusy = true; defer { companyBusy = false }
+        let prior = companies
+        do {
+            var profile = try await ownerAPI.companyInvite(server:invite.server,code:invite.code)
+            guard canManageGuestAccess, profile.server == invite.server, profile.pendingCode == invite.code else { throw GuestCrypto.Failure.invalidEnvelope }
+            if let old = companies.first(where:{ $0.id == profile.id }) {
+                if profile.logo?.isEmpty != false { profile.logo = old.logo }
+            }
+            if let index = companies.firstIndex(where:{ $0.id == profile.id }) { companies[index] = profile }
+            else { companies.append(profile) }
+            try KnownCompany.validateDirectory(companies)
+            var updated = owners
+            if let index = updated.firstIndex(where:{ $0.server == profile.server }) {
+                // Prefs.setOrgKnownPub: deliberately opening a NEW company
+                // request updates that company's issued pins. Ordinary owner
+                // sync/profile branding must never take this path.
+                if let publicKey = profile.publicKey {
+                    for offset in (updated[index].issuedKeys ?? []).indices where updated[index].issuedKeys![offset].company?.companyID == profile.companyID {
+                        updated[index].issuedKeys![offset].company?.publicKey = publicKey
+                    }
+                }
+            }
+            try saveOwners(updated)
+            companyRequestID = profile.id
+            // Android marks arrival only after the request is stored, and only
+            // with credentials belonging to this exact server. No registration.
+            if let credentials = owners.first(where:{ $0.server == invite.server })?.credentials {
+                try? await ownerAPI.companyClaim(server:invite.server,credentials:credentials,code:invite.code)
+            }
+        } catch {
+            companies = prior
+            errorMessage = "Не удалось сохранить запрос компании. Доступ не выдавался."
+        }
+    }
+    func companyKeys(_ company: KnownCompany) -> [OwnerIssuedKey] {
+        owners.first(where:{ $0.server == company.server })?.issuedKeys?.filter { $0.company?.companyID == company.companyID && $0.state != .revoked } ?? []
+    }
+    func issueCompanyAccess(profileID: String, numberIDs: [Int], calls: [String:OwnerCallPreference]) async -> Bool {
+        guard canManageGuestAccess, !ownerBusy, !busy, let company = companies.first(where:{ $0.id == profileID }),
+              owners.contains(where:{ $0.server == company.server && $0.credentials != nil }) else { return false }
+        ownerBusy = true; defer { ownerBusy = false }
+        do {
+            // Avoid the API's implicit merge into an unknown signing identity.
+            await syncOwner(company.server)
+            guard canManageGuestAccess, ownerMessages[company.server] == nil, let snapshot = ownerSnapshots[company.server],
+                  !snapshot.keyRows.contains(where:{ $0["org_id"] as? Int == company.companyID && ($0["enabled"] as? Int) != 0 }),
+                  let currentIndex = owners.firstIndex(where:{ $0.server == company.server }) else {
+                errorMessage = "У компании уже есть доступ. Откройте его настройки; если ключа нет на телефоне, восстановите резервную копию."; return false
+            }
+            var authority = owners[currentIndex]; authority.reservedGuestIDs = allReservedGuestIDs()
+            let key = try OwnerIssuedKey.forCompany(owner:authority,profile:company,numberIDs:numberIDs,calls:calls)
+            var updated = owners
+            updated[currentIndex].reservedGuestIDs = authority.reservedGuestIDs
+            updated[currentIndex].issuedKeys = (updated[currentIndex].issuedKeys ?? []) + [key]
+            try saveOwners(updated)
+            return await sendOwnerKey(server:company.server,keyID:key.id)
+        } catch { errorMessage = "Не удалось сохранить доступ компании. Выберите сохранённые объекты для звонка."; return false }
+    }
+    func forgetCompany(_ id: String) async {
+        guard canManageGuestAccess, !companyBusy, !ownerBusy, !busy, let company = companies.first(where:{ $0.id == id }) else { return }
+        companyBusy = true; defer { companyBusy = false }
+        for key in companyKeys(company) {
+            guard key.keyID != nil else {
+                if !key.sent { discardUnsentOwnerKey(server:company.server,keyID:key.id); continue }
+                errorMessage = "Сначала проверьте результат незавершённой выдачи компании."; return
+            }
+            await revokeOwnerKey(server:company.server,keyID:key.id)
+        }
+        guard companyKeys(company).isEmpty else { errorMessage = "Отзыв доступа компании ещё не подтверждён. Обновите данные и повторите удаление."; return }
+        let prior = companies
+        companies.removeAll { $0.id == id }
+        do { try save(guests) } catch { companies = prior; errorMessage = "Не удалось сохранить удаление компании." }
+    }
+}
+
+extension AppModel {
+    @discardableResult func saveGuestDefaults(_ defaults: OwnerGuestDefaults) -> Bool {
+        guard canManageGuestAccess else { return false }
+        let previous = ownerGuestDefaults
+        do {
+            try defaults.validate()
+            var updated = owners
+            if defaults.ownerName != previous.ownerName {
+                for index in updated.indices {
+                    updated[index].hostLabel = defaults.ownerName
+                    for key in updated[index].issuedKeys ?? [] { updated[index].queueKeySettings(key.id) }
+                }
+            }
+            ownerGuestDefaults = defaults
+            try saveOwners(updated)
+            return true
+        } catch { ownerGuestDefaults = previous; errorMessage = "Не удалось сохранить пресеты гостей."; return false }
+    }
+    func canCloneOwnerKey(server: String, keyID: UUID) -> Bool {
+        guard let owner = owners.first(where:{ $0.server == server }),
+              let key = owner.issuedKeys?.first(where:{ $0.id == keyID }), key.company == nil, key.pending == nil,
+              [.active,.paused,.restricted].contains(key.state), key.accessNeedsReview != true else { return false }
+        return !(owner.issuedKeys ?? []).contains { $0.cloneSourceID == keyID && $0.pending == .keyCreate }
+    }
+    func cloneOwnerKey(server: String, keyID: UUID) async {
+        guard canManageGuestAccess, !busy, !ownerBusy, canCloneOwnerKey(server:server,keyID:keyID),
+              let index = owners.firstIndex(where:{ $0.server == server }), let source = owners[index].issuedKeys?.first(where:{ $0.id == keyID }) else { return }
+        ownerBusy = true; defer { ownerBusy = false }
+        do {
+            let suffix = ProductText.string("guest_key_copy_suffix")
+            let label = source.label.isEmpty ? suffix : source.label+" ("+suffix+")"
+            let clone = try source.cloned(owner:owners[index],label:label)
+            var updated = owners; updated[index].issuedKeys = (updated[index].issuedKeys ?? [])+[clone]
+            try saveOwners(updated)
+            _ = await sendOwnerKey(server:server,keyID:clone.id)
+        } catch { errorMessage = "Не удалось сохранить копию ключа. Новая выдача не подтверждена." }
     }
 }

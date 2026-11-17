@@ -129,7 +129,10 @@ struct SettingsScreen: View {
                             .disabled(!model.storageReady || model.ownerBusy)
                     }
                 case .keys:
-                    if model.guests.isEmpty { Text("Пока нет полученных ключей").foregroundStyle(Brand.secondaryInk) }
+                    if model.guests.isEmpty && model.androidPendingGuests.isEmpty { Text("Пока нет полученных ключей").foregroundStyle(Brand.secondaryInk) }
+                    ForEach(model.androidPendingGuests) { source in
+                        ImportedGuestKeyRow(source:source,manager:model.backups)
+                    }
                     ForEach(model.guests) { guest in
                         NavigationLink { KeyDetailScreen(guestID: guest.id) } label: {
                             VStack(alignment: .leading, spacing: 7) {

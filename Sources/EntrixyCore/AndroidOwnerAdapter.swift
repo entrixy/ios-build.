@@ -88,10 +88,11 @@ public enum AndroidOwnerAdapter {
                     policy = try JSONSerialization.data(withJSONObject: value, options: .sortedKeys)
                 } else { policy = nil }
             } else { policy = nil }
-            let object = try OwnerObject(importing: stableID(server: ref.server, numberID: ref.numberID), numberID: ref.numberID,
+            var object = try OwnerObject(importing: stableID(server: ref.server, numberID: ref.numberID), numberID: ref.numberID,
                 kind: kind, cipher: sourceCipher ?? GuestCrypto.encrypt(key: objectKey, plaintext: JSONSerialization.data(withJSONObject: metadata, options: .sortedKeys)),
                 wrappedKey: wrapped ?? GuestCrypto.encrypt(key: master, plaintext: objectKey), masterKey: master,
                 phone: phone, routing: routing, socketSecret: socket, bleSecret: bleSecret, bleDeviceID: bleDID, localPolicy: policy)
+            object.localConfiguration = try document.ownerLocalConfiguration(localID:localID)
             result[ref.server]!.objects = (result[ref.server]!.objects ?? []) + [object]
             if let bleDID, let bleSecret {
                 let signedDID = Int32(bitPattern: bleDID)
@@ -122,7 +123,11 @@ public enum AndroidOwnerAdapter {
             guard let raw = try document.string(name), let map = try JSONSerialization.jsonObject(with: Data(raw.utf8)) as? [String: Any] else { throw GuestCrypto.Failure.invalidEnvelope }
             for name in map.keys { guard let id = Int(name), (1...65535).contains(id) else { throw GuestCrypto.Failure.invalidEnvelope }; reserved.insert(id) }
         }
-        for host in Array(result.keys) { result[host]!.reservedGuestIDs = reserved.sorted() }
+        let defaults = try document.guestDefaults()
+        for host in Array(result.keys) {
+            result[host]!.reservedGuestIDs = reserved.sorted()
+            result[host]!.hostLabel = defaults.ownerName
+        }
         let owners = result.values.sorted { $0.server < $1.server }
         guard owners.count <= 100 else { throw GuestCrypto.Failure.invalidEnvelope }
         for owner in owners { try owner.validate() }

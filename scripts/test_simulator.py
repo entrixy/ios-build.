@@ -12,7 +12,12 @@ def main():
     selection = parser.add_mutually_exclusive_group()
     selection.add_argument("--only-native", action="store_true", help="Run hosted native tests without UI automation")
     selection.add_argument("--only-ui", action="store_true", help="Run unchanged UI assertions on a fresh runner without hosted unit tests")
+    parser.add_argument("--use-built-tests", action="store_true", help="Run the existing build-for-testing products without rebuilding")
     args = parser.parse_args()
+    if args.use_built_tests:
+        products = Path('.local-checks/DerivedData/Build/Products')
+        if not list(products.glob('*.xctestrun')):
+            parser.error('--use-built-tests requires build-for-testing products in .local-checks/DerivedData')
     sdk = subprocess.check_output(['xcrun', '--sdk', 'iphonesimulator', '--show-sdk-version'], text=True).strip()
     runtimes = json.loads(subprocess.check_output(['xcrun', 'simctl', 'list', 'runtimes', '--json']))['runtimes']
     runtime = next(r['identifier'] for r in runtimes if r.get('isAvailable') and '.iOS-' in r['identifier'] and (r['version'] == sdk or r['version'].startswith(sdk + '.')))
@@ -21,7 +26,7 @@ def main():
         command = ['xcodebuild', '-project', 'Entrixy.xcodeproj', '-scheme', 'EntrixyTests',
             '-configuration', 'Debug', '-destination', 'id=' + device,
             '-derivedDataPath', '.local-checks/DerivedData', '-parallel-testing-enabled', 'NO',
-            'CODE_SIGNING_ALLOWED=YES', 'CODE_SIGN_IDENTITY=-', 'test']
+            'CODE_SIGNING_ALLOWED=YES', 'CODE_SIGN_IDENTITY=-', 'test-without-building' if args.use_built_tests else 'test']
         if args.only_ui:
             command.append('-only-testing:EntrixyUITests')
         elif args.only_native:

@@ -51,6 +51,12 @@ targets:
             UTTypeConformsTo: [public.data]
             UTTypeTagSpecification:
               public.filename-extension: [eib]
+        UTImportedTypeDeclarations:
+          - UTTypeIdentifier: com.entrixy.android.backup
+            UTTypeDescription: Entrixy Android Backup
+            UTTypeConformsTo: [public.data]
+            UTTypeTagSpecification:
+              public.filename-extension: [ekb]
         CFBundleDisplayName: Entrixy
         CFBundleLocalizations: [en, ru, de, es, fr, pt, zh]
         NSCameraUsageDescription: Сканирование QR-кода гостевого ключа Entrixy

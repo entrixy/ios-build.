@@ -191,9 +191,26 @@ render of the selected sound/gain, and honor mute/zero volume. Three hosted test
 sources cover actual bundled decoding, persistence/import rollback, and mute/
 volume-bounded local notification audio. Their Apple execution is pending.
 
+## Guest defaults and cloning follow-on (source)
+
+Presets data is now protected and included in iOS backups: a 40-character owner
+name goes only into encrypted host_label, and default object access is applied
+when selecting an object for a NEW guest. Changing the default leaves existing
+ACLs and guest identities untouched. A name change queues immutable-version
+bundle refreshes, preserving in-flight request material and current token expiry.
+
+An explicit clone now has a fresh signing/bundle key and controller DID in its
+first request, retaining narrowed access, original force rules/network bans,
+per-object choices and welcome. A pending uncertain clone blocks another clone
+of the same source until reconciliation, which retains its prepared identity.
+Explicit read-only sharing of an existing paused link does not reactivate it.
+Three core tests pass (210 total); two hosted sources cover private/default
+scope and lost-clone-response recovery. The main Android Guests card/tabs/
+company UI is still being ported; this is not a completed Guests screen claim.
+
 ## Actual verification
 
-Linux Swift6.0.3 + swift-crypto: 207 core tests, zero failures, including immutable
+Linux Swift6.0.3 + swift-crypto: 210 core tests, zero failures, including immutable
 in-flight bundle requests, scoped templates, force bounds, overnight windows,
 private camera material, stale edit rejection, durable device registration,
 avatar rollback, per-key local override isolation and the Android phone-webhook
@@ -221,6 +238,16 @@ This predates the guest-object settings follow-on above: [run44073814465](https:
 and91 hosted tests with zero failures. This predates migration, delegated auto-fulfillment
 and the new runtime source. Their own Apple results remain separate.
 
+Public0fd8f39d83a33a83783a32c0004729c76fce4234 (native0013921),
+[run44078176150](https://github.com/entrixy/ios-build./actions/runs/44078176150),
+passed197 Apple core, Debug/Release/isolation and99 hosted tests with zero failures,
+including all three new automatic-route failure/replay tests. It predates the
+passive-BLE/camera/sound/defaults follow-ons. Public9014ccd/nativea3ad116,
+[run44081255143](https://github.com/entrixy/ios-build./actions/runs/44081255143),
+subsequently passed203 Apple core, Debug/Release/isolation and101 hosted tests,
+including actual fake-radio automatic-write/latch/relaunch checks. No physical
+controller was actuated. Camera/sound/default additions have their own pending run.
+
 This does NOT establish native interactions, device operation or App Store readiness. The separate ci/functional-port workflow builds Debug/test
 bundles and Release with fixture isolation, without taking screenshots or actuating hardware. It then runs hosted native
 transaction tests on an isolated simulator, without UI automation. Its exact-source result is recorded afterward.
@@ -242,3 +269,76 @@ transaction tests on an isolated simulator, without UI automation. Its exact-sou
 
 The new editor source is not a claim that the full settings block or application
 is finished. Old successful UI tests validate only their original source.
+
+## Guests hub and companies — source checkpoint 17 November
+
+The working Guests root now follows GuestsScreen.kt: People / Companies / Presets,
+expandable root-key cards with settings, clone, QR, share, message, pause and delete
+in Android order; delegated keys contribute the count below their root instead
+of becoming separate owner cards. Received-access cards and their create action
+are inline below the owner tabs. Per-object and preset access fields share one
+component. Owner name/default rights use the previously protected defaults model.
+
+Company links/QRs are server-scoped, stored before a same-server arrival claim,
+and never register an owner or automatically grant access. Company issue/edit is
+call-only with depth zero, explicit public object labels and pinned signing keys.
+Ordinary sync cannot replace a pin used by an issued key. Explicitly opening a
+new company request repins that company's grants as Prefs.setOrgKnownPub does. Company
+requests verify Ed25519 over the exact original signed body and bind key_ref,
+actor, object and the 600-second window; omitted objects require a singleton
+scope. The durable nonce ledger retains 25 minutes as Android does. Actuation
+still uses the protected existing call flow and records only a real attempt.
+Unknown existing company keys and merged-create replies cannot adopt a new local
+signing identity. Directory/pins survive protected storage and iOS backups;
+removal waits for confirmed access revocation. Logos are shown only for proven
+trusted-server profiles and loaded without redirects/cookies or direct company
+site checks.
+
+Linux Swift core: 215 tests, zero failures. App/hosted/UI source parses; localized
+labels and diff whitespace pass. Five new hosted scenarios cover arrival scope,
+storage failure, ambiguous create, pinned-key rotation/revoke, duplicate merge,
+and signed actor/replay. These new native scenarios and changed UI routes have
+NOT yet executed on Apple at this checkpoint; the exact-source CI follows this
+commit. Functional-port CI also includes the earlier built-test reuse change.
+No new screenshots or website publication. UI appearance and physical operation
+still require their separate acceptance. Remaining video/background/restore/
+global settings and device/signing work above is not marked complete.
+
+## Android backup entry point and resumable signing-key migration — source
+
+BackupManager.inspect now distinguishes authenticated iOS and Android payload
+headers after decrypting the common envelope. AndroidOwnerAdapter is connected
+to the real import preview. Original preference bytes are retained in protected
+state and subsequent encrypted backups, including fields not mapped yet. Owner
+name/default rights, server-scoped companies, locally recorded company pins,
+private camera settings and hangup preferences are translated. Existing object,
+BLE, socket and signing material keeps its original identity. Company recovery
+uses the PHONE's saved association and pin, never a company flag from host_sync.
+
+Incoming Android keys migrate using their original per-server Android fingerprint
+and signing identity, with their real bundle key or recipient private key when
+available. The complete plan is protected before a claim/move; confirmed device
+moves are checkpointed before bundle recovery. A missing owner bundle becomes a
+persisted waiting key rather than a fabricated decryption key or a migration that
+blocks the rest of the app. Recovery is authenticated and can resume after a
+restart. Exporting a still-waiting key from iOS rebases its old-device proof to
+that exporting iPhone, while retaining the original Android archive separately.
+Conflicts and combined archive/directory limits are checked before server moves.
+A recovered BLE key is disarmed until a real exit/reentry, including when its
+first BLE objects arrive only in the later authenticated bundle.
+
+Prefs.setOrgKnownPub was checked directly: ordinary sync never rotates a company
+pin; explicitly opening a new company request updates that company's pins, as
+Android does. The model scenario now distinguishes those two paths.
+
+Actual local verification: 219 Linux core tests, zero failures; all App/hosted/UI
+Swift source parses and diff whitespace passes. Two new hosted migration cases
+cover pre-wire storage failure, restart after a confirmed move, recipient/key
+retention, absent bundles, later protected recovery and correct iOS re-export
+fingerprints. These additions still require their exact-source Apple run. The
+older Guests snapshot is already building/testing separately; do not attribute
+its result to these later changes. No UI captures or publication were made.
+
+Remaining Android preferences such as incoming local automation overrides and
+passed-link presentation must still be mapped before claiming full backup parity;
+retaining their original archive is preservation, not a claim that they are active.
