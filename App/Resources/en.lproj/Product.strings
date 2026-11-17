@@ -928,3 +928,4 @@
 "ios_privacy_unavailable" = "The protected cellular route is unavailable on iOS 16. When home-network rules exist, server connections are blocked. Bluetooth, direct phone calls and local webhooks from this iPhone work independently.";
 "ios_privacy_unknown_wifi" = "The current Wi-Fi network could not be identified. Connect to Wi-Fi and allow location access to identify it.";
 "ios_privacy_wifi_permission" = "Allow network identification";
+"ios_privacy_blocked" = "Server connections are blocked by home-network rules. Check cellular data and permission under Settings → System → Home network.";

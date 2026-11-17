@@ -177,4 +177,25 @@ import EntrixyCore
         XCTAssertFalse(echo.received.isEmpty)
         XCTAssertNotEqual(String(data:echo.received,encoding:.utf8)?.contains("GET /private"),true)
     }
+    func testWebSocketAlsoUsesTheAuthenticatedProxyAndRetainsTLSValidation() async throws {
+        guard #available(iOS 17.0,*) else { throw XCTSkip("Public proxy configuration requires iOS17") }
+        let echo = try PrivacyEchoServer(), port = try await echo.start(); defer { echo.stop() }
+        var attempts = 0
+        let proxy = try ServerPrivacyProxy(decide:{ _ in .cellular },connect:{ _,_,route in
+            XCTAssertEqual(route,.cellular); attempts += 1
+            return NWConnection(host:"127.0.0.1",port:NWEndpoint.Port(rawValue:port)!,using:.tcp)
+        }); defer { proxy.stop() }
+        let address = try await proxy.start()
+        let configuration = URLSessionConfiguration.ephemeral
+        configuration.timeoutIntervalForRequest = 5; configuration.timeoutIntervalForResource = 5
+        address.configure(configuration)
+        let session = URLSession(configuration:configuration); defer { session.invalidateAndCancel() }
+        let socket = session.webSocketTask(with:URLRequest(url:URL(string:"wss://server.invalid/socket")!,timeoutInterval:5))
+        defer { socket.cancel(with:.goingAway,reason:nil) }
+        socket.resume()
+        do { _ = try await socket.receive(); XCTFail("The echo server is not a valid TLS/WebSocket peer") } catch { }
+        XCTAssertGreaterThan(attempts,0,proxy.rejectedHeaderShapeForTesting ?? "No rejected HTTP header")
+        XCTAssertFalse(echo.received.isEmpty)
+        XCTAssertNotEqual(String(data:echo.received,encoding:.utf8)?.contains("GET /socket"),true)
+    }
 }

@@ -5,7 +5,7 @@ import EntrixyCore
 
 /// The production composition boundary for server HTTPS/WSS only. This router
 /// must be started before any live model request. Never routes camera/webhooks.
-/// Not attached to LiveAppRoot until the complete route has passed Apple checks.
+/// Installs a closed gate during initialization, before live model requests.
 @MainActor final class ServerPrivacyRouter: ObservableObject {
     private final class Gate: @unchecked Sendable {
         private let lock = NSLock()
@@ -13,6 +13,8 @@ import EntrixyCore
         private var ready = false
         private var restricted = false
         private var forcedClosed = false
+        private var routeBlocked = true
+        func restrict(_ blocked: Bool) { lock.lock(); routeBlocked = blocked; lock.unlock() }
         func update(address: ServerPrivacyProxy.Address?,ready: Bool,restricted: Bool,forcedClosed: Bool) {
             lock.lock(); self.address = address; self.ready = ready; self.restricted = restricted; self.forcedClosed = forcedClosed; lock.unlock()
         }
@@ -21,7 +23,7 @@ import EntrixyCore
             if #available(iOS 17.0,*),let address { address.configure(configuration) }
         }
         func authorize(_ url: URL) throws {
-            lock.lock(); let permitted = ready && !forcedClosed && (!restricted || address != nil); lock.unlock()
+            lock.lock(); let permitted = ready && !forcedClosed && !routeBlocked && (!restricted || address != nil); lock.unlock()
             guard permitted, ["https","wss"].contains(url.scheme?.lowercased() ?? "") else {
                 throw GuestAPI.Failure(status:0,code:"network_policy_blocked")
             }
@@ -42,7 +44,12 @@ import EntrixyCore
     private var generation = UUID()
     private var installed = false
     private let connector: ServerPrivacyProxy.Connect?
-    init(connect: ServerPrivacyProxy.Connect? = nil) { connector = connect }
+    init(connect: ServerPrivacyProxy.Connect? = nil) {
+        connector = connect
+        let gate = gate
+        ServerSessionPolicy.shared.install({ gate.configure($0) },authorize:{ try gate.authorize($0) },networkPrivacyEnforced:true)
+        installed = true
+    }
     var supportsConstrainedRouting: Bool { if #available(iOS 17.0,*) { return true }; return false }
 
     func start() async -> Bool {
@@ -105,12 +112,14 @@ import EntrixyCore
     }
     private func recheck() {
         route = effectiveRoute
+        gate.restrict(route == .blocked)
         proxy?.restrict(to:route)
     }
     func stop() {
         generation = UUID(); starting = false; ready = false
         monitor?.cancel(); monitor = nil
         proxy?.stop(); proxy = nil; address = nil; route = .blocked
+        gate.restrict(true)
         gate.update(address:nil,ready:false,restricted:restricted,forcedClosed:forcedClosed)
         if installed { ServerSessionPolicy.shared.resetSessions() }
     }

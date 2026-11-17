@@ -85,6 +85,23 @@ private final class ServerAPI: OwnerTransport {
         let ok = await app.saveServerConfiguration(server:"owner.invalid",accessCode:"",email:"new@example.test",password:"not-a-stored-password")
         XCTAssertFalse(ok); XCTAssertTrue(app.owners.isEmpty); XCTAssertEqual(api.registrations,0); XCTAssertEqual(api.logins,0)
     }
+    func testOnlyLocalPrivacyPreflightAllowsExplicitRetryWithTheSameReservedMaster() async throws {
+        let store = ServerStorage(), api = ServerAPI(), app = AppModel(storage:store,ownerAPI:api)
+        defer { app.suspend() }
+        api.registrationError = GuestAPI.Failure(status:0,code:"network_policy_blocked")
+        let blocked = await app.saveServerConfiguration(server:"owner.invalid",accessCode:"",email:"",password:"")
+        XCTAssertFalse(blocked); XCTAssertEqual(app.owners[0].registrationPhase,.prepared)
+        let master = app.owners[0].masterKey
+        XCTAssertTrue(app.owners[0].canRegisterSafely)
+        // A remote server error with the same text is not local proof of no send.
+        api.registrationError = OwnerAPI.Failure(status:503,code:"network_policy_blocked")
+        let ambiguous = await app.saveServerConfiguration(server:"owner.invalid",accessCode:"",email:"",password:"")
+        XCTAssertFalse(ambiguous); XCTAssertEqual(app.owners[0].registrationPhase,.sent)
+        XCTAssertFalse(app.owners[0].canRegisterSafely); XCTAssertEqual(app.owners[0].masterKey,master)
+        let calls = api.registrations
+        let retry = await app.saveServerConfiguration(server:"owner.invalid",accessCode:"",email:"",password:"")
+        XCTAssertFalse(retry); XCTAssertEqual(api.registrations,calls)
+    }
     func testLostAccountReplyReconcilesWithoutRegistrationOrNewSecrets() async throws {
         let api = ServerAPI(); var owner = try registered(api:api); var settings = OwnerServerSettings()
         settings.accountEmail = "old@example.test"; owner.serverSettings = settings

@@ -928,3 +928,4 @@
 "ios_privacy_unavailable" = "A ligação móvel protegida não está disponível no iOS 16. Com regras de redes domésticas, as ligações ao servidor são bloqueadas. Bluetooth, chamadas diretas e webhooks locais deste iPhone funcionam de forma independente.";
 "ios_privacy_unknown_wifi" = "Não foi possível identificar a rede Wi-Fi atual. Ligue-se ao Wi-Fi e permita o acesso à localização.";
 "ios_privacy_wifi_permission" = "Permitir identificar a rede";
+"ios_privacy_blocked" = "As regras de redes domésticas bloqueiam a ligação ao servidor. Verifique os dados móveis e a permissão em Definições → Sistema → Rede doméstica.";

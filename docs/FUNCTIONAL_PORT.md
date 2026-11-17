@@ -1063,3 +1063,34 @@ Two Intel native runs remained in native-test preparation/execution for over8min
 Added ci/native-review-arm on the same macos15 ARM runner that passed UI17, to
 execute complete Core/Debug/Release/isolation/hosted checks on current composition.
 Existing runs are not cancelled. No product screenshot batch/publication.
+
+
+### Actual proxy green and live composition source
+
+Native633005e/publicbe2be6a run44150323650/job134276531601 ACTUALSUCCESS:
+Apple268 core, Debug/test bundles, Release/isolation and153 hosted native tests
+(134.464s zero). All five proxy cases passed, including actual URLSession CONNECT
+authentication with TLS rejection retained and unavailable-cellular no fallback.
+Both privacy backup state cases passed. This source predates router composition.
+Native1927187/public04154a7 run44152754848/job134285231958 ACTUALSUCCESS:
+Apple270 core, Debug and ALL17 UI (499.154s zero), still before home-network UI.
+
+LiveAppRoot now composes the router: a closed gate is installed during router
+initialization, before model use; start/reset finishes before resume. Router
+construction stays INSIDE StateObject's deferred initializer so rebuilding the
+Scene cannot replace the retained model's global gate. DEBUG hosted unit tests
+use a blank host; explicit UI/capture routes keep their existing isolated models.
+Normal live empty startup/theme rebuild and home-network consent/delete/key
+preservation are two new UI SOURCE cases (19 total), not yet executed. Permission
+button has its own clear list section, avoiding a grouped background fragment.
+
+The route also rejects known blocked policies synchronously before any HTTP/WSS
+request. Only the typed local preflight failure can reset a registration marked
+sent in THIS invocation to prepared; an old sent reservation or a remote server
+error cannot. No automatic retry/new master/physical command. Added a hosted
+source case for explicit retry preserving the master and refusing an ambiguous
+server error with the same text. Added actual WebSocket proxy/TLS source coverage
+alongside HTTP. All current Swift syntax passes; local Linux271 and7 Product
+tables920 keys validated. Full current Apple typing/native/UI19 still pending.
+Real cellular/DNS/Wi-Fi roaming/VPN/device/signing and remaining full-port features
+are not proven by loopback; no screenshot batch or gallery update has occurred.

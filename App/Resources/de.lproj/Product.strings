@@ -928,3 +928,4 @@
 "ios_privacy_unavailable" = "Der geschützte Mobilfunkweg ist unter iOS 16 nicht verfügbar. Bei Heimnetzregeln werden Serververbindungen blockiert. Bluetooth, direkte Telefonanrufe und lokale Webhooks dieses iPhones funktionieren unabhängig.";
 "ios_privacy_unknown_wifi" = "Das aktuelle WLAN konnte nicht ermittelt werden. Verbinden Sie sich mit WLAN und erlauben Sie den Standortzugriff.";
 "ios_privacy_wifi_permission" = "Netzwerkerkennung erlauben";
+"ios_privacy_blocked" = "Heimnetzregeln blockieren die Serververbindung. Prüfen Sie mobile Daten und die Freigabe unter Einstellungen → System → Heimnetz.";

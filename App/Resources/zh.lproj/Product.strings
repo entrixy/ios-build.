@@ -928,3 +928,4 @@
 "ios_privacy_unavailable" = "iOS 16 不支持受保护的移动数据路径。存在家庭网络规则时，将阻止服务器连接。蓝牙、本 iPhone 的直接通话和本地 Webhook 独立工作。";
 "ios_privacy_unknown_wifi" = "无法识别当前 Wi-Fi 网络。请连接 Wi-Fi 并允许位置访问。";
 "ios_privacy_wifi_permission" = "允许识别网络";
+"ios_privacy_blocked" = "家庭网络规则已阻止服务器连接。请在设置 → 系统 → 家庭网络中检查移动数据及授权。";

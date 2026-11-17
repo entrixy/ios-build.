@@ -881,6 +881,7 @@ final class AppModel: ObservableObject {
     }
 
     private func registerReservedOwner(_ host: String,accessCode: String,accountToken: String?,suiteChecked: Bool) async -> Bool {
+        var markedThisAttempt = false
         do {
             if !suiteChecked, !(try await ownerAPI.supportsOwnerSuite(server:host)) { errorMessage = ProductText.string("server_suite_mismatch"); return false }
             guard canManageGuestAccess, let index = owners.firstIndex(where:{ $0.server == host }), owners[index].canRegisterSafely else { return false }
@@ -888,12 +889,24 @@ final class AppModel: ObservableObject {
             try updated[index].markRegistrationSent()
             if updated[index].serverSettings?.pendingAccount != nil { updated[index].serverSettings?.pendingAccount?.sent = true }
             try saveOwners(updated)
+            markedThisAttempt = true
             let credentials = try await ownerAPI.register(server:host,accessCode:accessCode,accountToken:accountToken)
             unsavedOwnerCredentials[host] = credentials
             try persistOwnerCredentials(host)
             await syncOwner(host)
             return true
         } catch {
+            if (error as? GuestAPI.Failure)?.code == "network_policy_blocked",
+               let index = owners.firstIndex(where:{ $0.server == host && $0.credentials == nil }) {
+                var updated = owners
+                do {
+                    if markedThisAttempt {
+                        try updated[index].resetUnsentRegistration()
+                        try saveOwners(updated)
+                    }
+                    ownerMessages[host] = ProductText.string("ios_privacy_blocked"); errorMessage = ownerMessages[host]; return false
+                } catch { /* Keep the sent reservation if persistence fails. */ }
+            }
             if let failure = error as? OwnerAPI.Failure, failure.code == "access_denied", (400..<500).contains(failure.status),
                let index = owners.firstIndex(where:{ $0.server == host && $0.credentials == nil }) {
                 var updated = owners
@@ -1957,7 +1970,7 @@ final class AppModel: ObservableObject {
     }
 
     private func safeDiagnosticCode(_ code: String) -> String {
-        let allowed = GuestEvent.terminalReasons.union(["connection_failed", "storage_error", "paused", "network_policy_unsupported", "awaiting_owner", "server_error", "replay", "invalid_response", "rate_limited", "too_many_requests", "device_binding_failed", "event_overflow"])
+        let allowed = GuestEvent.terminalReasons.union(["connection_failed", "storage_error", "paused", "network_policy_unsupported", "network_policy_blocked", "awaiting_owner", "server_error", "replay", "invalid_response", "rate_limited", "too_many_requests", "device_binding_failed", "event_overflow"])
         return allowed.contains(code) ? code : "unknown_error"
     }
 
@@ -1969,6 +1982,7 @@ final class AppModel: ObservableObject {
         case "paused": return "Владелец приостановил действие ключа."
         case "awaiting_owner": return "Ожидаем подготовки ключа владельцем."
         case "network_policy_unsupported": return "У ключа есть сетевые ограничения. Поддержка этих условий ещё не подключена."
+        case "network_policy_blocked": return ProductText.string("ios_privacy_blocked")
         default: return "Не удалось получить данные. Ключ сохранён; попробуйте позже."
         }
     }

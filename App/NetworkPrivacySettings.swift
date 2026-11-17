@@ -36,7 +36,9 @@ struct NetworkPrivacySettingsSection: View {
             } else {
                 Section {
                     Text(ProductText.string("ios_privacy_unknown_wifi")).font(.footnote).foregroundStyle(Brand.secondaryInk)
-                    if sensors.locationAuthorization == .notDetermined {
+                }
+                if sensors.locationAuthorization == .notDetermined {
+                    Section {
                         Button(ProductText.string("ios_privacy_wifi_permission")) { sensors.requestNetworkAccess() }
                             .buttonStyle(SecondaryActionStyle()).actionListRow()
                     }

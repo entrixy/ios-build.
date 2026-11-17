@@ -34,6 +34,13 @@ public extension OwnerAccount {
         registrationPhase = .rejected
         serverSettings?.pendingAccount = nil
     }
+    /// Only a local transport preflight rejection proves no request left this
+    /// phone. A network error or a server error must keep the sent reservation.
+    mutating func resetUnsentRegistration() throws {
+        guard credentials == nil, registrationPhase == .sent else { throw GuestCrypto.Failure.invalidEnvelope }
+        registrationPhase = .prepared
+        serverSettings?.pendingAccount?.sent = false
+    }
     mutating func reconcileAccount(_ snapshot: OwnerSnapshot) throws {
         guard snapshot.accountSpecified else { return }
         var settings = serverSettings ?? OwnerServerSettings()
