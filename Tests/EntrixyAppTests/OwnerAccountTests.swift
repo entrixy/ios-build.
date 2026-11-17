@@ -600,18 +600,23 @@ final class OwnerAccountTests: XCTestCase {
             "sign_pub": pub, "guest_pub": recipient.publicKey,
             "vouch_sig": try DelegationProof.vouch(userKey: pair.userKey, server: owner.server, childID: 18, signPublic: pub, guestPublic: recipient.publicKey),
             "objects": [try KeyObjectAccess(depth: 1, pool: 3).json(id: 7)], "needs_bundle": 1])
-        await app.refreshOwners()
-        let prepared = try XCTUnwrap(app.owners[0].delegatedKeys?.first)
-        XCTAssertEqual(api.keyMutations, 1)
+        var uploadedCipher: String?
+        api.loseKeyEditReply = true
         api.beforeMutation = { operation, body in
             if operation == .keyEdit {
                 XCTAssertEqual(storage.state?.owners?[0].delegatedKeys?[0].sent, true)
-                XCTAssertEqual(storage.state?.owners?[0].delegatedKeys?[0].bundleCipher, prepared.bundleCipher)
+                let stored = storage.state?.owners?[0].delegatedKeys?[0].bundleCipher
+                let uploaded = try? JSONSerialization.jsonObject(with: body) as? [String: Any]
+                XCTAssertEqual(stored, uploaded?["bundle_cipher"] as? String)
+                uploadedCipher = stored
                 XCTAssertFalse(String(decoding: body, as: UTF8.self).contains(user))
             }
         }
-        api.loseKeyEditReply = true
-        await app.approveDelegatedKey(server: owner.server, keyID: prepared.id)
+        // No extra owner tap: synchronization fulfills a vouched recipient.
+        await app.refreshOwners()
+        let prepared = try XCTUnwrap(app.owners[0].delegatedKeys?.first)
+        XCTAssertEqual(api.keyMutations, 2)
+        XCTAssertEqual(prepared.bundleCipher, uploadedCipher)
         XCTAssertEqual(app.owners[0].delegatedKeys?[0].state, .awaiting)
         XCTAssertEqual(app.owners[0].delegatedKeys?[0].sent, true)
         let relaunched = AppModel(storage: storage, ownerAPI: api)

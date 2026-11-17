@@ -328,6 +328,8 @@ private struct OwnerObjectEditorForm: View {
     let objectID: UUID
     let showDeleteOnLaunch: Bool
     @State private var draft: OwnerObjectEdit
+    @State private var targetServer: String
+    @State private var confirmingMove = false
     @State private var automation = false
     @State private var serverModeWarning = false
     @State private var credentials: DeviceConfigurationCredentials?
@@ -337,14 +339,16 @@ private struct OwnerObjectEditorForm: View {
     @State private var deleting = false
     init(server: String, objectID: UUID, initialDraft: OwnerObjectEdit, showDeleteOnLaunch: Bool) {
         self.server = server; self.objectID = objectID; self.showDeleteOnLaunch = showDeleteOnLaunch
+        _targetServer = State(initialValue: server)
         var draft = initialDraft
         if draft.webhookSecret.isEmpty { draft.webhookSecret = PhoneWebhook.newSecret() }
         _draft = State(initialValue: draft)
     }
     private var object: OwnerObject? { model.owners.first { $0.server == server }?.objects?.first { $0.id == objectID } }
+    private var move: OwnerBLEMove? { model.bleMove(server: server, objectID: objectID) }
     private var canSave: Bool {
         guard let object else { return false }
-        return model.canManageGuestAccess && !model.ownerBusy && object.available != false && object.pending == nil &&
+        return model.canManageGuestAccess && !model.ownerBusy && move == nil && object.available != false && object.pending == nil &&
             object.revision != nil && !draft.label.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty &&
             (object.kind != "call" || !draft.phone.isEmpty) &&
             (object.kind != "webhook" || !draft.webhookURL.isEmpty && !draft.webhookSecret.isEmpty)
@@ -353,7 +357,7 @@ private struct OwnerObjectEditorForm: View {
         Form {
             if let object {
                 Section {
-                    if model.owners.filter({ !$0.registrationPending }).count > 1 {
+                    if object.kind != "ble", model.owners.filter({ !$0.registrationPending }).count > 1 {
                         Text(ProductText.string("object_server") + ": " + server).font(.footnote).foregroundStyle(Brand.secondaryInk)
                     }
                     AppField(ProductText.string("add_object_name")) {
@@ -368,7 +372,8 @@ private struct OwnerObjectEditorForm: View {
                         WebhookConfigurationFields(url: $draft.webhookURL, secret: $draft.webhookSecret,
                             mode: $draft.webhookMode, toggles: $draft.webhookToggle, requestServerMode: { serverModeWarning = true })
                     }
-                }.disabled(model.ownerBusy || object.pending != nil || object.available == false)
+                }.disabled(model.ownerBusy || object.pending != nil || object.available == false || move != nil)
+                if object.kind == "ble" { bleFields }
                 if object.kind == "call" { PhoneHangupLimitation(hangupSeconds: draft.local.hangupSeconds) }
                 if object.kind == "device" { deviceFields }
                 if object.kind != "ble" {
@@ -382,20 +387,25 @@ private struct OwnerObjectEditorForm: View {
                 if let message = model.ownerObjectMessages[objectID] {
                     Section { Text(message).font(.subheadline).foregroundStyle(Brand.secondaryInk) }
                 }
-                Section {
-                    Button { Task { if await model.updateOwnerObject(server: server, objectID: objectID, draft: draft) { dismiss() } } } label: {
-                        ActionButtonLabel(title: ProductText.string("btn_save"), busy: model.ownerBusy)
-                    }.buttonStyle(PrimaryActionStyle()).actionListRow().disabled(!canSave)
+                if move == nil {
+                    Section {
+                        Button {
+                            if object.kind == "ble", targetServer != server { confirmingMove = true }
+                            else { Task { if await model.updateOwnerObject(server: server, objectID: objectID, draft: draft) { dismiss() } } }
+                        } label: {
+                            ActionButtonLabel(title: ProductText.string(object.kind == "ble" && targetServer != server ? "ble_move_button" : "btn_save"), busy: model.ownerBusy)
+                        }.buttonStyle(PrimaryActionStyle()).actionListRow().disabled(!canSave)
+                    }
                 }
             }
         }
         .navigationTitle(ProductText.string(object?.kind == "ble" ? "ble_object_default" : "edit_object_title"))
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
-            ToolbarItem(placement: .navigationBarTrailing) {
+            if object?.kind != "ble" { ToolbarItem(placement: .navigationBarTrailing) {
                 Button { automation = true } label: { Image(systemName: "arrow.triangle.2.circlepath") }
                     .accessibilityLabel(ProductText.string("owner_automation_desc")).accessibilityIdentifier("owner-object-automation")
-            }
+            } }
         }
         .sheet(isPresented: $automation) { AutomationEditor(destination: .object(.owned(server: server, objectID: objectID))) }
         .sheet(isPresented: $showingCredentials) { if let credentials { DeviceCredentialsSheet(credentials: credentials, server: server) } }
@@ -406,9 +416,24 @@ private struct OwnerObjectEditorForm: View {
             Button(ProductText.string("btn_ok"), role: .cancel) {}
         } message: { Text(ProductText.string("edit_object_no_creds_text")) }
         .task { if showDeleteOnLaunch { deleting = true } }
-        .accessibilityHidden(serverModeWarning || deleting)
+        .interactiveDismissDisabled(model.ownerBusy)
+        .accessibilityHidden(serverModeWarning || deleting || confirmingMove)
         .overlay {
-            if serverModeWarning {
+            if confirmingMove {
+                AppDialogSurface {
+                    VStack(alignment: .leading, spacing: 18) {
+                        Text(ProductText.string("ble_move_title", targetServer)).font(.title3.bold())
+                        Text(ProductText.string("ble_move_hint"))
+                        HStack(spacing: 12) {
+                            Button(ProductText.string("btn_cancel")) { confirmingMove = false }.buttonStyle(SecondaryActionStyle())
+                            Button(ProductText.string("ble_move_button")) {
+                                confirmingMove = false
+                                Task { if await model.moveBLEObject(server: server, objectID: objectID, to: targetServer) { dismiss() } }
+                            }.buttonStyle(PrimaryActionStyle())
+                        }
+                    }
+                }
+            } else if serverModeWarning {
                 WebhookServerModeConfirmation(cancel: { serverModeWarning = false }, confirm: { draft.webhookMode = "server"; serverModeWarning = false })
             } else if deleting {
                 AppConfirmationDialog(title: "Удалить объект?", message: "Гости потеряют доступ к этому объекту.",
@@ -416,6 +441,26 @@ private struct OwnerObjectEditorForm: View {
                         deleting = false
                         Task { await model.deleteOwnerObject(server: server, objectID: objectID); if object == nil { dismiss() } }
                     })
+            }
+        }
+    }
+    @ViewBuilder private var bleFields: some View {
+        let hosts = model.owners.filter { !$0.registrationPending }.map(\.server)
+        if hosts.count > 1 {
+            Section {
+                ForEach(hosts, id: \.self) { host in
+                    ObjectRadioChoice(title: host, selected: (move?.destination ?? targetServer) == host) { targetServer = host }
+                }
+                if targetServer != server || move != nil { Text(ProductText.string("ble_move_hint")).font(.footnote).foregroundStyle(Brand.secondaryInk) }
+            } header: { Text(ProductText.string("ble_server_label")) }
+                .disabled(model.ownerBusy || move != nil)
+        }
+        if let move {
+            Section { Text("Перенос ожидает подтверждения: " + move.destination).foregroundStyle(Brand.secondaryInk) }
+            Section {
+                Button { Task { if await model.moveBLEObject(server: server, objectID: objectID, to: move.destination) { dismiss() } } } label: {
+                    ActionButtonLabel(title: "Проверить результат", busy: model.ownerBusy)
+                }.buttonStyle(PrimaryActionStyle()).actionListRow().disabled(model.ownerBusy)
             }
         }
     }

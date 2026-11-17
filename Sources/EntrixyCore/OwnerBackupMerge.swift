@@ -67,6 +67,17 @@ public extension OwnerAccount {
             if let index = archived.firstIndex(where: { $0.id == incoming.id }) { _ = try object(archived[index], incoming) }
             else { archived.append(incoming) }
         }
+        var moves = bleMoves ?? []
+        for incoming in source.bleMoves ?? [] {
+            if let existing = moves.first(where: { $0.id == incoming.id }) {
+                guard existing.objectID == incoming.objectID, existing.destination == incoming.destination,
+                      existing.sourceNumberID == incoming.sourceNumberID, existing.cipher == incoming.cipher else { throw GuestCrypto.Failure.invalidEnvelope }
+            } else if active.contains(where: { $0.id == incoming.objectID }) {
+                guard !moves.contains(where: { $0.objectID == incoming.objectID }) else { throw GuestCrypto.Failure.invalidEnvelope }
+                moves.append(incoming)
+            }
+        }
+        merged.bleMoves = moves
         merged.objects = active; merged.bleArchivedObjects = archived
 
         var issued = issuedKeys ?? []

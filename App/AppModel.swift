@@ -408,9 +408,12 @@ final class AppModel: ObservableObject {
         }
     }
 
-    private func saveOwners(_ updated: [OwnerAccount]) throws {
-        try storage.save(SavedState(identity: identity, guests: guests, journal: journal, actionCode: actionCode, owners: updated, usedOwnerPresses: usedOwnerPresses, pendingRestore: pendingRestore, delegations: delegations, passedAccess: passedAccess, receivedDelegations: receivedDelegations, incomingMessages: incomingMessages, outgoingMessages: outgoingMessages, delegatedJournalLedger: delegatedJournalLedger, appLockEnabled: appLockEnabled, appEntryBiometricEnabled: appEntryBiometricEnabled, objectPreferences: objectPreferences))
+    private func saveOwners(_ updated: [OwnerAccount], preferences: ObjectCatalogPreferences? = nil) throws {
+        let preferences = preferences ?? objectPreferences
+        try preferences.validate()
+        try storage.save(SavedState(identity: identity, guests: guests, journal: journal, actionCode: actionCode, owners: updated, usedOwnerPresses: usedOwnerPresses, pendingRestore: pendingRestore, delegations: delegations, passedAccess: passedAccess, receivedDelegations: receivedDelegations, incomingMessages: incomingMessages, outgoingMessages: outgoingMessages, delegatedJournalLedger: delegatedJournalLedger, appLockEnabled: appLockEnabled, appEntryBiometricEnabled: appEntryBiometricEnabled, objectPreferences: preferences))
         owners = updated
+        if objectPreferences != preferences { objectPreferences = preferences }
         scheduleOwnerSettingsRefresh()
     }
 
@@ -657,7 +660,7 @@ final class AppModel: ObservableObject {
         catch { errorMessage = "Не удалось сохранить доступ. Регистрация повторно не отправлялась." }
     }
 
-    private func syncOwner(_ host: String) async {
+    private func syncOwner(_ host: String, fulfillDelegations: Bool = true) async {
         guard let credentials = owners.first(where: { $0.server == host })?.credentials else { return }
         do {
             let fingerprint = GuestCrypto.hash(identity + Data(host.utf8))
@@ -688,6 +691,7 @@ final class AppModel: ObservableObject {
             }
             ownerSnapshots[host] = snapshot
             ownerMessages.removeValue(forKey: host)
+            if fulfillDelegations { await fulfillVerifiedDelegations(server: host) }
         } catch {
             let code = (error as? OwnerAPI.Failure)?.code
             ownerMessages[host] = ["evicted", "wrong_device"].contains(code ?? "")
@@ -726,7 +730,7 @@ final class AppModel: ObservableObject {
     }
 
     func renameOwnerObject(server: String, objectID: UUID, label: String, preset: Int? = nil) async -> Bool {
-        guard storageReady, !ownerBusy, let index = owners.firstIndex(where: { $0.server == server }),
+        guard storageReady, !ownerBusy, let index = owners.firstIndex(where: { $0.server == server }), !owners[index].isMoving(objectID),
               let offset = owners[index].objects?.firstIndex(where: { $0.id == objectID }) else { return false }
         ownerBusy = true
         defer { ownerBusy = false }
@@ -740,7 +744,7 @@ final class AppModel: ObservableObject {
     }
 
     func updateOwnerObject(server: String, objectID: UUID, draft: OwnerObjectEdit) async -> Bool {
-        guard storageReady, !ownerBusy, let index = owners.firstIndex(where: { $0.server == server }),
+        guard storageReady, !ownerBusy, let index = owners.firstIndex(where: { $0.server == server }), !owners[index].isMoving(objectID),
               let offset = owners[index].objects?.firstIndex(where: { $0.id == objectID }) else { return false }
         ownerBusy = true
         defer { ownerBusy = false }
@@ -827,7 +831,7 @@ final class AppModel: ObservableObject {
     }
 
     func deleteOwnerObject(server: String, objectID: UUID) async {
-        guard storageReady, !ownerBusy, let index = owners.firstIndex(where: { $0.server == server }),
+        guard storageReady, !ownerBusy, let index = owners.firstIndex(where: { $0.server == server }), !owners[index].isMoving(objectID),
               let offset = owners[index].objects?.firstIndex(where: { $0.id == objectID }),
               owners[index].objects![offset].pending == nil, owners[index].objects![offset].available != false else { return }
         ownerBusy = true
@@ -976,12 +980,40 @@ final class AppModel: ObservableObject {
         }
     }
 
+    /// Android HostService.syncHostData/Vault.fulfilDelegatedKey: a verified
+    /// recipient does not need another owner approval. Each exact blob is saved
+    /// before upload; an uncertain sent blob is reconciled, not regenerated.
+    private func fulfillVerifiedDelegations(server: String) async {
+        var attempted = Set<UUID>()
+        // A confirmed parent can unlock its next descendant. Five passes match
+        // the protocol depth and keep this work bounded for hostile snapshots.
+        for _ in 0..<5 {
+            guard canManageGuestAccess, ownerMessages[server] == nil,
+                  let owner = owners.first(where: { $0.server == server }) else { return }
+            let pending = (owner.delegatedKeys ?? []).filter {
+                $0.state == .awaiting && !$0.sent && $0.revocationPending != true && !attempted.contains($0.id)
+            }.map(\.id)
+            guard !pending.isEmpty else { return }
+            for id in pending {
+                guard canManageGuestAccess else { return }
+                attempted.insert(id)
+                await sendVerifiedDelegation(server: server, keyID: id, retry: false)
+            }
+        }
+    }
+
     func approveDelegatedKey(server: String, keyID: UUID, retry: Bool = false) async {
-        guard storageReady, !ownerBusy, !busy else { return }
+        guard canManageGuestAccess, !ownerBusy, !busy else { return }
         ownerBusy = true
         defer { ownerBusy = false }
-        await syncOwner(server)
-        guard ownerMessages[server] == nil,
+        await syncOwner(server, fulfillDelegations: false)
+        guard ownerMessages[server] == nil else { return }
+        await sendVerifiedDelegation(server: server, keyID: keyID, retry: retry)
+        await fulfillVerifiedDelegations(server: server)
+    }
+
+    private func sendVerifiedDelegation(server: String, keyID: UUID, retry: Bool) async {
+        guard canManageGuestAccess,
               let index = owners.firstIndex(where: { $0.server == server }),
               let offset = owners[index].delegatedKeys?.firstIndex(where: { $0.id == keyID }),
               let credentials = owners[index].credentials else { return }
@@ -997,9 +1029,11 @@ final class AppModel: ObservableObject {
         } catch { ownerDelegationMessages[keyID] = "Не удалось сохранить связку. На сервер она не отправлялась."; return }
         do {
             let body = try owners[index].delegatedKeys![offset].request()
-            _ = try await ownerAPI.mutate(server: server, credentials: credentials,
+            let data = try await ownerAPI.mutate(server: server, credentials: credentials,
                 fingerprint: backupFingerprint(server: server), operation: .keyEdit, body: body)
-            await syncOwner(server)
+            guard let reply = try JSONSerialization.jsonObject(with: data) as? [String: Any],
+                  (reply["ok"] as? NSNumber)?.boolValue == true else { throw GuestCrypto.Failure.invalidEnvelope }
+            await syncOwner(server, fulfillDelegations: false)
         } catch {
             ownerDelegationMessages[keyID] = "Ответ передачи связки не подтверждён. Данные получателя сохранены; сначала обновите сервер."
         }
@@ -2243,7 +2277,7 @@ extension AppModel {
                 try save(guests, preferences: preferences)
                 return true
             case let .owned(server, id):
-                guard let index = owners.firstIndex(where: { $0.server == server }),
+                guard let index = owners.firstIndex(where: { $0.server == server }), !owners[index].isMoving(id),
                       let offset = owners[index].objects?.firstIndex(where: { $0.id == id }) else { return false }
                 ownerBusy = true; defer { ownerBusy = false }
                 var updated = owners
@@ -2287,4 +2321,140 @@ extension AppModel {
 extension AppModel {
     func beginEditingGuestKey(_ id: UUID) { editingOwnerKeys.insert(id) }
     func endEditingGuestKey(_ id: UUID) { editingOwnerKeys.remove(id); scheduleOwnerSettingsRefresh() }
+}
+
+extension AppModel {
+    func bleMove(server: String, objectID: UUID) -> OwnerBLEMove? {
+        owners.first(where: { $0.server == server })?.bleMoves?.first(where: { $0.objectID == objectID })
+    }
+    func objectIsMoving(server: String, objectID: UUID) -> Bool { bleMove(server: server, objectID: objectID) != nil }
+
+    func moveBLEObject(server: String, objectID: UUID, to destination: String) async -> Bool {
+        guard canManageGuestAccess, !busy, !ownerBusy, server != destination,
+              owners.contains(where: { $0.server == destination && $0.credentials != nil }),
+              unsavedOwnerObjects[objectID] == nil else { return false }
+        ownerBusy = true; defer { ownerBusy = false }
+        do {
+            if let existing = bleMove(server: server, objectID: objectID) {
+                guard existing.destination == destination else { throw GuestCrypto.Failure.invalidEnvelope }
+            } else {
+                await syncOwner(server)
+                guard ownerMessages[server] == nil, let index = owners.firstIndex(where: { $0.server == server }),
+                      let object = owners[index].objects?.first(where: { $0.id == objectID }), let number = object.numberID,
+                      !owners.contains(where: { account in
+                          account.server == destination && (account.objects ?? []).contains(where: { $0.bleDeviceID == object.bleDeviceID })
+                      }), !(owners[index].issuedKeys ?? []).contains(where: { $0.numberIDs.contains(number) && ($0.pending != nil || unsavedOwnerKeys[$0.id] != nil) }) else {
+                    ownerObjectMessages[objectID] = "Сначала дождитесь подтверждения настроек объекта и его гостевых ключей."
+                    return false
+                }
+                let move = try OwnerBLEMove(object: object, destination: destination)
+                var updated = owners
+                updated[index].bleMoves = (updated[index].bleMoves ?? []) + [move]
+                var preferences = objectPreferences
+                let actual = catalogObjects(includeHidden: true).map(\.target)
+                preferences.order = actual + preferences.order.filter { !actual.contains($0) }
+                try saveOwners(updated, preferences: preferences)
+            }
+            return try await continueBLEMove(server: server, objectID: objectID)
+        } catch {
+            ownerObjectMessages[objectID] = "Перенос не подтверждён. Секрет контроллера сохранён; проверьте результат. Новая привязка не выполнялась."
+            return false
+        }
+    }
+    private func moveSnapshot(_ server: String) async throws -> OwnerSnapshot {
+        guard let owner = owners.first(where: { $0.server == server }), let credentials = owner.credentials else { throw GuestCrypto.Failure.invalidEnvelope }
+        return try OwnerSnapshot.decode(await ownerAPI.sync(server: server, credentials: credentials,
+            fingerprint: GuestCrypto.hash(identity + Data(server.utf8))))
+    }
+    private func moveRequest(_ server: String, operation: OwnerOperation, body: Data) async throws -> [String: Any] {
+        guard let credentials = owners.first(where: { $0.server == server })?.credentials else { throw GuestCrypto.Failure.invalidEnvelope }
+        let data = try await ownerAPI.mutate(server: server, credentials: credentials,
+            fingerprint: GuestCrypto.hash(identity + Data(server.utf8)), operation: operation, body: body)
+        guard let json = try JSONSerialization.jsonObject(with: data) as? [String: Any] else { throw GuestCrypto.Failure.invalidEnvelope }
+        return json
+    }
+    private func saveMove(_ move: OwnerBLEMove, server: String) throws {
+        guard let i = owners.firstIndex(where: { $0.server == server }),
+              let j = owners[i].bleMoves?.firstIndex(where: { $0.id == move.id }) else { throw GuestCrypto.Failure.invalidEnvelope }
+        var updated = owners; updated[i].bleMoves![j] = move; try saveOwners(updated)
+    }
+    private func continueBLEMove(server: String, objectID: UUID) async throws -> Bool {
+        var removedSourceThisAttempt = false, removedTargetThisAttempt = false
+        for _ in 0..<8 {
+            guard canManageGuestAccess, var move = bleMove(server: server, objectID: objectID) else { return false }
+            switch move.phase {
+            case .createPrepared:
+                let request = try move.request(); try move.markSent(); try saveMove(move, server: server)
+                do {
+                    let response = try await moveRequest(move.destination, operation: .create, body: request)
+                    try move.acceptedCreation(numberID: OwnerObject.replyID(response["id"]))
+                    try saveMove(move, server: server)
+                } catch let failure as OwnerAPI.Failure {
+                    if [400,401,403,404,409,422].contains(failure.status) {
+                        try move.rejectedCreation(); try saveMove(move, server: server)
+                    }
+                    throw failure
+                }
+            case .createSent:
+                let target = try await moveSnapshot(move.destination)
+                let found = try move.reconcileDestination(target)
+                try saveMove(move, server: server)
+                if !found { ownerObjectMessages[objectID] = "Ответ создания на новом сервере ещё не подтверждён. Проверка не создаёт вторую запись."; return false }
+            case .removePrepared, .removeSent:
+                let target = try await moveSnapshot(move.destination)
+                guard try move.reconcileDestination(target) else { throw GuestCrypto.Failure.invalidEnvelope }
+                let source = try await moveSnapshot(server)
+                move.reconcileSource(source)
+                if move.phase == .ready { try saveMove(move, server: server); continue }
+                guard source.rows.contains(where: { $0["id"] as? Int == move.sourceNumberID && $0["type"] as? String == "ble" && $0["data_cipher"] as? String == move.cipher }) else {
+                    if move.phase == .removePrepared { try move.rollback(); try saveMove(move, server: server); continue }
+                    throw GuestCrypto.Failure.invalidEnvelope
+                }
+                if move.phase == .removeSent {
+                    guard !removedSourceThisAttempt else { return false }
+                    try move.retryIdempotentRemoval()
+                }
+                let request = try move.request(); try move.markSent(); try saveMove(move, server: server)
+                removedSourceThisAttempt = true
+                do {
+                    let response = try await moveRequest(server, operation: .delete, body: request)
+                    guard (response["ok"] as? NSNumber)?.boolValue == true else { throw GuestCrypto.Failure.invalidEnvelope }
+                } catch let failure as OwnerAPI.Failure {
+                    if [400,401,403,409,422].contains(failure.status) { try move.rollback(); try saveMove(move, server: server) }
+                    else { throw failure }
+                }
+            case .rollbackPrepared, .rollbackSent:
+                let target = try await moveSnapshot(move.destination)
+                guard let destinationID = move.destinationNumberID else { throw GuestCrypto.Failure.invalidEnvelope }
+                if !target.rows.contains(where: { $0["id"] as? Int == destinationID }) {
+                    guard let index = owners.firstIndex(where: { $0.server == server }) else { return false }
+                    var updated = owners; updated[index].bleMoves?.removeAll { $0.id == move.id }; try saveOwners(updated)
+                    ownerObjectMessages[objectID] = "Перенос не выполнен. Запись на новом сервере отменена; исходный объект сохранён."
+                    await syncOwner(server); return false
+                }
+                guard try move.reconcileDestination(target) else { throw GuestCrypto.Failure.invalidEnvelope }
+                if move.phase == .rollbackSent {
+                    guard !removedTargetThisAttempt else { return false }
+                    try move.retryIdempotentRemoval()
+                }
+                let request = try move.request(); try move.markSent(); try saveMove(move, server: server)
+                removedTargetThisAttempt = true
+                let response = try await moveRequest(move.destination, operation: .delete, body: request)
+                guard (response["ok"] as? NSNumber)?.boolValue == true else { throw GuestCrypto.Failure.invalidEnvelope }
+            case .ready:
+                let sourceSnapshot = try await moveSnapshot(server), targetSnapshot = try await moveSnapshot(move.destination)
+                guard let fromIndex = owners.firstIndex(where: { $0.server == server }),
+                      let toIndex = owners.firstIndex(where: { $0.server == move.destination }) else { throw GuestCrypto.Failure.invalidEnvelope }
+                let (from, to, preferences) = try move.committed(source: owners[fromIndex], destination: owners[toIndex],
+                    sourceSnapshot: sourceSnapshot, destinationSnapshot: targetSnapshot, preferences: objectPreferences)
+                var updated = owners; updated[fromIndex] = from; updated[toIndex] = to
+                try saveOwners(updated, preferences: preferences)
+                ownerObjectMessages.removeValue(forKey: objectID)
+                await flushOwnerObjectSettings(server: server)
+                await syncOwner(server); await syncOwner(move.destination)
+                return true
+            }
+        }
+        return false
+    }
 }

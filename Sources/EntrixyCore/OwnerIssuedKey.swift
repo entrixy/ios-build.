@@ -108,7 +108,7 @@ public struct OwnerIssuedKey: Codable, Identifiable, Equatable {
                            automation: [String: Data]? = nil, streamAllowed: [Int]? = nil, inheritRestrictions: Bool = false, bleLifetimes: [String: UInt32]? = nil) throws -> Data {
         guard !numberIDs.isEmpty, Set(numberIDs).count == numberIDs.count, welcome.utf8.count <= 4096 else { throw GuestCrypto.Failure.invalidEnvelope }
         let selected = (owner.objects ?? []).filter { numberIDs.contains($0.numberID ?? -1) }
-        guard selected.count == numberIDs.count, selected.allSatisfy({ $0.pending == nil && $0.available != false }) else { throw GuestCrypto.Failure.invalidEnvelope }
+        guard selected.count == numberIDs.count, selected.allSatisfy({ $0.pending == nil && $0.available != false && !owner.isMoving($0.id) }) else { throw GuestCrypto.Failure.invalidEnvelope }
         let oldBLE = existing["ble"] as? [[String: Any]] ?? []
         guard existing["ble"] == nil || existing["ble"] is [[String: Any]] else { throw GuestCrypto.Failure.invalidEnvelope }
         let oldBLEIDs = try oldBLE.map { try OwnerObject.replyID($0["id"]) }
@@ -197,7 +197,7 @@ public struct OwnerIssuedKey: Codable, Identifiable, Equatable {
     }
 
     public func validate(masterKey: Data) throws {
-        guard (1...65535).contains(guestID), !numberIDs.isEmpty, numberIDs.allSatisfy({ $0 > 0 }),
+        guard (1...65535).contains(guestID), (!numberIDs.isEmpty || keyID != nil), numberIDs.allSatisfy({ $0 > 0 }),
               Set(numberIDs).count == numberIDs.count,
               pending == .keyEdit || effectiveNumberIDs == nil || Set(effectiveNumberIDs!).isSubset(of: Set(numberIDs)),
               keyID == nil || keyID! > 0,

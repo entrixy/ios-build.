@@ -107,7 +107,12 @@ struct KeychainStore: StateStorage {
         for entry in pending { try entry.validate() }
         let owners = state.owners ?? []
         guard Set(owners.map(\.server)).count == owners.count else { throw Failure(status: errSecDecode) }
-        for owner in owners { try owner.validate() }
+        for owner in owners {
+            try owner.validate()
+            for move in owner.bleMoves ?? [] {
+                guard owners.contains(where: { $0.server == move.destination && $0.credentials != nil }) else { throw Failure(status: errSecDecode) }
+            }
+        }
     }
 
     func save(_ state: SavedState) throws {

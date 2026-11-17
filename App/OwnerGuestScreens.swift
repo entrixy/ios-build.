@@ -107,7 +107,7 @@ struct IssueOwnerKeyScreen: View {
     }
     private func access(_ number: Int) -> KeyObjectAccess { draft.access[number] ?? (try! KeyObjectAccess()) }
     private func toggle(_ account: OwnerAccount, _ object: OwnerObject) {
-        guard let number = object.numberID, eligible(object) else { return }
+        guard let number = object.numberID, eligible(object), !account.isMoving(object.id) else { return }
         if draft.selected.isEmpty, editingKeyID == nil, server != account.server {
             draft.access = [:]; draft.templates = [:]; draft.streams = [:]; draft.lifetimes = [:]; draft.calls = [:]
             server = account.server
@@ -172,7 +172,7 @@ struct IssueOwnerKeyScreen: View {
                             Image(systemName: selected ? "checkmark.square.fill" : "square")
                             Text(model.objectLabel(entry)).lineLimit(1).frame(maxWidth: .infinity, alignment: .leading)
                         }.foregroundStyle(Brand.ink).frame(minHeight: 48).contentShape(Rectangle())
-                    }.buttonStyle(.plain).disabled(locked || !eligible(object) || model.ownerBusy)
+                    }.buttonStyle(.plain).disabled(locked || !eligible(object) || account.isMoving(object.id) || model.ownerBusy)
                         .accessibilityIdentifier("guest-object-" + entry.target.id)
                         .accessibilityAddTraits(selected ? .isSelected : [])
                     if selected {
@@ -307,7 +307,7 @@ struct OwnerKeyScreen: View {
                     }
                     if key.pending == nil, key.state == .active, let owner,
                        let bundle = try? key.bundle(masterKey: owner.masterKey), let rows = bundle["ble"] as? [[String: Any]], !rows.isEmpty {
-                        Button("Продлить Bluetooth-пропуска на 24 часа") { renewingBLE = true }.buttonStyle(SecondaryActionStyle())
+                        Button("Продлить Bluetooth-пропуска") { renewingBLE = true }.buttonStyle(SecondaryActionStyle())
                     }
                     if key.pending == nil && [.active, .paused, .restricted].contains(key.state) {
                         Button("Написать сообщение") { composing = true }.buttonStyle(SecondaryActionStyle())
@@ -327,7 +327,7 @@ struct OwnerKeyScreen: View {
         }
         .sheet(isPresented: $editing) { IssueOwnerKeyScreen(serverPreset: server, editingKeyID: keyID, editAccessOnLaunch: reviewingRestoredAccess) }
         .task { if showRevokeOnLaunch { revoking = true } }
-        .confirmationDialog("Продлить Bluetooth-пропуска на 24 часа?", isPresented: $renewingBLE, titleVisibility: .visible) {
+        .confirmationDialog("Продлить Bluetooth-пропуска на выбранный срок?", isPresented: $renewingBLE, titleVisibility: .visible) {
             Button("Продлить") { Task { await model.renewOwnerBLEKey(server: server, keyID: keyID) } }
         }
         .confirmationDialog("Отозвать ключ? Гость и получатели переданного им доступа потеряют доступ.", isPresented: $revoking, titleVisibility: .visible) {

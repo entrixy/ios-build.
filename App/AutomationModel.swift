@@ -38,7 +38,7 @@ extension AppModel {
                 label: try object.metadata(masterKey: owner.masterKey)["label"] as? String ?? "",
                 isBLE: object.kind == "ble", incoming: false, issued: false,
                 template: try AutomationTemplate(data: object.localPolicy), ownerTemplate: nil, objectTemplate: nil,
-                allowStream: false, canEdit: canManageGuestAccess && object.pending != .delete)
+                allowStream: false, canEdit: canManageGuestAccess && object.pending != .delete && !owner.isMoving(object.id))
         case .object(.received(let guestID, let objectID)):
             guard let guest = guests.first(where: { $0.id == guestID }),
                   let object = guest.objects.first(where: { $0.id == objectID }) else { throw GuestCrypto.Failure.invalidEnvelope }
@@ -59,7 +59,7 @@ extension AppModel {
                 template: try key.objectTemplate(numberID: number, owner: owner), ownerTemplate: nil,
                 objectTemplate: try AutomationTemplate(data: object.localPolicy),
                 allowStream: (key.streamAllowed ?? bundle["streams"] as? [Int] ?? key.numberIDs).contains(number),
-                canEdit: canManageGuestAccess && [.active, .paused].contains(key.state) && key.pending != .keyRevoke)
+                canEdit: canManageGuestAccess && [.active, .paused].contains(key.state) && key.pending != .keyRevoke && !owner.isMoving(object.id))
         }
     }
 }

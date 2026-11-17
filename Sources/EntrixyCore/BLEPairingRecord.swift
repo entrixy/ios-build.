@@ -25,6 +25,14 @@ public struct BLEPairingRecord: Codable, Identifiable, Equatable {
         wrappedSecret = try GuestCrypto.encrypt(key: masterKey, plaintext: secret)
         phase = .prepared
     }
+    public init(transferring source: BLEPairingRecord, from sourceKey: Data, to destinationKey: Data) throws {
+        try source.validate(masterKey: sourceKey)
+        guard source.phase == .confirmed, source.objectID != nil else { throw GuestCrypto.Failure.invalidEnvelope }
+        id = source.id; peripheralID = source.peripheralID; deviceID = source.deviceID
+        label = source.label; peerPublic = source.peerPublic; packet = source.packet
+        wrappedSecret = try GuestCrypto.encrypt(key: destinationKey, plaintext: source.secret(masterKey: sourceKey))
+        phase = .confirmed; objectID = source.objectID
+    }
     public func secret(masterKey: Data) throws -> Data {
         let secret = try GuestCrypto.decrypt(key: masterKey, envelope: wrappedSecret)
         guard secret.count == 32 else { throw GuestCrypto.Failure.invalidKey }

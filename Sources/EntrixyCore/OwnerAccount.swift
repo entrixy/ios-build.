@@ -17,6 +17,7 @@ public struct OwnerAccount: Codable, Identifiable, Equatable {
     public var bleRestoreObjectIDs: [String: [Int]]?
     public var bleRestorePending: [UUID]?
     public var blePairings: [BLEPairingRecord]?
+    public var bleMoves: [OwnerBLEMove]?
     public var lastSynced: Date?
     public var bundleRefreshQueue: [String: String]?
     public var id: String { server }
@@ -57,6 +58,13 @@ public struct OwnerAccount: Codable, Identifiable, Equatable {
         for object in archived {
             guard object.kind == "ble", object.available == false, object.pending == nil, !object.sent else { throw GuestCrypto.Failure.invalidEnvelope }
             try object.validate(masterKey: masterKey)
+        }
+        let moves = bleMoves ?? []
+        guard moves.count <= 1000, Set(moves.map(\.id)).count == moves.count,
+              Set(moves.map(\.objectID)).count == moves.count else { throw GuestCrypto.Failure.invalidEnvelope }
+        for move in moves {
+            try move.validate()
+            guard move.destination != server, (objects ?? []).contains(where: { $0.id == move.objectID && $0.kind == "ble" && $0.bleDeviceID == move.deviceID && $0.numberID == move.sourceNumberID }) else { throw GuestCrypto.Failure.invalidEnvelope }
         }
         let pairings = blePairings ?? []
         guard pairings.count <= 500, Set(pairings.map(\.id)).count == pairings.count,

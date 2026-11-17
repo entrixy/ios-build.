@@ -72,7 +72,7 @@ struct ObjectSettingsRows: View {
             VStack(alignment: .leading, spacing: 14) {
                 HStack(spacing: 12) {
                     Button { model.objectAvatarTarget = entry.target } label: { CatalogAvatar(entry: entry, size: 56) }
-                        .buttonStyle(.plain).accessibilityLabel(ProductText.string("avatar_picker_title"))
+                        .buttonStyle(.plain).accessibilityLabel(ProductText.string("avatar_picker_title")).disabled(entry.deletionPending)
                     Button {
                     withAnimation(.easeInOut(duration: 0.2)) {
                         if expanded.contains(entry.target) { expanded.remove(entry.target) }
@@ -148,7 +148,7 @@ private extension CatalogObject {
     var isOwned: Bool { if case .owned = self { return true }; return false }
     var kindTask: ObjectSettingsTask { isOwned ? .edit(target) : .rename(target) }
     var deletionPending: Bool {
-        if case let .owned(_, object) = self { return object.pending != nil || object.available == false }
+        if case let .owned(owner, object) = self { return object.pending != nil || object.available == false || owner.isMoving(object.id) }
         return false
     }
 }

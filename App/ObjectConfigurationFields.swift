@@ -52,7 +52,7 @@ struct WebhookServerModeConfirmation: View {
     }
 }
 
-private struct ObjectRadioChoice: View {
+struct ObjectRadioChoice: View {
     let title: String
     let selected: Bool
     let select: () -> Void

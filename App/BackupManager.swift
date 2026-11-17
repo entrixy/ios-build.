@@ -55,7 +55,12 @@ struct IOSBackupPayload: Codable {
         let passed = passedAccess ?? []
         guard passed.count <= 500, Set(passed.map(\.id)).count == passed.count else { throw BackupFailure.invalidPayload }
         for record in passed { try record.validate() }
-        for owner in owners { try owner.validate() }
+        for owner in owners {
+            try owner.validate()
+            for move in owner.bleMoves ?? [] {
+                guard owners.contains(where: { $0.server == move.destination && $0.credentials != nil }) else { throw BackupFailure.invalidPayload }
+            }
+        }
         for guest in guests {
             try guest.validateObjectSettings()
             _ = try guest.bleCache?.open(key: guest.invite.bundleKey)

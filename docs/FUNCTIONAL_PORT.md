@@ -80,9 +80,36 @@ phone confirmation and cannot dial from the background. App lock blocks manageme
 and automatic handoff. Webhook's invocation setting is the shared object mode,
 with Android's warning, not a meaningless per-guest call reaction.
 
+## Verified delegated bundle fulfillment
+
+Owner synchronization now automatically sends prepared recipient bundles after
+vouch, parent scope and full-chain verification, matching HostService/Vault.
+Parents must be confirmed before descendants become eligible. The exact recipient
+key and ciphertext are persisted before upload; ambiguous replies remain sent and
+are reconciled on the next sync. No new recipient identity, repeat physical action
+or manual owner-approval gate is introduced. The hosted lost-reply test now checks
+this automatic path; core chain/forgery tests remain in the regression suite.
+
+## BLE registry move follow-on (source)
+
+ObjectMove.kt now has a durable iOS transaction and the same server selector in
+the BLE object editor. The destination receives the same encrypted object, then
+the old registry entry is removed. The local UUID, controller DID/secret, pairing,
+avatar, automation and catalog position survive; no pairing or actuator packet is
+sent. Previous-server guest bundles lose only this object, keeping the same guest
+identity and all other token bytes/expiry. Offline revocation delivery remains a
+separate operation, as with Android.
+
+Each network phase is saved before sending. An uncertain creation is reconciled
+by its exact ciphertext, without a second create. Source rejection rolls back the
+destination without revoking existing guests. Local commit is atomic across both
+accounts and catalog preferences. Five hosted test sources cover completion,
+lost create/delete replies, rollback and failed local storage; these await Apple
+execution. Four corresponding core tests pass on Linux. No new capture was made.
+
 ## Actual verification
 
-Linux Swift6.0.3 + swift-crypto: 180 core tests, zero failures, including immutable
+Linux Swift6.0.3 + swift-crypto: 184 core tests, zero failures, including immutable
 in-flight bundle requests, scoped templates, force bounds, overnight windows,
 private camera material, stale edit rejection, durable device registration,
 avatar rollback, per-key local override isolation and the Android phone-webhook
@@ -118,8 +145,8 @@ transaction tests on an isolated simulator, without UI automation. Its exact-sou
   and runtime evaluation are connected.
 - Port actual automatic execution/rearm/session behavior and GeoCorridorMatcher;
   background/permission behavior and passive authenticated BLE observations.
-- BLE cross-server move transaction and exact object editor/guest transfer UI;
-  preserve physical secrets, existing guest identity, order and local settings.
+- Verify the new BLE registry move on Apple and real server/controller routes;
+  finish remaining guest transfer/product routes.
 - Live camera presentation,
   complete per-guest permissions/TTL and corresponding Android product routes.
 - Remaining 62-node gaps documented in IOS_STRUCTURE/ANDROID_IOS_PARITY: company,
