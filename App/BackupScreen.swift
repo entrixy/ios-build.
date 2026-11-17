@@ -69,7 +69,7 @@ struct BackupScreen: View {
                     Section {
                         KeyValueRow(title: "Копия создана", value: preview.created.formatted(date: .abbreviated, time: .shortened))
                         KeyValueRow(title: "Своих серверов", value: String(preview.owners.count))
-                        KeyValueRow(title: "Полученных ключей", value: String(preview.guests.count))
+                        KeyValueRow(title: "Полученных ключей", value: String(preview.guests.count + (preview.androidGuests ?? []).count))
                         ForEach(preview.owners) { Text($0.server).font(.subheadline).foregroundStyle(Brand.secondaryInk) }
                         Button("Перенести доступы на этот iPhone") { confirming = true }.buttonStyle(PrimaryActionStyle()).disabled(manager.busy)
                     } header: { Text("Файл проверен") }

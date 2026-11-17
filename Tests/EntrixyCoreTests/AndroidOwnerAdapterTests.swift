@@ -32,8 +32,9 @@ final class AndroidOwnerAdapterTests: XCTestCase {
             "blerev_\(Int32(bitPattern: 0xf1234567))": try json(["9": ["v": 100, "r": 1, "s": record.signature.base64EncodedString()]]),
             "key_17@first.invalid": user, "e2ee_guest_17@first.invalid": try GuestCrypto.encrypt(key: master, plaintext: guestKey),
             "press_pub_17@first.invalid": GuestCrypto.base64URL(try GuestCrypto.signingKey(userKey: user).publicKey.rawRepresentation),
-            "owner_guest_label_17@first.invalid": "Друг"]
-        let source = try document(values, integers: ["ble_guest_did_17@first.invalid": 9])
+            "owner_guest_label_17@first.invalid": "Друг",
+            "snap_url_7":"http://camera.invalid/image?ts={ts}","snap_auth_7":"bearer","snap_val_7":"private-camera-value","snap_when_7":"nearby"]
+        let source = try document(values, integers: ["ble_guest_did_17@first.invalid": 9,"hangup_7":5,"snap_int_7":10])
         let owners = try AndroidOwnerAdapter.owners(from: source)
         XCTAssertEqual(owners.count, 2)
         let first = try XCTUnwrap(owners.first { $0.server == "first.invalid" }), second = try XCTUnwrap(owners.first { $0.server == "second.invalid" })
@@ -42,6 +43,11 @@ final class AndroidOwnerAdapterTests: XCTestCase {
         XCTAssertEqual(try OwnerManualPolicy(call.localPolicy).authentication, "pin")
         XCTAssertEqual(try OwnerManualPolicy(ble.localPolicy).authentication, "biometric")
         XCTAssertEqual(call.numberID, 7); XCTAssertEqual(call.cipher, cipherA); XCTAssertEqual(call.localPhone, "+15550000001")
+        XCTAssertEqual(call.localConfiguration?.hangupSeconds,5)
+        XCTAssertEqual(call.localConfiguration?.camera.authValue,"private-camera-value")
+        XCTAssertEqual(call.localConfiguration?.camera.intervalSec,10)
+        XCTAssertEqual(call.localConfiguration?.camera.showWhen,"nearby")
+        XCTAssertFalse(String(decoding:call.cipher.data(using:.utf8)!,as:UTF8.self).contains("private-camera-value"))
         XCTAssertEqual(second.objects?.first?.numberID, 7); XCTAssertEqual(second.objects?.first?.cipher, cipherB)
         XCTAssertNotEqual(call.id, second.objects?.first?.id)
         XCTAssertEqual(try GuestCrypto.decrypt(key: master, envelope: ble.wrappedBLESecret!), bleSecret)
@@ -72,5 +78,26 @@ final class AndroidOwnerAdapterTests: XCTestCase {
         values["e2ee_obj_7"] = try GuestCrypto.encrypt(key: master, plaintext: sourceKey)
         values["obj_alias"] = try json(["7": "second.invalid|7"])
         XCTAssertThrowsError(try AndroidOwnerAdapter.owners(from: document(values)))
+    }
+    func testGuestPresetsAndServerScopedCompanyPinsAreReadFromOriginalPreferences() throws {
+        let first = Data(repeating:21,count:32), second = Data(repeating:22,count:32)
+        let user = "AAECAwQFBgcICQoLDA0ODxAREhMUFRYX"
+        let values = ["e2ee_master_key":GuestCrypto.base64URL(master),"owner_self_label":"Хозяин",
+            "default_obj_access":try json(["id":0,"native_only":1,"depth":2,"pool":7]),
+            "owner_accounts":try json(["first.invalid","second.invalid"].map { ["host":$0,"id":String(repeating:"a",count:32),"secret":String(repeating:"b",count:64)] }),
+            "known_orgs":try json(["first.invalid","second.invalid"].map { ["host":$0,"id":11,"name":"Компания","verified":true] as [String:Any] }),
+            "org_known_pub_11@first.invalid":first.base64EncodedString(),"org_known_pub_11@second.invalid":second.base64EncodedString(),
+            "key_17@first.invalid":user,"key_17@second.invalid":user,
+            "org_pub_17@first.invalid":first.base64EncodedString(),"pending_org_code":"SERVER_SPECIFIC_CODE"]
+        let source = try document(values,integers:["key_org_17@first.invalid":11,"key_org_17@second.invalid":11,"pending_org_id":11])
+        XCTAssertEqual(try source.guestDefaults().ownerName,"Хозяин")
+        XCTAssertEqual(try source.guestDefaults().access,try KeyObjectAccess(nativeOnly:true,depth:2,pool:7))
+        let companies = try source.companies(); XCTAssertEqual(companies.count,2)
+        XCTAssertEqual(companies[0].companyID,companies[1].companyID); XCTAssertNotEqual(companies[0].id,companies[1].id)
+        XCTAssertTrue(companies.allSatisfy { !$0.proven && $0.pendingCode == nil })
+        XCTAssertEqual(try source.ownerKeyMaterial(server:"first.invalid",masterKey:master).first?.companyPublicKey,first)
+        XCTAssertEqual(try source.ownerKeyMaterial(server:"second.invalid",masterKey:master).first?.companyPublicKey,second)
+        let owners = try AndroidOwnerAdapter.owners(from:source)
+        XCTAssertTrue(owners.allSatisfy { $0.hostLabel == "Хозяин" })
     }
 }

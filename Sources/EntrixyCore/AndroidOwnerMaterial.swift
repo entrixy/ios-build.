@@ -9,9 +9,13 @@ public struct AndroidOwnerKeyMaterial: Codable, Equatable, Identifiable {
     public let guestID: Int?
     public let label: String
     public let signPublic: String?
+    public var companyID: Int? = nil
+    public var companyPublicKey: Data? = nil
     public var id: Int { serverKeyID }
     public func validate(masterKey: Data) throws {
         guard serverKeyID > 0, label.utf8.count <= 512, guestID == nil || (1...65535).contains(guestID!) else { throw GuestCrypto.Failure.invalidEnvelope }
+        guard companyID == nil || companyID! > 0,
+              companyPublicKey == nil || (companyID != nil && companyPublicKey?.count == 32) else { throw GuestCrypto.Failure.invalidEnvelope }
         if let userKey { _ = try GuestSigningIdentity(server: "material.invalid", userKey: userKey) }
         if let wrappedBundleKey { guard try GuestCrypto.decrypt(key: masterKey, envelope: wrappedBundleKey).count == 32 else { throw GuestCrypto.Failure.invalidKey } }
         if let signPublic {
@@ -55,9 +59,16 @@ public extension AndroidBackupDocument {
             guard user != nil || wrapped != nil else { continue }
             let rawDID = try integer("ble_guest_did_\(ref)")
             if let rawDID { guard (1...65535).contains(rawDID) else { throw GuestCrypto.Failure.invalidEnvelope } }
-            let material = AndroidOwnerKeyMaterial(serverKeyID: id, userKey: user, wrappedBundleKey: wrapped,
+            var material = AndroidOwnerKeyMaterial(serverKeyID: id, userKey: user, wrappedBundleKey: wrapped,
                 guestID: rawDID.map(Int.init), label: try string("owner_guest_label_\(ref)") ?? "Восстановленный ключ",
                 signPublic: try string("press_pub_\(ref)"))
+            if let companyID = try integer("key_org_\(ref)"), companyID > 0, companyID <= Int.max {
+                material.companyID = Int(companyID)
+                if let encoded = try string("org_pub_\(ref)") ?? string("org_known_pub_\(companyID)@\(host)") {
+                    guard let publicKey = Data(base64Encoded:encoded), publicKey.count == 32 else { throw GuestCrypto.Failure.invalidKey }
+                    material.companyPublicKey = publicKey
+                }
+            }
             try material.validate(masterKey: masterKey); result.append(material)
         }
         guard result.count <= 1000 else { throw GuestCrypto.Failure.invalidEnvelope }

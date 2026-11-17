@@ -19,9 +19,13 @@ struct IOSBackupPayload: Codable {
     let delegatedJournalLedger: DelegatedJournalLedger?
     let ownerGuestDefaults: OwnerGuestDefaults?
     let companies: [KnownCompany]?
+    let androidArchives: [AndroidBackupDocument]?
+    /// Present only in a normalized Android import, never in a later iOS
+    /// export. Original archives remain preserved separately for unmapped data.
+    let androidGuests: [AndroidGuestMigration]?
     let objectPreferences: ObjectCatalogPreferences?
-    init(state: SavedState) {
-        app = "entrixy-ios"; version = 1; created = Date(); sourceIdentity = state.identity
+    init(state: SavedState, created: Date = Date(), androidGuests: [AndroidGuestMigration]? = nil) {
+        app = "entrixy-ios"; version = 1; self.created = created; sourceIdentity = state.identity
         owners = state.owners ?? []; guests = state.guests
         journal = (state.journal ?? []).filter(\.isAction)
         usedOwnerPresses = state.usedOwnerPresses ?? [:]
@@ -33,14 +37,38 @@ struct IOSBackupPayload: Codable {
         objectPreferences = state.objectPreferences
         ownerGuestDefaults = state.ownerGuestDefaults
         companies = state.companies
+        androidArchives = state.androidArchives
+        self.androidGuests = androidGuests ?? state.androidPendingGuests?.map { source in
+            var exported = source
+            // This pending identity was already moved to the exporting iPhone.
+            // A later migration must sign with THAT device, not the old Android.
+            exported.oldFingerprint = GuestCrypto.hash(state.identity + Data(source.identity.server.utf8))
+            return exported
+        }
+    }
+    init(android document: AndroidBackupDocument) throws {
+        let owners = try AndroidOwnerAdapter.owners(from:document)
+        let migrations = try document.guestMigrations()
+        // Provenance digest, NOT a replacement installation identity or an
+        // Android device fingerprint. Android migrations carry their real old
+        // per-server fingerprint and never use sourceIdentity for authorization.
+        let hash = document.archiveID
+        let provenance = Data(stride(from:0,to:64,by:2).map { UInt8(hash.dropFirst($0).prefix(2),radix:16)! })
+        let state = SavedState(identity:provenance,guests:[],owners:owners,ownerGuestDefaults:try document.guestDefaults(),companies:try document.companies(),androidArchives:[document])
+        self.init(state:state,created:document.created,androidGuests:migrations)
     }
     func validate() throws {
         try ownerGuestDefaults?.validate()
         try KnownCompany.validateDirectory(companies ?? [])
+        try AndroidBackupDocument.validateArchives(androidArchives ?? [])
+        let android = androidGuests ?? []
+        guard android.count <= 1000, Set(android.map(\.id)).count == android.count,
+              Set(android.map(\.id)).isDisjoint(with:Set(guests.map(\.id))) else { throw BackupFailure.invalidPayload }
+        for guest in android { try guest.validate() }
         try objectPreferences?.validate()
         try delegatedJournalLedger?.validate()
         guard app == "entrixy-ios", version == 1, sourceIdentity.count == 32, owners.count <= 100,
-              (!owners.isEmpty || !guests.isEmpty || !(passedAccess ?? []).isEmpty), guests.count <= 1000, journal.count <= 500, usedOwnerPresses.count <= 2048,
+              (!owners.isEmpty || !guests.isEmpty || !android.isEmpty || !(passedAccess ?? []).isEmpty), guests.count <= 1000, journal.count <= 500, usedOwnerPresses.count <= 2048,
               created.timeIntervalSinceReferenceDate.isFinite,
               Set(journal.map(\.id)).count == journal.count,
               journal.allSatisfy({ $0.isAction && $0.date.timeIntervalSinceReferenceDate.isFinite }),
@@ -81,8 +109,15 @@ struct BackupRestorePlan: Codable {
     var preflightDone = false
     var restoredOwners: [String] = []
     var restoredGuests: [String] = []
+    var movedAndroidGuests: [String]? = nil
+    var restoredAndroidGuests: [String]? = nil
     func validate() throws {
         try payload.validate()
+        let androidIDs = Set((payload.androidGuests ?? []).map(\.id))
+        guard Set(movedAndroidGuests ?? []).count == (movedAndroidGuests ?? []).count,
+              Set(restoredAndroidGuests ?? []).count == (restoredAndroidGuests ?? []).count,
+              Set(movedAndroidGuests ?? []).isSubset(of:androidIDs),
+              Set(restoredAndroidGuests ?? []).isSubset(of:Set(movedAndroidGuests ?? [])) else { throw BackupFailure.invalidPayload }
         guard Set(restoredOwners).count == restoredOwners.count,
               Set(restoredGuests).count == restoredGuests.count,
               Set(restoredOwners).isSubset(of: Set(payload.owners.map(\.server))),
@@ -102,6 +137,7 @@ final class BackupManager: ObservableObject {
     @Published private(set) var exportData: Data?
     @Published private(set) var remainingOwners = 0
     @Published private(set) var remainingGuests = 0
+    @Published private(set) var importMessages: [String:String] = [:]
     private unowned let app: AppModel
     private let guestMover: GuestMigrationTransport
     private let refreshAfterRestore: Bool
@@ -116,7 +152,7 @@ final class BackupManager: ObservableObject {
         busy = true; message = nil
         defer { busy = false }
         let state = try app.backupState()
-        guard !(state.owners ?? []).isEmpty || !state.guests.isEmpty || !(state.passedAccess ?? []).isEmpty else { throw BackupFailure.noAccess }
+        guard !(state.owners ?? []).isEmpty || !state.guests.isEmpty || !(state.passedAccess ?? []).isEmpty || !(state.androidPendingGuests ?? []).isEmpty else { throw BackupFailure.noAccess }
         let payload = IOSBackupPayload(state: state)
         try payload.validate()
         let bytes = try JSONEncoder().encode(payload)
@@ -131,8 +167,15 @@ final class BackupManager: ObservableObject {
         busy = true; preview = nil; message = nil
         defer { busy = false }
         let plain = try await Task.detached(priority: .userInitiated) { try BackupEnvelope.open(bytes, password: password) }.value
-        let payload = try JSONDecoder().decode(IOSBackupPayload.self, from: plain)
+        guard let header = try JSONSerialization.jsonObject(with:plain) as? [String:Any] else { throw BackupFailure.invalidPayload }
+        let payload: IOSBackupPayload
+        switch header["app"] as? String {
+        case "entrixy-ios": payload = try JSONDecoder().decode(IOSBackupPayload.self,from:plain)
+        case "entrixy": payload = try IOSBackupPayload(android:AndroidBackupDocument(plain))
+        default: throw BackupFailure.invalidPayload
+        }
         try payload.validate()
+        guard try JSONEncoder().encode(payload).count <= BackupEnvelope.maxPayloadSize else { throw BackupFailure.invalidPayload }
         try app.validateRestoreConflicts(payload)
         preview = payload
     }
@@ -174,9 +217,25 @@ final class BackupManager: ObservableObject {
                 try app.activateBackupGuest(guest, plan: plan)
                 updateProgress()
             }
+            for source in plan.payload.androidGuests ?? [] where !(plan.restoredAndroidGuests ?? []).contains(source.id) {
+                let newFingerprint = try app.backupFingerprint(server:source.identity.server)
+                if !(plan.movedAndroidGuests ?? []).contains(source.id) {
+                    try await guestMover.move(identity:source.identity,oldFingerprint:source.oldFingerprint,newFingerprint:newFingerprint)
+                    plan.movedAndroidGuests = (plan.movedAndroidGuests ?? []) + [source.id]
+                    try app.saveBackupPlan(plan)
+                }
+                let invite = try await guestMover.recover(identity:source.identity,bundleKey:source.bundleKey,recipient:source.recipient,fingerprint:newFingerprint)
+                guard invite == nil || invite?.id == source.id else { throw BackupFailure.invalidPayload }
+                plan.restoredAndroidGuests = (plan.restoredAndroidGuests ?? []) + [source.id]
+                if let invite { try app.activateBackupGuest(SavedGuest(invite:invite,requiresBLEExitOnRestore:true),plan:plan) }
+                else { try app.activatePendingAndroidGuest(source,plan:plan) }
+                updateProgress()
+            }
             try app.finishBackupRestore(plan)
             preview = nil
-            message = "Доступы перенесены на этот iPhone. Старый телефон больше не может использовать перенесённые привязки."
+            message = app.androidPendingGuests.isEmpty
+                ? "Доступы перенесены на этот iPhone. Старый телефон больше не может использовать перенесённые привязки."
+                : "Привязки перенесены. Ключей, ожидающих защищённую связку от владельца: \(app.androidPendingGuests.count). Они сохранены в разделе «Ключи»."
         } catch {
             // The saved plan retains old-device proofs if a later server or a write failed.
             let code = (error as? OwnerAPI.Failure)?.code ?? (error as? GuestAPI.Failure)?.code
@@ -186,6 +245,20 @@ final class BackupManager: ObservableObject {
         }
     }
     func clearPreview() { preview = nil; message = nil }
+    func recoverImportedGuest(_ id: String) async {
+        guard !busy, app.canManageGuestAccess, let source = app.androidPendingGuests.first(where:{ $0.id == id }) else { return }
+        busy = true; defer { busy = false }; importMessages.removeValue(forKey:id)
+        do {
+            let fingerprint = try app.backupFingerprint(server:source.identity.server)
+            guard let invite = try await guestMover.recover(identity:source.identity,bundleKey:source.bundleKey,recipient:source.recipient,fingerprint:fingerprint) else {
+                importMessages[id] = ProductText.string("guests_key_awaiting_bundle"); return
+            }
+            try app.acceptRecoveredAndroidGuest(invite)
+        } catch { importMessages[id] = "Связка пока не подтверждена. Исходный ключ и данные получателя сохранены." }
+    }
+    func refreshImportedGuests() async {
+        for source in app.androidPendingGuests { await recoverImportedGuest(source.id) }
+    }
     func clearExport() { exportData = nil }
     func report(_ error: Error) {
         switch error {
@@ -201,6 +274,6 @@ final class BackupManager: ObservableObject {
     func updateProgress() {
         guard let plan = app.backupPlan() else { remainingOwners = 0; remainingGuests = 0; return }
         remainingOwners = plan.payload.owners.count - plan.restoredOwners.count
-        remainingGuests = plan.payload.guests.count - plan.restoredGuests.count
+        remainingGuests = plan.payload.guests.count - plan.restoredGuests.count + (plan.payload.androidGuests ?? []).count - (plan.restoredAndroidGuests ?? []).count
     }
 }

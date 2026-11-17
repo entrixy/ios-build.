@@ -19,6 +19,14 @@ extension OwnerIssuedKey {
         // were not sealed in Android preferences, so require explicit review.
         grantedAccess = try Dictionary(uniqueKeysWithValues: numberIDs.map { (String($0), try KeyObjectAccess(nativeOnly: nativeOnly, depth: 0, pool: 1)) })
         accessNeedsReview = true
+        if let companyID = material.companyID {
+            guard row["org_id"] as? Int == companyID else { throw GuestCrypto.Failure.invalidEnvelope }
+            try Self.checkCompanyScope(owner:owner,numberIDs:numberIDs)
+            var profile = try KnownCompany(server:owner.server,json:["org_id":companyID,"name":material.label,"verified":false])
+            profile.publicKey = material.companyPublicKey
+            company = try CompanyGrant(profile:profile,labels:Self.companyLabels(owner:owner,numberIDs:numberIDs))
+            accessNeedsReview = false
+        }
         try validate(masterKey: owner.masterKey)
     }
 }
@@ -43,6 +51,8 @@ public extension OwnerAccount {
             if recovered.contains(where: { $0.keyID == material.serverKeyID }) {
                 // Retain an unmatched slot rather than silently dropping it.
                 let existing = recovered.first { $0.keyID == material.serverKeyID }!
+                guard existing.company?.companyID == material.companyID,
+                      material.companyPublicKey == nil || existing.company?.publicKey == material.companyPublicKey else { throw GuestCrypto.Failure.invalidKey }
                 let key = try existing.secrets(masterKey: masterKey)
                 guard key.userKey == user, material.guestID == nil || material.guestID == existing.guestID else { throw GuestCrypto.Failure.invalidKey }
                 if let wrapped = material.wrappedBundleKey { guard try GuestCrypto.decrypt(key: masterKey, envelope: wrapped) == key.bundleKey else { throw GuestCrypto.Failure.invalidKey } }

@@ -59,5 +59,29 @@ final class AndroidKeyRecoveryTests: XCTestCase {
         XCTAssertThrowsError(try OwnerIssuedKey(owner: owner, label: "Новый", numberIDs: [7], welcome: "", nativeOnly: false, confirmation: true))
         XCTAssertEqual(owner.androidKeys?.count, 1)
     }
+    func testCompanyRecoveryUsesLocallyRecordedAssociationAndPinnedKey() throws {
+        var owner = try OwnerAccount(server:"owner.invalid")
+        var object = try OwnerObject(masterKey:owner.masterKey,label:"Ворота",kind:"call",phone:"+79990001122")
+        object.numberID = 7; object.pending = nil; object.available = true; owner.objects = [object]
+        var profile = try KnownCompany(server:owner.server,json:["org_id":11,"name":"Компания","verified":false])
+        profile.publicKey = Data(repeating:19,count:32)
+        let original = try OwnerIssuedKey.forCompany(owner:owner,profile:profile,numberIDs:[7])
+        let pair = try original.secrets(masterKey:owner.masterKey)
+        var material = AndroidOwnerKeyMaterial(serverKeyID:17,userKey:pair.userKey,wrappedBundleKey:try GuestCrypto.encrypt(key:owner.masterKey,plaintext:pair.bundleKey),guestID:original.guestID,label:original.label,signPublic:GuestCrypto.base64URL(try GuestCrypto.signingKey(userKey:pair.userKey).publicKey.rawRepresentation))
+        material.companyID = 11; material.companyPublicKey = profile.publicKey
+        owner.androidKeys = [material]
+        var row: [String:Any] = ["id":17,"org_id":11,"enabled":1,"mode":"auto","number_ids":[7],"ble_ids":[Int](),"bundle_cipher":original.bundleCipher,"sign_pub":material.signPublic!,"objects":[try KeyObjectAccess(depth:0,pool:1).json(id:7)]]
+        var mismatch = owner; row["org_id"] = 12
+        XCTAssertEqual(try mismatch.reconcileAndroidKeys(snapshot(row)),0)
+        XCTAssertEqual(mismatch.androidKeys?.first?.companyPublicKey,profile.publicKey)
+        row["org_id"] = 11
+        XCTAssertEqual(try owner.reconcileAndroidKeys(snapshot(row)),1)
+        try owner.reconcileIssuedKeys(snapshot(row)); try owner.validate()
+        let recovered = try XCTUnwrap(owner.issuedKeys?.first)
+        XCTAssertEqual(recovered.company?.companyID,11); XCTAssertEqual(recovered.company?.publicKey,profile.publicKey)
+        XCTAssertEqual(recovered.accessNeedsReview,false)
+        XCTAssertThrowsError(try recovered.link(server:owner.server,masterKey:owner.masterKey))
+        XCTAssertEqual(try owner.authorizedGuest(keyID:17,numberID:7)?.publicKey,profile.publicKey)
+    }
 
 }

@@ -12,6 +12,7 @@ struct SavedGuest: Codable, Identifiable {
     var incomingDepth: Int? = nil
     var automation: [String: IncomingAutomationConfiguration]? = nil
     var cameras: [String: ObjectCameraConfiguration]? = nil
+    var requiresBLEExitOnRestore: Bool? = nil
     var id: String { invite.id }
     func validateObjectSettings() throws {
         guard (automation ?? [:]).count <= 1000, (cameras ?? [:]).count <= 1000 else {
@@ -48,6 +49,8 @@ struct SavedState: Codable {
     var bleAutomationDisarmed: Set<String>? = nil
     var ownerGuestDefaults: OwnerGuestDefaults? = nil
     var companies: [KnownCompany]? = nil
+    var androidArchives: [AndroidBackupDocument]? = nil
+    var androidPendingGuests: [AndroidGuestMigration]? = nil
 }
 
 /// One local, device-only Keychain item. Read/decode failures never mean “new installation”.
@@ -88,6 +91,11 @@ struct KeychainStore: StateStorage {
               (state.bleAutomationDisarmed ?? []).allSatisfy({ !$0.isEmpty && $0.utf8.count <= 1024 }) else { throw Failure(status:errSecDecode) }
         try state.ownerGuestDefaults?.validate()
         try KnownCompany.validateDirectory(state.companies ?? [])
+        try AndroidBackupDocument.validateArchives(state.androidArchives ?? [])
+        let waiting = state.androidPendingGuests ?? []
+        guard waiting.count <= 1000, Set(waiting.map(\.id)).count == waiting.count,
+              Set(waiting.map(\.id)).isDisjoint(with:Set(state.guests.map(\.id))) else { throw Failure(status:errSecDecode) }
+        for key in waiting { try key.validate() }
         try state.objectPreferences?.validate()
         try state.pendingRestore?.validate()
         let received = state.receivedDelegations ?? []

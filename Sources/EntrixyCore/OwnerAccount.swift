@@ -85,7 +85,7 @@ public struct OwnerAccount: Codable, Identifiable, Equatable {
         for key in keys {
             try key.validate(masterKey: masterKey)
             if key.company != nil {
-                guard (objects ?? []).filter({ key.numberIDs.contains($0.numberID ?? -1) }).allSatisfy({ $0.kind == "call" }),
+                guard objects.filter({ key.numberIDs.contains($0.numberID ?? -1) }).allSatisfy({ $0.kind == "call" }),
                       [key.grantedAccess,key.requestedAccess].compactMap({ $0 }).allSatisfy({ $0.values.allSatisfy({ !$0.nativeOnly && $0.depth == 0 && $0.pool == 1 }) }) else { throw GuestCrypto.Failure.invalidEnvelope }
             }
         }

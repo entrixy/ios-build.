@@ -2,7 +2,7 @@ import SwiftUI
 import EntrixyCore
 
 enum GuestRemovalTarget {
-    case key(GuestKeyRow), company(KnownCompany), passed(PassedAccess)
+    case key(GuestKeyRow), company(KnownCompany), passed(PassedAccess), imported(AndroidGuestMigration)
 }
 struct GuestRemovalDialog: View {
     @EnvironmentObject private var app: AppModel
@@ -16,6 +16,7 @@ struct GuestRemovalDialog: View {
         case .key(let row): return row.key.label + "\n" + ProductText.string("passon_delete_warning")
         case .company(let company): return company.name
         case .passed: return ProductText.string("passon_delete_warning")
+        case .imported(let source): return source.label + "\n" + ProductText.string("guest_delete_warning")
         }
     }
     var body: some View {
@@ -26,6 +27,7 @@ struct GuestRemovalDialog: View {
                 case .key(let row): await app.revokeOwnerKey(server:row.server,keyID:row.key.id)
                 case .company(let company): await app.forgetCompany(company.id)
                 case .passed(let record): await app.passManager.revoke(record.id,retry:true)
+                case .imported(let source): app.removeImportedGuestRecovery(source.id)
                 }
             }
         })

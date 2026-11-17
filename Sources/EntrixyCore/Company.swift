@@ -70,7 +70,8 @@ public struct KnownCompany: Codable, Equatable, Identifiable {
 }
 
 /// Explicitly associated and pinned when granting access. A later server
-/// profile refresh cannot replace the key used to verify an issued grant.
+/// profile refresh cannot replace the key used to verify an issued grant;
+/// Android explicitly repins when the owner opens a new company request.
 public struct CompanyGrant: Codable, Equatable {
     public let companyID: Int
     public var publicKey: Data?

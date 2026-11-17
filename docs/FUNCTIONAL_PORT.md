@@ -282,7 +282,8 @@ component. Owner name/default rights use the previously protected defaults model
 Company links/QRs are server-scoped, stored before a same-server arrival claim,
 and never register an owner or automatically grant access. Company issue/edit is
 call-only with depth zero, explicit public object labels and pinned signing keys.
-Profile refresh cannot replace a pin already used by an issued key. Company
+Ordinary sync cannot replace a pin used by an issued key. Explicitly opening a
+new company request repins that company's grants as Prefs.setOrgKnownPub does. Company
 requests verify Ed25519 over the exact original signed body and bind key_ref,
 actor, object and the 600-second window; omitted objects require a singleton
 scope. The durable nonce ledger retains 25 minutes as Android does. Actuation
@@ -302,3 +303,42 @@ commit. Functional-port CI also includes the earlier built-test reuse change.
 No new screenshots or website publication. UI appearance and physical operation
 still require their separate acceptance. Remaining video/background/restore/
 global settings and device/signing work above is not marked complete.
+
+## Android backup entry point and resumable signing-key migration — source
+
+BackupManager.inspect now distinguishes authenticated iOS and Android payload
+headers after decrypting the common envelope. AndroidOwnerAdapter is connected
+to the real import preview. Original preference bytes are retained in protected
+state and subsequent encrypted backups, including fields not mapped yet. Owner
+name/default rights, server-scoped companies, locally recorded company pins,
+private camera settings and hangup preferences are translated. Existing object,
+BLE, socket and signing material keeps its original identity. Company recovery
+uses the PHONE's saved association and pin, never a company flag from host_sync.
+
+Incoming Android keys migrate using their original per-server Android fingerprint
+and signing identity, with their real bundle key or recipient private key when
+available. The complete plan is protected before a claim/move; confirmed device
+moves are checkpointed before bundle recovery. A missing owner bundle becomes a
+persisted waiting key rather than a fabricated decryption key or a migration that
+blocks the rest of the app. Recovery is authenticated and can resume after a
+restart. Exporting a still-waiting key from iOS rebases its old-device proof to
+that exporting iPhone, while retaining the original Android archive separately.
+Conflicts and combined archive/directory limits are checked before server moves.
+A recovered BLE key is disarmed until a real exit/reentry, including when its
+first BLE objects arrive only in the later authenticated bundle.
+
+Prefs.setOrgKnownPub was checked directly: ordinary sync never rotates a company
+pin; explicitly opening a new company request updates that company's pins, as
+Android does. The model scenario now distinguishes those two paths.
+
+Actual local verification: 219 Linux core tests, zero failures; all App/hosted/UI
+Swift source parses and diff whitespace passes. Two new hosted migration cases
+cover pre-wire storage failure, restart after a confirmed move, recipient/key
+retention, absent bundles, later protected recovery and correct iOS re-export
+fingerprints. These additions still require their exact-source Apple run. The
+older Guests snapshot is already building/testing separately; do not attribute
+its result to these later changes. No UI captures or publication were made.
+
+Remaining Android preferences such as incoming local automation overrides and
+passed-link presentation must still be mapped before claiming full backup parity;
+retaining their original archive is preservation, not a claim that they are active.

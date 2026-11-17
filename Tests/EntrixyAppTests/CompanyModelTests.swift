@@ -102,19 +102,22 @@ private final class CompanyChannel: OwnerLiveTransport {
         let backup = IOSBackupPayload(state:storage.state!); try backup.validate()
         XCTAssertEqual(backup.companies?.first?.publicKey,api.profile.publicKey)
     }
-    func testProfileRotationDoesNotReplaceIssuedPinAndUncertainRevocationKeepsCompany() async throws {
+    func testOrdinarySyncCannotRotatePinButExplicitRequestCanAndUncertainRevocationKeepsCompany() async throws {
         let (storage,api,app) = try fixture(granted:true); defer { app.suspend() }
         let original = app.owners[0].issuedKeys![0].company?.publicKey
         api.profile.publicKey = Data(repeating:88,count:32)
+        api.keys[0]["org_pubkey"] = api.profile.publicKey!.base64EncodedString()
+        await app.refreshOwners()
+        XCTAssertEqual(app.owners[0].issuedKeys![0].company?.publicKey,original)
         await app.receiveCompanyInvite(try CompanyInvite.parse("https://owner.invalid/c/CODE11"))
         XCTAssertEqual(app.companies[0].publicKey,api.profile.publicKey)
-        XCTAssertEqual(app.owners[0].issuedKeys![0].company?.publicKey,original)
+        XCTAssertEqual(app.owners[0].issuedKeys![0].company?.publicKey,api.profile.publicKey)
         api.loseRevokeReply = true; await app.forgetCompany(api.profile.id)
         XCTAssertEqual(app.companies.count,1); XCTAssertNotNil(app.owners[0].issuedKeys![0].pending)
         XCTAssertNil(try app.owners[0].authorizedGuest(keyID:17,numberID:7))
         await app.refreshOwners(); api.loseRevokeReply = false; await app.forgetCompany(api.profile.id)
         XCTAssertTrue(app.companies.isEmpty); XCTAssertTrue(storage.state?.companies?.isEmpty == true)
-        XCTAssertEqual(app.owners[0].issuedKeys![0].company?.publicKey,original)
+        XCTAssertEqual(app.owners[0].issuedKeys![0].company?.publicKey,api.profile.publicKey)
     }
     func testMergedResponseCannotBindNewSecretsToTheExistingServerKey() async throws {
         let (_,api,app) = try fixture(); defer { app.suspend() }
