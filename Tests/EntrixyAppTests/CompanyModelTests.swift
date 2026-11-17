@@ -130,6 +130,11 @@ private final class CompanyChannel: OwnerLiveTransport {
     }
     func testSignedCompanyCallUsesPinnedKeyAndSignedActorAndRejectsReplay() async throws {
         let (_,api,app) = try fixture(granted:true); defer { app.suspend() }
+        XCTAssertNil(app.owners[0].lastSynced)
+        await app.refreshOwners()
+        XCTAssertNotNil(app.owners[0].lastSynced)
+        XCTAssertNil(app.ownerMessages["owner.invalid"])
+        XCTAssertNotNil(try app.owners[0].authorizedGuest(keyID:17,numberID:7))
         var preference = OwnerCallPreference(); preference.reaction = "confirm"
         let keyID = app.owners[0].issuedKeys![0].id, objectID = app.owners[0].objects![0].id
         XCTAssertTrue(app.saveIssuedCallPreference(server:"owner.invalid",keyID:keyID,objectID:objectID,preference:preference))
@@ -153,5 +158,22 @@ private final class CompanyChannel: OwnerLiveTransport {
         XCTAssertTrue(app.journal.first?.who.contains("Курьер Иван") == true)
         channel.emit(request); try await Task.sleep(nanoseconds:20_000_000)
         XCTAssertTrue(control.phoneRequests.isEmpty); XCTAssertEqual(dialed,1)
+    }
+    func testCompanyCallBeforeFreshRightsSnapshotCannotDialOrConsumeNonce() async throws {
+        let (storage,api,app) = try fixture(granted:true); defer { app.suspend() }
+        let channel = CompanyChannel(); api.liveChannel = channel
+        var dialed = 0
+        let control = OwnerControlModel(app:app,dialer:{ _ in dialed += 1; return true })
+        defer { control.suspend() }; control.resume()
+        for _ in 0..<200 { if control.connections["owner.invalid"] == .connected { break }; try await Task.sleep(nanoseconds:5_000_000) }
+        XCTAssertEqual(control.connections["owner.invalid"],.connected)
+        let body = #"{"key_ref":17,"number_id":7,"actor":"Курьер"}"#
+        let ts = Int64(Date().timeIntervalSince1970), nonce = String(repeating:"b",count:32)
+        let material = Data("delivery.example.\(ts).\(nonce).\(GuestCrypto.hash(Data(body.utf8)))".utf8)
+        let sig = try GuestCrypto.signingKey(userKey:userKey).signature(for:material).base64EncodedString()
+        channel.emit(["type":"do_call","call_id":"not-synced","number_id":7,"user_key_id":17,"press":["org":["domain":"delivery.example","ts":ts,"nonce":nonce,"body":body,"sig":sig]]])
+        try await Task.sleep(nanoseconds:30_000_000)
+        XCTAssertTrue(control.phoneRequests.isEmpty); XCTAssertEqual(dialed,0)
+        XCTAssertTrue(app.journal.isEmpty); XCTAssertTrue((storage.state?.usedOwnerPresses ?? [:]).isEmpty)
     }
 }
