@@ -15,9 +15,8 @@ public struct CameraRequest: Equatable {
         guard localKeyID.utf8.count <= 64, localKeyID.allSatisfy({ $0.isASCII && ($0.isNumber || $0.isLetter || $0 == "-") }) else { throw GuestCrypto.Failure.invalidEnvelope }
         let value = configuration.url.replacingOccurrences(of:"{ts}",with:String(epoch))
             .replacingOccurrences(of:"{token}",with:token).replacingOccurrences(of:"{key_id}",with:localKeyID)
-        guard let url = URL(string:value), let parts = URLComponents(url:url,resolvingAgainstBaseURL:false),
+        guard let url = URL(string:value), var parts = URLComponents(url:url,resolvingAgainstBaseURL:false),
               parts.host?.isEmpty == false, ["http","https","rtsp","rtmp"].contains(parts.scheme?.lowercased() ?? "") else { throw GuestCrypto.Failure.invalidEnvelope }
-        self.url = url
         var headers: [String:String] = [:]
         if !configuration.authValue.isEmpty {
             switch configuration.authType {
@@ -27,8 +26,13 @@ public struct CameraRequest: Equatable {
             default: break
             }
         }
+        if let user = parts.user {
+            if headers["Authorization"] == nil { headers["Authorization"] = "Basic " + Data((user + ":" + (parts.password ?? "")).utf8).base64EncodedString() }
+            parts.user = nil; parts.password = nil
+        }
+        guard let address = parts.url else { throw GuestCrypto.Failure.invalidEnvelope }; self.url = address
         self.headers = headers
-        authenticated = !headers.isEmpty || parts.user != nil || parts.password != nil
+        authenticated = !headers.isEmpty
         let path = parts.path.lowercased(), scheme = parts.scheme?.lowercased()
         if scheme == "rtsp" || scheme == "rtmp" || [".mpd",".webm",".mkv"].contains(where:path.hasSuffix) { media = .otherVideo }
         else if [".m3u8",".mp4",".mov",".m4v"].contains(where:path.hasSuffix) { media = .nativeVideo }

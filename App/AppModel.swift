@@ -2139,8 +2139,9 @@ extension AppModel {
         ownerActionRejections.removeValue(forKey: objectID)
         do {
             guard foreground, canManageGuestAccess, !busy, !ownerBusy,
-                  let owner = owners.first(where: { $0.server == server && $0.ownershipLost != true }), !owner.registrationPending,
-                  let object = owner.objects?.first(where: { $0.id == objectID }), object.ownerCardAvailable, !owner.isMoving(objectID) else {
+                  let owner = owners.first(where: { $0.server == server && $0.ownershipLost != true }),
+                  let object = owner.objects?.first(where: { $0.id == objectID }),
+                  !owner.registrationPending || object.kind == "ble", object.ownerCardAvailable, !owner.isMoving(objectID) else {
                 throw ActionDenied.message("Объект сейчас недоступен.")
             }
             let policy = try OwnerManualPolicy(object.localPolicy, readiness: conditionReadiness(.owned(server: server, objectID: object.id)))
@@ -2661,7 +2662,9 @@ extension AppModel {
 
 extension AppModel {
     func ownerAccessIsUsable(_ host: String) -> Bool {
-        owners.contains { $0.server == host && $0.credentials != nil && $0.ownershipLost != true }
+        // A locally authenticated BLE pairing may work before server metadata
+        // registration finishes. Missing HTTP credentials are not an eviction.
+        owners.contains { $0.server == host && $0.ownershipLost != true }
     }
 
     /// Once this device learns that its claim was lost, offline owner secrets

@@ -509,7 +509,7 @@ by fresh rights. One UI source case covers the same checkbox/access layout witho
 creating a key. These additions have not yet run on Apple.
 
 Actual Linux235 core tests zero, Swift parse/diff checks pass. Latest expected
-hosted137 and UI15 are SOURCE counts, not runtime evidence. Publicb003/native3b165a4
+hosted137 and UI14 are SOURCE counts, not runtime evidence. Publicb003/native3b165a4
 Apple core231 passed, Debug failed at BackupPresentation.swift:185 because the
 missing-audio warning was placed outside the preview scope. Moved it into the
 actual decrypted review view; no guards or assertions removed. Follow-up Apple
@@ -517,3 +517,123 @@ verification must confirm the fix and the new passing code. A separate ci/ui-rev
 branch now runs the existing native UI suite, without captures or a second hosted
 unit run. Standard functional branches retain Debug, Release/isolation and native
 checks. No new product PNGs or website changes until the functional batch is ready.
+
+
+## Follow-up: preserve paired local BLE before HTTP registration completes
+
+Public793e02f/nativee3e25b8 run44113733057/job134145970244 completed the Apple225
+core, Debug and Release/isolation checks. Hosted129 executed with TWO assertions
+in ONE existing case failing: paired owner BLE before server acknowledgement.
+The seven new server cases and two loss-at-scan/nonce cases passed. New denial
+logic had incorrectly required HTTP credentials even for an existing authenticated
+local BLE pairing. The follow-up treats missing registration as distinct from
+known eviction and preserves strict ownership-loss denial. The real card-intent
+path also allows that paired BLE object before metadata acknowledgement; all
+non-BLE actions still require owner registration. Enhanced the existing native
+case to require a real card intent as well as one fake-radio FIRE, no registration
+and no metadata retry. This source fix still needs its actual Apple native run.
+
+
+## Authenticated native camera video — current source awaiting Apple
+
+CameraStream now routes authenticated HLS/MP4/MOV/M4V through a per-visible-camera
+loopback HTTP bridge, then the existing AVPlayer/VideoPlayer. It uses public
+Network and URLSession APIs; no unsupported AVURLAssetHTTPHeaderFieldsKey option.
+The listener binds 127.0.0.1, accepts only loopback peers and read requests, checks
+Host plus an unpredictable session capability, and resolves only authenticated
+encrypted same-origin resource URLs minted by that bridge. Remote URL/query tokens
+and auth headers do not appear in player URLs. HLS variants, segments and URI
+attributes (keys/audio/subtitles/maps) are rewritten; foreign or non-HTTP resources
+are rejected. Range/Content-Range and bounded-buffer streaming support progressive
+video without loading a whole recording into memory. Cookies and remote response
+headers other than constrained media metadata never reach the local client.
+Redirects use the same camera-origin boundary; stop/background removes the bridge,
+connections and URLSession work. Inline URL credentials become Basic headers and
+are removed from request/player addresses. Explicit configured Authorization wins.
+
+Actual Linux core239 zero (4 new parser/URL cases), Swift parse/diff pass. Three
+hosted SOURCE tests exercise the real loopback listener with isolated remote HTTP
+fixtures: HLS-to-segment auth, rejection of foreign/unknown resources, and MP4 range/
+stop behavior. Expected latest hosted140 not yet Apple-compiled or executed. No
+actual remote camera or physical iPhone video/decoder acceptance was performed.
+RTSP/RTMP/DASH/unsupported native codecs and DRM remain unsupported in this source;
+this does not claim every Android video codec is implemented. No new product
+screenshot is represented by these transport tests.
+
+API deployment read-only check: https://entrixy.com/api/meta.php returns HTTP200
+with v1 and expected websocket/delegation metadata; /api/pwa_login.php returns
+HTTP404. The optional account sign-in path cannot be claimed live-working until
+that server-side Android endpoint is restored/verified. No account credentials
+or mutations were sent in the check.
+
+
+Public API references for video loader choice: Apple engineer explicitly notes
+that AVURLAssetHTTPHeaderFieldsKey is unsupported:
+https://developer.apple.com/forums/thread/671139 . Listener binding/acceptance:
+https://developer.apple.com/documentation/network/nwparameters/requiredlocalendpoint
+and https://developer.apple.com/documentation/network/nwlistener/newconnectionhandler .
+
+
+## Actual follow-up evidence and additional-source test correction
+
+Publicd1d121b/native6fef9d0 run44119185836/job134165513442: Apple235 core,
+Debug, Release/isolation passed; hosted137 executed with three assertions in two
+cases failing. Two are the already-fixed paired-owner-before-registration case
+(fixc19a8a6 was intentionally absent from that snapshot). The third was the new
+additional-source test fixture returning a single global invitation list for two
+different source keys; the first part consequently saw the second part's rights.
+Corrected the recording API to isolate invitation/child state by signing identity
+in that test, without changing assertions or production reconciliation. All five
+new sound/export/restore cases, actual imported PIN policy, both Android migration
+cases and explicit per-object ACL bounds passed in this exact Apple run. A full
+native pass still requires the corrected complete source run; these are individual
+case results, not a green-suite claim. The separate UI result for that source is recorded below.
+
+
+Latest source also bounds expanded HLS output to 4 MiB, resource expansion count
+and individual opaque URLs, in addition to the 1 MiB source limit; a malicious
+short playlist cannot allocate an unbounded rewritten body. Local239 checkpoint
+was followed by actual Linux240 zero at16:27:27UTC with the expansion-bound case.
+Owned camera views stop exposing a context on known ownership loss. The loopback
+peer check includes IPv4-mapped IPv6 loopback; remote non-loopback peers remain
+rejected. All latest Swift parse/diff checks pass; Apple SDK/runtime still pending.
+
+
+A separate ci/ui-review-arm branch selects macOS15 Apple Silicon for the same UI
+assertions. Earlier catalogue UI had passed on ARM after Intel Accessibility setup
+failed; the present Intel UI run is retained for its real outcome. This is an
+alternate runner, not changed assertions or a capture rerun. Ordinary functional
+branches still use Intel Debug/Release/native. Do not infer an ARM pass from the
+old catalogue source; the new exact-source run is tracked separately.
+
+
+## Apple functional result and UI corrections — 17 November, 16:46 UTC
+
+Native fe9e8e1 / public76276e70ef82bb651f2f9cb87fb8b08746c0e8e6,
+[run44126465550](https://github.com/entrixy/ios-build./actions/runs/44126465550),
+job134191517562 actually passed Apple240 core, Debug/test bundles,
+Release/isolation and 140 hosted native tests (37.815 seconds, zero failures).
+Both paired-owner-before-HTTP-registration and additional-source lost-reply
+regressions passed. All three CameraVideoProxy tests passed with the real local
+listener and isolated remote responses. This is transport verification, not proof
+of actual camera decoding or physical controller/device acceptance.
+The older c19-only run44120544060 ended cancelled, not passed.
+
+Separate UI run44119347879/job134166101257 on publicd1d121b/native6fef9d0
+actually executed 14 tests: nine passed, five failed (1041.5 seconds). Unlike the
+historical Intel setup failure, this runner successfully started Accessibility
+and executed tests. Nine passes include received-passing and server form routes.
+Failed hierarchy inspection identified: an ancestor Section identifier overwrote
+four object-type button IDs; a Settings label matched both row and bottom tab;
+the avatar tap did not open its picker; and the code test targeted a labelled
+switch row rather than its nested UISwitch. Changes move the ancestor ID to its
+header, give object edit/avatar controls scoped IDs and an explicit 56pt avatar
+hit area, and target the real switch in the test. Existing order, size, all eight
+presets, upload/cancel and wrong/correct-code assertions remain. These changes
+have syntax/diff checks; their actual UI runtime is pending. No claim that the
+avatar change has already resolved the hit issue.
+
+UI failure attachment export now retains teardown keepAlways PNGs as well as
+issue attachments; the old --only-failures flag omitted actual screenshots.
+The downloaded old diagnostics contain hierarchies only, so no visual acceptance
+is inferred from them. No new product screenshot batch or website update occurred.

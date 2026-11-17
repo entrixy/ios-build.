@@ -151,7 +151,7 @@ final class NavigationUITests: XCTestCase {
     }
     func testActualWebhookEditorContainsAndroidFieldsAndAutomationRoute() {
         let app = launch("owner-expanded")
-        app.buttons["Настройки"].tap()
+        app.buttons.matching(NSPredicate(format:"identifier BEGINSWITH %@","object-edit-owner:")).firstMatch.tap()
         XCTAssertTrue(app.navigationBars["Редактировать объект"].waitForExistence(timeout: 10))
         XCTAssertEqual(app.textFields["Название"].value as? String, "Ворота во двор")
         XCTAssertFalse(app.staticTexts["Значок объекта"].exists)
@@ -166,7 +166,9 @@ final class NavigationUITests: XCTestCase {
     }
     func testAvatarPickerOpensFromAvatarAndKeepsObjectRow() {
         let app = launch("owner-objects")
-        app.buttons["Иконка объекта"].tap()
+        let avatar = app.buttons.matching(NSPredicate(format:"identifier BEGINSWITH %@","object-avatar-owner:")).firstMatch
+        XCTAssertTrue(avatar.waitForExistence(timeout:10)); XCTAssertGreaterThanOrEqual(avatar.frame.width,44); XCTAssertGreaterThanOrEqual(avatar.frame.height,44)
+        avatar.tap()
         for index in 1...8 { XCTAssertTrue(app.buttons["Иконка \(index)"].waitForExistence(timeout: 10)) }
         XCTAssertTrue(app.buttons["Загрузить иконку"].exists)
         app.buttons["Отмена"].tap()
@@ -227,22 +229,29 @@ final class NavigationUITests: XCTestCase {
         let app = launch("empty")
         app.segmentedControls.buttons["Система"].tap()
         let lock = app.switches.matching(NSPredicate(format:"label CONTAINS %@","Спрашивать код при входе")).firstMatch
-        for _ in 0..<4 { if lock.isHittable { break }; app.swipeUp() }
-        XCTAssertTrue(lock.isHittable); lock.tap()
+        // iOS exposes the whole labelled row and its actual UISwitch as nested
+        // Switch elements. Activate the real control, rather than the row's
+        // geometric centre (which is the label, outside the switch hit region).
+        func tapLock() {
+            let thumb = lock.switches.firstMatch
+            for _ in 0..<4 { if thumb.isHittable { break }; app.swipeUp() }
+            XCTAssertTrue(thumb.isHittable); thumb.tap()
+        }
+        tapLock()
         let code = app.secureTextFields["Код Entrixy"], repeated = app.secureTextFields["Повторите код"]
         XCTAssertTrue(code.waitForExistence(timeout:10)); XCTAssertTrue(repeated.exists)
         code.tap(); code.typeText("1234"); repeated.tap(); repeated.typeText("1234")
         app.buttons["Сохранить"].tap()
         XCTAssertTrue(app.buttons["Сменить код"].waitForExistence(timeout:15))
         XCTAssertEqual(lock.value as? String,"1")
-        lock.tap()
+        tapLock()
         let current = app.secureTextFields["Текущий код"]
         XCTAssertTrue(current.waitForExistence(timeout:10)); current.tap(); current.typeText("0000")
         app.buttons["ОК"].tap()
         XCTAssertTrue(app.staticTexts["Неверный код"].waitForExistence(timeout:10))
         app.buttons["Отмена"].tap()
         XCTAssertEqual(lock.value as? String,"1")
-        lock.tap(); XCTAssertTrue(current.waitForExistence(timeout:10))
+        tapLock(); XCTAssertTrue(current.waitForExistence(timeout:10))
         current.tap(); current.typeText("1234"); app.buttons["ОК"].tap()
         let disabled = XCTNSPredicateExpectation(predicate:NSPredicate { _,_ in lock.exists && lock.value as? String == "0" },object:lock)
         XCTAssertEqual(XCTWaiter.wait(for:[disabled],timeout:15),.completed)
