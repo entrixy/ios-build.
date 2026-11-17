@@ -170,6 +170,7 @@ struct SettingsScreen: View {
                     AppCodeSettingsSection()
                     BackupSettingsSection(flow:model.backupPresentation)
                     ServerSettingsSection()
+                    if model.privacyRouter != nil { NetworkPrivacySettingsSection(sensors:model.automationSensors) }
                     Section {
                         NavigationLink("Сообщения") { MessagesScreen() }
                         NavigationLink("Лицензии") { LicenseScreen() }

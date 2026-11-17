@@ -30,6 +30,8 @@ import EntrixyCore
         router.stop()
         do { _ = try await client.register(server:"server.invalid",accessCode:""); XCTFail("Stopped router permitted a request") }
         catch { XCTAssertEqual((error as? GuestAPI.Failure)?.code,"network_policy_blocked") }
+        let logo = await CompanyLogoLoader.image(URL(string:"https://server.invalid/logo.png")!)
+        XCTAssertNil(logo)
         XCTAssertEqual(attempts,0)
         XCTAssertFalse(router.ready)
     }

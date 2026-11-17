@@ -919,3 +919,12 @@
 "ios_server_loss_save_failed" = "Control of this server has stopped. This state could not be saved in protected storage.";
 
 "ios_backup_missing_sounds" = "Custom sounds without audio files in this backup: %1$d. These events will use default sounds; choose custom files in Settings → Sounds.";
+
+/* Protected server routing on iOS. */
+"ios_privacy_hint" = "服务器可以看到连接所用网络的地址。标记您的家庭 Wi-Fi：规则保存在手机上，并通过加密钥匙传递给访客。";
+"ios_privacy_transport" = "存在家庭网络规则时，iOS 仅通过移动数据连接服务器，包括连接其他 Wi-Fi 时。没有移动数据，或未允许在 Wi-Fi 下使用移动数据时，将阻止服务器连接。蓝牙、本 iPhone 的直接通话和本地 Webhook 独立工作。";
+"ios_privacy_cellular" = "在 Wi-Fi 下使用移动数据";
+"ios_privacy_cellular_hint" = "此授权仅适用于本 iPhone。运营商可能收取数据费用，包括漫游费用。此授权不会从备份中导入。";
+"ios_privacy_unavailable" = "iOS 16 不支持受保护的移动数据路径。存在家庭网络规则时，将阻止服务器连接。蓝牙、本 iPhone 的直接通话和本地 Webhook 独立工作。";
+"ios_privacy_unknown_wifi" = "无法识别当前 Wi-Fi 网络。请连接 Wi-Fi 并允许位置访问。";
+"ios_privacy_wifi_permission" = "允许识别网络";

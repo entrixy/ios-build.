@@ -67,6 +67,7 @@ public extension OwnerAccount {
                       let wrapped = material.wrappedBundleKey, let cipher = row["bundle_cipher"] as? String, !cipher.isEmpty else { throw GuestCrypto.Failure.invalidKey }
                 let key = try GuestCrypto.decrypt(key: masterKey, envelope: wrapped)
                 guard key.count == 32, let bundle = try JSONSerialization.jsonObject(with: GuestCrypto.decrypt(key: key, envelope: cipher)) as? [String: Any] else { throw GuestCrypto.Failure.invalidEnvelope }
+                _ = try PrivacyNetwork.decode(bundle["net_block"])
                 guard bundle["obj_ids"] == nil || bundle["obj_ids"] is [Any], bundle["ble"] == nil || bundle["ble"] is [[String: Any]] else { throw GuestCrypto.Failure.invalidEnvelope }
                 let network = try (bundle["obj_ids"] as? [Any] ?? []).map { try OwnerObject.replyID($0) }
                 let bluetooth = bundle["ble"] as? [[String: Any]] ?? []
@@ -110,6 +111,14 @@ public extension OwnerAccount {
             }
         }
         issuedKeys = recovered; androidKeys = remaining; androidKeyFailures = failures
+        if privacyNetworks != nil, count > 0 {
+            // Imported keys recovered after a local rule edit also need the
+            // current root list. Keep their existing ciphertext until publish.
+            for key in recovered where key.pending == nil && key.state != .revoked {
+                let contents = try key.bundle(masterKey:masterKey)
+                if try PrivacyNetwork.decode(contents["net_block"]) != privacyNetworks { queueKeySettings(key.id) }
+            }
+        }
         return count
     }
 }

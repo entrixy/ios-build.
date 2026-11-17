@@ -1,7 +1,7 @@
 name: iOS functional port compilation
 "on":
   push:
-    branches: [ci/functional-port, ci/automation-runtime, ci/ui-review, ci/ui-review-arm]
+    branches: [ci/functional-port, ci/automation-runtime, ci/ui-review, ci/ui-review-arm, ci/native-review-arm]
   workflow_dispatch:
 permissions:
   contents: read
@@ -10,7 +10,7 @@ concurrency:
   cancel-in-progress: true
 jobs:
   compile:
-    runs-on: ${{ github.ref == 'refs/heads/ci/ui-review-arm' && 'macos-15' || 'macos-15-intel' }}
+    runs-on: ${{ (github.ref == 'refs/heads/ci/ui-review-arm' || github.ref == 'refs/heads/ci/native-review-arm') && 'macos-15' || 'macos-15-intel' }}
     timeout-minutes: 45
     env:
       DEVELOPER_DIR: /Applications/Xcode_26.3.app/Contents/Developer

@@ -55,6 +55,10 @@ struct AutomationWiFiNetwork: Equatable {
             }
         }
     }
+    func requestNetworkAccess() {
+        if manager.authorizationStatus == .notDetermined { manager.requestWhenInUseAuthorization() }
+        refreshNetwork()
+    }
 
     func trackLocation(enabled: Bool, background: Bool) {
         tracking = enabled

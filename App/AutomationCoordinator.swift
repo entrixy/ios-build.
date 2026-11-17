@@ -158,7 +158,7 @@ extension AppModel {
     }
     func performAutomaticAction(_ entry: CatalogObject, readiness: AutomationReadiness) async {
         guard canManageGuestAccess, !busy, !ownerBusy, actionPrompt == nil,
-              codePrompt == nil, serverPrompt == nil, !backupPromptPending,
+              codePrompt == nil, serverPrompt == nil, networkPrivacyPrompt == nil, !backupPromptPending,
               objectRemovalTarget == nil, objectAvatarTarget == nil, bleInformationTarget == nil, !ownerGuestRequestPending,
               companyRequestID == nil, guestRemovalTarget == nil,
               let context = try? automationContext(.object(entry.target)), context.template == readiness.template,

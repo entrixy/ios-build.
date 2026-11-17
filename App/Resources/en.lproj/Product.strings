@@ -919,3 +919,12 @@
 "ios_server_loss_save_failed" = "Control of this server has stopped. This state could not be saved in protected storage.";
 
 "ios_backup_missing_sounds" = "Custom sounds without audio files in this backup: %1$d. These events will use default sounds; choose custom files in Settings → Sounds.";
+
+/* Protected server routing on iOS. */
+"ios_privacy_hint" = "The server sees the address of the network used to connect. Mark your home Wi-Fi: the rule stays on your phone and travels to guests inside the encrypted key.";
+"ios_privacy_transport" = "While home-network rules exist, iOS uses cellular data for every server connection, including on other Wi-Fi networks. Without cellular data or permission to use it alongside Wi-Fi, server connections are blocked. Bluetooth, direct phone calls and local webhooks from this iPhone work independently.";
+"ios_privacy_cellular" = "Cellular data alongside Wi-Fi";
+"ios_privacy_cellular_hint" = "This permission applies only to this iPhone. Your carrier may charge for data, including roaming. This permission is not imported from backups.";
+"ios_privacy_unavailable" = "The protected cellular route is unavailable on iOS 16. When home-network rules exist, server connections are blocked. Bluetooth, direct phone calls and local webhooks from this iPhone work independently.";
+"ios_privacy_unknown_wifi" = "The current Wi-Fi network could not be identified. Connect to Wi-Fi and allow location access to identify it.";
+"ios_privacy_wifi_permission" = "Allow network identification";

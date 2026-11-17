@@ -62,7 +62,8 @@ struct IOSBackupPayload: Codable {
         // per-server fingerprint and never use sourceIdentity for authorization.
         let hash = document.archiveID
         let provenance = Data(stride(from:0,to:64,by:2).map { UInt8(hash.dropFirst($0).prefix(2),radix:16)! })
-        let state = SavedState(identity:provenance,guests:[],owners:owners,ownerGuestDefaults:try document.guestDefaults(),companies:try document.companies(),androidArchives:[document],selectedOwnerServer:try document.primaryServer(),networkPrivacy:try document.networkPrivacyPreferences())
+        let privacy = document.entries["blocked_wifi"] == nil ? nil : try document.networkPrivacyPreferences()
+        let state = SavedState(identity:provenance,guests:[],owners:owners,ownerGuestDefaults:try document.guestDefaults(),companies:try document.companies(),androidArchives:[document],selectedOwnerServer:try document.primaryServer(),networkPrivacy:privacy)
         self.init(state:state,created:document.created,androidGuests:migrations,eventSounds:try document.eventSoundBackup())
     }
     func validate() throws {

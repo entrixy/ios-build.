@@ -14,6 +14,7 @@ final class AppModel: ObservableObject {
     @Published private(set) var owners: [OwnerAccount] = []
     @Published private(set) var selectedOwnerServer = "entrixy.com"
     @Published private(set) var networkPrivacy = try! NetworkPrivacyPreferences()
+    @Published var networkPrivacyPrompt: PrivacyNetwork?
     let privacyRouter: ServerPrivacyRouter?
     private var unsavedGuestNetworkRestrictions = Set<String>()
     @Published private(set) var ownerBusy = false
@@ -238,7 +239,7 @@ final class AppModel: ObservableObject {
             || (payload?.owners ?? []).contains { !($0.privacyNetworks ?? []).isEmpty }
             || (payload?.guests ?? []).contains(where:restricted)
             || (payload?.androidGuests ?? []).contains { !($0.privacyNetworks ?? []).isEmpty }
-        privacyRouter.update(restricted:blocked,cellularAuthorized:storageReady && networkPrivacy.cellularAuthorized)
+        privacyRouter.update(restricted:blocked,cellularAuthorized:storageReady && networkPrivacy.cellularAuthorized,forcedClosed:!storageReady)
     }
 
     private func rememberGuestNetworkRestrictions(bundle: Data,id: String) throws {
@@ -262,7 +263,9 @@ final class AppModel: ObservableObject {
         do {
             try preferences.validate()
             var updated = owners
-            for index in updated.indices { try updated[index].setPrivacyNetworks(preferences.own) }
+            if preferences.own != previous.own {
+                for index in updated.indices { try updated[index].setPrivacyNetworks(preferences.own) }
+            }
             networkPrivacy = preferences
             do { try saveOwners(updated) } catch { networkPrivacy = previous; throw error }
             return true
@@ -600,7 +603,9 @@ final class AppModel: ObservableObject {
             for archive in plan.payload.androidArchives ?? [] where !androidArchives.contains(where:{ $0.archiveID == archive.archiveID }) { androidArchives.append(archive) }
             try AndroidBackupDocument.validateArchives(androidArchives)
             var refreshedOwners = owners
-            for index in refreshedOwners.indices { try refreshedOwners[index].setPrivacyNetworks(networkPrivacy.own) }
+            for index in refreshedOwners.indices where !networkPrivacy.own.isEmpty || refreshedOwners[index].privacyNetworks != nil {
+                try refreshedOwners[index].setPrivacyNetworks(networkPrivacy.own)
+            }
             if let defaults = plan.payload.ownerGuestDefaults {
                 ownerGuestDefaults = defaults
                 for index in refreshedOwners.indices where refreshedOwners[index].hostLabel != defaults.ownerName {
@@ -1641,6 +1646,7 @@ final class AppModel: ObservableObject {
     }
 
     func suspend() {
+        networkPrivacyPrompt = nil
         bleInformationTarget = nil
         if let prompt = actionPrompt { dismissActionPrompt(prompt.id) }
         confirmedAutomaticPromptID = nil; executingActionPrompt = nil
