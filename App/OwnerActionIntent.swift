@@ -9,6 +9,7 @@ struct OwnerActionIntent: Identifiable {
     let label: String
     let action: GuestAction
     let policy: OwnerManualPolicy
+    var automatic = false
     let created = ProcessInfo.processInfo.systemUptime
     var title: String {
         object.kind == "call" ? "Позвонить" : ActionIntent.displayTitle(action: action, kind: object.kind)

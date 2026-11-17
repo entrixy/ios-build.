@@ -61,14 +61,34 @@ final class GuestActionTests: XCTestCase {
             XCTAssertEqual(frame["action"] as? String, action.isEmpty ? nil : action)
         }
     }
-    private func policy(template: Any = [String: Any](), metadata: [String: Any] = ["label": "Test"], extra: [String: Any] = [:], overrides: IncomingAutomationConfiguration? = nil) throws -> GuestActionPolicy {
+    private func policy(template: Any = [String: Any](), metadata: [String: Any] = ["label": "Test"], extra: [String: Any] = [:], overrides: IncomingAutomationConfiguration? = nil, readiness: AutomationReadiness? = nil, date: Date = Date()) throws -> GuestActionPolicy {
         let key = Data(repeating: 9, count: 32)
         var bundle: [String: Any] = ["obj_keys": ["7": GuestCrypto.base64URL(key)], "templates": ["7": template]]
         bundle.merge(extra) { _, new in new }
         let row: [String: Any] = ["id": 7, "type": "webhook", "data_cipher": try GuestCrypto.encrypt(key: key, plaintext: JSONSerialization.data(withJSONObject: metadata))]
         return try GuestActionPolicy.decode(bundle: JSONSerialization.data(withJSONObject: bundle),
-            snapshot: JSONSerialization.data(withJSONObject: ["numbers": [row]]), numberID: 7, overrides: overrides)
+            snapshot: JSONSerialization.data(withJSONObject: ["numbers": [row]]), numberID: 7, overrides: overrides, readiness: readiness, date: date)
     }
+    func testCombinedConditionsNeedFreshMatchingEvidenceAndCannotClearNetworkBan() throws {
+        var template = AutomationTemplate()
+        template.combineMode = "all"; template.wifiEnabled = true; template.timeEnabled = true
+        template.timeEntries = [AutomationTimeEntry(weekdays:[],fromMin:0,toMin:60)]
+        var runtime = AutomationRuntime(sessionStarted:99)
+        _ = runtime.evaluate(key:"a",template:template,date:Date(timeIntervalSince1970:100),wifiMatches:0,wifiRequired:1)
+        var utc = Calendar(identifier:.gregorian); utc.timeZone = TimeZone(secondsFromGMT:0)!
+        let date = Date(timeIntervalSince1970:101)
+        let proof = runtime.evaluate(key:"a",template:template,date:date,wifiMatches:1,wifiRequired:1,calendar:utc)
+        XCTAssertTrue(proof.matched)
+        let wire = try JSONSerialization.jsonObject(with:template.data())
+        XCTAssertNil(try policy(template:wire,readiness:proof,date:date).blockedReason)
+        XCTAssertNil(try OwnerManualPolicy(template.data(),readiness:proof,date:date).blockedReason)
+        XCTAssertNotNil(try policy(template:wire,readiness:proof,date:date.addingTimeInterval(3)).blockedReason)
+        XCTAssertNotNil(try OwnerManualPolicy(template.data(),readiness:proof,date:date.addingTimeInterval(-1)).blockedReason)
+        XCTAssertNotNil(try policy(template:wire,extra:["net_block":["blocked"]],readiness:proof,date:date).blockedReason)
+        template.confirmEnabled = true
+        XCTAssertNotNil(try policy(template:JSONSerialization.jsonObject(with:template.data()),readiness:proof,date:date).blockedReason)
+    }
+
     func testManualOverrideMatchesAndroidAndUnsupportedHardGatesFailClosed() throws {
         XCTAssertNil(try policy(template: ["mode": "any", "geo_on": true, "wifi_on": true]).blockedReason)
         XCTAssertNil(try policy(template: ["mode": "all", "geo_on": true]).blockedReason)

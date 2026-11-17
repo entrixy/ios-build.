@@ -33,6 +33,9 @@ final class AppModel: ObservableObject {
     @Published var objectAvatarTarget: ObjectReference?
     @Published var ownerGuestRequestPending = false
     lazy var automationSensors = AutomationSensors()
+    lazy var automation = AutomationCoordinator(app: self)
+    var automaticPermits: [ObjectReference: AutomationReadiness] = [:]
+    var automaticConsumedAt: [ObjectReference: Date] = [:]
     @Published private(set) var objectPreferences = ObjectCatalogPreferences()
     @Published private(set) var bleVisibleUntil: [ObjectReference: TimeInterval] = [:]
     @Published private(set) var busy = false
@@ -460,7 +463,7 @@ final class AppModel: ObservableObject {
               cache.revision == intent.revision else { throw BLETransportFailure.cancelled }
         let material = try cache.open(key: guest.invite.bundleKey)
         let decoded = try GuestActionPolicy.decodeBLE(bundle: material.bundle, numberID: intent.object.numberID,
-            epoch: max(cache.maximumEpoch, UInt64(max(0, Date().timeIntervalSince1970))), overrides: guest.automation?[intent.object.id])
+            epoch: max(cache.maximumEpoch, UInt64(max(0, Date().timeIntervalSince1970))), overrides: guest.automation?[intent.object.id], readiness: conditionReadiness(.received(guestID: intent.guestID, objectID: intent.object.id)))
         guard decoded.policy.blockedReason == nil, decoded.policy.template == intent.policy.template else { throw BLETransportFailure.unsupported }
         if let snapshot = try JSONSerialization.jsonObject(with: material.snapshot) as? [String: Any],
            let row = (snapshot["numbers"] as? [[String: Any]])?.first(where: { ($0["id"] as? Int) == intent.object.numberID }),
@@ -498,6 +501,7 @@ final class AppModel: ObservableObject {
         journal = Array(journal.prefix(500))
         do { try save(updated) } catch { journal = previous; throw error }
         bleAuthorizedIntent = nil
+        noteAutomationAttempt(.received(guestID:intent.guestID,objectID:intent.object.id))
         return actionKey
     }
     func isBLEGuestAuthorized(_ id: UUID) -> Bool { canManageGuestAccess && bleAuthorizedIntent == id }
@@ -530,9 +534,14 @@ final class AppModel: ObservableObject {
         try saveOwners(updated)
     }
 
+    func ownerActionWho(server: String, objectID: UUID) -> String {
+        activeOwnerAction?.server == server && activeOwnerAction?.object.id == objectID && activeOwnerAction?.automatic == true
+            ? ProductText.string("journal_who_geo") : "Я"
+    }
+
     func ownerManualActionAllowed(_ object: OwnerObject, server: String, action: GuestAction) -> Bool {
         do {
-            let policy = try OwnerManualPolicy(object.localPolicy)
+            let policy = try OwnerManualPolicy(object.localPolicy, readiness: conditionReadiness(.owned(server: server, objectID: object.id)))
             if let reason = policy.blockedReason { rejectOwnerAction(object.id, reason); return false }
             if policy.authentication != nil {
                 guard foreground, let active = activeOwnerAction, active.server == server,
@@ -559,6 +568,7 @@ final class AppModel: ObservableObject {
             result: "Результат Bluetooth-команды не получен", level: "warning"), at: 0)
         journal = Array(journal.prefix(500))
         do { try saveOwners(updated) } catch { journal = previous; throw error }
+        noteAutomationAttempt(.owned(server:server,objectID:objectID))
         return actionKey
     }
 
@@ -1342,6 +1352,7 @@ final class AppModel: ObservableObject {
     func resume() async {
         foreground = true
         scheduleOwnerSettingsRefresh()
+        automation.resume()
         if ownerBusy && busy { return }
         ownerControl.resume()
         if busy { resumeRequested = true; return }
@@ -1354,6 +1365,7 @@ final class AppModel: ObservableObject {
     }
 
     func suspend() {
+        automation.suspend(); automaticPermits.removeAll()
         ownerSettingsTask?.cancel(); ownerSettingsTask = nil; ownerSettingsTaskGeneration = nil
         delegationInbox.suspend()
         ownerControl.suspend()
@@ -1381,7 +1393,7 @@ final class AppModel: ObservableObject {
     func objectActionTitle(guestID: String, object: GuestObject) -> String {
         if object.kind == "ble" { return ActionIntent.displayTitle(action: .toggle, kind: "ble") }
         guard let link = actionLinks[guestID], let bundle = link.bundle, let snapshot = link.snapshot,
-              let policy = try? GuestActionPolicy.decode(bundle: bundle, snapshot: snapshot, numberID: object.numberID, overrides: guests.first(where: { $0.id == guestID })?.automation?[object.id]) else {
+              let policy = try? GuestActionPolicy.decode(bundle: bundle, snapshot: snapshot, numberID: object.numberID, overrides: guests.first(where: { $0.id == guestID })?.automation?[object.id], readiness: conditionReadiness(.received(guestID: guestID, objectID: object.id))) else {
             return "Управлять"
         }
         let action = chosenGuestAction(policy: policy, numberID: object.numberID, positions: link.positions)
@@ -1391,7 +1403,7 @@ final class AppModel: ObservableObject {
     func objectConnectionTitle(guestID: String, object: GuestObject) -> String {
         guard let link = actionLinks[guestID], connection(for: guestID) == .connected,
               let bundle = link.bundle, let snapshot = link.snapshot,
-              let policy = try? GuestActionPolicy.decode(bundle: bundle, snapshot: snapshot, numberID: object.numberID, overrides: guests.first(where: { $0.id == guestID })?.automation?[object.id]) else {
+              let policy = try? GuestActionPolicy.decode(bundle: bundle, snapshot: snapshot, numberID: object.numberID, overrides: guests.first(where: { $0.id == guestID })?.automation?[object.id], readiness: conditionReadiness(.received(guestID: guestID, objectID: object.id))) else {
             return connection(for: guestID).title
         }
         if let reason = policy.blockedReason { return reason }
@@ -1674,6 +1686,7 @@ struct ActionIntent: Identifiable {
     let action: GuestAction
     let wireAction: String
     let policy: GuestActionPolicy
+    var automatic = false
     var title: String { Self.displayTitle(action: action, kind: policy.kind) }
     static func displayTitle(action: GuestAction, kind: String) -> String {
         kind == "ble" ? "Подать импульс / переключить" : action == .close ? "Закрыть" : (action == .toggle ? "Переключить" : "Открыть")
@@ -1694,13 +1707,14 @@ private final class ActionLink {
     var devices: Set<Int> = []
     var positions: [Int: String] = [:]
     var session = GuestActionSession()
-    var attempt: (journalID: UUID, numberID: Int, key: String)?
+    var attempt: (journalID: UUID, numberID: Int, key: String, template: Data, automatic: AutomationReadiness?)?
     var timeout: Task<Void, Never>?
     init(live: GuestActionTransport) { self.live = live }
 }
 
 extension AppModel {
-    func actionIntent(guestID: String, object: GuestObject) -> ActionIntent? {
+    func actionIntent(guestID: String, object: GuestObject, automatic: Bool = false) -> ActionIntent? {
+        if automatic && !automaticPermitValid(.received(guestID:guestID,objectID:object.id)) { return nil }
         guard objectIsVisible(.received(guestID: guestID, objectID: object.id)) else { return nil }
         actionRejections.removeValue(forKey: guestID + "|" + object.id)
         do {
@@ -1710,7 +1724,7 @@ extension AppModel {
                       guest.objects.contains(object), let cache = guest.bleCache else { throw ActionDenied.message("Защищённый Bluetooth-пропуск не сохранён. Обновите ключ через интернет.") }
                 let material = try cache.open(key: guest.invite.bundleKey)
                 let decoded = try GuestActionPolicy.decodeBLE(bundle: material.bundle, numberID: object.numberID,
-                    epoch: max(cache.maximumEpoch, UInt64(max(0, Date().timeIntervalSince1970))), overrides: guest.automation?[object.id])
+                    epoch: max(cache.maximumEpoch, UInt64(max(0, Date().timeIntervalSince1970))), overrides: guest.automation?[object.id], readiness: conditionReadiness(.received(guestID: guest.id, objectID: object.id)))
                 if let reason = decoded.policy.blockedReason { throw ActionDenied.message(reason) }
                 let intent = ActionIntent(guestID: guestID, object: object, revision: cache.revision,
                     action: .toggle, wireAction: "toggle", policy: decoded.policy)
@@ -1724,13 +1738,13 @@ extension AppModel {
                   let bundle = link.bundle, let snapshot = link.snapshot else {
                 throw ActionDenied.message("Объект сейчас недоступен. Дождитесь подключения и завершения текущего запроса.")
             }
-            let policy = try GuestActionPolicy.decode(bundle: bundle, snapshot: snapshot, numberID: object.numberID, overrides: guests.first(where: { $0.id == guestID })?.automation?[object.id])
+            let policy = try GuestActionPolicy.decode(bundle: bundle, snapshot: snapshot, numberID: object.numberID, overrides: guests.first(where: { $0.id == guestID })?.automation?[object.id], readiness: conditionReadiness(.received(guestID: guestID, objectID: object.id)))
             if let reason = policy.blockedReason { throw ActionDenied.message(reason) }
             let reachable = policy.serverWebhook || (policy.kind == "device" ? policy.deviceID.map { link.devices.contains($0) } == true : link.hostOnline)
             guard reachable else { throw ActionDenied.message(policy.kind == "device" ? "Контроллер не в сети." : "Телефон владельца не в сети.") }
-            let action = chosenGuestAction(policy: policy, numberID: object.numberID, positions: link.positions)
+            let action: GuestAction = automatic ? .open : chosenGuestAction(policy: policy, numberID: object.numberID, positions: link.positions)
             let wire = action == .close ? "close" : (action == .toggle ? "toggle" : "")
-            return ActionIntent(guestID: guestID, object: object, revision: link.revision, action: action, wireAction: wire, policy: policy)
+            return ActionIntent(guestID: guestID, object: object, revision: link.revision, action: action, wireAction: wire, policy: policy, automatic: automatic)
         } catch let ActionDenied.message(text) { rejectAction(guestID: guestID, object: object, message: text) }
         catch BLECommandSession.Failure.expired { rejectAction(guestID: guestID, object: object, message: "Срок Bluetooth-пропуска истёк. Обновите ключ через интернет; продление разрешает владелец.") }
         catch { rejectAction(guestID: guestID, object: object, message: "Не удалось проверить защищённые условия доступа к объекту.") }
@@ -1741,7 +1755,7 @@ extension AppModel {
         // Recheck after confirmation/authentication. Never change the direction silently.
         if intent.policy.kind == "ble" {
             defer { finishBLEGuestAuthorization(intent.id) }
-            guard let fresh = actionIntent(guestID: intent.guestID, object: intent.object) else { return }
+            guard let fresh = actionIntent(guestID: intent.guestID, object: intent.object, automatic: intent.automatic) else { return }
             guard fresh.revision == intent.revision, fresh.policy.template == intent.policy.template else {
                 rejectAction(guestID: intent.guestID, object: intent.object, message: "Bluetooth-пропуск изменился. Нажмите на объект ещё раз."); return
             }
@@ -1751,7 +1765,7 @@ extension AppModel {
             await bleGuestControl.execute(intent)
             return
         }
-        guard let fresh = actionIntent(guestID: intent.guestID, object: intent.object) else { return }
+        guard let fresh = actionIntent(guestID: intent.guestID, object: intent.object, automatic: intent.automatic) else { return }
         guard fresh.revision == intent.revision, fresh.action == intent.action, fresh.policy.template == intent.policy.template,
               let link = actionLinks[intent.guestID],
               let guest = guests.first(where: { $0.id == intent.guestID }) else {
@@ -1768,12 +1782,13 @@ extension AppModel {
                                    credential: intent.policy.credential, now: ProcessInfo.processInfo.systemUptime)
             // Persist the attempt BEFORE the first socket write. A crash is ambiguous,
             // so the initial durable result deliberately says no result is known.
-            let entry = JournalEntry(who: "Я", what: intent.object.label, actionKey: key,
+            let entry = JournalEntry(who: intent.automatic ? ProductText.string("journal_who_geo") : "Я", what: intent.object.label, actionKey: key,
                                      result: "Результат не получен", level: "warning")
             let previous = journal
             journal.insert(entry, at: 0); journal = Array(journal.prefix(500))
             do { try save(guests) } catch { journal = previous; throw error }
-            link.attempt = (entry.id, intent.object.numberID, key)
+            noteAutomationAttempt(.received(guestID:intent.guestID,objectID:intent.object.id))
+            link.attempt = (entry.id, intent.object.numberID, key, intent.policy.template, intent.automatic ? automaticPermits[.received(guestID:intent.guestID,objectID:intent.object.id)] : nil)
             actionMessages[key] = "Запрос отправлен"
             link.timeout = Task { [weak self, weak link] in
                 try? await Task.sleep(nanoseconds: 30_000_000_000)
@@ -1828,9 +1843,11 @@ extension AppModel {
                   let guest = guests.first(where: { $0.id == guestID }), !guest.paused,
                   let object = guest.objects.first(where: { $0.kind == "device" && $0.numberID == attempt.numberID }),
                   let bundle = link.bundle, let snapshot = link.snapshot,
-                  let policy = try? GuestActionPolicy.decode(bundle: bundle, snapshot: snapshot, numberID: object.numberID, overrides: guest.automation?[object.id]),
-                  policy.blockedReason == nil,
+                  let policy = try? GuestActionPolicy.decode(bundle: bundle, snapshot: snapshot, numberID: object.numberID, overrides: guest.automation?[object.id], readiness: conditionReadiness(.received(guestID: guest.id, objectID: object.id))),
+                  policy.blockedReason == nil, policy.template == attempt.template,
                   policy.deviceID.map({ link.devices.contains($0) }) == true else { return }
+            if let evidence = attempt.automatic,
+               !automaticEvidenceValid(evidence,target:.received(guestID:guestID,objectID:object.id)) { return }
             // Unsolicited, expired and duplicate challenges produce no signature.
             guard let frame = try? link.session.fire(challenge: m, now: ProcessInfo.processInfo.systemUptime) else { return }
             try await link.live.sendAction(frame)
@@ -1953,7 +1970,8 @@ extension AppModel {
     private func rejectOwnerAction(_ id: UUID, _ message: String) {
         ownerActionRejections[id] = ActionTapRejection(message: message)
     }
-    func ownerActionIntent(server: String, objectID: UUID) -> OwnerActionIntent? {
+    func ownerActionIntent(server: String, objectID: UUID, automatic: Bool = false) -> OwnerActionIntent? {
+        if automatic && !automaticPermitValid(.owned(server:server,objectID:objectID)) { return nil }
         ownerActionRejections.removeValue(forKey: objectID)
         do {
             guard foreground, canManageGuestAccess, !busy, !ownerBusy,
@@ -1961,7 +1979,7 @@ extension AppModel {
                   let object = owner.objects?.first(where: { $0.id == objectID }), object.ownerCardAvailable else {
                 throw ActionDenied.message("Объект сейчас недоступен.")
             }
-            let policy = try OwnerManualPolicy(object.localPolicy)
+            let policy = try OwnerManualPolicy(object.localPolicy, readiness: conditionReadiness(.owned(server: server, objectID: object.id)))
             if let reason = policy.blockedReason { throw ActionDenied.message(reason) }
             if object.kind == "ble" {
                 guard !bleControl.busy else { throw ActionDenied.message("Предыдущая Bluetooth-команда ещё не завершена.") }
@@ -1981,17 +1999,17 @@ extension AppModel {
             }
             let metadata = try object.metadata(masterKey: owner.masterKey)
             let position = object.numberID.flatMap { ownerControl.positions[server]?[$0] }
-            let action: GuestAction = object.kind == "ble" ? .toggle :
+            let action: GuestAction = automatic ? .open : object.kind == "ble" ? .toggle :
                 (object.kind == "device" && ["open", "opening"].contains(position ?? "") ? .close :
                 (object.kind == "webhook" && metadata["wh_toggle"] as? Int == 1 ? .toggle : .open))
-            return OwnerActionIntent(server: server, object: object, label: metadata["label"] as? String ?? "Объект", action: action, policy: policy)
+            return OwnerActionIntent(server: server, object: object, label: metadata["label"] as? String ?? "Объект", action: action, policy: policy, automatic: automatic)
         } catch let ActionDenied.message(message) { rejectOwnerAction(objectID, message) }
         catch { rejectOwnerAction(objectID, "Не удалось проверить защищённые данные объекта.") }
         return nil
     }
     private func ownerIntentStillValid(_ intent: OwnerActionIntent) -> Bool {
         guard ProcessInfo.processInfo.systemUptime - intent.created < 120,
-              let fresh = ownerActionIntent(server: intent.server, objectID: intent.object.id),
+              let fresh = ownerActionIntent(server: intent.server, objectID: intent.object.id, automatic: intent.automatic),
               fresh.object == intent.object, fresh.action == intent.action else { return false }
         return true
     }
@@ -2065,7 +2083,7 @@ extension AppModel {
               let object = owners[index].objects?[offset], object.pending == nil,
               object.available != false, object.localPolicy == expected else { return false }
         do {
-            _ = try OwnerManualPolicy(object.localPolicy)
+            _ = try OwnerManualPolicy(object.localPolicy, readiness: conditionReadiness(.owned(server: server, objectID: object.id)))
             var policy: [String: Any] = [:]
             if let bytes = object.localPolicy {
                 guard let decoded = try JSONSerialization.jsonObject(with: bytes) as? [String: Any] else { throw GuestCrypto.Failure.invalidEnvelope }
@@ -2154,7 +2172,7 @@ extension AppModel {
             if case let .received(guest, object) = entry {
                 guard let cache = guest.bleCache, let material = try? cache.open(key: guest.invite.bundleKey),
                       (try? GuestActionPolicy.decodeBLE(bundle: material.bundle, numberID: object.numberID,
-                        epoch: max(cache.maximumEpoch, UInt64(max(0, Date().timeIntervalSince1970))), overrides: guest.automation?[object.id])) != nil else { return .offline }
+                        epoch: max(cache.maximumEpoch, UInt64(max(0, Date().timeIntervalSince1970))), overrides: guest.automation?[object.id], readiness: conditionReadiness(.received(guestID: guest.id, objectID: object.id)))) != nil else { return .offline }
             }
             guard let until = bleVisibleUntil[entry.target] else { return .unknown }
             return now < until ? .ready : .offline
@@ -2174,7 +2192,7 @@ extension AppModel {
             case .connected: break
             }
             guard let link = actionLinks[guest.id], let bundle = link.bundle, let snapshot = link.snapshot,
-                  let policy = try? GuestActionPolicy.decode(bundle: bundle, snapshot: snapshot, numberID: object.numberID, overrides: guest.automation?[object.id]) else { return .unknown }
+                  let policy = try? GuestActionPolicy.decode(bundle: bundle, snapshot: snapshot, numberID: object.numberID, overrides: guest.automation?[object.id], readiness: conditionReadiness(.received(guestID: guest.id, objectID: object.id))) else { return .unknown }
             if policy.kind == "device" { return policy.deviceID.map { link.devices.contains($0) } == true ? .ready : .offline }
             return link.hostOnline ? .ready : .offline
         }

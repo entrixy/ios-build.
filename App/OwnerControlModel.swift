@@ -68,12 +68,15 @@ final class OwnerControlModel: ObservableObject {
         let objectID: UUID
         let journalID: UUID
         let actionKey: String
+        let object: OwnerObject
+        let automatic: AutomationReadiness?
         var command: OwnerCommand
         var callID: String?
         var earlyStatuses: [String: [String: Any]] = [:]
         var timeout: Task<Void, Never>?
-        init(objectID: UUID, journalID: UUID, actionKey: String, command: OwnerCommand) {
+        init(objectID: UUID, journalID: UUID, actionKey: String, command: OwnerCommand, object: OwnerObject, automatic: AutomationReadiness?) {
             self.objectID = objectID; self.journalID = journalID; self.actionKey = actionKey; self.command = command
+            self.object = object; self.automatic = automatic
         }
     }
 
@@ -187,10 +190,11 @@ final class OwnerControlModel: ObservableObject {
             let frame = try command.request()
             let label = (try object.metadata(masterKey: owner.masterKey)["label"] as? String) ?? "Объект"
             let actionKey = "owner:" + UUID().uuidString
-            let entry = JournalEntry(who: "Я", what: label, actionKey: actionKey, result: "Результат не получен", level: "warning")
+            let entry = JournalEntry(who: app.ownerActionWho(server:server,objectID:objectID), what: label, actionKey: actionKey, result: "Результат не получен", level: "warning")
             app.recordAction(entry)
             guard app.journal.contains(where: { $0.id == entry.id }) else { return }
-            let attempt = Attempt(objectID: objectID, journalID: entry.id, actionKey: actionKey, command: command)
+        app.noteAutomationAttempt(.owned(server:server,objectID:objectID))
+            let attempt = Attempt(objectID: objectID, journalID: entry.id, actionKey: actionKey, command: command, object: object, automatic: app.automaticPermits[.owned(server:server,objectID:objectID)])
             link.attempt = attempt
             messages[objectID] = "Запрос отправляется"
             attempt.timeout = Task { [weak self, weak link] in
@@ -282,6 +286,11 @@ final class OwnerControlModel: ObservableObject {
         } else if type == "sock_challenge" {
             guard let commandID = json["command_id"] as? String,
                   attempt.callID == nil || attempt.callID == commandID else { return }
+            let target = ObjectReference.owned(server:server,objectID:attempt.objectID)
+            guard app.canManageGuestAccess,
+                  app.owners.first(where: { $0.server == server })?.objects?.first(where: { $0.id == attempt.objectID }) == attempt.object,
+                  try OwnerManualPolicy(attempt.object.localPolicy,readiness:app.conditionReadiness(target)).blockedReason == nil else { return }
+            if let evidence = attempt.automatic, !app.automaticEvidenceValid(evidence,target:target) { return }
             let proof = try attempt.command.fire(challenge: json, now: ProcessInfo.processInfo.systemUptime)
             attempt.callID = commandID
             try await link.live.sendAction(proof)
@@ -406,7 +415,7 @@ final class OwnerControlModel: ObservableObject {
               phone.enumerated().allSatisfy({ $0.element.isASCII && ($0.element.isNumber || ($0.offset == 0 && $0.element == "+")) }),
               let url = URL(string: "tel:" + phone) else { app.errorMessage = "Не удалось прочитать локальный номер владельца."; return }
         if request == nil, !app.ownerManualActionAllowed(object, server: server, action: .open) { return }
-        var who = "Я"
+        var who = app.ownerActionWho(server:server,objectID:objectID)
         if let request {
             let explicit = phoneRequests.contains(where: { $0.id == request.id })
             let automatic = automaticPhoneRequests.remove(request.id) != nil
@@ -430,6 +439,7 @@ final class OwnerControlModel: ObservableObject {
         let entry = JournalEntry(who: who, what: label, actionKey: actionKey, result: "Результат звонка не подтверждён", level: "warning")
         app.recordAction(entry)
         guard app.journal.contains(where: { $0.id == entry.id }) else { return }
+        app.noteAutomationAttempt(.owned(server:server,objectID:objectID))
         let accepted = await dialer(url)
         app.actionResult(actionKey: actionKey, result: accepted ? "Передано приложению «Телефон»" : "Приложение «Телефон» не открылось", level: accepted ? "info" : "danger", replace: true)
         if let request, let link = links[server], link.authenticated {
@@ -451,7 +461,7 @@ final class OwnerControlModel: ObservableObject {
               object.routing["webhook_mode"] == "phone", let number = object.numberID,
               let url = object.routing["webhook_url"], let secret = object.routing["webhook_secret"] else { return }
         if request == nil, !app.ownerManualActionAllowed(object, server: server, action: requested) { return }
-        var who = "Я", direction: GuestAction? = requested
+        var who = app.ownerActionWho(server:server,objectID:objectID), direction: GuestAction? = requested
         if let request {
             guard request.server == server, request.objectID == objectID,
                   let key = try? owner.authorizedGuest(localID: request.keyID, numberID: number) else { return }
@@ -480,6 +490,7 @@ final class OwnerControlModel: ObservableObject {
             result: "Результат запроса не получен", level: "warning")
         app.recordAction(entry)
         guard app.journal.contains(where: { $0.id == entry.id }) else { return }
+        app.noteAutomationAttempt(.owned(server:server,objectID:objectID))
         let task = Task { try await webhook.send(url: url, body: body) }
         webhookTasks[target] = task
         do {
