@@ -110,8 +110,8 @@ struct AppCodeDialog: View {
             } catch {
                 // A successful first save may precede a failed lock-setting
                 // save. Keep that real code and let the controls reflect it.
-                error = ProductText.string("ios_code_save_failed")
-                if case .setup = request.action, model.hasActionCode { model.codePrompt = nil; model.errorMessage = error }
+                self.error = ProductText.string("ios_code_save_failed")
+                if case .setup = request.action, model.hasActionCode { model.codePrompt = nil; model.errorMessage = self.error }
             }
         }
     }
