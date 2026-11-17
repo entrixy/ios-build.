@@ -46,8 +46,10 @@ private struct OfflineWebhookOwnerAPI: OwnerTransport {
         app.ownerControl.resume()
         return (storage, app, object, sender)
     }
-    private func routeProof(at date: Date = Date()) -> (AutomationTemplate,AutomationReadiness) {
+    private func routeProof(at date: Date = Date(), gate: String? = nil) -> (AutomationTemplate,AutomationReadiness) {
         var template = AutomationTemplate()
+        if gate == "confirm" { template.confirmEnabled = true }
+        if gate == "pin" { template.authEnabled = true; template.authMode = "pin" }
         template.geoEnabled = true; template.geoMode = "route"; template.geoLat = 0; template.geoLon = 0
         template.corridors = [[AutomationGeoPoint(lat:160/111320,lon:0),AutomationGeoPoint(lat:0,lon:0)]]
         var runtime = AutomationRuntime(sessionStarted:date.timeIntervalSince1970-60)
@@ -98,6 +100,78 @@ private struct OfflineWebhookOwnerAPI: OwnerTransport {
         storage.failing = false
         await app.performAutomaticAction(entry,readiness:proof)
         XCTAssertTrue(sender.calls.isEmpty); XCTAssertTrue(app.journal.isEmpty)
+    }
+    func testAutomaticConfirmationPresentsWithoutPOSTAndOneExplicitApprovalSendsExactlyOnce() async throws {
+        let (template,proof) = routeProof(gate:"confirm")
+        let (storage,app,object,sender) = try fixture(template:template,toggles:true)
+        defer { app.suspend() }
+        let entry = CatalogObject.owned(app.owners[0],object)
+        await app.performAutomaticAction(entry,readiness:proof)
+        let prompt = try XCTUnwrap(app.actionPrompt)
+        guard case .owner(let intent) = prompt else { return XCTFail("Wrong prompt scope") }
+        XCTAssertTrue(intent.automatic); XCTAssertEqual(intent.action,.open)
+        XCTAssertTrue(sender.calls.isEmpty); XCTAssertTrue(app.journal.isEmpty)
+        await app.performAutomaticAction(entry,readiness:proof)
+        XCTAssertEqual(app.actionPrompt?.id,prompt.id)
+        await app.execute(intent) // Possessing an intent does not prove a dialog tap.
+        XCTAssertTrue(sender.calls.isEmpty)
+        sender.beforeSend = { XCTAssertEqual(storage.state?.journal?.count,1) }
+        await app.executeActionPrompt(prompt)
+        await app.executeActionPrompt(prompt)
+        XCTAssertNil(app.actionPrompt); XCTAssertTrue(app.automaticPermits.isEmpty)
+        XCTAssertEqual(sender.calls.count,1); XCTAssertEqual(app.journal.count,1)
+        XCTAssertEqual(app.journal.first?.who,ProductText.string("journal_who_geo"))
+    }
+    func testAutomaticConfirmationCancelConsumesArrivalWithoutPOSTOrReopeningTheSameEvidence() async throws {
+        let (template,proof) = routeProof(gate:"confirm")
+        let (_,app,object,sender) = try fixture(template:template)
+        defer { app.suspend() }
+        let entry = CatalogObject.owned(app.owners[0],object)
+        await app.performAutomaticAction(entry,readiness:proof)
+        let prompt = try XCTUnwrap(app.actionPrompt)
+        app.dismissActionPrompt(prompt.id)
+        await app.executeActionPrompt(prompt)
+        await app.performAutomaticAction(entry,readiness:proof)
+        XCTAssertNil(app.actionPrompt); XCTAssertTrue(app.automaticPermits.isEmpty)
+        XCTAssertTrue(sender.calls.isEmpty); XCTAssertTrue(app.journal.isEmpty)
+    }
+    func testAutomaticPINRequiresCorrectCodeForThePresentedIntentBeforePOST() async throws {
+        let (template,proof) = routeProof(gate:"pin")
+        let (_,app,object,sender) = try fixture(template:template)
+        defer { app.suspend() }
+        try await app.setActionCode("1234")
+        await app.performAutomaticAction(.owned(app.owners[0],object),readiness:proof)
+        let prompt = try XCTUnwrap(app.actionPrompt)
+        guard case .owner(let intent) = prompt else { return XCTFail("Wrong prompt scope") }
+        let wrong = try await app.authorizeCode("0000",ownerIntent:intent)
+        XCTAssertFalse(wrong); XCTAssertTrue(sender.calls.isEmpty)
+        XCTAssertEqual(app.actionPrompt?.id,prompt.id)
+        let correct = try await app.authorizeCode("1234",ownerIntent:intent)
+        XCTAssertTrue(correct)
+        await app.executeActionPrompt(prompt)
+        XCTAssertEqual(sender.calls.count,1); XCTAssertEqual(app.journal.count,1)
+        XCTAssertTrue(app.automaticPermits.isEmpty)
+    }
+    func testAutomaticConfirmationRechecksExpiryStorageAndBackgroundBeforePOST() async throws {
+        for failure in ["expired","storage","background","policy"] {
+            let (template,proof) = routeProof(gate:"confirm")
+            let (storage,app,object,sender) = try fixture(template:template)
+            let entry = CatalogObject.owned(app.owners[0],object)
+            await app.performAutomaticAction(entry,readiness:proof)
+            let prompt = try XCTUnwrap(app.actionPrompt)
+            if failure == "expired" { app.automaticPermits[entry.target] = routeProof(at:Date().addingTimeInterval(-40),gate:"confirm").1 }
+            if failure == "storage" { storage.failing = true }
+            if failure == "background" { app.suspend() }
+            if failure == "policy" {
+                let context = try app.automationContext(.object(entry.target))
+                var changed = template; changed.authEnabled = true; changed.authMode = "pin"
+                XCTAssertTrue(app.saveAutomation(context,template:changed))
+            }
+            await app.executeActionPrompt(prompt)
+            XCTAssertTrue(sender.calls.isEmpty,failure); XCTAssertTrue(app.journal.isEmpty,failure)
+            XCTAssertNil(app.actionPrompt,failure); XCTAssertTrue(app.automaticPermits.isEmpty,failure)
+            app.suspend()
+        }
     }
 
     func testLocalWebhookWorksWithoutOwnerServerAndPersistsAttemptBeforePOST() async throws {

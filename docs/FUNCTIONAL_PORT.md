@@ -668,3 +668,77 @@ closure. Expected source counts now native141/UI15, pending actual execution.
 No new screenshots or website publication. Automatic triggers that require
 confirmation/authentication still consume without opening a prompt; this remaining
 runtime path is explicitly not declared implemented by the manual dialog change.
+
+
+## Foreground automatic confirmation/authentication — follow-up source
+
+Android ActionCard.runAuthThenCall uses the same confirmation/CodeGate for manual
+and automatic arrivals. Automatic foreground arrivals now retain their frozen
+intent in the same ActionPrompt rather than silently consuming a gated trigger.
+No HTTP/BLE command or journal action is produced by opening the dialog. A single
+explicit approval consumes the presented prompt before dispatch; direct execution
+of an automatic gated intent without that approval is rejected. Existing PIN or
+biometric authorization must still match that exact intent. An already-present
+modal prevents another trigger from replacing it. Cancellation consumes the
+arrival/latch, removes its permit and cannot reopen from the same evidence.
+
+Proofs are fresh within two seconds at proposal. While the matching dialog or its
+single execution owns the evidence, the maximum is thirty seconds; current policy,
+conditions and foreground authority are rechecked on authentication, dispatch and
+late socket challenge/BLE stages as before. Old/changed evidence cannot be turned
+into a manual command. Route triggers retain open-only direction. Background clears
+both pending/executing prompt state and all automatic permits; no prompt is saved
+or restored. No new background mode or OS permission is claimed by this change.
+
+Five new hosted SOURCE cases cover owner confirm/exactly once, cancellation,
+wrong/correct PIN, expiry/storage/background/policy changes before sending, and
+received guest confirm/PIN plus duplicate challenge binding. Existing automatic
+storage-failure, force/condition and no-replay tests remain. Syntax/diff checks
+pass; Apple execution of latest expected native146 is pending. Core unchanged240;
+UI source15 still awaits its exact-source runtime result. The previous manual-only
+limitation above is historical; this section supersedes that source boundary.
+
+
+## Factory claim links — source follow-up, Apple pending
+
+Read Android MainActivity.handleInviteIntent claim branch and SettingsScreen
+pendingClaim/AddObjectSheet targetHost handling before implementation. DeviceClaimLink
+recognizes entrixy://claim?c= and HTTPS /claim URLs, normalizes the Android hexadecimal
+code and opens the existing AddOwnerObjectScreen in device/claim mode. HTTPS keeps
+the manufacturer origin/port; custom scheme uses the selected server. Query h
+cannot move a factory claim to another host. Duplicated c, credentials/fragments,
+invalid schemes, empty/non-ASCII hex and excessive input are rejected. The form
+shows its server, keeps normal type order and does not register/claim until Save.
+Switching away from factory-claim mode uses the ordinary selected server, matching
+Android. After switching to new device creation, saved device credentials are
+shown through the existing sheet. Cancel preserves the empty profile.
+
+The existing Save now freezes the destination before awaiting registration and
+keeps fields disabled during owner work. Existing durable registration/object
+claim behavior is reused, with no extra automatic mutation or retry. Five new
+core tests passed within actual Linux245/zero at17:07:10UTC. Swift frontend parse
+and diff checks pass; one additional UI SOURCE case covers the real pendingURL
+route, prefilled code/origin and cancellation. Expected UI16, native146 unchanged.
+Apple typing/runtime of this follow-up remains pending. No manufacturer device
+or actual server claim was used. Custom scheme is registered; HTTPS universal
+link entitlement/AASA association still requires the release team's real identity
+and remains a separate release criterion, not proven by direct pendingURL testing.
+
+
+## Actual compact-dialog UI result and avatar accessibility correction
+
+ARM run44131318837/job134208842769, publicceca452/nativea70c33a, actually passed
+Apple240 core and Debug test build, then executed all 15 UI tests: fourteen passed,
+one failed (339.345 seconds). Compact card confirmation/code setup cancellation,
+wrong-code entry-lock, Android type order/default/BLE creation, exact object editor,
+passing and server routes all passed. The remaining avatar test failed before a
+tap: adding accessibilityElement(children:.ignore) had exposed its labelled/ID
+wrapper as Other with an anonymous Button child, so app.buttons could not select
+it. Removed that wrapper modifier while retaining the explicit 56pt frame/hit
+shape and label/identifier on the actual Button. Existing size/preset/upload/cancel
+assertions remain. This correction is syntax-checked, actual retest pending.
+
+Failure export now actually retained the native PNG and screen recording. The
+private PNG was inspected; it shows the original object row and avatar, not an
+opened picker. It is diagnostic evidence, not a replacement gallery capture.
+No new product batch/site publication has occurred.

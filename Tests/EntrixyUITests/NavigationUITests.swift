@@ -75,6 +75,19 @@ final class NavigationUITests: XCTestCase {
             app.terminate()
         }
     }
+    func testFactoryClaimLinkPreparesDeviceFormWithOriginalServerAndCancelDoesNotRegister() {
+        let app = XCUIApplication()
+        app.launchArguments = ["--stage-two","device-claim","-AppleLanguages","(ru)","-AppleLocale","ru_RU"]
+        app.launch(); activeApp = app
+        let code = app.textFields["device-claim-code"]
+        XCTAssertTrue(code.waitForExistence(timeout:20)); XCTAssertEqual(code.value as? String,"A1B2C3D4")
+        XCTAssertTrue(app.staticTexts.matching(NSPredicate(format:"label CONTAINS %@","factory.invalid:8443")).firstMatch.exists)
+        XCTAssertTrue(app.textFields["Название"].exists)
+        app.buttons["Отмена"].tap()
+        assertBottom(app,["settings","journal"])
+        XCTAssertTrue(app.staticTexts["Пока нет объектов"].exists)
+        XCTAssertFalse(app.buttons["main-tab-guests"].exists)
+    }
     func testGuestNestedBackAndRootSwitch() {
         let app = launch("guest-keys")
         assertBottom(app, ["control", "settings", "journal"])

@@ -91,6 +91,15 @@ struct AddOwnerObjectScreen: View {
     @FocusState private var editingName: Bool
     var embedded = false
     var completion: ((ObjectReference?) -> Void)? = nil
+    private let incomingClaim: Bool
+    init(server: String, initialClaimCode: String? = nil, embedded: Bool = false, completion: ((ObjectReference?) -> Void)? = nil) {
+        self.server = server; self.embedded = embedded; self.completion = completion
+        incomingClaim = initialClaimCode != nil
+        _kind = State(initialValue:initialClaimCode == nil ? "call" : "device")
+        _claimMode = State(initialValue:initialClaimCode != nil)
+        _claimCode = State(initialValue:initialClaimCode ?? "")
+    }
+    private var destinationServer: String { incomingClaim && !(kind == "device" && claimMode) ? model.selectedOwnerServer : server }
     private var complete: Bool {
         !label.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty &&
         (kind == "ble" || (kind == "device" ? !claimMode || !claimCode.isEmpty :
@@ -141,11 +150,12 @@ struct AddOwnerObjectScreen: View {
                     if claimMode {
                         AppField(ProductText.string("add_object_device_claim_code")) {
                             TextField("A1B2C3D4", text: $claimCode).textInputAutocapitalization(.characters).autocorrectionDisabled()
+                                .accessibilityIdentifier("device-claim-code")
                         }
                     }
                 }
-                if model.owners.filter({ !$0.registrationPending }).count > 1 {
-                    Text(ProductText.string("object_server") + ": " + server).font(.footnote).foregroundStyle(Brand.secondaryInk)
+                if incomingClaim || model.owners.filter({ !$0.registrationPending }).count > 1 {
+                    Text(ProductText.string("object_server") + ": " + destinationServer).font(.footnote).foregroundStyle(Brand.secondaryInk)
                 }
             }
             if kind == "call" {
@@ -155,13 +165,13 @@ struct AddOwnerObjectScreen: View {
                 }
                 PhoneHangupLimitation(hangupSeconds: 0)
             }
-            if let owner = model.owners.first(where: { $0.server == server }), owner.registrationPending {
+            if let owner = model.owners.first(where: { $0.server == destinationServer }), owner.registrationPending {
                 Section {
                     Text(model.ownerMessages[server] ?? "Доступ владельца ещё не подтверждён.").foregroundStyle(Brand.secondaryInk)
                     Button(ProductText.string("server_edit")) {
                         finish(nil)
                         model.settingsRequest = .system
-                        model.serverPrompt = ServerSettingsPrompt(action:.configure(server,initial:server))
+                        model.serverPrompt = ServerSettingsPrompt(action:.configure(destinationServer,initial:destinationServer))
                     }.buttonStyle(SecondaryActionStyle()).actionListRow()
                 }
             }
@@ -171,6 +181,7 @@ struct AddOwnerObjectScreen: View {
                 }.buttonStyle(PrimaryActionStyle()).actionListRow().disabled(!complete || model.ownerBusy)
             }
         }
+        .disabled(model.ownerBusy)
         .navigationTitle(ProductText.string("add_object_title")).navigationBarTitleDisplayMode(.inline)
         .task {
             #if DEBUG && targetEnvironment(simulator)
@@ -178,7 +189,7 @@ struct AddOwnerObjectScreen: View {
             #endif
         }
         .navigationDestination(isPresented: $pairing) {
-            BLEPairingScreen(server: server, initialLabel: label, completion: { target in finish(target) })
+            BLEPairingScreen(server: destinationServer, initialLabel: label, completion: { target in finish(target) })
                 .sheetDismissFooter(disabled: model.ownerBusy) { dismiss() }
         }
         .sheet(isPresented: $contacts) {
@@ -200,6 +211,8 @@ struct AddOwnerObjectScreen: View {
         }
     }
     private func save() async {
+        guard complete, !model.ownerBusy, !model.busy else { return }
+        let server = destinationServer
         // Opening a form never registers a replacement owner identity.
         if !model.owners.contains(where: { $0.server == server }) {
             guard await model.addOwner(server: server, accessCode: "") else { return }

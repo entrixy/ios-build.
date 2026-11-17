@@ -47,6 +47,8 @@ private struct LiveAppRoot: View {
 }
 
 struct RootView: View {
+    private struct DeviceClaimPrompt: Identifiable { let id = UUID(); let claim: DeviceClaimLink }
+    private struct DeviceCredentialsPrompt: Identifiable { let id = UUID(); let server: String; let credentials: DeviceConfigurationCredentials }
     @EnvironmentObject private var model: AppModel
     @AppStorage("entrixy.language") private var language = ""
     @State private var selectedTab: AppTab
@@ -54,6 +56,9 @@ struct RootView: View {
     @State private var adding = false
     @State private var input = ""
     @State private var companyObjectFlow: KnownCompany?
+    @State private var deviceClaimFlow: DeviceClaimPrompt?
+    @State private var claimCreatedDevice: ObjectReference?
+    @State private var claimDeviceCredentials: DeviceCredentialsPrompt?
     private let showAddKeyOnLaunch: Bool
     @Binding private var pendingURL: URL?
 
@@ -117,6 +122,16 @@ struct RootView: View {
             if let url { pendingURL = nil; receiveURL(url) }
         }
         .sheet(isPresented: $adding) { KeyImportScreen(input: $input) }
+        .sheet(item:$deviceClaimFlow,onDismiss:{
+            defer { claimCreatedDevice = nil }
+            if case let .owned(server,id) = claimCreatedDevice,
+               let credentials = try? model.ownerDeviceCredentials(server:server,objectID:id) {
+                claimDeviceCredentials = DeviceCredentialsPrompt(server:server,credentials:credentials)
+            }
+        }) { prompt in
+            AddOwnerObjectScreen(server:prompt.claim.server,initialClaimCode:prompt.claim.code,completion:{ claimCreatedDevice = $0 })
+        }
+        .sheet(item:$claimDeviceCredentials) { prompt in DeviceCredentialsSheet(credentials:prompt.credentials,server:prompt.server) }
         .sheet(item:$companyObjectFlow) { company in
             if model.owners.contains(where:{ $0.server == company.server && $0.credentials != nil }) { AddOwnerObjectScreen(server:company.server) }
             else { AddOwnerServerScreen(initialServer:company.server) }
@@ -129,6 +144,14 @@ struct RootView: View {
         if url.isFileURL, ["eib","ekb"].contains(url.pathExtension.lowercased()) {
             selectedTab = .settings; userPickedTab = true; model.settingsRequest = .system
             if !model.backups.hasPendingRestore { Task { await model.backupPresentation.acceptFile(.success(url)) } }
+            return
+        }
+        if DeviceClaimLink.recognizes(url) {
+            do {
+                let claim = try DeviceClaimLink.parse(url,selectedServer:model.selectedOwnerServer)
+                selectedTab = .settings; userPickedTab = true; model.settingsRequest = .objects
+                deviceClaimFlow = DeviceClaimPrompt(claim:claim)
+            } catch { model.errorMessage = "В ссылке нет корректного кода привязки устройства." }
             return
         }
         if let company = try? CompanyInvite.parse(url.absoluteString) {

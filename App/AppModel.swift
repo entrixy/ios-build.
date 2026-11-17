@@ -47,6 +47,33 @@ final class AppModel: ObservableObject {
     @Published var guestRemovalTarget: GuestRemovalTarget?
     @Published var codePrompt: AppCodePrompt?
     @Published var actionPrompt: ActionPrompt?
+    private var executingActionPrompt: ActionPrompt?
+    private var confirmedAutomaticPromptID: UUID?
+    func dismissActionPrompt(_ id: UUID) {
+        guard let prompt = actionPrompt, prompt.id == id else { return }
+        actionPrompt = nil
+        if prompt.automatic { automaticPermits.removeValue(forKey:prompt.target) }
+        if authorizedIntent == id { authorizedIntent = nil }
+    }
+    func actionPromptRetainsAutomaticEvidence(_ target: ObjectReference) -> Bool {
+        [actionPrompt,executingActionPrompt].contains { $0?.automatic == true && $0?.target == target }
+    }
+    func executeActionPrompt(_ request: ActionPrompt) async {
+        guard canManageGuestAccess, actionPrompt?.id == request.id, executingActionPrompt == nil else { return }
+        // Consume the actual presented request before dispatch. A second tap or
+        // delayed callback cannot reuse it, even after a successful response.
+        actionPrompt = nil; executingActionPrompt = request
+        confirmedAutomaticPromptID = request.automatic ? request.id : nil
+        defer {
+            confirmedAutomaticPromptID = nil; executingActionPrompt = nil
+            if request.automatic { automaticPermits.removeValue(forKey:request.target) }
+        }
+        switch request { case .guest(let intent): await execute(intent); case .owner(let intent): await execute(intent) }
+    }
+    private func consumeAutomaticPromptConfirmation(_ id: UUID) -> Bool {
+        guard confirmedAutomaticPromptID == id else { return false }
+        confirmedAutomaticPromptID = nil; return true
+    }
     @Published var backupPromptPending = false
     @Published var serverPrompt: ServerSettingsPrompt?
     @Published var settingsRequest: SettingsTab?
@@ -1520,7 +1547,8 @@ final class AppModel: ObservableObject {
     }
 
     func suspend() {
-        actionPrompt = nil
+        if let prompt = actionPrompt { dismissActionPrompt(prompt.id) }
+        confirmedAutomaticPromptID = nil; executingActionPrompt = nil
         codePrompt = nil
         serverPrompt = nil
         backupPresentation.cancel()
@@ -1917,6 +1945,8 @@ extension AppModel {
     }
 
     func execute(_ intent: ActionIntent) async {
+        if intent.automatic && (intent.policy.confirmation || intent.policy.authentication != nil),
+           !consumeAutomaticPromptConfirmation(intent.id) { return }
         // Recheck after confirmation/authentication. Never change the direction silently.
         if intent.policy.kind == "ble" {
             defer { finishBLEGuestAuthorization(intent.id) }
@@ -2189,6 +2219,8 @@ extension AppModel {
         try await authorizeBiometric(authentication: intent.policy.authentication, requestID: intent.id)
     }
     func execute(_ intent: OwnerActionIntent) async {
+        if intent.automatic && (intent.policy.confirmation || intent.policy.authentication != nil),
+           !consumeAutomaticPromptConfirmation(intent.id) { return }
         let authenticated = authorizedIntent == intent.id
         authorizedIntent = nil
         guard activeOwnerAction == nil, ownerIntentStillValid(intent) else {

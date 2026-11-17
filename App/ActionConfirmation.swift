@@ -1,10 +1,18 @@
 import SwiftUI
+import EntrixyCore
 
 /// One frozen card intent, presented over the current root like Android CodeGate.
 enum ActionPrompt: Identifiable {
     case guest(ActionIntent)
     case owner(OwnerActionIntent)
     var id: UUID { switch self { case .guest(let value): return value.id; case .owner(let value): return value.id } }
+    var target: ObjectReference {
+        switch self {
+        case .guest(let value): return .received(guestID:value.guestID,objectID:value.object.id)
+        case .owner(let value): return .owned(server:value.server,objectID:value.object.id)
+        }
+    }
+    var automatic: Bool { switch self { case .guest(let value): return value.automatic; case .owner(let value): return value.automatic } }
 }
 
 struct ActionConfirmation: View {
@@ -86,7 +94,7 @@ struct ActionConfirmation: View {
     }
     private func close() {
         code = ""; repeatedCode = ""; codeFocused = false
-        if model.actionPrompt?.id == request.id { model.actionPrompt = nil }
+        model.dismissActionPrompt(request.id)
     }
     private func submit() {
         guard isCurrent, !working else { return }
@@ -99,8 +107,7 @@ struct ActionConfirmation: View {
     }
     private func perform() async {
         guard isCurrent else { return }
-        if let guestIntent { await model.execute(guestIntent) }
-        else if let ownerIntent { await model.execute(ownerIntent) }
+        await model.executeActionPrompt(request)
     }
     private func authorizeCode() async throws -> Bool {
         if let guestIntent { return try await model.authorizeCode(code, intent: guestIntent) }
