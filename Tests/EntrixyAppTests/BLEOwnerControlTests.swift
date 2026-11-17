@@ -57,7 +57,7 @@ private final class BLEOwnerStorage: StateStorage {
     func stop() {}
 }
 @MainActor final class BLEOwnerControlTests: XCTestCase {
-    private func fixture() throws -> (BLEOwnerStorage, OwnerBLECentral, AppModel, OwnerObject, Data) {
+    private func fixture(template: AutomationTemplate? = nil) throws -> (BLEOwnerStorage, OwnerBLECentral, AppModel, OwnerObject, Data) {
         let storage = BLEOwnerStorage(), central = OwnerBLECentral()
         var owner = try OwnerAccount(server: "https://fixture.invalid")
         owner.credentials = try OwnerCredentials(deviceID: String(repeating: "a", count: 32), deviceSecret: String(repeating: "b", count: 64))
@@ -70,18 +70,59 @@ private final class BLEOwnerStorage: StateStorage {
         let payload = head + signed.dropFirst(8).prefix(8)
         try pair.confirm(advertisement: payload, masterKey: owner.masterKey)
         var object = try OwnerObject(pairing: pair, masterKey: owner.masterKey)
+        object.localPolicy = try template?.data()
         object.numberID = 7; object.pending = nil; object.available = true
         owner.objects = [object]
         storage.state = SavedState(identity: Data(repeating: 4, count: 32), guests: [], owners: [owner])
         central.discoveries = [BLEDiscovery(id: UUID(), name: "Entrixy", rssi: -45, manufacturerPayload: payload)]
         return (storage, central, AppModel(storage: storage), object, secret)
     }
+    func testAuthenticatedPassiveProximityFiresOnceAndKeepsLatchAcrossRelaunch() async throws {
+        var template = AutomationTemplate(); template.bleEnabled = true
+        let (storage,central,app,object,_) = try fixture(template:template)
+        app.bleControl = BLEOwnerControlModel(app:app,transport:central)
+        defer { app.suspend() }
+        let target = ObjectReference.owned(server:"fixture.invalid",objectID:object.id)
+        app.automation.receiveBLE(try XCTUnwrap(central.discoveries[0].manufacturerPayload),rssi:-45)
+        let proof = try XCTUnwrap(app.conditionReadiness(target))
+        XCTAssertTrue(proof.ready)
+        await app.performAutomaticAction(.owned(app.owners[0],object),readiness:proof)
+        XCTAssertEqual(central.channel.writes.count,1)
+        XCTAssertTrue(app.bleAutomationDisarmed.contains(target.id))
+        let next = try XCTUnwrap(app.conditionReadiness(target))
+        XCTAssertFalse(next.ready)
+        await app.performAutomaticAction(.owned(app.owners[0],object),readiness:next)
+        XCTAssertEqual(central.channel.writes.count,1)
+        let restarted = AppModel(storage:storage)
+        defer { restarted.suspend() }
+        restarted.automation.receiveBLE(try XCTUnwrap(central.discoveries[0].manufacturerPayload),rssi:-45)
+        XCTAssertFalse(try XCTUnwrap(restarted.conditionReadiness(target)).ready)
+        XCTAssertEqual(restarted.journal.count,1)
+    }
+    func testForgedPassiveFramesAndLatchStorageFailureCannotStartGATT() async throws {
+        var template = AutomationTemplate(); template.bleEnabled = true
+        let (storage,central,app,object,_) = try fixture(template:template)
+        app.bleControl = BLEOwnerControlModel(app:app,transport:central)
+        defer { app.suspend() }
+        let target = ObjectReference.owned(server:"fixture.invalid",objectID:object.id)
+        app.automation.receiveBLE(Data(repeating:0,count:16),rssi:-20)
+        XCTAssertFalse(try XCTUnwrap(app.conditionReadiness(target)).ready)
+        XCTAssertNil(app.bleVisibleUntil[target])
+        app.automation.receiveBLE(try XCTUnwrap(central.discoveries[0].manufacturerPayload),rssi:-45)
+        let proof = try XCTUnwrap(app.conditionReadiness(target)); XCTAssertTrue(proof.ready)
+        storage.failing = true
+        await app.performAutomaticAction(.owned(app.owners[0],object),readiness:proof)
+        XCTAssertEqual(central.connects,0); XCTAssertTrue(central.channel.writes.isEmpty)
+        XCTAssertFalse(app.bleAutomationDisarmed.contains(target.id)); XCTAssertTrue(app.journal.isEmpty)
+    }
+
     func testDurableJournalAndProofBeforeOneWriteAndFirstFireResult() async throws {
         let (storage, central, app, object, secret) = try fixture()
         let model = BLEOwnerControlModel(app: app, transport: central)
         central.channel.beforeWrite = {
             XCTAssertEqual(storage.state?.journal?.count, 1)
             XCTAssertEqual(storage.state?.owners?.first?.objects?.first?.bleProofs?.count, 1)
+            XCTAssertTrue(storage.state?.bleAutomationDisarmed?.contains(ObjectReference.owned(server:"fixture.invalid",objectID:object.id).id) == true)
         }
         await model.execute(server: "fixture.invalid", objectID: object.id)
         XCTAssertEqual(central.channel.writes, [try BLECrypto.ownerFire(ownerSecret: secret, nonce: central.channel.nonce)])
@@ -90,6 +131,7 @@ private final class BLEOwnerStorage: StateStorage {
         XCTAssertFalse(model.busy)
         // A fresh application cannot reuse this consumed challenge.
         let restored = AppModel(storage: storage)
+        XCTAssertTrue(restored.bleAutomationDisarmed.contains(ObjectReference.owned(server:"fixture.invalid",objectID:object.id).id))
         let again = BLEOwnerControlModel(app: restored, transport: central)
         await again.execute(server: "fixture.invalid", objectID: object.id)
         XCTAssertEqual(central.channel.writes.count, 1)

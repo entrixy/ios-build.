@@ -31,6 +31,7 @@ final class MessageManager: ObservableObject {
                 }
                 updated.insert(saved, at: 0)
                 try app.saveMessages(incoming: updated)
+                AppSoundCenter.shared.play(.message)
             }
             try await acknowledge(saved.id)
         } catch { message = "Сообщение не удалось проверить или сохранить. Подтверждение чтения не отправлялось." }

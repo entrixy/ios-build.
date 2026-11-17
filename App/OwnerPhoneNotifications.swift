@@ -45,7 +45,7 @@ private final class PhoneNoticeDelegate: NSObject, UNUserNotificationCenterDeleg
         let content = UNMutableNotificationContent()
         content.title = ProductText.string("notify_call_title", guest)
         content.body = ProductText.string("notify_call_big", guest, object)
-        content.sound = .default; content.categoryIdentifier = "entrixy.guest-call"
+        content.sound = AppSoundCenter.shared.notificationSound(.incall); content.categoryIdentifier = "entrixy.guest-call"
         do { try await center.add(UNNotificationRequest(identifier: id, content: content, trigger: nil)); return true }
         catch { return false }
     }

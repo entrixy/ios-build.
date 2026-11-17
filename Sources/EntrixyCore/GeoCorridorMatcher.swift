@@ -43,7 +43,7 @@ public struct GeoCorridorMatcher {
                                 corridors: [[AutomationGeoPoint]]) -> Bool {
         guard fix.isValid, gate.lat.isFinite, gate.lon.isFinite, (-90...90).contains(gate.lat),
               (-180...180).contains(gate.lon), !corridors.isEmpty,
-              corridors.count <= 100, corridors.allSatisfy({ $0.count <= 1000 && $0.allSatisfy { $0.lat.isFinite && $0.lon.isFinite && (-90...90).contains($0.lat) && (-180...180).contains($0.lon) } }) else { return false }
+              corridors.count <= 6, corridors.reduce(0,{ $0+$1.count }) <= 16384, corridors.allSatisfy({ $0.allSatisfy { $0.lat.isFinite && $0.lon.isFinite && (-90...90).contains($0.lat) && (-180...180).contains($0.lon) } }) else { return false }
         var state = states[key] ?? State()
         // Core Location can repeat cached fixes. They cannot count as a second
         // independent near fix or turn zero elapsed time into an approach.

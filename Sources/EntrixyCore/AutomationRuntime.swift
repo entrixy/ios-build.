@@ -8,6 +8,10 @@ public struct AutomationReadiness: Equatable {
     public let routeMatched: Bool
     public let ready: Bool
     public let distanceM: Double?
+    public func forBLE(armed: Bool) -> Self {
+        Self(template:template,evaluatedAt:evaluatedAt,observations:observations,matched:matched,routeMatched:false,
+            ready:armed && observations.bleReady == true && matched,distanceM:distanceM)
+    }
     public func satisfies(_ candidate: AutomationTemplate, at date: Date) -> Bool {
         let age = date.timeIntervalSince(evaluatedAt)
         return candidate == template && age >= 0 && age <= 2 && matched

@@ -36,6 +36,9 @@ final class AppModel: ObservableObject {
     lazy var automation = AutomationCoordinator(app: self)
     var automaticPermits: [ObjectReference: AutomationReadiness] = [:]
     var automaticConsumedAt: [ObjectReference: Date] = [:]
+    @Published private(set) var bleAutomationDisarmed = Set<String>()
+    @Published private(set) var cameraActivity: [ObjectReference: UInt64] = [:]
+    func noteCameraAction(_ target: ObjectReference) { cameraActivity[target] = (cameraActivity[target] ?? 0) &+ 1 }
     @Published private(set) var objectPreferences = ObjectCatalogPreferences()
     @Published private(set) var bleVisibleUntil: [ObjectReference: TimeInterval] = [:]
     @Published private(set) var busy = false
@@ -115,6 +118,8 @@ final class AppModel: ObservableObject {
             let preferences = state.objectPreferences ?? ObjectCatalogPreferences()
             try preferences.validate()
             objectPreferences = preferences
+            bleAutomationDisarmed = state.bleAutomationDisarmed ?? []
+            guard bleAutomationDisarmed.count <= 2000, bleAutomationDisarmed.allSatisfy({ !$0.isEmpty && $0.utf8.count <= 1024 }) else { throw KeychainStore.Failure(status:-1) }
             usedOwnerPresses = state.usedOwnerPresses ?? [:]
             pendingRestore = state.pendingRestore
             delegations = state.delegations ?? []
@@ -157,7 +162,7 @@ final class AppModel: ObservableObject {
     private func save(_ updated: [SavedGuest], preferences: ObjectCatalogPreferences? = nil) throws {
         let preferences = preferences ?? objectPreferences
         try preferences.validate()
-        try storage.save(SavedState(identity: identity, guests: updated, journal: journal, actionCode: actionCode, owners: owners, usedOwnerPresses: usedOwnerPresses, pendingRestore: pendingRestore, delegations: delegations, passedAccess: passedAccess, receivedDelegations: receivedDelegations, incomingMessages: incomingMessages, outgoingMessages: outgoingMessages, delegatedJournalLedger: delegatedJournalLedger, appLockEnabled: appLockEnabled, appEntryBiometricEnabled: appEntryBiometricEnabled, objectPreferences: preferences))
+        try storage.save(SavedState(identity: identity, guests: updated, journal: journal, actionCode: actionCode, owners: owners, usedOwnerPresses: usedOwnerPresses, pendingRestore: pendingRestore, delegations: delegations, passedAccess: passedAccess, receivedDelegations: receivedDelegations, incomingMessages: incomingMessages, outgoingMessages: outgoingMessages, delegatedJournalLedger: delegatedJournalLedger, appLockEnabled: appLockEnabled, appEntryBiometricEnabled: appEntryBiometricEnabled, objectPreferences: preferences, bleAutomationDisarmed: bleAutomationDisarmed))
         guests = updated
         if objectPreferences != preferences { objectPreferences = preferences }
     }
@@ -355,9 +360,10 @@ final class AppModel: ObservableObject {
             }
             if let existingIndex { updated[existingIndex] = imported } else { updated.append(imported) }
         }
-        let previous = pendingRestore
+        let previous = pendingRestore, priorLatches = bleAutomationDisarmed
+        for object in owner.objects ?? [] where object.kind == "ble" { bleAutomationDisarmed.insert(ObjectReference.owned(server:owner.server,objectID:object.id).id) }
         pendingRestore = plan
-        do { try saveOwners(updated) } catch { pendingRestore = previous; throw error }
+        do { try saveOwners(updated) } catch { pendingRestore = previous; bleAutomationDisarmed = priorLatches; throw error }
     }
     func activateBackupGuest(_ guest: SavedGuest, plan: BackupRestorePlan) throws {
         var updated = guests
@@ -366,9 +372,10 @@ final class AppModel: ObservableObject {
             imported.objects = []; imported.checkedAt = nil
             updated.append(imported)
         }
-        let previous = pendingRestore
+        let previous = pendingRestore, priorLatches = bleAutomationDisarmed
+        for object in guest.objects where object.kind == "ble" { bleAutomationDisarmed.insert(ObjectReference.received(guestID:guest.id,objectID:object.id).id) }
         pendingRestore = plan
-        do { try save(updated) } catch { pendingRestore = previous; throw error }
+        do { try save(updated) } catch { pendingRestore = previous; bleAutomationDisarmed = priorLatches; throw error }
     }
     func finishBackupRestore(_ plan: BackupRestorePlan) throws {
         let previousPlan = pendingRestore, previousJournal = journal, previousPresses = usedOwnerPresses
@@ -414,7 +421,7 @@ final class AppModel: ObservableObject {
     private func saveOwners(_ updated: [OwnerAccount], preferences: ObjectCatalogPreferences? = nil) throws {
         let preferences = preferences ?? objectPreferences
         try preferences.validate()
-        try storage.save(SavedState(identity: identity, guests: guests, journal: journal, actionCode: actionCode, owners: updated, usedOwnerPresses: usedOwnerPresses, pendingRestore: pendingRestore, delegations: delegations, passedAccess: passedAccess, receivedDelegations: receivedDelegations, incomingMessages: incomingMessages, outgoingMessages: outgoingMessages, delegatedJournalLedger: delegatedJournalLedger, appLockEnabled: appLockEnabled, appEntryBiometricEnabled: appEntryBiometricEnabled, objectPreferences: preferences))
+        try storage.save(SavedState(identity: identity, guests: guests, journal: journal, actionCode: actionCode, owners: updated, usedOwnerPresses: usedOwnerPresses, pendingRestore: pendingRestore, delegations: delegations, passedAccess: passedAccess, receivedDelegations: receivedDelegations, incomingMessages: incomingMessages, outgoingMessages: outgoingMessages, delegatedJournalLedger: delegatedJournalLedger, appLockEnabled: appLockEnabled, appEntryBiometricEnabled: appEntryBiometricEnabled, objectPreferences: preferences, bleAutomationDisarmed: bleAutomationDisarmed))
         owners = updated
         if objectPreferences != preferences { objectPreferences = preferences }
         scheduleOwnerSettingsRefresh()
@@ -461,6 +468,11 @@ final class AppModel: ObservableObject {
               canManageGuestAccess, !busy, let guest = guests.first(where: { $0.id == intent.guestID }),
               !guest.paused, guest.objects.contains(intent.object), let cache = guest.bleCache,
               cache.revision == intent.revision else { throw BLETransportFailure.cancelled }
+        let target = ObjectReference.received(guestID:intent.guestID,objectID:intent.object.id)
+        if intent.automatic {
+            guard let evidence = automaticPermits[target], automaticEvidenceValid(evidence,target:target),
+                  !automation.bleOpenish(target) else { throw BLETransportFailure.cancelled }
+        }
         let material = try cache.open(key: guest.invite.bundleKey)
         let decoded = try GuestActionPolicy.decodeBLE(bundle: material.bundle, numberID: intent.object.numberID,
             epoch: max(cache.maximumEpoch, UInt64(max(0, Date().timeIntervalSince1970))), overrides: guest.automation?[intent.object.id], readiness: conditionReadiness(.received(guestID: intent.guestID, objectID: intent.object.id)))
@@ -499,7 +511,9 @@ final class AppModel: ObservableObject {
         journal.insert(JournalEntry(who: "Я", what: intent.object.label, actionKey: actionKey,
             result: "Результат Bluetooth-команды не получен", level: "warning"), at: 0)
         journal = Array(journal.prefix(500))
-        do { try save(updated) } catch { journal = previous; throw error }
+        let priorLatches = bleAutomationDisarmed
+        bleAutomationDisarmed.insert(ObjectReference.received(guestID:intent.guestID,objectID:intent.object.id).id)
+        do { try save(updated) } catch { journal = previous; bleAutomationDisarmed = priorLatches; throw error }
         bleAuthorizedIntent = nil
         noteAutomationAttempt(.received(guestID:intent.guestID,objectID:intent.object.id))
         return actionKey
@@ -541,7 +555,12 @@ final class AppModel: ObservableObject {
 
     func ownerManualActionAllowed(_ object: OwnerObject, server: String, action: GuestAction) -> Bool {
         do {
-            let policy = try OwnerManualPolicy(object.localPolicy, readiness: conditionReadiness(.owned(server: server, objectID: object.id)))
+            let target = ObjectReference.owned(server:server,objectID:object.id)
+            if object.kind == "ble", activeOwnerAction?.automatic == true {
+                guard let evidence = automaticPermits[target], automaticEvidenceValid(evidence,target:target),
+                      !automation.bleOpenish(target) else { return false }
+            }
+            let policy = try OwnerManualPolicy(object.localPolicy, readiness: conditionReadiness(target))
             if let reason = policy.blockedReason { rejectOwnerAction(object.id, reason); return false }
             if policy.authentication != nil {
                 guard foreground, let active = activeOwnerAction, active.server == server,
@@ -567,7 +586,9 @@ final class AppModel: ObservableObject {
         journal.insert(JournalEntry(who: "Я", what: label, actionKey: actionKey,
             result: "Результат Bluetooth-команды не получен", level: "warning"), at: 0)
         journal = Array(journal.prefix(500))
-        do { try saveOwners(updated) } catch { journal = previous; throw error }
+        let priorLatches = bleAutomationDisarmed
+        bleAutomationDisarmed.insert(ObjectReference.owned(server:server,objectID:objectID).id)
+        do { try saveOwners(updated) } catch { journal = previous; bleAutomationDisarmed = priorLatches; throw error }
         noteAutomationAttempt(.owned(server:server,objectID:objectID))
         return actionKey
     }
@@ -1466,7 +1487,13 @@ final class AppModel: ObservableObject {
         let previous = journal
         journal[index].result = result
         journal[index].level = level
-        do { try save(guests) }
+        do {
+            try save(guests)
+            if previous[index].result != result || previous[index].level != level {
+                if level == "success" { AppSoundCenter.shared.play(.success) }
+                else if level == "error" || level == "danger" { AppSoundCenter.shared.play(.error) }
+            }
+        }
         catch { journal = previous; errorMessage = "Не удалось сохранить результат действия." }
     }
 
@@ -1727,7 +1754,7 @@ extension AppModel {
                     epoch: max(cache.maximumEpoch, UInt64(max(0, Date().timeIntervalSince1970))), overrides: guest.automation?[object.id], readiness: conditionReadiness(.received(guestID: guest.id, objectID: object.id)))
                 if let reason = decoded.policy.blockedReason { throw ActionDenied.message(reason) }
                 let intent = ActionIntent(guestID: guestID, object: object, revision: cache.revision,
-                    action: .toggle, wireAction: "toggle", policy: decoded.policy)
+                    action: .toggle, wireAction: "toggle", policy: decoded.policy, automatic: automatic)
                 _ = try guestBLEMaterial(intent)
                 return intent
             }
@@ -1933,6 +1960,7 @@ extension AppModel {
         defer { authenticationBusy = false }
         guard actionCode != nil, foreground, authentication != "pin" else { throw KeychainStore.Failure(status: -1) }
         let service = biometricService
+        AppSoundCenter.shared.play(.biometric)
         try await Task.detached { try ActionBiometrics.authenticate(service: service) }.value
         guard foreground else { throw KeychainStore.Failure(status: -1) }
         authorizedIntent = requestID
@@ -1976,7 +2004,7 @@ extension AppModel {
         do {
             guard foreground, canManageGuestAccess, !busy, !ownerBusy,
                   let owner = owners.first(where: { $0.server == server }), !owner.registrationPending,
-                  let object = owner.objects?.first(where: { $0.id == objectID }), object.ownerCardAvailable else {
+                  let object = owner.objects?.first(where: { $0.id == objectID }), object.ownerCardAvailable, !owner.isMoving(objectID) else {
                 throw ActionDenied.message("Объект сейчас недоступен.")
             }
             let policy = try OwnerManualPolicy(object.localPolicy, readiness: conditionReadiness(.owned(server: server, objectID: object.id)))
@@ -1999,7 +2027,7 @@ extension AppModel {
             }
             let metadata = try object.metadata(masterKey: owner.masterKey)
             let position = object.numberID.flatMap { ownerControl.positions[server]?[$0] }
-            let action: GuestAction = automatic ? .open : object.kind == "ble" ? .toggle :
+            let action: GuestAction = object.kind == "ble" ? .toggle : automatic ? .open :
                 (object.kind == "device" && ["open", "opening"].contains(position ?? "") ? .close :
                 (object.kind == "webhook" && metadata["wh_toggle"] as? Int == 1 ? .toggle : .open))
             return OwnerActionIntent(server: server, object: object, label: metadata["label"] as? String ?? "Объект", action: action, policy: policy, automatic: automatic)
@@ -2466,7 +2494,11 @@ extension AppModel {
                 let (from, to, preferences) = try move.committed(source: owners[fromIndex], destination: owners[toIndex],
                     sourceSnapshot: sourceSnapshot, destinationSnapshot: targetSnapshot, preferences: objectPreferences)
                 var updated = owners; updated[fromIndex] = from; updated[toIndex] = to
-                try saveOwners(updated, preferences: preferences)
+                let priorLatches = bleAutomationDisarmed
+                let oldTarget = ObjectReference.owned(server:server,objectID:objectID).id
+                if bleAutomationDisarmed.remove(oldTarget) != nil { bleAutomationDisarmed.insert(ObjectReference.owned(server:move.destination,objectID:objectID).id) }
+                do { try saveOwners(updated, preferences: preferences) }
+                catch { bleAutomationDisarmed = priorLatches; throw error }
                 ownerObjectMessages.removeValue(forKey: objectID)
                 await flushOwnerObjectSettings(server: server)
                 await syncOwner(server); await syncOwner(move.destination)
@@ -2474,5 +2506,15 @@ extension AppModel {
             }
         }
         return false
+    }
+}
+
+extension AppModel {
+    func setBLEAutomationArmed(_ target: ObjectReference, armed: Bool) throws {
+        guard canManageGuestAccess else { throw BLETransportFailure.cancelled }
+        let prior = bleAutomationDisarmed
+        if armed { bleAutomationDisarmed.remove(target.id) } else { bleAutomationDisarmed.insert(target.id) }
+        guard bleAutomationDisarmed != prior else { return }
+        do { try save(guests) } catch { bleAutomationDisarmed = prior; throw error }
     }
 }

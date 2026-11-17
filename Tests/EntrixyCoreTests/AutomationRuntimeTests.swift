@@ -6,6 +6,18 @@ final class AutomationRuntimeTests: XCTestCase {
     private func fix(_ distance: Double, _ seconds: Int64, accuracy: Float = 5) -> AutomationLocationFix {
         AutomationLocationFix(latitude:distance/111195,longitude:0,accuracyM:accuracy,timestampMS:seconds*1000)
     }
+    func testBLEUsesItsOwnRadioLatchAndRequiresAnActualBLEObservation() {
+        var runtime = AutomationRuntime(sessionStarted:100), template = AutomationTemplate(); template.bleEnabled = true
+        let absent = runtime.evaluate(key:"a",template:template,date:date(101),bleReady:false)
+        XCTAssertFalse(absent.forBLE(armed:true).ready)
+        let nearby = runtime.evaluate(key:"a",template:template,date:date(102),bleReady:true)
+        XCTAssertTrue(nearby.forBLE(armed:true).ready)
+        XCTAssertFalse(nearby.forBLE(armed:false).ready)
+        runtime.consume("a",route:false,at:date(102))
+        // A real radio exit is the BLE rearm source, rather than GPS cooldown.
+        XCTAssertTrue(runtime.evaluate(key:"a",template:template,date:date(103),bleReady:true).forBLE(armed:true).ready)
+    }
+
     func testStartingInsideWiFiDoesNotFireUntilActualExitAndNewEntry() {
         var runtime = AutomationRuntime(sessionStarted:100), template = AutomationTemplate()
         template.wifiEnabled = true

@@ -359,6 +359,7 @@ final class OwnerControlModel: ObservableObject {
         }
         // A migrated key with no explicit local choice retains the earlier
         // iOS explicit-tap behavior. New form choices follow Android's reaction.
+        if object.kind == "call", preference?.reaction != "notify" { AppSoundCenter.shared.play(.incall) }
         if object.kind != "call" || request.needsConfirmation || preference == nil || preference?.reaction == "confirm" {
             phoneRequests.append(request); return
         }

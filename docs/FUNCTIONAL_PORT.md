@@ -122,16 +122,78 @@ route seen while editing/on another tab, keeps automatic commands open-only and
 uses the ordinary identity/policy/journal transactions. Code/confirmation gates
 remain manual. Policy and actual condition evidence are rechecked at the first
 send and delayed socket challenge. A consumed candidate/lost reply is not replayed.
-BLE proximity remains blocked until real passive authenticated sightings are
-connected. Background execution is not implemented by this foreground worker.
+BLE proximity was subsequently connected as described below. Background
+execution is not implemented by this foreground worker.
 Ambient Wi-Fi scan rules remain unmet on iOS; the current network is not invented
-as an ambient scan result. Thirteen new core tests pass (197 total); three hosted
+as an ambient scan result. Twenty-three new core tests pass (207 total); three hosted
 sources check automatic POST direction, one attempt, changed/expired proof and
 storage failure. Apple/runtime validation of this addition is still pending.
 
+## Authenticated passive BLE follow-on (source)
+
+A separate service-filtered CoreBluetooth observer never connects or writes.
+Owner radio packets must pass the owner-secret MAC and, where present, the state
+MAC. Guest automatic proximity requires the scoped, unexpired grant's state MAC;
+a public DID/name alone cannot trigger it. Sleep-aware radio expiry, Android's
+5-second RSSI debounce/thresholds and an actual observed absence govern rearming.
+Unsigned old/guest sleep metadata cannot shorten that absence window.
+
+Automatic BLE stays armed through proximity until consumed once. Its disarmed
+latch is protected before GATT and again atomically with the final proof/journal;
+relaunch and restoration cannot repeat the old approach. Registry move carries
+the latch to the new server slot. Own GATT/background gaps do not count as a radio
+exit. Open/opening bistable state skips an automatic toggle; current authenticated
+state and all conditions are rechecked before FIRE. Manual/code-gated paths and
+expired/revoked grants retain their guards. Old guest firmware without a state
+MAC retains manual access, without invented authenticated passive proximity.
+
+Five new radio/core tests and one BLE-latch/runtime test pass locally (203 total).
+Two hosted sources check one automatic write and persistent relaunch latch,
+forged discovery rejection and pre-GATT storage failure; the original manual
+proof transaction now also asserts durable latch storage. These additions still
+require their exact-source Apple run and physical controller tests. No capture
+or real controller actuation was performed.
+
+## Camera card follow-on (source)
+
+ActionCard now uses one common owner/guest compound card: the main action remains
+independently tappable; a camera icon sits at the right and opens the picture
+inside that same card. Always/call/nearby policies open it once and respect manual
+collapse. Camera permission/configuration comes only from the selected owner's
+private settings or that incoming key's allowed camera bundle. Hidden, paused or
+removed incoming objects cannot display a camera.
+
+HTTP images and multipart JPEG use a bounded native loader, original Android
+Basic/Bearer/custom-header authentication and timestamp/public-hash placeholders.
+Multipart JPEG respects segment lengths, so EXIF thumbnails cannot truncate the
+outer frame. Camera secrets cannot follow cross-origin or TLS-downgrade redirects.
+Actual frames are decoded/downsampled; invalid bodies, HTTP/TLS errors and first
+frame timeouts produce the existing Android stream messages, without endless
+placeholders. Leaving the card/background cancels loading/playback. Native public
+AVPlayer handles unauthenticated HLS/MP4. RTSP/RTMP/DASH/other codecs and authenticated
+video still need their supported media integration; these are not represented as
+working video paths. Four core tests pass (207 total), and four hosted sources
+exercise scoped HTTP headers, real bytes/decoding, denied responses and multipart.
+No new screenshot or live camera/server request was made for this checkpoint.
+
+## Event sounds follow-on (source)
+
+Settings/Sounds now follows the same nine Android event rows and order, with
+10% default master volume, actual preview, enabled switch, private file import
+and reset. All eleven original Android MP3 resources are copied byte for byte;
+no sounds are synthesized or substituted. Invalid imports preserve the old
+custom file; unavailable custom audio falls back to its original sample.
+
+The same player handles card taps, confirmation, incoming guest calls, automatic
+triggers, biometry, authenticated new messages and actual success/error results.
+It mixes respectfully with iOS audio. Local call notifications use a bounded CAF
+render of the selected sound/gain, and honor mute/zero volume. Three hosted test
+sources cover actual bundled decoding, persistence/import rollback, and mute/
+volume-bounded local notification audio. Their Apple execution is pending.
+
 ## Actual verification
 
-Linux Swift6.0.3 + swift-crypto: 197 core tests, zero failures, including immutable
+Linux Swift6.0.3 + swift-crypto: 207 core tests, zero failures, including immutable
 in-flight bundle requests, scoped templates, force bounds, overnight windows,
 private camera material, stale edit rejection, durable device registration,
 avatar rollback, per-key local override isolation and the Android phone-webhook
@@ -167,13 +229,14 @@ transaction tests on an isolated simulator, without UI automation. Its exact-sou
 
 - Validate the new foreground any/all runtime and socket revalidation on Apple;
   complete its BLE/background and gated-notification paths.
-- Background/permission behavior and passive authenticated BLE observations.
+- Background/permission behavior and physical acceptance of passive BLE on iPhone.
 - Verify the new BLE registry move on Apple and real server/controller routes;
   finish remaining guest transfer/product routes.
-- Live camera presentation,
-  complete per-guest permissions/TTL and corresponding Android product routes.
+- Complete authenticated/video codec camera integration and test the new card
+  loader on Apple; finish remaining Android guest/company product routes.
 - Remaining 62-node gaps documented in IOS_STRUCTURE/ANDROID_IOS_PARITY: company,
-  global settings/help/language/sounds, restore and device/release integration.
+  global settings/help/language, restore and device/release integration; native
+  execution and backup treatment of new sound preferences/custom files.
 - Native functional tests of all changed routes, one final coherent capture batch,
   review and publication, physical device/controller checks, signing and review.
 

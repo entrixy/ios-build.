@@ -24,7 +24,7 @@ import EntrixyCore
         let key = intent.guestID + "|" + intent.object.id
         let current = UUID(); generation = current
         defer {
-            app.finishBLEGuestAuthorization(intent.id)
+            app.finishBLEGuestAuthorization(intent.id); app.automation.resetBLEContinuity()
             if generation == current { busy = false; activeGuest = nil }
         }
         var channel: (any BLEChannel)?
@@ -43,6 +43,11 @@ import EntrixyCore
                 return true
             }.sorted { $0.rssi > $1.rssi }
             guard let discovery = matching.first else { messages[key] = "Контроллер не найден. Поднесите iPhone ближе и разбудите его."; return }
+            if intent.automatic {
+                guard let bytes = discovery.manufacturerPayload else { throw BLETransportFailure.invalidValue }
+                let observation = try AuthenticatedBLEObservation.guest(payload:bytes,grant:grant,epoch:UInt64(max(0,Date().timeIntervalSince1970)))
+                if observation.openish { return }
+            }
             app.noteBLESighting(.received(guestID: intent.guestID, objectID: intent.object.id))
             _ = try app.guestBLEMaterial(intent)
             let connection = try await transport.connect(discovery.id, pairing: false); channel = connection
