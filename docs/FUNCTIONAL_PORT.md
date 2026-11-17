@@ -881,3 +881,50 @@ legacy net_block guard was relaxed, no privacy setting falsely enabled. Next
 required work is protected own/received rules, encrypted-bundle propagation, live
 session lifecycle/guard composition (including iOS16 fail-closed), and matching UI.
 Expected next hosted151/core259 are SOURCE counts pending Apple.
+
+
+Session-lifecycle follow-up SOURCE: both server Core clients now use a locked
+ServerHTTPSession holder. Installing/changing policy rebuilds sessions and cancels
+old HTTP/WSS tasks without resubmission. Requests take the session before checking
+the latest authorization, so a later change cancels that retained session rather
+than granting a newly replaced one from a stale check. HTTP, metadata, initial
+snapshot and both live sockets pass the same preflight. Three new actual Linux
+Core cases verify no request under deny, the same client after removal, WSS/initial
+snapshot preflight, and cancellation of a held request with no duplicate send.
+Complete Linux262 zero (server-session-policy-core.log), syntax/diff pass. The
+live app still installs no routing policy; persistence/UI/bundle propagation and
+full Apple execution of this follow-up remain pending. Legacy net_block rejection
+has not been relaxed.
+
+
+## Actual later UI17 result and rename synchronization follow-up
+
+Public88d365270bf993f63442d3431915ea1ae89d65c3/native d876de8,
+run44138620969/job134234929889 passed Apple248 core/Debug, then executed17 UI
+cases:16passed/1failed (509.845s). Owned BLE Info no-data/close, avatar, compact
+confirmation/PIN and factory claim all actually passed. The old rename/hide case
+failed after Save when tapping Control: XCTest reported an unhittable {-1,-1}
+point and the final hierarchy still showed the original Settings row. This same
+case had passed on the earlier sixteen-case source. It did not assert the typed
+value or saved label before switching tabs, so this is not proof of a storage bug.
+
+Received-object name input now disables autocorrection, offers Done and dismisses
+the keyboard on submission/save; line breaks are stripped consistently with owner
+names. The UI test asserts exact Yard input, waits for that actual row label and
+all bottom-tab hit targets before switching, then retains all existing Control/
+hide/key-preservation checks. No assertion removed and no blind repeat of the
+same scenario. Source parse/diff pass; actual retest and diagnostic PNG inspection
+are pending. New product screenshot batch/gallery still unchanged.
+
+
+Isolated proxy publicb48ee49/nativef008db3 run44143833623/job134253459314
+actually passed Apple259 core, then Debug test-bundle compilation failed at
+ServerPrivacyProxyTests.swift156: an await was inside XCTAssertTrue's synchronous
+autoclosure. Moved only the awaited response into a local variable before the
+same assertion. No native proxy cases ran in that attempt; retry on corrected
+complete source is still required. The public API transport remains uninstalled.
+The UI17 failure PNG was actually inspected privately: original guest Settings
+row/name/expanded actions, with no keyboard or rename form. It does not identify
+whether typing or commit failed. The new exact input/saved-row assertions pinpoint
+that boundary; the name draft also initializes once and freezes before resigning
+focus, so presentation updates cannot overwrite an active edit.

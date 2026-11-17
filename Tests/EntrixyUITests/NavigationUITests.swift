@@ -140,10 +140,14 @@ final class NavigationUITests: XCTestCase {
         let field = app.textFields["Название"]
         XCTAssertTrue(field.waitForExistence(timeout: 10)); field.tap()
         let old = field.value as? String ?? ""
-        field.typeText(String(repeating: XCUIKeyboardKey.delete.rawValue, count: old.count) + "Yard")
+        field.typeText(String(repeating: XCUIKeyboardKey.delete.rawValue, count: old.count) + "Yard\n")
+        XCTAssertEqual(field.value as? String,"Yard")
         app.buttons["Сохранить"].tap()
         let row = app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH %@", "object-settings-guest:")).firstMatch
         XCTAssertTrue(row.waitForExistence(timeout: 10))
+        let renamed = XCTNSPredicateExpectation(predicate:NSPredicate { _,_ in row.exists && row.label.contains("Yard") },object:row)
+        XCTAssertEqual(XCTWaiter.wait(for:[renamed],timeout:10),.completed)
+        assertBottom(app,["control","settings","journal"])
         app.buttons["main-tab-control"].tap()
         XCTAssertTrue(app.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", "Yard.")).firstMatch.waitForExistence(timeout: 10))
         app.buttons["main-tab-settings"].tap()

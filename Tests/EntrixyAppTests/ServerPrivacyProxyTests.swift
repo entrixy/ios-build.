@@ -153,7 +153,8 @@ import EntrixyCore
         }); defer { proxy.stop() }
         let address = try await proxy.start(), socket = PrivacyTestSocket(port:address.port); defer { socket.close() }
         try await socket.open(); try await socket.send(header(address))
-        XCTAssertTrue(String(decoding:try await socket.response(),as:UTF8.self).hasPrefix("HTTP/1.1 502"))
+        let response = try await socket.response()
+        XCTAssertTrue(String(decoding:response,as:UTF8.self).hasPrefix("HTTP/1.1 502"))
         XCTAssertEqual(routes,[.cellular])
     }
     func testPublicURLSessionProxyConfigurationAuthenticatesBeforeTLSAndKeepsTLSValidation() async throws {
