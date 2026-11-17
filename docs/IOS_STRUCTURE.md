@@ -76,7 +76,7 @@ Core245 Apple/Debug также прошли. Новый BLE Info и код в р
 | O14 | Редактор своего BLE | OwnerObjectEditor / OwnerBLEMove / moveBLEObject | Durable create-target/delete-source/local merge; исходные UUID/secret/pairing и порядок сохраняются, неоднозначный ответ не дублирует создание. |
 | O15 | Информация BLE | BLEInformationDialog / BLEDeviceInformation / owner observer | Authenticated owner v3/v4 battery/status/fw/hw/sleep/age; явное no-data для legacy/без наблюдения. Core248 Linux прошёл; новая UI17/Apple проверка pending. |
 | O16 | Удаление своего объекта | ObjectSettingsRows → deleteOwnerObject | Существующий durable delete/reconcile и BLE revocations сохраняются. |
-| O17 | Аватар объекта | ObjectAvatarPicker / ObjectAvatarImage / saveObjectAvatar | 8 исходных пресетов и PhotosPicker/crop/JPEG; owner encrypted upload и incoming local override. UI-открытие аватара в последнем прогоне упало, исправление ожидает проверки. |
+| O17 | Аватар объекта | ObjectAvatarPicker / ObjectAvatarImage / saveObjectAvatar | 8 исходных пресетов и PhotosPicker/crop/JPEG; owner encrypted upload и incoming local override. Открытие, 8 пресетов и кнопка загрузки прошли UI17; физическая загрузка фото ещё не принята. |
 | O18 | Камера: настройки | ObjectCameraFields / ObjectCameraConfiguration | Stream/snapshot/auth/showWhen, частные параметры и per-key entitlement; real camera/device acceptance остаётся. |
 | K01 | Полученные ключи | SettingsScreen.keys → KeyDetailScreen | Отдельная подвкладка; connection здесь остаётся информативным текстом. |
 | K02 | Добавить ключ | KeyImportScreen → AppModel.add | Paste/QR/photo + bind; повторный импорт возвращает hidden без замены identity. |
@@ -84,10 +84,10 @@ Core245 Apple/Debug также прошли. Новый BLE Info и код в р
 | S01 | Звуки | SoundSettingsRows / AppSoundCenter / EventSoundBackup | 9 исходных событий, оригинальные MP3, volume/mute/custom/reset/preview, actual audio bytes в backup; звук физического iPhone не принят. |
 | Y01 | Согласие на отчёты | Нет полного production route | Разделить crash consent и диагностические координаты. |
 | Y02 | Тема | SettingsScreen.system / appearance | Существующий выбор темы. |
-| Y03 | Код Entrixy | AppCodeSettingsSection / AppCodeDialog / AppEntryLockScreen / ActionConfirmation | Защищённые изменения entry lock и отдельная авторизация intent; compact action dialogs source ждут проверки. |
+| Y03 | Код Entrixy | AppCodeSettingsSection / AppCodeDialog / AppEntryLockScreen / ActionConfirmation | Защищённые изменения entry lock и отдельная авторизация intent; Compact action confirm/PIN прошли native и UI17; полный набор настроек ещё ждёт визуальной приёмки. |
 | Y04 | Резервная копия | BackupSettingsSection / BackupPresentation / BackupManager | Native/Android inspect, preview, encrypted export, claims/checkpoints, merge и напоминание; real cross-device migration не принят. |
-| Y05 | Серверы | ServerSettingsSection / ServerSettingsDialog / OwnerServerSettings | Inline список, selected host, access code/account link/unlink/local forget и owner-loss guards. Клиентские fixtures прошли, live pwa_login.php возвращает404. |
-| Y06 | Сети приватности | Нет production route; GuestActionPolicy guards | Не ослаблять неподдержанную network policy. |
+| Y05 | Серверы | ServerSettingsSection / ServerSettingsDialog / OwnerServerSettings | Inline список, selected host, access code/account link/unlink/local forget и owner-loss guards. Клиентские fixtures прошли; live pwa_login.php восстановлен (site875d2b6), negative HTTP contract проверен без cookies; успешный реальный login/link ещё не принят. |
+| Y06 | Сети приватности | ServerPrivacyRouter source / scoped storage / encrypted bundles; live composition pending | Proxy/runtime исправления и подключение live/UI ещё проверяются; capability по умолчанию закрыта. |
 | Y07 | Подсказки ОС | Нет полного production route | Платформенные разрешения/готовность iPhone отдельно от Android OEM. |
 | Y08 | Разработчик | DEBUG captures/catalogues; production dev flow отсутствует | DEBUG routes изолированы от Release, не являются продуктовой dev вкладкой. |
 | G01 | Свои выданные доступы | GuestsHub.OwnerGuestsScreen | Android People/Companies/Presets, conditional tabs, scoped cards и передаваемые доступы подключены; полная UI/E2E-приёмка остаётся. |

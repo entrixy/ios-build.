@@ -41,6 +41,19 @@ final class BLEBundleTests: XCTestCase {
         var wrong = row; wrong["sig"] = Data(repeating: 0, count: 16).base64EncodedString()
         XCTAssertThrowsError(try BLEBundle.row(object: object, masterKey: owner.masterKey, guestID: 9, template: [:], existing: wrong))
     }
+    func testHomeNetworkRestrictionDoesNotBypassOrDisableOfflineBLEAuthorization() throws {
+        let (owner,object) = try fixture()
+        let row = try BLEBundle.row(object:object,masterKey:owner.masterKey,guestID:9,
+            template:["confirm_on":true,"auth_on":true,"auth":"pin"],epoch:1000,ttl:3600)
+        let bundle = try JSONSerialization.data(withJSONObject:["ble":[row],"net_block":[PrivacyNetwork(ssid:"Home").wire]])
+        ServerSessionPolicy.shared.install({ _ in },authorize:{ _ in throw URLError(.notConnectedToInternet) },networkPrivacyEnforced:true)
+        defer { ServerSessionPolicy.shared.clear() }
+        let decoded = try GuestActionPolicy.decodeBLE(bundle:bundle,numberID:7,epoch:2000)
+        XCTAssertNil(decoded.policy.blockedReason)
+        XCTAssertTrue(decoded.policy.confirmation); XCTAssertEqual(decoded.policy.authentication,"pin")
+        XCTAssertEqual(decoded.grant.guestID,9)
+        XCTAssertThrowsError(try GuestActionPolicy.decodeBLE(bundle:bundle,numberID:7,epoch:4601))
+    }
     func testIssuedBLEBundleContainsOneCardNoOwnerSecretAndReconcilesSplitIDs() throws {
         var (owner, object) = try fixture()
         var key = try OwnerIssuedKey(owner: owner, label: "Гость", numberIDs: [7], welcome: "", nativeOnly: false, confirmation: true)

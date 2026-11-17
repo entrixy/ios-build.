@@ -30,7 +30,8 @@ public enum GuestObjects {
               let s = try JSONSerialization.jsonObject(with: snapshot) as? [String: Any] else {
             throw GuestCrypto.Failure.invalidEnvelope
         }
-        if let blocked = b["net_block"] as? [Any], !blocked.isEmpty {
+        if ServerSessionPolicy.shared.networkPrivacyEnforced { _ = try PrivacyNetwork.decode(b["net_block"]) }
+        else if let blocked = b["net_block"] as? [Any], !blocked.isEmpty {
             throw GuestAPI.Failure(status: 0, code: "network_policy_unsupported")
         }
         let current = b["obj_keys"] as? [String: String] ?? [:]

@@ -13,17 +13,18 @@
 они не ограничивают текущую разрешённую работу. Полный результат ещё не готов.
 Актуальные функциональные границы и проверки — [FUNCTIONAL_PORT.md](FUNCTIONAL_PORT.md).
 
-Последняя полная функциональная Apple-проверка: native `a70c33a`, public
-`bbad08ba38c371b39059b251583c4a5b7a2b5f7a`,
-[CI 44131228346](https://github.com/entrixy/ios-build./actions/runs/44131228346):
-240 core, Debug/test bundles, Release/isolation и141 hosted native без ошибок.
-Более поздний native `d1f89b7` / public `7630c62`,
-[UI CI 44134044615](https://github.com/entrixy/ios-build./actions/runs/44134044615),
-прошёл Apple245 core, Debug и все16 UI-сценариев: аватар/пресеты/кнопка загрузки,
-компактные confirm/PIN и factory claim. В том UI-job hosted native не запускались.
-Последующие BLE Info/диалог кода в редакторе имеют Linux248 и syntax проверки;
-актуальные Apple/native/UI17 ещё ожидаются. Физический импорт фото, камера/BLE,
-фон, оставшиеся product routes, signing и выпуск этим не подтверждены.
+Последняя полная функциональная Apple-проверка: native `fd82582`, public `b10f1d7`,
+[CI44137608867](https://github.com/entrixy/ios-build./actions/runs/44137608867):
+248 core, Debug/test bundles, Release/isolation и146 hosted native без ошибок.
+Более поздний native `c5e4a05` / public `a2960e9`,
+[UI CI44146147004](https://github.com/entrixy/ios-build./actions/runs/44146147004),
+прошёл Apple262 core, Debug и все17 UI-сценариев, включая точное сохранение имени,
+скрытие с сохранением ключа, BLE Info, аватары, compact confirm/PIN и factory claim.
+Новый изолированный транспорт сетевой приватности пока не включён: реальный
+runtime-прогон выявил два проблемных случая; исправления и сохранение правил в
+резервных копиях проходят отдельную проверку. Локальный Core267 прошёл.
+Физический импорт фото, камера/BLE, фон, оставшиеся product routes, signing и
+выпуск этим не подтверждены.
 Новый полный набор PNG ещё не снят и не опубликован.
 На сайте остаются 19 прежних кадров `069d20b`; это не снимки текущего приложения.
 Физические устройства, фон, дополнительные видеоформаты, signing и App Store

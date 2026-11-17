@@ -45,6 +45,10 @@ import EntrixyCore
     private var readiness: CheckedContinuation<Address,Error>?
     private var startupTimeout: Task<Void,Never>?
     private var tunnels: [UUID:Tunnel] = [:]
+    #if DEBUG && targetEnvironment(simulator)
+    // Structural diagnostics only: never retain the target or credentials.
+    private(set) var rejectedHeaderShapeForTesting: String?
+    #endif
     init(decide: @escaping Decision,connect: Connect? = nil) throws {
         self.decide = decide
         self.connect = connect ?? { host,port,route in
@@ -138,7 +142,16 @@ import EntrixyCore
                 } catch ServerProxyConnect.Failure.incomplete {
                     if error != nil || complete { self.close(tunnel) } else { self.readHeader(tunnel) }
                 } catch ServerProxyConnect.Failure.unauthorized { self.reject(tunnel,status:407) }
-                catch { self.reject(tunnel,status:400) }
+                catch {
+                    #if DEBUG && targetEnvironment(simulator)
+                    let lines = String(decoding:tunnel.header.prefix(16384),as:UTF8.self).components(separatedBy:"\r\n")
+                    let request = lines.first?.split(separator:" ") ?? []
+                    let version = request.last.map { String($0.prefix(16)) } ?? "missing"
+                    let fields = lines.dropFirst().compactMap { line in line.firstIndex(of:":").map { String(line[..<$0]) } }
+                    self.rejectedHeaderShapeForTesting = "version="+version+" fields="+fields.joined(separator:",")
+                    #endif
+                    self.reject(tunnel,status:400)
+                }
             }
         }
     }
@@ -167,7 +180,7 @@ import EntrixyCore
                             self.forward(tunnel,from:remote,to:tunnel.local)
                         }
                     })
-                case .failed:
+                case .failed, .waiting:
                     if tunnel.established { self.close(tunnel) } else { self.reject(tunnel,status:502) }
                 default: break
                 }

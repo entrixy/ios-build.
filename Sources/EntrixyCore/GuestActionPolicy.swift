@@ -36,8 +36,11 @@ public struct GuestActionPolicy {
         } else { auth = nil }
         var blocked: String?
         if let raw = contents["net_block"] {
-            guard let networks = raw as? [Any] else { throw GuestCrypto.Failure.invalidEnvelope }
-            if !networks.isEmpty { blocked = "Сетевые ограничения ключа пока не поддерживаются на iOS." }
+            if ServerSessionPolicy.shared.networkPrivacyEnforced { _ = try PrivacyNetwork.decode(raw) }
+            else {
+                guard let networks = raw as? [Any] else { throw GuestCrypto.Failure.invalidEnvelope }
+                if !networks.isEmpty { blocked = "Сетевые ограничения ключа пока не поддерживаются на iOS." }
+            }
         }
         let mode = template["mode"] as? String ?? "any"
         guard ["any", "all"].contains(mode) else { throw GuestCrypto.Failure.invalidEnvelope }
@@ -90,8 +93,11 @@ public struct GuestActionPolicy {
         let serverWebhook = try flag("server_webhook") && kind == "webhook"
         var blocked: String?
         if let raw = b["net_block"] {
-            guard let rules = raw as? [Any] else { throw GuestCrypto.Failure.invalidEnvelope }
-            if !rules.isEmpty { blocked = "Сетевые ограничения этого ключа пока не поддерживаются на iOS." }
+            if ServerSessionPolicy.shared.networkPrivacyEnforced { _ = try PrivacyNetwork.decode(raw) }
+            else {
+                guard let rules = raw as? [Any] else { throw GuestCrypto.Failure.invalidEnvelope }
+                if !rules.isEmpty { blocked = "Сетевые ограничения этого ключа пока не поддерживаются на iOS." }
+            }
         }
         let channels = try ["geo_on", "wifi_on", "time_on", "ble_on"].filter { try flag($0) }
         let mode = template["mode"] as? String ?? "any"

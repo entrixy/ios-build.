@@ -45,6 +45,12 @@ public extension OwnerIssuedKey {
 }
 
 public extension OwnerAccount {
+    mutating func setPrivacyNetworks(_ networks: [PrivacyNetwork]) throws {
+        try PrivacyNetwork.validate(networks)
+        guard privacyNetworks != networks else { return }
+        privacyNetworks = networks
+        for key in issuedKeys ?? [] where key.state != .revoked { queueKeySettings(key.id) }
+    }
     mutating func queueObjectSettings(numberID: Int) {
         var queue = bundleRefreshQueue ?? [:]
         for key in issuedKeys ?? [] where key.numberIDs.contains(numberID) && key.state != .revoked {

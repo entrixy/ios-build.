@@ -928,3 +928,107 @@ row/name/expanded actions, with no keyboard or rename form. It does not identify
 whether typing or commit failed. The new exact input/saved-row assertions pinpoint
 that boundary; the name draft also initializes once and freezes before resigning
 focus, so presentation updates cannot overwrite an active edit.
+
+
+### Network policy material — 17 November, follow-up
+
+Owner network rules now enter only the encrypted root guest bundle; child bundles
+retain their parent's restrictions. Explicit empty rules remove the owner's list;
+legacy nil leaves an existing protected list intact. A changed list queues a fresh
+bundle after reconciliation without modifying a persisted in-flight ciphertext or
+signing identity. Android own/guest lists are decoded by their original scopes,
+and original backup bytes remain unchanged. Import merging preserves this phone's
+cellular consent and cannot acquire it from another device.
+
+Linux266 core tests passed, including four new scope/merge/inheritance/in-flight
+cases (privacy-bundle-verified.log). The first new encrypted-request fixture lacked
+a pending operation and failed; setting that test's real keyEdit operation fixed
+the fixture without weakening guards. Live storage/UI/routing integration is still
+pending: the proxy remains uninstalled and net_block unsupported barriers intact.
+
+Corrected proxy/session source c5e4a05, publicd4128a9/a2960e9, is running in
+Apple runs44146144027 and44146147004. Core/Debug passed in both and Release/isolation
+passed in the functional job; native151 and UI17 execution are still pending.
+
+
+### Native privacy persistence / actual UI17 — 17 November
+
+SavedState, SavedGuest, pending Android recipients and iOS/Android backup adapters
+now retain scoped privacy lists. Export strips only local cellular authorization.
+Owner backup merge unions restrictions and queues changed bundles without changing
+sent ciphertext/identity; failed final activation rolls preferences back with the
+restore plan. Two new hosted source cases cover protected-state/export and failed
+activation/retry; Android migration cases now assert own/guest/pending scopes.
+Linux267 core and all Swift frontend syntax checks passed. Hosted SDK/runtime
+verification of this persistence step is pending. The proxy remains uninstalled;
+no net_block guard was removed and no new privacy controls are exposed yet.
+
+UI retest nativec5e4a05/publica2960e9, run44146147004/job134261681030, actually
+passed Apple262 core, Debug and ALL17 UI cases (432.439s). Exact Yard input, saved
+row, Control and hiding-with-key-preservation passed; new owner BLEInfo passed too.
+This is not actual photo upload/hardware/release/full screenshot batch evidence.
+
+
+### First actual proxy runtime results and compatibility correction
+
+Publicd4128a9/nativec5e4a05 run44146144027/job134261671566 actually passed
+Apple262 core, Debug and Release/isolation; hosted151 ran with3 assertions failing
+in TWO new proxy cases (31.447s). Existing146 passed. Three new cases passed:
+authenticated opaque bytes, missing capability/blocked policy and closing an
+existing default tunnel. A refused upstream remained waiting beyond the client's
+10s deadline; URLSession's actual CONNECT got local400 before any upstream attempt.
+Artifact upload also failed with GitHub service request timeouts.
+
+The proxy now rejects waiting upstreams promptly with502, without retry/fallback.
+Parser accepts HTTP1.0 legacy CONNECT and equivalent Host default443, still requiring
+explicit target port, matching authority, bounded headers, capability and no body.
+Added a Core authority case; Linux268 zero. Native test assertions remain intact.
+A DEBUG/simulator-only structural rejection diagnostic retains only HTTP version
+and header field names, no target or credential. The exact rejected Apple header
+shape was not available in the failed run; actual retest must confirm the change.
+The transport remains uninstalled; no released runtime behavior changed.
+
+
+### Protected routing composition source — not attached to live root yet
+
+ServerPrivacyRouter installs a closed authorization gate, configures/reset existing
+server clients through the opaque proxy and cancels old sessions on rule changes.
+iOS16 rejects server traffic with restrictions. On iOS17, because the public TCP
+interface selector does not bind one SSID across roaming, the conservative choice
+is to require cellular for ALL server traffic while any home restriction exists.
+Fallback from Wi-Fi requires this phone's explicit consent; an already cellular
+system path keeps using cellular. This platform difference must be visible in the
+System section before enabling controls. Real radio/DNS/VPN/roaming acceptance
+is still required; loopback tests do not prove physical interface behavior.
+
+AppModel optionally composes this router, retains newly authenticated guest rules
+before snapshot/live traffic and includes protected pending-restore rules before
+claims. A failed rule write keeps a restrictive in-memory latch across unrelated
+saves. Protected network edits atomically update preferences and owner bundle
+refresh queues. Legacy cached BLE metadata supplies missing local rule records.
+The shared metadata capability defaults OFF; only an installed guarded transport
+can accept strictly validated net_block metadata. Offline BLE retains confirm/PIN
+and expiry checks even when that boundary rejects every server request.
+
+Linux270 zero, including two new boundary/offline BLE cases; full Swift parse and
+diff pass. Two new hosted router source cases cover the actual pre-existing
+OwnerAPI adopting a required-cellular route with no fallback and stop denying
+requests before any connection. Apple typing/execution is still pending.
+LiveAppRoot has NOT injected the router yet; no new privacy UI is exposed.
+
+
+### Missing server account contract restored — site875d2b6
+
+The endpoint used by BOTH Android and iOS, api/pwa_login.php, was absent. It now
+uses the existing password hash/email confirmation/session-version model and
+website login throttle, returning the existing token contract with a five-minute
+uid/sv/exp token. No browser session/cookie, account registration, device linking
+or DB mutation is performed by this endpoint. Request JSON/input sizes are bounded
+and failures disclose no token/credential/exception text. No iOS wire change.
+
+PHP syntax, isolated login contract checks and existing guest signature tests
+passed. Live HTTPS405/400/401 for method/invalid/unknown account passed with no
+Set-Cookie and no-store. No real account was authenticated or changed; successful
+real login/link remains a device/integration acceptance item. Site gallery and
+all unrelated pending web sources were preserved. This closes the known404 gap
+without claiming complete production account acceptance.

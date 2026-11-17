@@ -38,7 +38,8 @@ private final class AndroidIncomingMover: GuestMigrationTransport {
         let values: [String:String] = ["backup_src_seed":String(repeating:"ab",count:32),"e2ee_master_key":GuestCrypto.base64URL(master),"owner_self_label":"Хозяин",
             "guest_keys":#"[{"id":3,"host":"owner.invalid","key":"AAECAwQFBgcICQoLDA0ODxAREhMUFRYX","label":"Ключ от ворот"}]"#,
             "dlg_pub_3":recipient.publicKey,"dlg_priv_3":try GuestCrypto.encrypt(key:master,plaintext:Data(recipient.privateKey.utf8)),"future_private_setting":"keep this untouched",
-            "e2ee_in_tpl_3_7":#"{"auth_on":true,"auth":"pin"}"#,"e2ee_in_tplo_3_7":"{}"]
+            "e2ee_in_tpl_3_7":#"{"auth_on":true,"auth":"pin"}"#,"e2ee_in_tplo_3_7":"{}",
+            "blocked_wifi":#"[{"s":"My home"}]"#,"blocked_wifi_g_3":#"[{"s":"Owner home"}]"#]
         let entries = values.mapValues { ["t":"s","v":$0] }
         return try AndroidBackupDocument(JSONSerialization.data(withJSONObject:["app":"entrixy","ver":1,"created":1800000000,"device":"Public fixture","count":entries.count,"entries":entries]))
     }
@@ -65,6 +66,9 @@ private final class AndroidIncomingMover: GuestMigrationTransport {
         XCTAssertEqual(mover.moves.count,1); XCTAssertNil(storage.state?.pendingRestore)
         XCTAssertEqual(restarted.guests.first?.invite.userKey,mover.moves[0].0.userKey)
         XCTAssertEqual(restarted.guests.first?.androidAutomation?["7"]?.local.authMode,"pin")
+        XCTAssertEqual(restarted.guests.first?.privacyNetworks?.map(\.ssid),["Owner home"])
+        XCTAssertEqual(restarted.networkPrivacy.own.map(\.ssid),["My home"])
+        XCTAssertFalse(restarted.networkPrivacy.cellularAuthorized)
         XCTAssertEqual(storage.state?.identity,target); XCTAssertEqual(storage.state?.androidArchives?.first?.original,source.original)
         XCTAssertEqual(restarted.ownerGuestDefaults.ownerName,"Хозяин"); XCTAssertTrue(restarted.journal.isEmpty)
         let payload = IOSBackupPayload(state:storage.state!); try payload.validate()
@@ -80,6 +84,7 @@ private final class AndroidIncomingMover: GuestMigrationTransport {
         XCTAssertNil(storage.state?.pendingRestore); XCTAssertTrue(app.canManageGuestAccess)
         XCTAssertTrue(app.guests.isEmpty); XCTAssertEqual(app.androidPendingGuests.count,1)
         XCTAssertEqual(app.androidPendingGuests[0].incomingAutomation?["7"]?.local.authMode,"pin")
+        XCTAssertEqual(app.androidPendingGuests[0].privacyNetworks?.map(\.ssid),["Owner home"])
         let recipient = app.androidPendingGuests[0].recipient
         let payload = IOSBackupPayload(state:storage.state!); try payload.validate()
         XCTAssertEqual(payload.androidGuests?.first?.oldFingerprint,try MigrationFingerprint.ios(identity:target,server:"owner.invalid"))
@@ -91,6 +96,7 @@ private final class AndroidIncomingMover: GuestMigrationTransport {
         await manager.recoverImportedGuest(app.androidPendingGuests[0].id)
         XCTAssertEqual(app.guests.count,1); XCTAssertTrue(app.androidPendingGuests.isEmpty)
         XCTAssertEqual(app.guests[0].androidAutomation?["7"]?.local.authMode,"pin")
+        XCTAssertEqual(app.guests[0].privacyNetworks?.map(\.ssid),["Owner home"])
         XCTAssertEqual(app.guests[0].requiresBLEExitOnRestore,true)
         XCTAssertEqual(storage.state?.identity,target); XCTAssertEqual(mover.moves.count,1)
     }
