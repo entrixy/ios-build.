@@ -22,10 +22,21 @@ private final class PassAPIStub: DelegationTransport {
     var beforeRevoke: (() -> Void)?
     var onVouch: (([String: Any]) throws -> Void)?
     var beforeEdit: (([String:Any]) -> Void)?
+    var scoped = false
+    private var invitationsBySource: [String:[[String:Any]]] = [:]
+    private var childrenBySource: [String:[[String:Any]]] = [:]
     func delegationInfo(server: String, group: String) async throws -> Data { throw BackupFailure.invalidPayload }
     func redeemDelegation(_ pending: DelegationRedemption, fingerprint: String) async throws -> Data { throw BackupFailure.invalidPayload }
     func resolveDelegation(_ pending: DelegationRedemption, part: DelegationRedemption.Part, fingerprint: String) async throws -> GuestInvite? { throw BackupFailure.invalidPayload }
     func delegate(invite: GuestInvite, fingerprint: String, operation: DelegationOperation, body: Data) async throws -> Data {
+        let previousInvitations = invitations, previousChildren = children
+        if scoped { invitations = invitationsBySource[invite.id] ?? []; children = childrenBySource[invite.id] ?? [] }
+        defer {
+            if scoped {
+                invitationsBySource[invite.id] = invitations; childrenBySource[invite.id] = children
+                invitations = previousInvitations; children = previousChildren
+            }
+        }
         let json = try JSONSerialization.jsonObject(with: body) as! [String: Any]
         switch operation {
         case .list:
@@ -71,6 +82,7 @@ final class PassManagerTests: XCTestCase {
     func testAdditionalSourcePartSavesBeforeWireAndLostReplyRecoversWithoutAnotherCreate() async throws {
         let first = try invite(), second = try GuestInvite.parse("https://sender.invalid/key#ICEiIyQlJicoKSorLC0uLzAxMjM0NTY3" + String(repeating:"A",count:43))
         let api = PassAPIStub(), storage = PassMemoryStorage(first)
+        api.scoped = true
         storage.state?.guests.append(SavedGuest(invite:second))
         let app = AppModel(storage:storage), manager = PassManager(app:app,api:api); defer { app.suspend() }
         let created = await manager.create(label:"Получатель",welcome:"private welcome",objects:[first.id:[7:try KeyObjectAccess(depth:0,pool:1)]])
