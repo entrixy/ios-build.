@@ -15,6 +15,13 @@ final class AppModel: ObservableObject {
     @Published private(set) var selectedOwnerServer = "entrixy.com"
     @Published private(set) var networkPrivacy = try! NetworkPrivacyPreferences()
     @Published var networkPrivacyPrompt: PrivacyNetwork?
+    @Published var diagnosticConsentPrompt = false
+    lazy var diagnostics = AppDiagnostics(app:self)
+    var hasTaskDialog: Bool {
+        actionPrompt != nil || bleInformationTarget != nil || objectRemovalTarget != nil || objectAvatarTarget != nil
+        || ownerGuestRequestPending || companyRequestID != nil || guestRemovalTarget != nil || codePrompt != nil
+        || backupPromptPending || serverPrompt != nil || networkPrivacyPrompt != nil || diagnosticConsentPrompt
+    }
     let privacyRouter: ServerPrivacyRouter?
     private var unsavedGuestNetworkRestrictions = Set<String>()
     @Published private(set) var ownerBusy = false
@@ -256,6 +263,12 @@ final class AppModel: ObservableObject {
     }
 
     func prepareServerRouting() async -> Bool { if let privacyRouter { return await privacyRouter.start() }; return true }
+    func diagnosticFacts() -> DiagnosticFacts {
+        DiagnosticFacts(owners:owners.count,guests:guests.count,
+            objects:guests.reduce(0) { $0+$1.objects.count } + owners.reduce(0) { $0+($1.objects?.count ?? 0) },
+            pending:androidPendingGuests.count+delegations.count+(pendingRestore == nil ? 0 : 1),
+            connected:connections.values.filter { $0 == .connected }.count,storageReady:storageReady,privacyBlocked:privacyRouter?.route == .blocked)
+    }
 
     @discardableResult func setNetworkPrivacy(_ preferences: NetworkPrivacyPreferences) -> Bool {
         guard canManageGuestAccess, !busy, !ownerBusy else { return false }
@@ -1659,6 +1672,7 @@ final class AppModel: ObservableObject {
     }
 
     func suspend() {
+        diagnosticConsentPrompt = false; diagnostics.pause()
         networkPrivacyPrompt = nil
         bleInformationTarget = nil
         if let prompt = actionPrompt { dismissActionPrompt(prompt.id) }
@@ -1970,6 +1984,7 @@ final class AppModel: ObservableObject {
     }
 
     private func safeDiagnosticCode(_ code: String) -> String {
+        if let event = DiagnosticEvent.Code(rawValue:code) { diagnostics.record(event) }
         let allowed = GuestEvent.terminalReasons.union(["connection_failed", "storage_error", "paused", "network_policy_unsupported", "network_policy_blocked", "awaiting_owner", "server_error", "replay", "invalid_response", "rate_limited", "too_many_requests", "device_binding_failed", "event_overflow"])
         return allowed.contains(code) ? code : "unknown_error"
     }

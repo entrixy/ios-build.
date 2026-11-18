@@ -26,6 +26,9 @@ struct AppHeaderActions: View {
 }
 
 struct HelpScreen: View {
+    @AppStorage("entrixy.developerMode") private var developerMode = false
+    @State private var developerTaps = 0
+    @State private var developerFeedback: String?
     private let sections = [("help_section_actions","help_c_control"),("help_section_objects","help_c_objects"),("help_section_auto","ios_help_auto"),("help_section_guests","help_c_guests"),("help_section_security","help_c_security"),("help_section_permissions","ios_help_permissions")]
     private var guide: URL {
         let language = ProductText.language
@@ -43,7 +46,13 @@ struct HelpScreen: View {
                     }.frame(maxWidth:.infinity,alignment:.leading).padding(16).background(Color(uiColor:.secondarySystemGroupedBackground),in:RoundedRectangle(cornerRadius:16))
                 }
                 Link(destination:guide) { Label(ProductText.string("help_full_guide"),systemImage:"arrow.up.right.square").frame(maxWidth:.infinity,minHeight:48) }.buttonStyle(PrimaryActionStyle())
+                if let developerFeedback { Text(developerFeedback).font(.footnote).foregroundStyle(Brand.secondaryInk) }
                 Text("v" + (Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "—")).font(.footnote).foregroundStyle(Brand.secondaryInk).frame(maxWidth:.infinity,alignment:.trailing).padding(.top,12)
+                    .contentShape(Rectangle()).accessibilityIdentifier("help-version").onTapGesture {
+                        guard !developerMode else { return }; developerTaps += 1
+                        if developerTaps >= 7 { developerMode = true; developerFeedback = ProductText.string("dev_mode_on") }
+                        else if developerTaps >= 4 { developerFeedback = ProductText.string("dev_mode_left_fmt",7-developerTaps) }
+                    }
             }.padding(DesignMetrics.pageInset)
         }.background(Color(uiColor:.systemGroupedBackground)).navigationTitle(ProductText.string("tab_help")).navigationBarTitleDisplayMode(.inline)
             .toolbar {

@@ -929,3 +929,9 @@
 "ios_privacy_unknown_wifi" = "The current Wi-Fi network could not be identified. Connect to Wi-Fi and allow location access to identify it.";
 "ios_privacy_wifi_permission" = "Allow network identification";
 "ios_privacy_blocked" = "Server connections are blocked by home-network rules. Check cellular data and permission under Settings → System → Home network.";
+"ios_diag_storage_failed" = "Diagnostic settings could not be read or saved. Automatic sending is paused; try again after unlocking your iPhone.";
+"ios_diag_sent" = "Technical log sent.";
+"ios_diag_send_failed" = "The technical log could not be sent. Check your connection and home-network settings.";
+"ios_diag_manual_hint" = "Technical error codes, versions and object counts. Names, server addresses, locations, keys and opening history are excluded. Crash reports are included only with separate consent.";
+"ios_developer_title" = "Developer";
+"ios_developer_off" = "Turn off developer mode";

@@ -13,6 +13,7 @@ enum StageTwoCapture: String, CaseIterable {
     case deviceClaim = "device-claim"
     case ownerBLEObjects = "owner-ble-objects"
     case networkPrivacy = "network-privacy"
+    case diagnostics
     static var current: Self? {
         let args = ProcessInfo.processInfo.arguments
         guard let i = args.firstIndex(of: "--stage-two"), args.indices.contains(i + 1) else { return nil }
@@ -21,7 +22,7 @@ enum StageTwoCapture: String, CaseIterable {
     var settingsTab: SettingsTab {
         switch self {
         case .guestKeys, .keyDetail, .addKey: return .keys
-        case .system, .codeSettings, .addServer, .networkPrivacy: return .system
+        case .system, .codeSettings, .addServer, .networkPrivacy, .diagnostics: return .system
         case .sounds: return .sounds
         default: return .objects
         }
@@ -73,6 +74,10 @@ struct StageTwoRoot: View {
         }
         if route == .networkPrivacy { state.networkPrivacy = try! NetworkPrivacyPreferences(own:[PrivacyNetwork(ssid:"Home fixture")]) }
         let app = AppModel(storage:StageTwoStorage(state),privacyRouter:route == .networkPrivacy ? ServerPrivacyRouter() : nil)
+        if route == .diagnostics {
+            UserDefaults.standard.set(false,forKey:"entrixy.developerMode")
+            app.diagnostics = AppDiagnostics(app:app,storage:StageDiagnosticStorage(),api:StageDiagnosticAPI(),usesMetricKit:false)
+        }
         if route == .ownerConfirmation || route == .ownerCodeConfirmation {
             // No resume/live factory or actual telephone handoff in these UI routes.
             app.ownerControl = OwnerControlModel(app:app,dialer:{ _ in false })
@@ -87,6 +92,7 @@ struct StageTwoRoot: View {
             .preferredColorScheme(.light)
             .task {
                 // Production RootView and screens; fixture data never calls resume/bind/send.
+                if route == .diagnostics { model.diagnostics.activate() }
                 if route == .objectDelete, let target = model.catalogObjects().first?.target { model.objectRemovalTarget = target }
                 let status: [String: Any] = ["ready": model.storageReady, "route": route.rawValue,
                     "tabs": model.navigationState.tabs.map(\.rawValue), "owners": model.owners.count,
@@ -95,6 +101,14 @@ struct StageTwoRoot: View {
                 if let bytes = try? JSONSerialization.data(withJSONObject: status) { try? bytes.write(to: path, options: .atomic) }
             }
     }
+}
+private final class StageDiagnosticStorage: DiagnosticStorage {
+    private var state = DiagnosticState()
+    func load() throws -> DiagnosticState { state }
+    func save(_ state: DiagnosticState) throws { try state.validate(); self.state = state }
+}
+private struct StageDiagnosticAPI: DiagnosticTransport {
+    func send(_ report: DiagnosticReport) async throws { try report.validate() }
 }
 private struct StageTwoDelegationAPI: DelegationTransport {
     func delegate(invite: GuestInvite,fingerprint: String,operation: DelegationOperation,body: Data) async throws -> Data {

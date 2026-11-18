@@ -157,6 +157,7 @@ struct SettingsScreen: View {
                 case .sounds:
                     SoundSettingsRows()
                 case .system:
+                    DiagnosticSettingsSection(service:model.diagnostics)
                     Section {
                         ForEach(["system","light","dark"],id:\.self) { choice in
                             Button { appearance = choice } label: {
@@ -176,6 +177,7 @@ struct SettingsScreen: View {
                         NavigationLink("Лицензии") { LicenseScreen() }
                         KeyValueRow(title: "Версия", value: Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "—")
                     }
+                    DeveloperSettingsSection(service:model.diagnostics)
                 }
             }.scrollContentBackground(.hidden).compactListSections()
                 .refreshable { if selected == .objects { await model.refreshOwners() }; await model.refresh() }

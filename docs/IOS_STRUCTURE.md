@@ -82,14 +82,14 @@ Core245 Apple/Debug также прошли. Новый BLE Info и код в р
 | K02 | Добавить ключ | KeyImportScreen → AppModel.add | Paste/QR/photo + bind; повторный импорт возвращает hidden без замены identity. |
 | K03 | Удалить входящий ключ | AppModel.removeKey | Очищает и catalog overrides/order только этого guest scope. |
 | S01 | Звуки | SoundSettingsRows / AppSoundCenter / EventSoundBackup | 9 исходных событий, оригинальные MP3, volume/mute/custom/reset/preview, actual audio bytes в backup; звук физического iPhone не принят. |
-| Y01 | Согласие на отчёты | Нет полного production route | Разделить crash consent и диагностические координаты. |
+| Y01 | Согласие на отчёты | AppDiagnostics / DiagnosticSettingsSection / DiagnosticConsentDialog | Persist-before-upload, opt-out purge, sanitized MetricKit, trusted guarded endpoint; native/UI execution pending. Геокоординаты не собираются. |
 | Y02 | Тема | SettingsScreen.system / appearance | Существующий выбор темы. |
 | Y03 | Код Entrixy | AppCodeSettingsSection / AppCodeDialog / AppEntryLockScreen / ActionConfirmation | Защищённые изменения entry lock и отдельная авторизация intent; Compact action confirm/PIN прошли native и UI17; полный набор настроек ещё ждёт визуальной приёмки. |
 | Y04 | Резервная копия | BackupSettingsSection / BackupPresentation / BackupManager | Native/Android inspect, preview, encrypted export, claims/checkpoints, merge и напоминание; real cross-device migration не принят. |
 | Y05 | Серверы | ServerSettingsSection / ServerSettingsDialog / OwnerServerSettings | Inline список, selected host, access code/account link/unlink/local forget и owner-loss guards. Клиентские fixtures прошли; live pwa_login.php восстановлен (site875d2b6), negative HTTP contract проверен без cookies; успешный реальный login/link ещё не принят. |
 | Y06 | Сети приватности | ServerPrivacyRouter / NetworkPrivacySettingsSection / scoped backup / encrypted bundles | Proxy153 green; live startup и home UI подключены в source, актуальные native/UI19 ещё проверяются. iOS17 — только cellular при правилах, iOS16 — запрет серверных подключений; hardware acceptance остаётся. |
 | Y07 | Подсказки ОС | Нет полного production route | Платформенные разрешения/готовность iPhone отдельно от Android OEM. |
-| Y08 | Разработчик | DEBUG captures/catalogues; production dev flow отсутствует | DEBUG routes изолированы от Release, не являются продуктовой dev вкладкой. |
+| Y08 | Разработчик | HelpScreen 7 taps / DeveloperSettingsSection | Manual technical send/off as Android; UI pending. Android FCM/geo debug tools не объявлены перенесёнными; DEBUG capture routes остаются отдельно от Release. |
 | G01 | Свои выданные доступы | GuestsHub.OwnerGuestsScreen | Android People/Companies/Presets, conditional tabs, scoped cards и передаваемые доступы подключены; полная UI/E2E-приёмка остаётся. |
 | G02 | Карточка гостя | GuestPersonCard / IssueOwnerKeyScreen / OwnerDelegatedKeyScreen | Раскрытие, редактирование/clone/QR/share/message/pause/delete; общая визуальная проверка всех состояний остаётся. |
 | G03 | Выдать гостю | IssueOwnerKeyScreen / GuestKeyDraft / OwnerIssuedKey | Черновик без server identity до Save; checkbox объектов, per-object invocations/templates/access/TTL/video. |
