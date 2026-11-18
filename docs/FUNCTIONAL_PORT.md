@@ -1164,3 +1164,50 @@ closes even if diagnostic storage alone cannot save, pauses auto sending and
 suppresses reoffering that session; a fifth hosted source case verifies access
 stays usable. Current diagnostic runs exclude this follow-up and remain pending.
 No actual production diagnostic report was uploaded and no new product screenshots.
+
+
+## 19.11.2026 — diagnostics/readiness accepted, widget source awaiting Apple
+
+Native12cd038/publicbd40d03, Apple run44412545161:279core,Debug,Release/isolation,
+164hosted zero failures(12.025s), including failed-storage Not Now dismissal.
+MetricKit OS delivery and permission prompts on a physical phone remain unaccepted.
+UIb053/3988205 run44409766979 executed20:17passed/3failed(AX snapshot of consent
+dialog, entry-lock switch lookup after additional tall section, outer Switch hit
+in home-network row). All three failure PNGs/logs are retained privately. Native
+783635d keeps assertions, prefers real nested UISwitch and scrolls to the row;
+latest permission-source UI20 rerun onpublic16b4e86 is pending. The diagnostic AX
+timeout has not been attributed to an app defect or infrastructure without proof.
+
+New Widget/WidgetShared/WidgetResources and project target implement Android's
+existing one-object widget selection, current label/original8presets/custom thumbnail
+and status dot. System iOS17 configuration lists the same ordered visible control
+catalog; there is no new Settings page. Missing/deleted binding opens the app and
+never substitutes another object. App Group exports bounded presentation only:hash
+target ID,label,source,preset,thumbnail,status. No invitation/server/phone/credentials/
+controller secret/automation template or pending command enters the extension.
+Thumbnails/catalog are atomic, protected until first unlock, excluded from backup;
+corrupt/unavailable group catalog fails empty. Remote readiness expires15s; local
+owner-call readiness is independent of server connectivity. WidgetKit scheduling
+is OS-controlled and is not a live-connection guarantee.
+
+WidgetObjectTapIntent runs in the application process with openAppWhenRun=true.
+It queues only an in-memory, per-invocation request (TTL60s), waits for app startup
+and entry unlock, consumes before current-target lookup/guard/transport, and uses
+the same manual intent/PIN/biometric/confirmation flow as a card. Unknown/hidden
+target is discarded; no late retry after refusal/ambiguity/restart/background.
+No custom URL-scheme fire route, shared-container command or restored widget action.
+System foreground execution is intentional while the current command engine remains
+foreground-bound; Android's no-app service execution is not claimed. No private
+API, fake background wake or bypassing app.canManageGuestAccess.
+
+Linux283corezero(4newscope/expiration/one-use/replacementcases); whole app/extension/
+hosted/UI frontend syntax passes, not Apple SDK proof. Four hosted widget cases
+added:startup+confirmation+one-use,entrylock+objectPIN,expiration/backgroundcancel,
+presentation-only export/corrupt catalog. Native expected168 is SOURCE only until
+Apple execution. No product PNG batch/site gallery update. Widget extension
+installation/tap/configuration and App Group physical-device provisioning remain
+unverified; Team/BundleID signing question still unanswered.
+
+Public Apple references used to verify the actual public integration:
+https://developer.apple.com/documentation/widgetkit/adding-interactivity-to-widgets-and-live-activities
+https://developer.apple.com/documentation/widgetkit/making-a-configurable-widget

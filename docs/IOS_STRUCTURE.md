@@ -113,7 +113,7 @@ Core245 Apple/Debug также прошли. Новый BLE Info и код в р
 | E03 | Автотриггер | AutomationCoordinator / ActionPrompt / executeActionPrompt | Единый foreground manual/automatic confirm/PIN/biometry, одно согласие на frozen intent, cancel consumes arrival; latest source6b42489 ещё не Apple-исполнен. |
 | E04 | Ключ принят/отклонён | KeyImportScreen / DelegationInboxScreen | Есть bind/errors/pending; полный readiness/welcome ещё не перенесён. |
 | E05 | Восстановление | BackupPresentation / BackupRestorePlan / backup reminder | Preview/restore/preflight/checkpoints/reminder подключены, системный файл sharing; реальный перенос между устройствами не принят. |
-| W01 | Виджет | Нет widget extension | Внешний intent должен проходить ту же policy/lock/target validation. |
+| W01 | Виджет | WidgetKit/AppIntent iOS17, source; Apple/device pending | Общий каталог представления, исходные аватары; foreground-only action через текущую policy/entry/PIN/confirm. TTL60с, consume-before-dispatch, нет fire URL/ключей в extension. Android service в фоне этим не перенесён. |
 
 ## Приёмка этого изменения
 

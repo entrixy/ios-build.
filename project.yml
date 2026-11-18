@@ -24,9 +24,12 @@ targets:
           - '*.swift'
       - path: App/Assets.xcassets
       - path: App/Resources
+      - path: WidgetShared
+      - path: WidgetResources
     dependencies:
       - package: EntrixyCore
         product: EntrixyCore
+      - target: EntrixyWidget
     settings:
       base:
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
@@ -74,6 +77,31 @@ targets:
         NSLocalNetworkUsageDescription: Соединение с вашими контроллерами, вебхуками и камерами в локальной сети
         NSAppTransportSecurity:
           NSAllowsArbitraryLoads: true
+
+  EntrixyWidget:
+    type: app-extension
+    platform: iOS
+    deploymentTarget: '17.0'
+    sources:
+      - path: Widget
+      - path: WidgetShared
+      - path: WidgetResources
+      - path: App/Assets.xcassets
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.entrixy.ios.widget
+        APPLICATION_EXTENSION_API_ONLY: YES
+        SWIFT_ACTIVE_COMPILATION_CONDITIONS: '$(inherited) WIDGET_EXTENSION'
+        CODE_SIGN_ENTITLEMENTS: scripts/widget.entitlements
+        SKIP_INSTALL: YES
+        TARGETED_DEVICE_FAMILY: '1'
+        GENERATE_INFOPLIST_FILE: YES
+    info:
+      path: .local-checks/EntrixyWidget-Info.plist
+      properties:
+        CFBundleDisplayName: Entrixy
+        NSExtension:
+          NSExtensionPointIdentifier: com.apple.widgetkit-extension
 
   EntrixyAppTests:
     type: bundle.unit-test

@@ -1,4 +1,5 @@
 import SwiftUI
+import Combine
 import EntrixyCore
 
 @main
@@ -33,6 +34,7 @@ private struct LiveAppRoot: View {
     @StateObject private var model: AppModel
     @Environment(\.scenePhase) private var phase
     @State private var pendingURL: URL?
+    @State private var widgetPublisher = WidgetPresentationPublisher()
     init() {
         // Keep router construction inside StateObject's deferred initializer.
         // Rebuilding this View must not replace the retained model's global gate.
@@ -45,11 +47,26 @@ private struct LiveAppRoot: View {
         }
         .environmentObject(model)
         .background(AppPrivacyShield(enabled: model.appLockEnabled, covered: phase != .active).frame(width: 0, height: 0))
-        .task { model.checkEntryLock(); _ = await model.prepareServerRouting(); await model.resume(); model.diagnostics.activate() }
+        .task {
+            model.checkEntryLock(); WidgetActionInbox.shared.bind(model)
+            try? widgetPublisher.publish(model)
+            _ = await model.prepareServerRouting(); await model.resume()
+            WidgetActionInbox.shared.setReady(true); model.diagnostics.activate()
+        }
+        .onReceive(model.objectWillChange.debounce(for:.milliseconds(250),scheduler:RunLoop.main)) { _ in try? widgetPublisher.publish(model) }
+        .onReceive(model.ownerControl.objectWillChange.debounce(for:.milliseconds(250),scheduler:RunLoop.main)) { _ in try? widgetPublisher.publish(model) }
         .onOpenURL { pendingURL = $0 }
         .onChange(of: phase) { value in
-            if value == .active { model.checkEntryLock(); Task { _ = await model.prepareServerRouting(); await model.resume(); model.diagnostics.activate() } }
-            else if value == .background { model.entryDidBackground(); model.suspend() }
+            if value == .active {
+                model.checkEntryLock()
+                Task {
+                    _ = await model.prepareServerRouting(); await model.resume()
+                    WidgetActionInbox.shared.setReady(true); model.diagnostics.activate()
+                }
+            } else if value == .background {
+                WidgetActionInbox.shared.cancel(); model.entryDidBackground(); model.suspend()
+                try? widgetPublisher.publish(model,forceOffline:true)
+            }
         }
         .onChange(of:model.appLocked) { if !$0 { model.diagnostics.activate() } }
     }
@@ -132,6 +149,9 @@ struct RootView: View {
         }
         .onChange(of: pendingURL) { url in
             if let url { pendingURL = nil; receiveURL(url) }
+        }
+        .onReceive(NotificationCenter.default.publisher(for:.entrixyWidgetAction)) { _ in
+            selectedTab = model.navigationState.resolve(.control); userPickedTab = true
         }
         .onChange(of:model.canManageGuestAccess) { if $0 { model.diagnostics.offerConsent() } }
         .sheet(isPresented: $adding) { KeyImportScreen(input: $input) }

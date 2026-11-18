@@ -4,23 +4,30 @@ Native iOS port of the full Android client, not an expansion of Entrixy Open.
 The existing full client defines expected behavior and the server wire formats.
 This repository is private working source; no new distribution license is assigned.
 
-## Current implementation and verification — 17 November 2026
+## Current implementation and verification — 19 November 2026
 
-The active task is the full Android port, followed by one reviewed native screenshot
-batch. It remains incomplete. The gallery still shows the previous 19-frame catalogue.
-Latest complete functional Apple snapshot: native `633005e`, public `be2be6a`,
-[run44150323650](https://github.com/entrixy/ios-build./actions/runs/44150323650):
-268 core tests, Debug/test bundles, Release/isolation and153 hosted native tests
-passed, including the isolated authenticated proxy and privacy backup persistence.
-Later native `1927187` / public `04154a7` passed Apple270 core, Debug and all17
-UI cases in [run44152754848](https://github.com/entrixy/ios-build./actions/runs/44152754848).
-The follow-up now attaches protected routing at ordinary app startup and adds
-home-network settings. Current-source Apple native/UI19 checks are pending;
-Linux271 and syntax checks passed. The shared server account endpoint is restored
-(site875d2b6); only its negative live contract was checked, without real-account login.
-Remaining full-port routes, background/device/radio acceptance, signing and the
-final screenshot batch are incomplete. Gallery still shows the prior19 catalogue.
-Exact implementation boundaries and pending checks: [FUNCTIONAL_PORT.md](docs/FUNCTIONAL_PORT.md).
+The full Android port remains the active task. The gallery still contains the old
+19-frame catalogue; a new full native screenshot batch follows functional completion.
+Latest verified app: native `12cd038`, public `bd40d03`,
+[Apple run44412545161](https://github.com/entrixy/ios-build./actions/runs/44412545161):
+279 core tests, Debug/test bundles, Release/isolation and164 hosted native tests passed.
+This includes live privacy routing, consented diagnostics and conditional phone readiness.
+It does not prove physical radio, background execution or OS MetricKit delivery.
+
+UI source `b053d3b` / public `3988205` ran20 scenarios:17 passed,3 failed
+(diagnostic-dialog AX timeout, entry-lock switch lookup and home-network switch tap).
+The next UI run retains the assertions and targets nested native switch controls;
+its outcome is pending. Previous `1927187` / `04154a7` passed all17 earlier UI cases.
+
+Current source adds the native configurable iOS17 widget, sharing presentation only.
+Its foreground AppIntent uses the same entry lock, current object policy, PIN and
+confirmation as a card; requests expire and are consumed before dispatch, without
+persisted/replayed fire commands or URL-scheme authority. This is not Android's
+background service behavior. Linux283 core and syntax checks passed; the extension's
+Apple build, hosted widget flows and on-device configuration remain pending.
+App Group/device provisioning is not configured. Full background/notifications,
+remaining parity/device/release gates and the final screenshot batch are incomplete.
+Detailed scope and evidence: [FUNCTIONAL_PORT.md](docs/FUNCTIONAL_PORT.md).
 
 ### Historical catalogue checkpoint — 16 November 2026
 
