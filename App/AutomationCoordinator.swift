@@ -157,10 +157,7 @@ extension AppModel {
         return automation.inspect(target,template:context.template,isBLE:context.isBLE,date:date)
     }
     func performAutomaticAction(_ entry: CatalogObject, readiness: AutomationReadiness) async {
-        guard canManageGuestAccess, !busy, !ownerBusy, actionPrompt == nil,
-              codePrompt == nil, serverPrompt == nil, networkPrivacyPrompt == nil, !backupPromptPending,
-              objectRemovalTarget == nil, objectAvatarTarget == nil, bleInformationTarget == nil, !ownerGuestRequestPending,
-              companyRequestID == nil, guestRemovalTarget == nil,
+        guard canManageGuestAccess, !busy, !ownerBusy, !hasTaskDialog,
               let context = try? automationContext(.object(entry.target)), context.template == readiness.template,
               (automaticConsumedAt[entry.target].map { readiness.evaluatedAt > $0 } ?? true),
               readiness.ready, Date() >= readiness.evaluatedAt, Date().timeIntervalSince(readiness.evaluatedAt) <= 2 else { return }

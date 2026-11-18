@@ -929,3 +929,9 @@
 "ios_privacy_unknown_wifi" = "无法识别当前 Wi-Fi 网络。请连接 Wi-Fi 并允许位置访问。";
 "ios_privacy_wifi_permission" = "允许识别网络";
 "ios_privacy_blocked" = "家庭网络规则已阻止服务器连接。请在设置 → 系统 → 家庭网络中检查移动数据及授权。";
+"ios_diag_storage_failed" = "无法读取或保存诊断设置。自动发送已暂停，请解锁 iPhone 后重试。";
+"ios_diag_sent" = "技术日志已发送。";
+"ios_diag_send_failed" = "无法发送技术日志。请检查连接和家庭网络设置。";
+"ios_diag_manual_hint" = "技术错误代码、版本和对象数量。不发送名称、服务器地址、位置、钥匙或开门历史。崩溃报告需要单独授权。";
+"ios_developer_title" = "开发者";
+"ios_developer_off" = "关闭开发者模式";

@@ -80,6 +80,8 @@ final class NavigationUITests: XCTestCase {
         let app = XCUIApplication()
         app.launchArguments = ["-AppleLanguages","(ru)","-AppleLocale","ru_RU"]
         app.launch(); activeApp = app
+        let later = app.buttons["diagnostic-consent-later"]
+        if later.waitForExistence(timeout:5) { later.tap() }
         XCTAssertTrue(app.buttons["main-tab-settings"].waitForExistence(timeout:20))
         assertBottom(app,["settings","journal"])
         app.segmentedControls.buttons["Система"].tap()
@@ -87,6 +89,39 @@ final class NavigationUITests: XCTestCase {
         assertBottom(app,["settings","journal"])
         app.buttons["main-tab-journal"].tap()
         XCTAssertTrue(app.staticTexts["Журнал пуст. Здесь будут появляться вызовы."].waitForExistence(timeout:5))
+    }
+    func testCrashConsentAndSevenTapDeveloperLogUseNativeSettingsAndPreserveNavigation() {
+        let app = XCUIApplication()
+        app.launchArguments = ["--stage-two","diagnostics","-AppleLanguages","(ru)","-AppleLocale","ru_RU"]
+        app.launch(); activeApp = app
+        let later = app.buttons["diagnostic-consent-later"], allow = app.buttons["diagnostic-consent-allow"]
+        XCTAssertTrue(later.waitForExistence(timeout:15)); XCTAssertTrue(allow.isHittable)
+        XCTAssertEqual(later.frame.height,allow.frame.height,accuracy:1); later.tap()
+        XCTAssertTrue(app.buttons["main-tab-settings"].waitForExistence(timeout:10))
+        let row = app.descendants(matching:.any).matching(identifier:"diagnostics-consent-switch").firstMatch
+        XCTAssertTrue(row.waitForExistence(timeout:10))
+        let control = row.elementType == .switch ? row : row.switches.firstMatch
+        XCTAssertEqual(control.value as? String,"0"); control.tap()
+        let enabled = XCTNSPredicateExpectation(predicate:NSPredicate { _,_ in control.value as? String == "1" },object:control)
+        XCTAssertEqual(XCTWaiter.wait(for:[enabled],timeout:5),.completed)
+        XCTAssertFalse(app.buttons["diagnostics-send"].exists)
+        app.buttons["header-help"].tap()
+        let version = app.descendants(matching:.any).matching(identifier:"help-version").firstMatch
+        for _ in 0..<14 { if version.exists && version.isHittable { break }; app.swipeUp() }
+        XCTAssertTrue(version.isHittable)
+        for _ in 0..<7 { version.tap() }
+        XCTAssertTrue(app.staticTexts["Режим разработчика включён"].waitForExistence(timeout:5))
+        app.navigationBars.buttons.element(boundBy:0).tap()
+        let send = app.buttons["diagnostics-send"]
+        for _ in 0..<14 { if send.exists && send.isHittable { break }; app.swipeUp() }
+        XCTAssertTrue(send.isHittable); send.tap()
+        XCTAssertTrue(app.staticTexts["Технический журнал отправлен."].waitForExistence(timeout:10))
+        let off = app.buttons["developer-disable"]
+        for _ in 0..<4 { if off.isHittable { break }; app.swipeUp() }
+        XCTAssertTrue(off.isHittable); off.tap()
+        let hidden = XCTNSPredicateExpectation(predicate:NSPredicate { _,_ in !send.exists },object:send)
+        XCTAssertEqual(XCTWaiter.wait(for:[hidden],timeout:5),.completed)
+        assertBottom(app,["control","settings","journal"])
     }
     func testCardConfirmationAndCodeSetupUseCompactDialogAndCancelWithoutLeavingControl() {
         for route in ["owner-confirmation","owner-code-confirmation"] {

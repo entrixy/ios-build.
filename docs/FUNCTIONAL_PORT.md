@@ -1094,3 +1094,47 @@ alongside HTTP. All current Swift syntax passes; local Linux271 and7 Product
 tables920 keys validated. Full current Apple typing/native/UI19 still pending.
 Real cellular/DNS/Wi-Fi roaming/VPN/device/signing and remaining full-port features
 are not proven by loopback; no screenshot batch or gallery update has occurred.
+
+
+## 19 November: continue full port — diagnostics and actual live-routing result
+
+Latest previous source native2556eaf/public3a13b4a run44157787988/job134303089647
+actually passed Apple271 core, Debug/test bundles, Release/isolation and159 hosted
+checks (20.712s zero), including WebSocket proxy/TLS and local-only registration
+preflight retry preserving the reserved master. UI19 public9ee3f34/run44157583649
+was CANCELLED IN QUEUE with no test steps; no UI19 execution is claimed.
+
+Read Android System crash switch before theme, Diagnostics.kt, trusted Api report
+endpoint, Help seven-tap unlock and actual developer manual-send/off controls.
+The manual send is inside Android's hidden developer section, not an invented
+normal System control. Native source follows those placements. MetricKit collects
+only crash stack summaries after an explicit persisted consent; old reporting
+periods are ignored. Stack data is rebuilt from known structural fields; paths,
+exception text, symbols and arbitrary fields are dropped. Reports contain only
+counts, versions and fixed technical error codes, no object names/server addresses/
+coordinates/access identity or action history. Report IDs are per-report, not a
+persistent installation identifier. Core uses the trusted entrixy.com report
+contract through the same guarded/resettable no-cookie/no-redirect server session.
+
+Consent/queue/technical events live in a bounded protected file excluded from
+backups. Failed opt-out persistence pauses automatic sending in memory; successful
+opt-out purges queued crashes. A lost upload reply preserves the same report and
+does not spin a retry loop. Backgrounding cancels upload and suppresses late UI
+completion. First-launch consent uses the shared compact dialog; task visibility
+is centralized so automatic actions cannot replace any active root dialog.
+Seven version taps in Help enable manual log send/off in System as Android.
+
+Linux276 passed (five new sanitization/contract/preflight cases); all Swift source
+syntax, diff and7 Product tables926 keys passed. Four new hosted flow SOURCE cases
+cover default-off/manual/no access mutation, consent-before-send, failed opt-out
+and retained lost-reply/unreadable consent. One new UI SOURCE case covers consent/
+seven taps/manual ACK/off, and ordinary startup handles first-launch consent.
+Expected current UI20/native163 are source counts ONLY, pending Xcode execution.
+No report was actually posted to the production server by tools. Real MetricKit
+delivery needs a physical device; no simulator/hardware/signing claim is made.
+
+Primary Apple references: https://developer.apple.com/documentation/metrickit/mxmetricmanagersubscriber
+https://developer.apple.com/documentation/metrickit/mxcallstacktree/jsonrepresentation()
+Legacy MX API supports the deployment target and installed Xcode26.3; delivery
+is OS scheduled. Remaining OS readiness/background/widget/device/release and
+the final complete native capture batch are still active work.

@@ -45,12 +45,13 @@ private struct LiveAppRoot: View {
         }
         .environmentObject(model)
         .background(AppPrivacyShield(enabled: model.appLockEnabled, covered: phase != .active).frame(width: 0, height: 0))
-        .task { model.checkEntryLock(); _ = await model.prepareServerRouting(); await model.resume() }
+        .task { model.checkEntryLock(); _ = await model.prepareServerRouting(); await model.resume(); model.diagnostics.activate() }
         .onOpenURL { pendingURL = $0 }
         .onChange(of: phase) { value in
-            if value == .active { model.checkEntryLock(); Task { _ = await model.prepareServerRouting(); await model.resume() } }
+            if value == .active { model.checkEntryLock(); Task { _ = await model.prepareServerRouting(); await model.resume(); model.diagnostics.activate() } }
             else if value == .background { model.entryDidBackground(); model.suspend() }
         }
+        .onChange(of:model.appLocked) { if !$0 { model.diagnostics.activate() } }
     }
 }
 
@@ -92,10 +93,11 @@ struct RootView: View {
             // NavigationStack can cover an outer safeAreaInset's hit targets.
             AppBottomNavigation(selection: $selectedTab, tabs: model.navigationState.tabs) { userPickedTab = true }
         }
-        .accessibilityHidden(model.actionPrompt != nil || model.bleInformationTarget != nil || model.objectRemovalTarget != nil || model.objectAvatarTarget != nil || model.ownerGuestRequestPending || model.companyRequestID != nil || model.guestRemovalTarget != nil || model.codePrompt != nil || model.backupPromptPending || model.serverPrompt != nil || model.networkPrivacyPrompt != nil)
+        .accessibilityHidden(model.hasTaskDialog)
         .overlay { BackupFlowHost(flow:model.backupPresentation) }
         .overlay {
             if let prompt = model.actionPrompt { ActionConfirmation(request:prompt).id(prompt.id) }
+            else if model.diagnosticConsentPrompt { DiagnosticConsentDialog(service:model.diagnostics) }
             else if let prompt = model.serverPrompt { ServerSettingsDialog(prompt:prompt).id(prompt.id) }
             else if let network = model.networkPrivacyPrompt { NetworkPrivacyDialog(network:network) }
             else if let prompt = model.codePrompt { AppCodeDialog(request:prompt).id(prompt.id) }
@@ -131,6 +133,7 @@ struct RootView: View {
         .onChange(of: pendingURL) { url in
             if let url { pendingURL = nil; receiveURL(url) }
         }
+        .onChange(of:model.canManageGuestAccess) { if $0 { model.diagnostics.offerConsent() } }
         .sheet(isPresented: $adding) { KeyImportScreen(input: $input) }
         .sheet(item:$deviceClaimFlow,onDismiss:{
             defer { claimCreatedDevice = nil }

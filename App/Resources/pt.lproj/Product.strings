@@ -929,3 +929,9 @@
 "ios_privacy_unknown_wifi" = "Não foi possível identificar a rede Wi-Fi atual. Ligue-se ao Wi-Fi e permita o acesso à localização.";
 "ios_privacy_wifi_permission" = "Permitir identificar a rede";
 "ios_privacy_blocked" = "As regras de redes domésticas bloqueiam a ligação ao servidor. Verifique os dados móveis e a permissão em Definições → Sistema → Rede doméstica.";
+"ios_diag_storage_failed" = "Não foi possível ler ou guardar as definições de diagnóstico. O envio automático está em pausa; tente novamente após desbloquear o iPhone.";
+"ios_diag_sent" = "Registo técnico enviado.";
+"ios_diag_send_failed" = "Não foi possível enviar o registo técnico. Verifique a ligação e as definições de redes domésticas.";
+"ios_diag_manual_hint" = "Códigos de erro técnicos, versões e quantidade de objetos. Não são enviados nomes, endereços de servidores, localizações, chaves ou histórico de aberturas. Os relatórios de falhas exigem consentimento separado.";
+"ios_developer_title" = "Para programadores";
+"ios_developer_off" = "Desativar o modo de programador";

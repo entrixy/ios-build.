@@ -929,3 +929,9 @@
 "ios_privacy_unknown_wifi" = "Das aktuelle WLAN konnte nicht ermittelt werden. Verbinden Sie sich mit WLAN und erlauben Sie den Standortzugriff.";
 "ios_privacy_wifi_permission" = "Netzwerkerkennung erlauben";
 "ios_privacy_blocked" = "Heimnetzregeln blockieren die Serververbindung. Prüfen Sie mobile Daten und die Freigabe unter Einstellungen → System → Heimnetz.";
+"ios_diag_storage_failed" = "Diagnoseeinstellungen konnten nicht gelesen oder gespeichert werden. Der automatische Versand ist pausiert; versuchen Sie es nach dem Entsperren erneut.";
+"ios_diag_sent" = "Technisches Protokoll gesendet.";
+"ios_diag_send_failed" = "Das technische Protokoll konnte nicht gesendet werden. Prüfen Sie die Verbindung und Heimnetzeinstellungen.";
+"ios_diag_manual_hint" = "Technische Fehlercodes, Versionen und Objektanzahl. Namen, Serveradressen, Standorte, Schlüssel und Öffnungsverlauf werden nicht übertragen. Absturzberichte nur mit gesonderter Zustimmung.";
+"ios_developer_title" = "Für Entwickler";
+"ios_developer_off" = "Entwicklermodus ausschalten";
