@@ -1138,3 +1138,29 @@ https://developer.apple.com/documentation/metrickit/mxcallstacktree/jsonrepresen
 Legacy MX API supports the deployment target and installed Xcode26.3; delivery
 is OS scheduled. Remaining OS readiness/background/widget/device/release and
 the final complete native capture batch are still active work.
+
+
+### Permission readiness and diagnostic decline follow-up
+
+Read the full Android permission card before Settings subtabs. Native PhoneReadiness
+now adapts actual per-object requirements: current/precise location for geo and
+connected-Wi-Fi rules, Bluetooth for BLE objects, notifications for configured
+notify reactions. A profile without these features asks for none. Always location
+is deliberately not requested by the still-foreground automation runtime; the
+portable readiness model distinguishes it for the future background integration.
+No Android OEM/autostart/battery-whitelist controls are invented on iOS.
+
+Reading permission state never creates a Bluetooth manager. Only a button tap can
+request Bluetooth authorization, location or notifications; denied/precision cases
+open public iPhone app settings. The card sits above Settings subtabs like Android,
+uses the existing common filled controls and does not replace object status circles.
+All six native permission purpose strings are now localized into the seven product
+languages. Apple accuracyAuthorization and CBManager.authorization docs consulted.
+
+Linux279 passed (three new readiness truth-table cases), all Swift syntax/diff and
+Product933/InfoPlist6-key tables in seven languages pass. Native permission UI/OS
+callbacks still need Apple/device acceptance. The first crash-consent Not Now now
+closes even if diagnostic storage alone cannot save, pauses auto sending and
+suppresses reoffering that session; a fifth hosted source case verifies access
+stays usable. Current diagnostic runs exclude this follow-up and remain pending.
+No actual production diagnostic report was uploaded and no new product screenshots.

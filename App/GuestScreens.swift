@@ -122,6 +122,7 @@ struct SettingsScreen: View {
     @State private var keyInput = ""
     var body: some View {
         VStack(spacing: 0) {
+            PhoneReadinessCard(service:model.phoneReadiness,sensors:model.automationSensors)
             Picker("Раздел настроек", selection: $selected) {
                 ForEach(SettingsTab.allCases, id: \.self) { Text($0.title).tag($0) }
             }.pickerStyle(.segmented).padding(.horizontal, 20).padding(.vertical, 12)

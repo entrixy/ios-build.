@@ -47,6 +47,7 @@ final class AppModel: ObservableObject {
     @Published var bleInformation: [ObjectReference: BLEDeviceInformation] = [:]
     @Published var ownerGuestRequestPending = false
     lazy var automationSensors = AutomationSensors()
+    lazy var phoneReadiness = PhoneReadiness()
     lazy var automation = AutomationCoordinator(app: self)
     var automaticPermits: [ObjectReference: AutomationReadiness] = [:]
     var automaticConsumedAt: [ObjectReference: Date] = [:]
@@ -268,6 +269,28 @@ final class AppModel: ObservableObject {
             objects:guests.reduce(0) { $0+$1.objects.count } + owners.reduce(0) { $0+($1.objects?.count ?? 0) },
             pending:androidPendingGuests.count+delegations.count+(pendingRestore == nil ? 0 : 1),
             connected:connections.values.filter { $0 == .connected }.count,storageReady:storageReady,privacyBlocked:privacyRouter?.route == .blocked)
+    }
+    func phoneRequirements() -> PhoneRequirements {
+        var needs = PhoneRequirements()
+        for entry in controlObjects {
+            switch entry {
+            case .owned(let owner,_): if owner.ownershipLost == true { continue }
+            case .received(let guest,_): if guest.paused { continue }
+            }
+            if let context = try? automationContext(.object(entry.target)) {
+                let location = context.template.geoEnabled || (context.template.wifiEnabled && context.template.wifiMode == "connect")
+                needs.location = needs.location || location; needs.preciseLocation = needs.preciseLocation || location
+                needs.bluetooth = needs.bluetooth || context.isBLE
+            }
+        }
+        needs.notifications = owners.contains { owner in
+            owner.ownershipLost != true && (owner.issuedKeys ?? []).contains { key in
+                key.state != .revoked && key.state != .paused && (key.callPreferences ?? [:]).values.contains { $0.reaction == "notify" }
+            }
+        }
+        // Foreground runtime cannot justify requesting Always location. Enable
+        // that requirement only when the bounded background path is connected.
+        return needs
     }
 
     @discardableResult func setNetworkPrivacy(_ preferences: NetworkPrivacyPreferences) -> Bool {

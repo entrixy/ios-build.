@@ -935,3 +935,10 @@
 "ios_diag_manual_hint" = "Codes d’erreur techniques, versions et nombre d’objets. Aucun nom, adresse de serveur, position, clé ou historique d’ouverture. Les rapports de plantage nécessitent un consentement distinct.";
 "ios_developer_title" = "Développeur";
 "ios_developer_off" = "Désactiver le mode développeur";
+"ios_perm_location" = "Position pour les règles configurées";
+"ios_perm_preciseLocation" = "Position précise pour les trajets et conditions Wi-Fi";
+"ios_perm_backgroundLocation" = "Position toujours pour les règles en arrière-plan";
+"ios_perm_bluetooth" = "Accès Bluetooth pour vos contrôleurs";
+"ios_perm_notifications" = "Notifications des demandes d’invités";
+"ios_perm_settings" = "Ouvrir les réglages de l’iPhone";
+"ios_perm_allow" = "Autoriser";

@@ -935,3 +935,10 @@
 "ios_diag_manual_hint" = "Códigos de erro técnicos, versões e quantidade de objetos. Não são enviados nomes, endereços de servidores, localizações, chaves ou histórico de aberturas. Os relatórios de falhas exigem consentimento separado.";
 "ios_developer_title" = "Para programadores";
 "ios_developer_off" = "Desativar o modo de programador";
+"ios_perm_location" = "Localização para as regras configuradas";
+"ios_perm_preciseLocation" = "Localização exata para percursos e condições Wi-Fi";
+"ios_perm_backgroundLocation" = "Localização sempre para regras em segundo plano";
+"ios_perm_bluetooth" = "Acesso Bluetooth para os seus controladores";
+"ios_perm_notifications" = "Notificações de pedidos de convidados";
+"ios_perm_settings" = "Abrir definições do iPhone";
+"ios_perm_allow" = "Permitir";

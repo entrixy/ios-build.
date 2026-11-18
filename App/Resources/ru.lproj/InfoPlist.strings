@@ -1,0 +1,6 @@
+"NSCameraUsageDescription" = "Сканирование QR-кода гостевого ключа Entrixy";
+"NSBluetoothAlwaysUsageDescription" = "Поиск, привязка и управление вашими контроллерами Entrixy поблизости";
+"NSFaceIDUsageDescription" = "Подтверждение защищённых действий в Entrixy";
+"NSLocationWhenInUseUsageDescription" = "Координаты объекта, маршруты подхода и текущая Wi-Fi сеть для настроенных вами правил";
+"NSLocationAlwaysAndWhenInUseUsageDescription" = "Выполнение настроенных вами правил приближения к объекту, когда приложение свёрнуто";
+"NSLocalNetworkUsageDescription" = "Соединение с вашими контроллерами, вебхуками и камерами в локальной сети";

@@ -935,3 +935,10 @@
 "ios_diag_manual_hint" = "技术错误代码、版本和对象数量。不发送名称、服务器地址、位置、钥匙或开门历史。崩溃报告需要单独授权。";
 "ios_developer_title" = "开发者";
 "ios_developer_off" = "关闭开发者模式";
+"ios_perm_location" = "已配置规则所需的位置权限";
+"ios_perm_preciseLocation" = "路线和 Wi-Fi 条件所需的精确位置";
+"ios_perm_backgroundLocation" = "后台规则所需的始终允许位置";
+"ios_perm_bluetooth" = "控制器所需的蓝牙访问权限";
+"ios_perm_notifications" = "访客请求通知";
+"ios_perm_settings" = "打开 iPhone 设置";
+"ios_perm_allow" = "允许";

@@ -13,6 +13,7 @@ struct AutomationWiFiNetwork: Equatable {
     @Published private(set) var network: AutomationWiFiNetwork?
     private(set) var networkObservedAt: Date?
     @Published private(set) var locationAuthorization: CLAuthorizationStatus = .notDetermined
+    @Published private(set) var preciseLocationAuthorized = false
     @Published private(set) var locating = false
     @Published private(set) var message: String?
     var onLocation: ((CLLocation) -> Void)?
@@ -27,6 +28,7 @@ struct AutomationWiFiNetwork: Equatable {
         super.init()
         manager.delegate = self; manager.desiredAccuracy = kCLLocationAccuracyBest
         manager.distanceFilter = 5; locationAuthorization = manager.authorizationStatus
+        preciseLocationAuthorized = manager.accuracyAuthorization == .fullAccuracy
     }
 
     func currentLocation() async throws -> CLLocation {
@@ -78,6 +80,7 @@ struct AutomationWiFiNetwork: Equatable {
 
     func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
         locationAuthorization = manager.authorizationStatus
+        preciseLocationAuthorized = manager.accuracyAuthorization == .fullAccuracy
         switch manager.authorizationStatus {
         case .authorizedAlways, .authorizedWhenInUse:
             if !requests.isEmpty { manager.requestLocation() }
