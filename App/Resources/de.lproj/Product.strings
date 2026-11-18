@@ -935,3 +935,10 @@
 "ios_diag_manual_hint" = "Technische Fehlercodes, Versionen und Objektanzahl. Namen, Serveradressen, Standorte, Schlüssel und Öffnungsverlauf werden nicht übertragen. Absturzberichte nur mit gesonderter Zustimmung.";
 "ios_developer_title" = "Für Entwickler";
 "ios_developer_off" = "Entwicklermodus ausschalten";
+"ios_perm_location" = "Standort für konfigurierte Regeln";
+"ios_perm_preciseLocation" = "Genauer Standort für Routen und WLAN-Bedingungen";
+"ios_perm_backgroundLocation" = "Standort immer für Hintergrundregeln";
+"ios_perm_bluetooth" = "Bluetooth-Zugriff für Ihre Controller";
+"ios_perm_notifications" = "Mitteilungen über Gastanfragen";
+"ios_perm_settings" = "iPhone-Einstellungen öffnen";
+"ios_perm_allow" = "Erlauben";

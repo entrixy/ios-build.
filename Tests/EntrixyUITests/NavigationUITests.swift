@@ -33,6 +33,10 @@ final class NavigationUITests: XCTestCase {
             }
         }
     }
+    private func nativeSwitch(_ row: XCUIElement) -> XCUIElement {
+        let thumb = row.switches.firstMatch
+        return thumb.exists ? thumb : row
+    }
     func testEmptyProfileAndModalCancellation() {
         let app = launch("empty")
         assertBottom(app, ["settings", "journal"])
@@ -56,13 +60,13 @@ final class NavigationUITests: XCTestCase {
         let row = app.descendants(matching:.any).matching(identifier:"privacy-cellular-consent").firstMatch
         for _ in 0..<12 {
             if row.exists {
-                let control = row.elementType == .switch ? row : row.switches.firstMatch
+                let control = nativeSwitch(row)
                 if control.exists && control.isHittable { break }
             }
             app.swipeUp()
         }
         XCTAssertTrue(row.waitForExistence(timeout:5))
-        let toggle = row.elementType == .switch ? row : row.switches.firstMatch
+        let toggle = nativeSwitch(row)
         XCTAssertTrue(toggle.exists); XCTAssertTrue(toggle.isHittable); XCTAssertEqual(toggle.value as? String,"0")
         toggle.tap()
         let enabled = XCTNSPredicateExpectation(predicate:NSPredicate { _,_ in toggle.value as? String == "1" },object:toggle)
@@ -100,7 +104,7 @@ final class NavigationUITests: XCTestCase {
         XCTAssertTrue(app.buttons["main-tab-settings"].waitForExistence(timeout:10))
         let row = app.descendants(matching:.any).matching(identifier:"diagnostics-consent-switch").firstMatch
         XCTAssertTrue(row.waitForExistence(timeout:10))
-        let control = row.elementType == .switch ? row : row.switches.firstMatch
+        let control = nativeSwitch(row)
         XCTAssertEqual(control.value as? String,"0"); control.tap()
         let enabled = XCTNSPredicateExpectation(predicate:NSPredicate { _,_ in control.value as? String == "1" },object:control)
         XCTAssertEqual(XCTWaiter.wait(for:[enabled],timeout:5),.completed)
@@ -357,8 +361,11 @@ final class NavigationUITests: XCTestCase {
         // Switch elements. Activate the real control, rather than the row's
         // geometric centre (which is the label, outside the switch hit region).
         func tapLock() {
-            let thumb = lock.switches.firstMatch
-            for _ in 0..<4 { if thumb.isHittable { break }; app.swipeUp() }
+            for _ in 0..<12 {
+                if lock.exists && nativeSwitch(lock).isHittable { break }
+                app.swipeUp()
+            }
+            let thumb = nativeSwitch(lock)
             XCTAssertTrue(thumb.isHittable); thumb.tap()
         }
         tapLock()

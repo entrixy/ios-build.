@@ -92,7 +92,7 @@ private final class DiagnosticSubscriber: NSObject, MXMetricManagerSubscriber {
         configureSubscriber(); offerConsent(); flush()
     }
     func offerConsent() {
-        if active && ready && !state.consent.asked && app.canManageGuestAccess && !app.hasTaskDialog { app.diagnosticConsentPrompt = true }
+        if active && ready && !autoPaused && !state.consent.asked && app.canManageGuestAccess && !app.hasTaskDialog { app.diagnosticConsentPrompt = true }
     }
     func record(_ code: DiagnosticEvent.Code) {
         guard ready else { return }
@@ -111,7 +111,10 @@ private final class DiagnosticSubscriber: NSObject, MXMetricManagerSubscriber {
             try storage.save(draft); state = draft; enabled = value; autoPaused = false; message = nil
             app.diagnosticConsentPrompt = false
             configureSubscriber(); flush(); return true
-        } catch { message = "ios_diag_storage_failed"; return false }
+        } catch {
+            if !value { app.diagnosticConsentPrompt = false }
+            message = "ios_diag_storage_failed"; return false
+        }
     }
     private func configureSubscriber() {
         guard usesMetricKit,active,enabled,!autoPaused,subscriber == nil else { return }

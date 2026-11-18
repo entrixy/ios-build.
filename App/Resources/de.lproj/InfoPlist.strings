@@ -1,0 +1,6 @@
+"NSCameraUsageDescription" = "QR-Code eines Entrixy-Gastschlüssels scannen";
+"NSBluetoothAlwaysUsageDescription" = "Ihre Entrixy-Controller in der Nähe finden, koppeln und steuern";
+"NSFaceIDUsageDescription" = "Geschützte Aktionen in Entrixy bestätigen";
+"NSLocationWhenInUseUsageDescription" = "Objektkoordinaten, Annäherungsrouten und aktuelles WLAN für Ihre Regeln";
+"NSLocationAlwaysAndWhenInUseUsageDescription" = "Ihre Annäherungsregeln ausführen, während die App im Hintergrund ist";
+"NSLocalNetworkUsageDescription" = "Mit Ihren Controllern, Webhooks und Kameras im lokalen Netzwerk verbinden";

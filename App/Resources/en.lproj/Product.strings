@@ -935,3 +935,10 @@
 "ios_diag_manual_hint" = "Technical error codes, versions and object counts. Names, server addresses, locations, keys and opening history are excluded. Crash reports are included only with separate consent.";
 "ios_developer_title" = "Developer";
 "ios_developer_off" = "Turn off developer mode";
+"ios_perm_location" = "Location for configured rules";
+"ios_perm_preciseLocation" = "Precise location for routes and Wi-Fi conditions";
+"ios_perm_backgroundLocation" = "Always location for background rules";
+"ios_perm_bluetooth" = "Bluetooth access for your controllers";
+"ios_perm_notifications" = "Guest request notifications";
+"ios_perm_settings" = "Open iPhone settings";
+"ios_perm_allow" = "Allow";

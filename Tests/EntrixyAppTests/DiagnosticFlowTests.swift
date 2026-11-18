@@ -94,4 +94,12 @@ private final class DiagnosticAccessMemory: StateStorage {
         XCTAssertFalse(unreadable.ready); XCTAssertFalse(unreadable.setConsent(true)); unreadable.activate()
         await unreadable.sendManual(); XCTAssertEqual(api.reports.count,1)
     }
+    func testDecliningConsentCannotTrapTheUserWhenOnlyDiagnosticStorageFails() async throws {
+        let (app,service,state,api,_) = fixture(); defer { app.suspend() }
+        state.failSave = true; service.activate(); XCTAssertTrue(app.diagnosticConsentPrompt)
+        XCTAssertFalse(service.setConsent(false))
+        XCTAssertFalse(app.diagnosticConsentPrompt); XCTAssertTrue(app.canManageGuestAccess)
+        service.activate(); await Task.yield()
+        XCTAssertFalse(app.diagnosticConsentPrompt); XCTAssertTrue(api.reports.isEmpty)
+    }
 }
