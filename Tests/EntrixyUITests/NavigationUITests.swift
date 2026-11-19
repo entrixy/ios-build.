@@ -10,17 +10,18 @@ final class NavigationUITests: XCTestCase {
         // is still moving. Keep the original screen capture, after bounded
         // geometric stability; the animated brand itself remains enabled.
         guard let app = activeApp else { XCTFail("Missing app for native checkpoint"); return }
-        // A keyboard transition can leave an AX Window with an infinite origin.
-        // Identify the actual UIKit app window, rather than a detached first
-        // window or an application element without an interactive hit point.
-        let anchor = reference ?? app.windows["entrixy-main-window"]
+        // Check the foreground app's bounds without asking a detached keyboard
+        // Window for a hit point. Explicit control anchors must remain hittable.
+        let anchor = reference ?? app
         var previous = CGRect.null
         var unchangedSince = Date()
         let settled = XCTNSPredicateExpectation(predicate:NSPredicate { _,_ in
             guard anchor.exists else { unchangedSince = Date(); return false }
             let current = anchor.frame
             guard !current.isEmpty,current.origin.x.isFinite,current.origin.y.isFinite,
-                  current.width.isFinite,current.height.isFinite,anchor.isHittable else { unchangedSince = Date(); return false }
+                  current.width.isFinite,current.height.isFinite else { unchangedSince = Date(); return false }
+            let visible = reference == nil ? app.state == .runningForeground : anchor.isHittable
+            guard visible else { unchangedSince = Date(); return false }
             if current != previous { previous = current; unchangedSince = Date(); return false }
             return Date().timeIntervalSince(unchangedSince) >= 0.6
         },object:anchor)

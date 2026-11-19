@@ -21,15 +21,16 @@ struct DiagnosticConsentPresenter: UIViewControllerRepresentable {
     weak var service: AppDiagnostics?
     var sceneActive = false
     private var dialog: DiagnosticConsentController?
-    private var dismissing = false
+    private var dialogWindow: UIWindow?
+    private weak var coveredWindow: UIWindow?
+    private var previousAXHidden = false
+    private var wasKey = false
     private var scheduled = false
     private var stopped = false
-    private let boundary = NativeModalAccessibilityBoundary()
     private let lifetime = UUID()
     override func loadView() { view = UIView(); view.backgroundColor = .clear; view.isUserInteractionEnabled = false }
     override func viewDidAppear(_ animated:Bool) {
         super.viewDidAppear(animated)
-        view.window?.accessibilityIdentifier = "entrixy-main-window"
         schedule()
     }
     func schedule() {
@@ -48,34 +49,41 @@ struct DiagnosticConsentPresenter: UIViewControllerRepresentable {
         guard let app,let service else { return }
         if let dialog {
             configure(dialog,app:app,service:service)
-            guard !dismissing,(!sceneActive || !app.diagnosticConsentPrompt || !app.canManageGuestAccess) else { return }
-            dismissing = true
-            dialog.dismiss(animated:true) { [weak self] in
-                guard let self else { return }
-                boundary.restore(); self.dialog = nil; dismissing = false
-                self.app?.setLocalTaskDialog(lifetime,presented:false); schedule()
-            }
+            if !sceneActive || !app.diagnosticConsentPrompt || !app.canManageGuestAccess { closeWindow() }
             return
         }
         guard sceneActive,app.diagnosticConsentPrompt,app.canManageGuestAccess,
-              let window = view.window,window.windowScene?.activationState == .foregroundActive,
+              let window = view.window,let scene = window.windowScene,scene.activationState == .foregroundActive,
               var presenter = window.rootViewController else { return }
         while let next = presenter.presentedViewController { presenter = next }
         guard !(presenter is UIAlertController),!presenter.isBeingPresented,!presenter.isBeingDismissed,
               presenter.viewIfLoaded?.window != nil else { return }
         let next = DiagnosticConsentController(); configure(next,app:app,service:service)
-        next.modalPresentationStyle = .overFullScreen; next.modalTransitionStyle = .crossDissolve
         next.overrideUserInterfaceStyle = presenter.traitCollection.userInterfaceStyle
         next.view.accessibilityViewIsModal = true
+        let nativeWindow = UIWindow(windowScene:scene)
+        nativeWindow.windowLevel = .alert; nativeWindow.backgroundColor = .clear
+        nativeWindow.overrideUserInterfaceStyle = presenter.traitCollection.userInterfaceStyle
+        nativeWindow.rootViewController = next
+        coveredWindow = window; previousAXHidden = window.accessibilityElementsHidden; wasKey = window.isKeyWindow
         dialog = next; app.setLocalTaskDialog(lifetime,presented:true)
-        presenter.present(next,animated:true) { [weak self,weak next,weak presenter] in
-            guard let self,let next,let presenter,self.dialog === next else { return }
-            boundary.conceal(presenter,for:next)
-        }
+        dialogWindow = nativeWindow
+        // A separately owned native window excludes the disabled SwiftUI Form
+        // provider altogether, while retaining the unchanged consent controls.
+        window.accessibilityElementsHidden = true
+        nativeWindow.makeKeyAndVisible()
+        UIAccessibility.post(notification:.screenChanged,argument:nil)
+    }
+    private func closeWindow() {
+        dialogWindow?.isHidden = true; dialogWindow?.rootViewController = nil
+        dialogWindow = nil; dialog = nil
+        coveredWindow?.accessibilityElementsHidden = previousAXHidden
+        if wasKey { coveredWindow?.makeKey() }
+        coveredWindow = nil; wasKey = false
+        app?.setLocalTaskDialog(lifetime,presented:false)
     }
     func stop() {
-        stopped = true; dialog?.dismiss(animated:false); dialog = nil; boundary.restore()
-        app?.setLocalTaskDialog(lifetime,presented:false)
+        stopped = true; closeWindow()
     }
 }
 
