@@ -38,7 +38,7 @@ final class PromotionTests: XCTestCase {
         XCTAssertEqual(try record(mode:"date_range").destination?.absoluteString,"https://entrixy.com/api/go.php?pid=7")
     }
     func testRequestContainsOnlyCoarseTagsVersionLanguageAndUnrelatedInstallationUUID() throws {
-        let now = Date(),state = PromotionState(now:Date().addingTimeInterval(-2*86400))
+        let now = Date(),state = PromotionState(now:now.addingTimeInterval(-2*86400))
         let data = try state.request(language:"ru",version:"1.0",tags:["has_call","has_guest"],now:now)
         let json = try XCTUnwrap(JSONSerialization.jsonObject(with:data) as? [String:Any])
         XCTAssertEqual(Set(json.keys),["lang","version","install_id","tags","age_days"])

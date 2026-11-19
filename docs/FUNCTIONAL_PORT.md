@@ -1677,3 +1677,18 @@ promotions), release association, footer/capture fixes and this AX lifetime fix:
 307core/185hosted/26UI/45PNG expected. No intermediate-source cancellation or
 separate screenshot replay. Interaction evidence uploads before independent
 iphoneos archive evidence, so its result no longer waits behind that archive.
+
+
+### Confirmed scope during bundle maintenance
+
+A final source review found that existing maintenance used requested numberIDs
+instead of the server-confirmed effectiveNumberIDs. After a remote scope removal,
+that could automatically regrant a removed object during a bundle refresh. The
+maintenance recipient set now uses confirmed scope, also holding publication for
+unresolved explicit edits/creates. Refresh narrows to confirmed nonempty scope;
+empty confirmed scope drops maintenance without generating a grant. A regression
+checks removed object7 is neither refreshed nor included in object8's new bundle.
+Linux308core0,19Nov08:58:59UTC. The first run exposed a test-only Date() boundary
+race in the promo age fixture (not product clock logic); the fixture now uses one
+frozen timestamp and the complete308-case suite passed. Hosted count185/UI26/45
+unchanged. Apple SDK/runtime remains pending for this followup.

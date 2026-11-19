@@ -1153,7 +1153,7 @@ final class AppModel: ObservableObject {
             if editingOwnerKeys.contains(key.id) { continue }
             do {
                 var updated = owners
-                if key.state == .revoked || (key.pending == nil && key.objectSettingsToken == token) {
+                if key.state == .revoked || (key.pending == nil && (key.objectSettingsToken == token || key.effectiveNumberIDs?.isEmpty == true)) {
                     updated[index].bundleRefreshQueue?.removeValue(forKey: keyID)
                     try saveOwners(updated); ownerBundleRetryAfter.removeValue(forKey: retryID)
                     ownerBundleRetryAttempts.removeValue(forKey: retryID)

@@ -102,7 +102,7 @@ public extension OwnerAccount {
         for object in objects ?? [] {
             guard let rotation = object.keyRotation, let number = object.numberID else { continue }
             let next = GuestCrypto.base64URL(try GuestCrypto.decrypt(key: masterKey, envelope: rotation.wrappedKey))
-            for key in issuedKeys ?? [] where key.state != .revoked && key.numberIDs.contains(number) && bundleRefreshQueue?[key.id.uuidString] == nil {
+            for key in issuedKeys ?? [] where key.state != .revoked && key.bundleRecipientNumberIDs.contains(number) && bundleRefreshQueue?[key.id.uuidString] == nil {
                 let bundle = try key.bundle(masterKey: masterKey)
                 if (bundle["obj_keys"] as? [String: String])?[String(number)] != next { queueKeySettings(key.id) }
             }
@@ -145,7 +145,7 @@ public extension OwnerAccount {
             } else { return false }
         }
         // A create with an unknown outcome may already exist on the server.
-        for key in issuedKeys ?? [] where key.state != .revoked && key.numberIDs.contains(number) {
+        for key in issuedKeys ?? [] where key.state != .revoked && key.bundleRecipientNumberIDs.contains(number) {
             guard key.pending == nil, key.keyID != nil, updated(try key.bundle(masterKey: masterKey)) else { return false }
         }
         return true

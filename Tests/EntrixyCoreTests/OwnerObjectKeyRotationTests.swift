@@ -127,4 +127,26 @@ final class OwnerObjectKeyRotationTests: XCTestCase {
         XCTAssertFalse(try account.canPublishKeyRotation(objectID: account.objects![0].id, snapshot: snapshot(account)))
         XCTAssertEqual(try account.objects![0].metadata(masterKey: account.masterKey)["label"] as? String, "Изменено на сервере")
     }
+
+    func testMaintenanceNeverRegrantsAnObjectRemovedFromTheConfirmedServerScope() throws {
+        var account = try owner()
+        var other = try OwnerObject(masterKey:account.masterKey,label:"Другой объект",kind:"call",phone:"+15550000002")
+        other.numberID = 8; other.pending = nil; other.revision = 100; other.available = true
+        account.objects?.append(other)
+        var key = try OwnerIssuedKey(owner:account,label:"Гость",numberIDs:[7,8],welcome:"",nativeOnly:false,confirmation:true)
+        key.keyID = 17; key.pending = nil; key.sent = false; key.state = .active; key.effectiveNumberIDs = [8]
+        account.issuedKeys = [key]
+        try prepare(&account)
+        XCTAssertTrue((account.bundleRefreshQueue ?? [:]).isEmpty)
+        XCTAssertTrue(try account.canPublishKeyRotation(objectID:account.objects![0].id,snapshot:snapshot(account)))
+        account.queueObjectSettings(numberID:8)
+        XCTAssertNotNil(account.bundleRefreshQueue?[key.id.uuidString])
+        try key.refreshObjectSettings(owner:account)
+        XCTAssertEqual(key.numberIDs,[8])
+        let bundle = try key.bundle(masterKey:account.masterKey)
+        XCTAssertEqual(bundle["obj_ids"] as? [Int],[8])
+        XCTAssertNil((bundle["obj_keys"] as? [String:String])?["7"])
+        key.effectiveNumberIDs = []; key.pending = nil
+        XCTAssertThrowsError(try key.refreshObjectSettings(owner:account))
+    }
 }

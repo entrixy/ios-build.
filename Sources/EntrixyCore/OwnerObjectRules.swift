@@ -1,6 +1,12 @@
 import Foundation
 
 public extension OwnerIssuedKey {
+    /// Confirmed scope wins for maintenance. An unresolved explicit edit/create
+    /// must also hold publication for objects its exact request may yet grant.
+    var bundleRecipientNumberIDs: Set<Int> {
+        let confirmed = Set(effectiveNumberIDs ?? numberIDs)
+        return pending == nil ? confirmed : confirmed.union(numberIDs)
+    }
     mutating func configureObjectSettings(numberID: Int, template: AutomationTemplate,
                                          allowStream: Bool, masterKey: Data) throws {
         guard numberIDs.contains(numberID), state == .active || state == .paused else { throw GuestCrypto.Failure.invalidEnvelope }
@@ -39,7 +45,9 @@ public extension OwnerIssuedKey {
 
     mutating func refreshObjectSettings(owner: OwnerAccount) throws {
         let contents = try bundle(masterKey: owner.masterKey)
-        try edit(owner: owner, label: label, numberIDs: numberIDs,
+        let confirmed = effectiveNumberIDs ?? numberIDs
+        guard !confirmed.isEmpty else { throw GuestCrypto.Failure.invalidEnvelope }
+        try edit(owner: owner, label: label, numberIDs: confirmed,
             welcome: contents["welcome"] as? String ?? "", confirmation: nil)
     }
 }
@@ -53,7 +61,7 @@ public extension OwnerAccount {
     }
     mutating func queueObjectSettings(numberID: Int) {
         var queue = bundleRefreshQueue ?? [:]
-        for key in issuedKeys ?? [] where key.numberIDs.contains(numberID) && key.state != .revoked {
+        for key in issuedKeys ?? [] where key.bundleRecipientNumberIDs.contains(numberID) && key.state != .revoked {
             queue[key.id.uuidString] = UUID().uuidString
         }
         bundleRefreshQueue = queue

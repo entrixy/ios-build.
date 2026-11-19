@@ -7,7 +7,7 @@ This repository is private working source; no new distribution license is assign
 ## Current implementation and verification — 19 November 2026
 
 The latest source also adds Android-compatible object-key rotation and the Home
-promotion catalogue. Linux307 core tests passed. The next whole Apple batch
+promotion catalogue. Linux308 core tests passed. The next whole Apple batch
 expects185 hosted tests,26 UI scenarios and45 original checkpoint PNGs; these
 new additions have NOT yet passed Apple SDK/runtime. Source and boundaries are
 recorded in [FUNCTIONAL_PORT.md](docs/FUNCTIONAL_PORT.md). The current Apple
