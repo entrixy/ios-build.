@@ -30,6 +30,19 @@ import EntrixyCore
         }
         return true
     }
+    func application(_ application:UIApplication,didRegisterForRemoteNotificationsWithDeviceToken deviceToken:Data) {
+        LiveAppRuntime.model().remoteNotifications.receivedDeviceToken(deviceToken)
+    }
+    func application(_ application:UIApplication,didFailToRegisterForRemoteNotificationsWithError error:Error) {
+        LiveAppRuntime.model().remoteNotifications.registrationFailed()
+    }
+    func application(_ application:UIApplication,didReceiveRemoteNotification userInfo:[AnyHashable:Any],
+                     fetchCompletionHandler completionHandler:@escaping (UIBackgroundFetchResult) -> Void) {
+        // Durable hints can wait behind entry protection. No background command,
+        // socket resume or acknowledgement of an unverified message is allowed.
+        let saved = LiveAppRuntime.model().remoteNotifications.receive(userInfo)
+        completionHandler(saved ? .newData : .noData)
+    }
 }
 
 /// UIKit can refuse/expire a wake window. Revocation precedes transport

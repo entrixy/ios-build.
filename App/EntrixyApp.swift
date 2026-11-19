@@ -55,10 +55,10 @@ private struct LiveAppRoot: View {
             if phase == .background { model.enterBackground() }
             else {
                 _ = await model.prepareServerRouting(); await model.resume()
-                WidgetActionInbox.shared.setReady(true); model.diagnostics.activate(); model.promotions.activate()
+                WidgetActionInbox.shared.setReady(true); model.diagnostics.activate(); model.promotions.activate(); model.remoteNotifications.activate()
             }
         }
-        .onReceive(model.objectWillChange.debounce(for:.milliseconds(250),scheduler:RunLoop.main)) { _ in try? widgetPublisher.publish(model) }
+        .onReceive(model.objectWillChange.debounce(for:.milliseconds(250),scheduler:RunLoop.main)) { _ in try? widgetPublisher.publish(model); model.remoteNotifications.schedule() }
         .onReceive(model.ownerControl.objectWillChange.debounce(for:.milliseconds(250),scheduler:RunLoop.main)) { _ in try? widgetPublisher.publish(model) }
         .onOpenURL { pendingURL = $0 }
         .onContinueUserActivity(NSUserActivityTypeBrowsingWeb) { activity in
@@ -69,7 +69,7 @@ private struct LiveAppRoot: View {
                 model.checkEntryLock()
                 Task {
                     _ = await model.prepareServerRouting(); await model.resume()
-                    WidgetActionInbox.shared.setReady(true); model.diagnostics.activate(); model.promotions.activate()
+                    WidgetActionInbox.shared.setReady(true); model.diagnostics.activate(); model.promotions.activate(); model.remoteNotifications.activate()
                 }
             } else if value == .background {
                 WidgetActionInbox.shared.cancel(); model.entryDidBackground(); model.enterBackground()
@@ -78,7 +78,7 @@ private struct LiveAppRoot: View {
         }
         .onChange(of:model.appLocked) { locked in
             if !locked && phase == .active {
-                Task { await model.resume(); WidgetActionInbox.shared.setReady(true); model.diagnostics.activate(); model.promotions.activate() }
+                Task { await model.resume(); WidgetActionInbox.shared.setReady(true); model.diagnostics.activate(); model.promotions.activate(); model.remoteNotifications.activate() }
             }
         }
     }

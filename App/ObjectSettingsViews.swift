@@ -243,13 +243,13 @@ private struct ReceivedObjectNameScreen: View {
             Form {
                 Section {
                     AppField("Название") {
-                        TextField("Название",text:$label).autocorrectionDisabled().focused($editing).submitLabel(.done)
+                        TextField(ProductText.string("add_object_name"),text:$label).autocorrectionDisabled().focused($editing).submitLabel(.done)
                             .onSubmit { editing = false }
                             .onChange(of:label) { label = String($0.replacingOccurrences(of:"\n",with:"").replacingOccurrences(of:"\r",with:"").prefix(64)) }
                     }
                 } footer: { Text("Название изменится только на этом iPhone.") }
                 Section {
-                    Button("Сохранить") { let name = label; editing = false; if model.renameReceivedObject(target,label:name) { dismiss() } }
+                    Button(ProductText.string("btn_save")) { let name = label; editing = false; if model.renameReceivedObject(target,label:name) { dismiss() } }
                         .buttonStyle(PrimaryActionStyle()).actionListRow().disabled(model.busy || model.catalogObject(target) == nil)
                 }
             }.navigationTitle("Название объекта").navigationBarTitleDisplayMode(.inline)

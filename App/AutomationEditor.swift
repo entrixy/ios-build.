@@ -254,7 +254,7 @@ private struct AutomationWiFiFields: View {
                         }
                     }
                 }
-                Text("Сканирование Wi-Fi сетей вокруг недоступно в iOS.").font(.footnote).foregroundStyle(Brand.secondaryInk)
+                Text(ProductText.string("ios_wifi_scan_unavailable")).font(.footnote).foregroundStyle(Brand.secondaryInk)
                 if !t.wifiBssids.isEmpty {
                     let minimum = readOnly ? max(1,t.ownerMinMatch ?? t.wifiMinMatch) : 1
                     let maximum = max(minimum,t.wifiBssids.count)

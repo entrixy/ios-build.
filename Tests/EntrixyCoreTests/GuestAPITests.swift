@@ -302,4 +302,49 @@ final class GuestAPITests: XCTestCase {
         catch { XCTAssertEqual(calls, 1) }
     }
 
+    func testNativePushRegistrationIsDeviceSignedAndNeverTransmitsAccessMaterial() async throws {
+        let invite = try invite(), fp = String(repeating:"f",count:64)
+        let registration = try NativePushRegistration(token:String(repeating:"b",count:80),environment:.sandbox)
+        var calls = 0
+        StubProtocol.handler = { request in
+            calls += 1
+            XCTAssertEqual(request.url?.path,"/api/native_push_register.php")
+            let body = try self.requestBody(request)
+            let row = try XCTUnwrap(JSONSerialization.jsonObject(with:body) as? [String:Any])
+            XCTAssertEqual(row["token"] as? String,registration.token)
+            XCTAssertEqual(row["environment"] as? String,"sandbox")
+            XCTAssertEqual(row["remove"] as? Bool,calls == 2 ? true : nil)
+            XCTAssertEqual(Set(row.keys),calls == 2 ? ["token","environment","remove"] : ["token","environment"])
+            XCTAssertFalse(String(decoding:body,as:UTF8.self).contains(invite.userKey))
+            XCTAssertNil(row["bundle_key"]); XCTAssertNil(row["server"])
+            XCTAssertEqual(request.value(forHTTPHeaderField:"X-Entrixy-Key"),GuestCrypto.hash(Data(invite.userKey.utf8)))
+            XCTAssertNotNil(request.value(forHTTPHeaderField:"X-Entrixy-Sig"))
+            return (200,Data(#"{"ok":true}"#.utf8))
+        }
+        let client = api()
+        try await client.registerNativePush(registration,invite:invite,fingerprint:fp)
+        try await client.removeNativePush(registration,invite:invite,fingerprint:fp)
+        XCTAssertEqual(calls,2)
+    }
+    func testPendingMessageIsReadOnlyAndMalformedResponseCannotConsumeADeliveryHint() async throws {
+        let invite = try invite(), fp = String(repeating:"f",count:64)
+        let cipher = try GuestMessageCrypto.seal("Ожидающее сообщение",bundleKey:invite.bundleKey)
+        let good = try JSONSerialization.data(withJSONObject:["cipher":cipher])
+        let client = api()
+        StubProtocol.handler = { request in
+            XCTAssertEqual(request.url?.path,"/api/message_pending.php")
+            XCTAssertEqual(try self.requestBody(request),Data("{}".utf8))
+            return (200,good)
+        }
+        let reply = try await client.pendingNativeMessage(invite:invite,fingerprint:fp)
+        XCTAssertEqual(reply,cipher)
+        StubProtocol.handler = { _ in (200,Data(#"{"cipher":null}"#.utf8)) }
+        let empty = try await client.pendingNativeMessage(invite:invite,fingerprint:fp); XCTAssertNil(empty)
+        for malformed in [#"{}"#,#"{"cipher":false}"#,#"{"cipher":""}"#] {
+            StubProtocol.handler = { _ in (200,Data(malformed.utf8)) }
+            do { _ = try await client.pendingNativeMessage(invite:invite,fingerprint:fp); XCTFail("Malformed response must retain the hint") }
+            catch { XCTAssertEqual(error as? GuestAPI.Failure,GuestAPI.Failure(status:0,code:"invalid_response")) }
+        }
+    }
+
 }

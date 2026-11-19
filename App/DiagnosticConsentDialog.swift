@@ -24,8 +24,14 @@ struct DiagnosticConsentPresenter: UIViewControllerRepresentable {
     private var dismissing = false
     private var scheduled = false
     private var stopped = false
+    private let boundary = NativeModalAccessibilityBoundary()
+    private let lifetime = UUID()
     override func loadView() { view = UIView(); view.backgroundColor = .clear; view.isUserInteractionEnabled = false }
-    override func viewDidAppear(_ animated:Bool) { super.viewDidAppear(animated); schedule() }
+    override func viewDidAppear(_ animated:Bool) {
+        super.viewDidAppear(animated)
+        view.window?.accessibilityIdentifier = "entrixy-main-window"
+        schedule()
+    }
     func schedule() {
         guard !scheduled,!stopped else { return }; scheduled = true
         Task { @MainActor [weak self] in
@@ -44,7 +50,11 @@ struct DiagnosticConsentPresenter: UIViewControllerRepresentable {
             configure(dialog,app:app,service:service)
             guard !dismissing,(!sceneActive || !app.diagnosticConsentPrompt || !app.canManageGuestAccess) else { return }
             dismissing = true
-            dialog.dismiss(animated:true) { [weak self] in self?.dialog = nil; self?.dismissing = false; self?.schedule() }
+            dialog.dismiss(animated:true) { [weak self] in
+                guard let self else { return }
+                boundary.restore(); self.dialog = nil; dismissing = false
+                self.app?.setLocalTaskDialog(lifetime,presented:false); schedule()
+            }
             return
         }
         guard sceneActive,app.diagnosticConsentPrompt,app.canManageGuestAccess,
@@ -57,9 +67,16 @@ struct DiagnosticConsentPresenter: UIViewControllerRepresentable {
         next.modalPresentationStyle = .overFullScreen; next.modalTransitionStyle = .crossDissolve
         next.overrideUserInterfaceStyle = presenter.traitCollection.userInterfaceStyle
         next.view.accessibilityViewIsModal = true
-        dialog = next; presenter.present(next,animated:true)
+        dialog = next; app.setLocalTaskDialog(lifetime,presented:true)
+        presenter.present(next,animated:true) { [weak self,weak next,weak presenter] in
+            guard let self,let next,let presenter,self.dialog === next else { return }
+            boundary.conceal(presenter,for:next)
+        }
     }
-    func stop() { stopped = true; dialog?.dismiss(animated:false); dialog = nil }
+    func stop() {
+        stopped = true; dialog?.dismiss(animated:false); dialog = nil; boundary.restore()
+        app?.setLocalTaskDialog(lifetime,presented:false)
+    }
 }
 
 private final class ConsentActionButton: UIButton {

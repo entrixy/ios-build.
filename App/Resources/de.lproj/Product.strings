@@ -946,3 +946,8 @@
 "ios_auto_foreground_notice" = "Eine Automatisierungsbedingung ist erfüllt. Öffne Entrixy, um das Objekt zu prüfen und die Aktion auszuführen.";
 
 "ios_key_import_pending" = "Der Schlüssel ist auf diesem iPhone gespeichert, der Zugriff wurde vom Server noch nicht bestätigt. Prüfe die Verbindung und füge ihn erneut hinzu; der gespeicherte Schlüssel bleibt erhalten.";
+
+"ios_wifi_scan_unavailable" = "Das Scannen von WLAN-Netzen in der Nähe ist unter iOS nicht verfügbar.";
+"ios_call_confirmation_required" = "iOS verlangt eine Bestätigung für Anrufe. Die App kann den Anruf nicht automatisch beenden.";
+"ios_call_guest_confirmation_required" = "iOS verlangt vor jedem Anruf eine Systembestätigung. Anrufe aus dem Hintergrund sind nicht möglich.";
+"ios_call_imported_hangup" = "Die Android-Einstellung zum Auflegen nach %d Sekunden wurde beibehalten.";

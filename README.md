@@ -6,6 +6,36 @@ This repository is private working source; no new distribution license is assign
 
 ## Current implementation and verification — 19 November 2026
 
+Latest completed public506cb4d/native94efd48: Apple308core, Debug/Release/privacy,
+ALL185hosted and unsigned physical-iPhone archive passed. UI23of27,44of56original
+frames; overall failure. Remaining map/row-size/window-anchor/diagnostic AX issues
+are recorded with exact artifacts in [current evidence](docs/FUNCTIONAL_PORT.md).
+The coherent remainder adds native message push/pending reads and server delivery,
+the actual review fixes, and localized platform hints. Local312core plus23provider/
+22isolated MariaDB/HTTP contracts passed;191hosted/27UI/56PNG await their exact Apple
+package. No real notification, migration, provider setup, signing or device test
+was performed. The live gallery still contains19older frames.
+
+### Previous package evidence
+
+Latest completed package: native6625b7e/public91491ea,
+[run44493224665](https://github.com/entrixy/ios-build./actions/runs/44493224665).
+Apple308core, Debug app/widget/test bundles, Release/privacy/isolation and an
+unsigned physical-iPhone Release archive passed. Hosted184of185 and UI24of26;
+40of45 original PNGs, overall failure. The old delegated-revoke assertion,
+promotion identifier and diagnostic AX failures are recorded in
+[the current evidence](docs/FUNCTIONAL_PORT.md).
+
+Next complete package native94efd48/public506cb4d,
+[run44499802532](https://github.com/entrixy/ios-build./actions/runs/44499802532),
+expects308core/185hosted/27UI/56distinct native PNGs. Shared action sizing and
+expanded object-rule/map/camera/guest/device inspection are included. Syntax and
+six pipeline contracts passed; Apple runtime remains pending. No failed/partial
+batch has replaced the19old gallery frames. Signing, hardware, interoperability,
+APNs, TestFlight and final Store material remain incomplete.
+
+### Earlier implementation and evidence notes
+
 The latest source also adds Android-compatible object-key rotation and the Home
 promotion catalogue. Linux308 core tests passed. The next whole Apple batch
 expects185 hosted tests,26 UI scenarios and45 original checkpoint PNGs; these

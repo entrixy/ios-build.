@@ -1,5 +1,70 @@
 # Functional Android port — in progress, 16 November 2026
 
+## Latest evidence — 19 November 2026
+
+Latest completed native94efd48/public506cb4d,
+run44499802532/job135476259632: Apple308core, Debug/Release/privacy/isolation,
+ALL185hosted and unsigned physical-iPhone app/widget archive passed. UI27:
+23passed,4failed;44of56original PNGs. Promotion is now green. Failures: wrong
+Map query type(the identified wrapper is Other; actual Map is its child), avatar
+buttons48vs66.3pt, a detached infinite-origin Window capture anchor, and initial
+diagnostic AX snapshot. Overall failure; no replacement gallery publication.
+Interaction artifact14518884446 SHA256
+7ba391467da71386401e6dfb2afa08daabbc36de37e08a3a890106386e34e464.
+Device evidence14519852648 SHA256
+d3a76eab0872773bfce0c9c899b51406001ee1a9809a8688235980d16e1373bb.
+
+The next coherent source includes context-only equal-row button filling, actual
+Map-child selection, a finite application capture anchor, and a reversible native
+AX boundary hiding the underlying presenting provider during UIKit dialogs.
+The same consent controller works in ordinary live startup; its Stage System
+underlay still failed in506cb4d. The new boundary is a proposed fix, not proof.
+Original assertions remain; no coordinates replace button queries/consent.
+
+Also implemented in this remainder package: [native message push](NATIVE_PUSH.md),
+device-signed pending-message reads, protected hint queue/token lifecycle, and
+server APNs outbox/provider/worker. New local312core passed;23pure provider and
+22disposable MariaDB/HTTP contracts passed with zero real sends/production DB writes.
+New six hosted cases await Apple; next312core/191hosted/27UI/56PNG. Four platform
+hints use all seven product languages, and13existing labels reuse Android keys.
+Untranslated legacy strings still require review; no full localization claim.
+Schema/provider credentials/worker install/signing/real delivery remain pending.
+No new full Apple run is started until the coherent remainder is committed.
+
+### Earlier completed evidence
+
+Completed native6625b7e/public91491ea, run44493224665/job135453835630:
+Apple308core, Debug app/widget/test products, Release/privacy/isolation and
+unsigned physical-iPhone Release archive passed. Hosted185:184passed; one old
+delegated-revoke case failed three assertions because revocation now also
+refreshes the remaining root recipient. The new rotation and catalogue cases
+passed. UI26:24passed; promotion action inherited its ancestor identifier and
+diagnostic consent's initial accessibility snapshot timed out.40of45 original
+PNGs exported; overall failure, no gallery publication.
+
+Interaction artifact14515912966 SHA256
+55fb12883ae0ed1eb1c89c21c57c1a28a8e5b0956a0a834d4fe3bfcae036ec4f.
+Physical-SDK evidence artifact14514944457 SHA256
+b55cb5d8612168d1fbe368ea20a1d8ae51595791af8491636a44d25def92bae4.
+Actual archive: SDK26.2, arm64 iphoneos, app minimum16/widget17, unsigned,
+privacy manifests and fixture isolation passed. No device/signing/Store claim.
+Native renderer probe1179×2556RGBA; XCTest PNGs1178×2556RGB, unretouched.
+
+Next complete package native94efd48/public506cb4d,
+run44499802532/job135476259632: expected308core/185hosted/27UI/56originalPNG.
+Direct UIKit consent presentation removes the SwiftUI modal content host;
+runtime/AX proof is pending. Promotion leaf identifiers/intrinsic CTA width,
+separate revoked-child/remaining-root assertions, shared action padding/equal
+footer cells and pending-key backup staleness are included. Existing native UI
+flows now inspect GEO/map drawing, both Wi-Fi modes, schedule points/intervals,
+camera settings, BLE lifetime, call reactions and device access parameters.
+Fixtures provide configured metadata, never simulated current sensor readings.
+No real registration, key issue, actuator command or analytics delivery occurs.
+Syntax/diff and six pipeline contracts passed. Apple runtime and final visual
+review remain pending. The19old gallery frames remain live pending replacement.
+
+The dated sections below preserve earlier implementation/evidence history.
+
 Android reference: full client 10.90, commit 56155352b0e9f36ef3685aa071a6aafdb2ef6622.
 Source locations are under app/src/main/java/com/entrixy/app/.
 The user requires the same screens, fields, order and actions as Android.

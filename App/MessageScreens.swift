@@ -60,7 +60,7 @@ struct ReadMessageScreen: View {
                 if let notice = manager.message { Section { Text(notice).foregroundStyle(Brand.secondaryInk) } }
             }
         }
-        .navigationTitle("Сообщение").navigationBarTitleDisplayMode(.inline)
+        .navigationTitle(ProductText.string("msg_incoming_title")).navigationBarTitleDisplayMode(.inline)
         .task { await manager.read(messageID) }
     }
 }

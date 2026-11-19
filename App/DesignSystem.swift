@@ -35,14 +35,23 @@ struct AppField<Content: View>: View {
     }
 }
 
+private struct EqualActionRowEnvironment: EnvironmentKey { static let defaultValue = false }
+private extension EnvironmentValues {
+    var equalActionRow: Bool {
+        get { self[EqualActionRowEnvironment.self] }
+        set { self[EqualActionRowEnvironment.self] = newValue }
+    }
+}
+
 struct PrimaryActionStyle: ButtonStyle {
     @Environment(\.isEnabled) private var isEnabled
+    @Environment(\.equalActionRow) private var equalRow
     func makeBody(configuration: Configuration) -> some View {
         configuration.label.font(.headline)
             .multilineTextAlignment(.center)
             .padding(.horizontal, DesignMetrics.actionHorizontalPadding).padding(.vertical, DesignMetrics.actionVerticalPadding)
             .foregroundStyle(isEnabled ? (configuration.role == .destructive ? Color.white : Color(uiColor: .systemBackground)) : Brand.secondaryInk)
-            .frame(maxWidth: .infinity).frame(minHeight: DesignMetrics.primaryHeight)
+            .frame(maxWidth:.infinity,minHeight:DesignMetrics.primaryHeight,maxHeight:equalRow ? .infinity : nil)
             .background(isEnabled ? (configuration.role == .destructive ? AppPalette.destructive : Brand.ink) : Color(uiColor: .tertiarySystemFill),
                         in: RoundedRectangle(cornerRadius: DesignMetrics.actionRadius))
             .opacity(configuration.isPressed ? 0.86 : 1)
@@ -55,12 +64,13 @@ enum AppPalette {
 }
 struct SecondaryActionStyle: ButtonStyle {
     @Environment(\.isEnabled) private var isEnabled
+    @Environment(\.equalActionRow) private var equalRow
     func makeBody(configuration: Configuration) -> some View {
         configuration.label.font(.body.weight(.semibold))
             .multilineTextAlignment(.center)
             .foregroundStyle(isEnabled ? (configuration.role == .destructive ? Color.white : Brand.ink) : Brand.secondaryInk)
             .padding(.horizontal, DesignMetrics.actionHorizontalPadding).padding(.vertical, DesignMetrics.actionVerticalPadding)
-            .frame(maxWidth: .infinity, minHeight: DesignMetrics.secondaryHeight)
+            .frame(maxWidth:.infinity,minHeight:DesignMetrics.secondaryHeight,maxHeight:equalRow ? .infinity : nil)
             .background(isEnabled ? (configuration.role == .destructive ? AppPalette.destructive : AppPalette.secondary) : Color(uiColor: .systemGray5), in: RoundedRectangle(cornerRadius: DesignMetrics.actionRadius))
             .opacity(configuration.isPressed ? 0.8 : 1)
     }
@@ -77,7 +87,7 @@ struct CardActionStyle: ButtonStyle {
 struct EqualActionRow<Content:View>: View {
     @Environment(\.layoutDirection) private var direction
     @ViewBuilder let content: () -> Content
-    var body: some View { EqualActionLayout(direction:direction) { content() } }
+    var body: some View { EqualActionLayout(direction:direction) { content() }.environment(\.equalActionRow,true) }
 }
 
 private struct EqualActionLayout: Layout {

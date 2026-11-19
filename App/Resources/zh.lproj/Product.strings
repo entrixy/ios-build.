@@ -946,3 +946,8 @@
 "ios_auto_foreground_notice" = "自动化条件已满足。请打开 Entrixy，检查对象状态并执行操作。";
 
 "ios_key_import_pending" = "密钥已保存在此 iPhone 上，但服务器尚未确认访问权限。请检查连接后重新添加，已保存的密钥不会改变。";
+
+"ios_wifi_scan_unavailable" = "iOS 不支持扫描附近的 Wi-Fi 网络。";
+"ios_call_confirmation_required" = "iOS 要求确认拨打电话。应用无法自动挂断电话。";
+"ios_call_guest_confirmation_required" = "iOS 始终要求通过系统确认拨号。无法在后台拨打电话。";
+"ios_call_imported_hangup" = "已保留 Android 的 %d 秒后自动挂断设置。";

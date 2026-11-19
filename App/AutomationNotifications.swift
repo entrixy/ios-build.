@@ -41,13 +41,20 @@ private final class UnifiedNoticeDelegate: NSObject, UNUserNotificationCenterDel
     init(cancelled: @escaping @MainActor (String) -> Void) { self.cancelled = cancelled }
     func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification,
                                 withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
-        completionHandler([.banner,.sound])
+        if notification.request.trigger is UNPushNotificationTrigger {
+            Task { @MainActor in
+                _ = LiveAppRuntime.model().remoteNotifications.receive(notification.request.content.userInfo)
+                completionHandler([]) // Actual decrypted-message path owns its sound/dialog.
+            }
+        } else { completionHandler([.banner,.sound]) }
     }
     func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse,
                                 withCompletionHandler completionHandler: @escaping () -> Void) {
         let request = response.notification.request
         Task { @MainActor in
-            if response.actionIdentifier == "entrixy.cancel-call" { cancelled(request.identifier) }
+            if request.trigger is UNPushNotificationTrigger {
+                _ = LiveAppRuntime.model().remoteNotifications.receive(request.content.userInfo)
+            } else if response.actionIdentifier == "entrixy.cancel-call" { cancelled(request.identifier) }
             else if request.content.categoryIdentifier == "entrixy.automation", response.actionIdentifier == UNNotificationDefaultActionIdentifier {
                 NotificationCenter.default.post(name:.entrixyAutomationFocus,object:nil)
             }

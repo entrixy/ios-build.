@@ -22,6 +22,7 @@ struct IncomingMessagePresenter: UIViewControllerRepresentable {
         private var dismissing = false
         private var scheduled = false
         private var stopped = false
+        private let boundary = NativeModalAccessibilityBoundary()
         override func loadView() {
             view = UIView(); view.backgroundColor = .clear; view.isUserInteractionEnabled = false
         }
@@ -58,7 +59,10 @@ struct IncomingMessagePresenter: UIViewControllerRepresentable {
             host.overrideUserInterfaceStyle = presenter.traitCollection.userInterfaceStyle
             host.modalPresentationStyle = .overFullScreen; host.modalTransitionStyle = .crossDissolve
             notice = host; noticeID = id; app.incomingMessagePromptID = id
-            presenter.present(host,animated:true)
+            presenter.present(host,animated:true) { [weak self,weak host,weak presenter] in
+                guard let self,let host,let presenter,self.notice === host else { return }
+                boundary.conceal(presenter,for:host)
+            }
         }
         private func close(_ id: String) {
             guard let app, let manager, noticeID == id, app.incomingMessagePromptID == id,
@@ -72,6 +76,7 @@ struct IncomingMessagePresenter: UIViewControllerRepresentable {
             let previous = noticeID
             notice.dismiss(animated:true) { [weak self] in
                 guard let self else { return }
+                self.boundary.restore()
                 self.notice = nil; self.noticeID = nil; self.dismissing = false
                 if self.app?.incomingMessagePromptID == previous { self.app?.incomingMessagePromptID = nil }
                 self.schedule()
@@ -80,7 +85,7 @@ struct IncomingMessagePresenter: UIViewControllerRepresentable {
         func stop() {
             stopped = true
             let previous = noticeID
-            notice?.dismiss(animated:false); notice = nil; noticeID = nil
+            notice?.dismiss(animated:false); notice = nil; noticeID = nil; boundary.restore()
             if let previous, app?.incomingMessagePromptID == previous { app?.incomingMessagePromptID = nil }
         }
     }

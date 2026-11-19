@@ -31,13 +31,13 @@ struct QRScannerScreen: View {
                     VStack(spacing: 20) {
                         Text("Разрешите доступ к камере в настройках iPhone или выберите фотографию QR-кода.")
                             .multilineTextAlignment(.center)
-                        Button("Открыть настройки") {
+                        Button(ProductText.string("btn_open_settings")) {
                             if let url = URL(string: UIApplication.openSettingsURLString) { UIApplication.shared.open(url) }
                         }.buttonStyle(PrimaryActionStyle())
                     }.padding(32)
                 }
             }
-            .navigationTitle("Сканировать QR").navigationBarTitleDisplayMode(.inline)
+            .navigationTitle(ProductText.string("add_key_scan")).navigationBarTitleDisplayMode(.inline)
             .sheetDismissFooter("Закрыть") { dismiss() }
             .onChange(of: phase) { value in
                 if value == .active { permission = AVCaptureDevice.authorizationStatus(for: .video) }

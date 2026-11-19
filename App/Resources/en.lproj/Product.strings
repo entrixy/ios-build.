@@ -946,3 +946,8 @@
 "ios_auto_foreground_notice" = "An automation condition matched. Open Entrixy to check the object and perform the action.";
 
 "ios_key_import_pending" = "The key is saved on this iPhone, but the server has not confirmed access. Check your connection and try adding it again; the saved key will stay the same.";
+
+"ios_wifi_scan_unavailable" = "Scanning nearby Wi-Fi networks is unavailable on iOS.";
+"ios_call_confirmation_required" = "iOS requires you to confirm a phone call. The app cannot end the call automatically.";
+"ios_call_guest_confirmation_required" = "iOS always asks for system confirmation before a call. Calls cannot start in the background.";
+"ios_call_imported_hangup" = "The Android setting to end calls after %d seconds has been preserved.";

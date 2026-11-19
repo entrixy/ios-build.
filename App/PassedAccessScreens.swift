@@ -191,7 +191,7 @@ struct PassedAccessDetail: View {
                 }.disabled(manager.busy || app.busy || app.ownerBusy)
             }
         }
-        .navigationTitle("Переданный ключ").navigationBarTitleDisplayMode(.inline)
+        .navigationTitle(ProductText.string("guests_key_delegated")).navigationBarTitleDisplayMode(.inline)
         .sheet(isPresented: $composing) { ComposeMessageScreen(manager: app.messages, target: .passed(accessID)) }
         .sheet(isPresented: Binding(get: { editingSource != nil }, set: { if !$0 { editingSource = nil } })) {
             if let source = editingSource { EditPassedObjects(manager: manager, accessID: accessID, sourceID: source) }

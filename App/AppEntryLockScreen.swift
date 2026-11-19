@@ -29,7 +29,7 @@ struct AppEntryLockScreen: View {
             }
                 .scrollDismissesKeyboard(.interactively)
                 .background(Color(uiColor: .systemGroupedBackground))
-                .navigationTitle("Вход в Entrixy").navigationBarTitleDisplayMode(.inline)
+                .navigationTitle(ProductText.string("code_bio_title")).navigationBarTitleDisplayMode(.inline)
         }
         .task {
             #if DEBUG && targetEnvironment(simulator)

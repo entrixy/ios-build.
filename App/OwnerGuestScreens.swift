@@ -295,7 +295,7 @@ struct OwnerKeyScreen: View {
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
                 if let key, key.pending == nil, key.state == .active || key.state == .paused {
-                    Button("Изменить") { reviewingRestoredAccess = false; editing = true }.disabled(model.ownerBusy)
+                    Button(ProductText.string("btn_edit")) { reviewingRestoredAccess = false; editing = true }.disabled(model.ownerBusy)
                 }
             }
         }

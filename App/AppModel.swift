@@ -19,6 +19,7 @@ final class AppModel: ObservableObject {
     @Published var keyAcceptance: KeyAcceptance?
     @Published var incomingMessagePromptID: String?
     lazy var diagnostics = AppDiagnostics(app:self)
+    lazy var remoteNotifications = AppRemoteNotifications(app:self)
     @Published private(set) var localTaskDialogs = Set<UUID>()
     func setLocalTaskDialog(_ id: UUID, presented: Bool) {
         guard localTaskDialogs.contains(id) != presented else { return }
@@ -1796,7 +1797,7 @@ final class AppModel: ObservableObject {
     func suspend(preserveAutomation: Bool = false) {
         backgroundMonitoring = false; backgroundActionScope = nil
         incomingMessagePromptID = nil; localTaskDialogs.removeAll()
-        diagnosticConsentPrompt = false; diagnostics.pause(); promotions.pause()
+        diagnosticConsentPrompt = false; diagnostics.pause(); promotions.pause(); remoteNotifications.pause()
         networkPrivacyPrompt = nil
         bleInformationTarget = nil
         if let prompt = actionPrompt { dismissActionPrompt(prompt.id) }
@@ -1864,6 +1865,7 @@ final class AppModel: ObservableObject {
             var preferences = objectPreferences; preferences.removeGuest(id)
             do { try save(guests.filter { $0.id != id }, preferences: preferences) }
             catch { receivedDelegations = previousReceived; incomingMessages = previousMessages; throw error }
+            if let removed { remoteNotifications.removed(removed.invite) }
             for object in removed?.objects ?? [] {
                 let key = AvatarCache.key(guestID: id, objectID: object.id)
                 avatars.removeValue(forKey: key)

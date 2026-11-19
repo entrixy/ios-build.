@@ -40,7 +40,8 @@ single light iPhone16 frame per state. Apple's current medium Dynamic Island
 format table includes1179×2556. HOWEVER the actual fc190f0 XCTest PNGs measured
 1178×2556; do not label those Store-ready or resize/retouch them. A separate raw
 simctl full-renderer diagnostic after the same UI pass will measure the device
-output without relaunching or replaying any state. It remains diagnostic (its
+output without relaunching or replaying any state. The actual91491ea probe is
+1179×2556 with an alpha channel. It remains diagnostic (its
 foreground content is not automatically a product/Store acceptance). Recheck the
 actual App Store Connect asset specification at upload and select original native
 frames only after both dimensions and visible content pass review.
@@ -48,7 +49,7 @@ frames only after both dimensions and visible content pass review.
 Primary source checked19November2026:
 [Apple screenshot specifications](https://developer.apple.com/help/app-store-connect/reference/app-information/screenshot-specifications).
 
-Only choose Store images after all45 checkpoints from the final source are
+Only choose Store images after all56 checkpoints from the final source are
 complete and visually reviewed. A partial/failed review and DEBUG fixture
 isolation are recorded separately; screenshots cannot establish hardware readiness.
 
@@ -59,6 +60,11 @@ isolation are recorded separately; screenshots cannot establish hardware readine
 - On-device location/Wi-Fi/Bluetooth conditions, optional camera/Photos access,
   Face ID and independent motion for configured geo warnings. No contacts read.
 - Explicit-consent MetricKit crashes; manual technical reports only on request.
+- Optional native notifications: APNs token registered only with entrixy.com,
+  bound guest-key hash and environment. Apple sees generic delivery hints rather
+  than message text/ciphertext. The separate worker expires inactive tokens after
+  thirty days when configured/running. Schema/provider/signing/device acceptance
+  is pending; no real APNs delivery has been performed.
 - Trusted promotion catalogue: per-install UUID, version/language, coarse usage
   tags/installation age and counted views; go.php processes clicks. Access-server
   credentials, names, SSIDs and coordinates are excluded from those requests.

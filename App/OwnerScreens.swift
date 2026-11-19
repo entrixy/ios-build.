@@ -45,7 +45,7 @@ struct OwnerObjectRows: View {
                     if (owner.objects ?? []).isEmpty { Text("Пока нет добавленных объектов").foregroundStyle(Brand.secondaryInk) }
                 }
                 Section {
-                    Button { adding = true } label: { Label("Добавить объект", systemImage: "plus") }
+                    Button { adding = true } label: { Label(ProductText.string("settings_add_object"), systemImage: "plus") }
                         .buttonStyle(SecondaryActionStyle())
                         .disabled(model.ownerBusy || owner.registrationPending)
                         .actionListRow()
@@ -241,10 +241,10 @@ private struct PhoneHangupLimitation: View {
     let hangupSeconds: Int
     var body: some View {
         Section {
-            Text("iOS требует подтверждать телефонный звонок. Автоматически завершить звонок приложение не может.")
+            Text(ProductText.string("ios_call_confirmation_required"))
                 .font(.footnote).foregroundStyle(Brand.secondaryInk)
             if hangupSeconds > 0 {
-                Text("Из Android сохранён авто-сброс через \(hangupSeconds) с.").font(.footnote).foregroundStyle(Brand.secondaryInk)
+                Text(ProductText.string("ios_call_imported_hangup",hangupSeconds)).font(.footnote).foregroundStyle(Brand.secondaryInk)
             }
         } header: { Text(ProductText.string("hangup_title")) }
     }

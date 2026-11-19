@@ -946,3 +946,8 @@
 "ios_auto_foreground_notice" = "Se ha cumplido una condición de automatización. Abre Entrixy para comprobar el objeto y realizar la acción.";
 
 "ios_key_import_pending" = "La clave está guardada en este iPhone, pero el servidor aún no ha confirmado el acceso. Comprueba la conexión y vuelve a añadirla; la clave guardada se conservará.";
+
+"ios_wifi_scan_unavailable" = "iOS no permite buscar redes Wi-Fi cercanas.";
+"ios_call_confirmation_required" = "iOS exige confirmar las llamadas. La app no puede finalizar la llamada automáticamente.";
+"ios_call_guest_confirmation_required" = "iOS siempre pide confirmación del sistema para llamar. No se puede llamar en segundo plano.";
+"ios_call_imported_hangup" = "Se ha conservado el ajuste de Android para colgar tras %d segundos.";

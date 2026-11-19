@@ -115,7 +115,7 @@ struct GuestInvocationEditor: View {
                                 }
                             }
                         }.padding(16).background(Color(uiColor: .secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 14))
-                        Text("iOS всегда запрашивает системное подтверждение звонка. Вызов из фона недоступен.").font(.footnote).foregroundStyle(Brand.secondaryInk)
+                        Text(ProductText.string("ios_call_guest_confirmation_required")).font(.footnote).foregroundStyle(Brand.secondaryInk)
                     } else if object?.kind == "webhook" {
                         Toggle(ProductText.string("webhook_server_mode_title"), isOn: Binding(get: { object?.routing["webhook_mode"] == "server" }, set: { toServer in
                             if toServer { warning = true } else { Task { await setMode("phone") } }

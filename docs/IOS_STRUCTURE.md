@@ -3,7 +3,17 @@
 Основание: [62 узла Android](ANDROID_STRUCTURE.md), Android 5615535. Это карта
 реального подключения и пробелов, а не объявление полного переноса.
 
-## Актуальная сверка — 17.11.2026
+## Актуальная сверка — 19.11.2026
+
+Последний завершённый native6625b7e/public91491ea: Apple308core,
+Debug/Release/privacy и unsigned iphoneos app+widget archive прошли.
+Hosted184из185, UI24из26,40из45оригинальныхPNG; общий failure.
+Следующий native94efd48/public506cb4d исправляет старые ожидания отзыва,
+promotion AX identifier и diagnostic presentation; расширяет реальные маршруты
+до27UI/56кадров. Apple runtime пока pending. Актуальное доказательство находится
+в начале [FUNCTIONAL_PORT.md](FUNCTIONAL_PORT.md).
+
+### Предыдущая сверка — 17.11.2026
 
 Таблица ниже обновлена по source `6b42489`. Последний полный функциональный
 Apple-прогон относится к `fe9e8e1`: core240/native140, Debug/Release/isolation

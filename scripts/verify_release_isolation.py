@@ -24,6 +24,13 @@ def main():
         raise RuntimeError('Debug executable does not contain the expected capture entry point')
     if any(marker in release for marker in MARKERS):
         raise RuntimeError('Release executable contains isolated fixture/bootstrap code')
+    for bundle, environment in [(args.debug_app, 'sandbox'), (args.release_app, 'production')]:
+        info = plistlib.loads((bundle / 'Info.plist').read_bytes())
+        if info.get('EntrixyPushEnvironment') != environment or 'remote-notification' not in info.get('UIBackgroundModes', []):
+            raise RuntimeError('Built application has an incorrect APNs environment/background declaration')
+        for language in ['en','ru','de','es','fr','pt','zh']:
+            if not (bundle / (language + '.lproj') / 'Localizable.strings').is_file():
+                raise RuntimeError('Built application is missing a localized OS message alert: ' + language)
     def required_reasons(bundle, expected):
         manifest = plistlib.loads((bundle / 'PrivacyInfo.xcprivacy').read_bytes())
         declared = {row['NSPrivacyAccessedAPIType']:set(row['NSPrivacyAccessedAPITypeReasons'])

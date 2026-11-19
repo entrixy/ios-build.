@@ -10,13 +10,17 @@ final class NavigationUITests: XCTestCase {
         // is still moving. Keep the original screen capture, after bounded
         // geometric stability; the animated brand itself remains enabled.
         guard let app = activeApp else { XCTFail("Missing app for native checkpoint"); return }
-        let anchor = reference ?? app.windows.firstMatch
+        // A keyboard transition can leave an AX Window with an infinite origin.
+        // Identify the actual UIKit app window, rather than a detached first
+        // window or an application element without an interactive hit point.
+        let anchor = reference ?? app.windows["entrixy-main-window"]
         var previous = CGRect.null
         var unchangedSince = Date()
         let settled = XCTNSPredicateExpectation(predicate:NSPredicate { _,_ in
-            guard anchor.exists, anchor.isHittable else { unchangedSince = Date(); return false }
+            guard anchor.exists else { unchangedSince = Date(); return false }
             let current = anchor.frame
-            guard !current.isEmpty else { unchangedSince = Date(); return false }
+            guard !current.isEmpty,current.origin.x.isFinite,current.origin.y.isFinite,
+                  current.width.isFinite,current.height.isFinite,anchor.isHittable else { unchangedSince = Date(); return false }
             if current != previous { previous = current; unchangedSince = Date(); return false }
             return Date().timeIntervalSince(unchangedSince) >= 0.6
         },object:anchor)
@@ -87,7 +91,9 @@ final class NavigationUITests: XCTestCase {
         XCTAssertTrue(route.waitForExistence(timeout:10)); bringIntoView(route,in:app)
         reviewCapture("automation-geo",settledBy:route)
         route.tap()
-        let map = app.maps["automation-route-map"], draw = app.buttons["route-map-draw"]
+        let mapHost = app.otherElements["automation-route-map"]
+        XCTAssertTrue(mapHost.waitForExistence(timeout:15))
+        let map = mapHost.maps.firstMatch, draw = app.buttons["route-map-draw"]
         XCTAssertTrue(map.waitForExistence(timeout:15)); XCTAssertTrue(draw.isEnabled); draw.tap()
         XCTAssertFalse(app.buttons["route-map-save"].isEnabled)
         map.coordinate(withNormalizedOffset:CGVector(dx:0.35,dy:0.40)).press(forDuration:0.1,

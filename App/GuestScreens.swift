@@ -138,7 +138,7 @@ struct SettingsScreen: View {
                     if model.catalogObjects().isEmpty { Text("Пока нет объектов").foregroundStyle(Brand.secondaryInk) }
                     ObjectSettingsRows(entries: model.catalogObjects())
                     Section {
-                        Button("Добавить объект") { addingObject = true }.buttonStyle(SecondaryActionStyle()).actionListRow()
+                        Button(ProductText.string("settings_add_object")) { addingObject = true }.buttonStyle(SecondaryActionStyle()).actionListRow()
                             .disabled(!model.storageReady || model.ownerBusy)
                     }
                 case .keys:
@@ -156,7 +156,7 @@ struct SettingsScreen: View {
                         }.accessibilityIdentifier("received-key-" + guest.id)
                     }
                     Section {
-                        Button("Добавить ключ") { keyInput = ""; addingKey = true }.buttonStyle(PrimaryActionStyle())
+                        Button(ProductText.string("settings_add_key")) { keyInput = ""; addingKey = true }.buttonStyle(PrimaryActionStyle())
                             .actionListRow()
                     }
                     Section { NavigationLink("Ожидаемые ключи") { DelegationInboxScreen() } }
@@ -280,7 +280,7 @@ struct JournalScreen: View {
             .buttonStyle(SecondaryActionStyle()).foregroundStyle(Brand.ink).disabled(model.journal.isEmpty)
             .padding(.horizontal, DesignMetrics.pageInset).padding(.top, 12).padding(.bottom, 16)
             if model.journal.isEmpty {
-                Text("Журнал пуст. Здесь будут появляться вызовы.")
+                Text(ProductText.string("journal_empty"))
                     .font(.body).foregroundStyle(Brand.secondaryInk)
                     .multilineTextAlignment(.center).padding(.horizontal, 32).padding(.top, 48)
                 Spacer()

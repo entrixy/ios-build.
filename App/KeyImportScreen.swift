@@ -71,7 +71,7 @@ struct KeyImportScreen: View {
                 }.padding(DesignMetrics.pageInset)
             }
             .background(Color(uiColor: .systemGroupedBackground))
-            .navigationTitle("Добавить ключ").navigationBarTitleDisplayMode(.inline)
+            .navigationTitle(ProductText.string("add_key_title")).navigationBarTitleDisplayMode(.inline)
             .onDisappear { if let id = acceptedGuestID { model.presentKeyAcceptance(id) } }
             .sheetDismissFooter(disabled: model.busy || readingPhoto) { dismiss() }
             .sheet(isPresented: $scanning) { QRScannerScreen { value in accept(value); scanning = false } }
