@@ -58,10 +58,10 @@ import EntrixyCore
 
 extension AppModel {
     var automationIsForeground: Bool { isForeground }
-    var canObserveAutomation: Bool { canManageGuestAccess || (backgroundMonitoring && storageReady && pendingRestore == nil) }
+    var canObserveAutomation: Bool { canManageGuestAccess || (backgroundMonitoring && storageAllowsAutomation) }
     func allowsAction(_ target: ObjectReference, automatic: Bool) -> Bool {
         if canManageGuestAccess { return true }
-        guard automatic, backgroundMonitoring, storageReady, pendingRestore == nil,
+        guard automatic, backgroundMonitoring, storageAllowsAutomation,
               let scope = backgroundActionScope, let context = try? automationContext(.object(target)),
               let entry = controlObjects.first(where:{ $0.target == target }), backgroundTransport(entry) == scope.transport,
               scope.allows(target,template:context.template,uptime:ProcessInfo.processInfo.systemUptime) else { return false }
@@ -73,7 +73,7 @@ extension AppModel {
         return nil
     }
     func beginBackgroundAutomatic(_ entry: CatalogObject, readiness: AutomationReadiness, duration: TimeInterval) -> UUID? {
-        guard backgroundMonitoring, !isForeground, storageReady, pendingRestore == nil, backgroundActionScope == nil,
+        guard backgroundMonitoring, !isForeground, storageAllowsAutomation, backgroundActionScope == nil,
               let transport = backgroundTransport(entry), let context = try? automationContext(.object(entry.target)),
               context.template == readiness.template, readiness.ready, Date() >= readiness.evaluatedAt,
               Date().timeIntervalSince(readiness.evaluatedAt) <= 2,
@@ -92,7 +92,7 @@ extension AppModel {
     /// Called only at a real scene/background boundary, never to pretend that
     /// the app is in foreground. Existing manual sessions are always stopped.
     func enterBackground() {
-        let eligible = storageReady && pendingRestore == nil && controlObjects.contains { entry in
+        let eligible = storageAllowsAutomation && controlObjects.contains { entry in
             guard let context = try? automationContext(.object(entry.target)) else { return false }
             return context.template.geoEnabled || (context.isBLE && context.template.bleEnabled)
         }

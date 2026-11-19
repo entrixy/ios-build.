@@ -1290,3 +1290,10 @@ Apple public references for OS limits/entry points:
 https://developer.apple.com/library/archive/documentation/NetworkingInternetWeb/Conceptual/CoreBluetooth_concepts/CoreBluetoothBackgroundProcessingForIOSApps/PerformingTasksWhileYourAppIsInTheBackground.html
 https://developer.apple.com/documentation/uikit/extending-your-app-s-background-execution-time
 https://developer.apple.com/documentation/corelocation/handling-location-updates-in-the-background
+
+Batch ef28285/publicb1a95ed run44470285106 passed Apple289core; Debug failed before
+any runtime/capture because BackgroundAutomation.swift accessed the model-private
+pendingRestore. The fix exposes only a read-only storageAllowsAutomation predicate
+inside AppModel (same storageReady && pendingRestore==nil guard), preserving the
+private restore state and command barriers. No hosted/UI/screenshot result exists
+for this failed build. The same coherent review batch is rerun after this fix.

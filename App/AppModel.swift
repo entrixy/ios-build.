@@ -148,6 +148,7 @@ final class AppModel: ObservableObject {
     private var generations: [String: UUID] = [:]
     private var foreground = true
     var isForeground: Bool { foreground }
+    var storageAllowsAutomation: Bool { storageReady && pendingRestore == nil }
     var backgroundMonitoring = false
     var backgroundActionScope: BackgroundActionScope?
     private var resumeRequested = false
