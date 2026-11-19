@@ -1568,3 +1568,20 @@ unsigned/upload_readyfalse, and the whole job still fails if UI failed. Swift sy
 actionlint and diff checks pass; no extra Core/runtime replay was run locally.
 Expected295Core/179hosted/25UI/44PNG plus actual iphoneos archive checks, all pending
 for the next exact-source snapshot.
+
+
+Visual followup after inspecting the actual3b806 received-key-delete PNG: the local
+confirmation dimmed navigation/content but left the separate bottom tab region
+white and changed icon colors via disabled styling. That sibling region now uses
+the same shared dim opacity while hit testing/accessibility remain blocked; it
+keeps normal icon rendering beneath the dim, like root modals. No extra panel,
+action or layout space was introduced. This reversible UI followup is outside
+activedc29234; source parsing/diff passed, final-source capture remains pending.
+
+
+OS purpose-string followup: camera description now covers actual key/company/
+controller QR scanning, and Face ID covers both app entry and action confirmation,
+in all seven InfoPlist localizations and the generated base Info. No new permission,
+request timing or feature was added. Existing text had described only guest QR and
+object actions despite the additional implemented routes. This source metadata
+followup is outside activedc29234; the next device archive packages the final text.

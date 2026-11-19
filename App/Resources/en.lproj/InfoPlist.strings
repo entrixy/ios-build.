@@ -1,6 +1,6 @@
-"NSCameraUsageDescription" = "Scan the QR code of an Entrixy guest key";
+"NSCameraUsageDescription" = "Scan QR codes for Entrixy keys, companies and controllers";
 "NSBluetoothAlwaysUsageDescription" = "Find, pair and control your nearby Entrixy controllers";
-"NSFaceIDUsageDescription" = "Confirm protected actions in Entrixy";
+"NSFaceIDUsageDescription" = "Sign in to Entrixy and confirm actions on objects";
 "NSLocationWhenInUseUsageDescription" = "Object coordinates, approach routes and the current Wi-Fi network for your configured rules";
 "NSLocationAlwaysAndWhenInUseUsageDescription" = "Run your configured approach rules while the app is in the background";
 "NSLocalNetworkUsageDescription" = "Connect to your controllers, webhooks and cameras on the local network";

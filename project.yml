@@ -41,7 +41,7 @@ targets:
         GENERATE_INFOPLIST_FILE: YES
         INFOPLIST_KEY_UILaunchScreen_Generation: YES
         INFOPLIST_KEY_UIApplicationSceneManifest_Generation: YES
-        INFOPLIST_KEY_NSCameraUsageDescription: Сканирование QR-кода гостевого ключа Entrixy
+        INFOPLIST_KEY_NSCameraUsageDescription: Сканирование QR-кодов ключей, компаний и контроллеров Entrixy
     info:
       path: .local-checks/Entrixy-Info.plist
       properties:
@@ -69,9 +69,9 @@ targets:
         CFBundleDisplayName: Entrixy
         CFBundleLocalizations: [en, ru, de, es, fr, pt, zh]
         NSMotionUsageDescription: Обнаружение зависших координат при движении телефона для настроенных вами геоправил
-        NSCameraUsageDescription: Сканирование QR-кода гостевого ключа Entrixy
+        NSCameraUsageDescription: Сканирование QR-кодов ключей, компаний и контроллеров Entrixy
         NSBluetoothAlwaysUsageDescription: Поиск, привязка и управление вашими контроллерами Entrixy поблизости
-        NSFaceIDUsageDescription: Подтверждение действий с объектами Entrixy
+        NSFaceIDUsageDescription: Вход в Entrixy и подтверждение действий с объектами
         NSLocationWhenInUseUsageDescription: Координаты объекта, маршруты подхода и условия автоматического управления
         NSLocationAlwaysAndWhenInUseUsageDescription: Выполнение настроенных вами правил приближения к объекту, когда приложение свёрнуто
         UIBackgroundModes: [location, bluetooth-central]

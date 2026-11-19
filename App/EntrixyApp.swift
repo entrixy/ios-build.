@@ -119,7 +119,13 @@ struct RootView: View {
             // Reserve a real sibling layout region. UIKit lists inside a
             // NavigationStack can cover an outer safeAreaInset's hit targets.
             AppBottomNavigation(selection: $selectedTab, tabs: model.navigationState.tabs) { userPickedTab = true }
-                .disabled(!model.localTaskDialogs.isEmpty).accessibilityHidden(!model.localTaskDialogs.isEmpty)
+                .allowsHitTesting(model.localTaskDialogs.isEmpty).accessibilityHidden(!model.localTaskDialogs.isEmpty)
+                .overlay {
+                    if !model.localTaskDialogs.isEmpty {
+                        Color.black.opacity(DesignMetrics.dialogDimOpacity).ignoresSafeArea(edges:.bottom)
+                            .allowsHitTesting(false).accessibilityHidden(true)
+                    }
+                }
         }
         .accessibilityHidden(model.hasRootDialog)
         .allowsHitTesting(!model.hasRootDialog)

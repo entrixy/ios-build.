@@ -1,6 +1,6 @@
-"NSCameraUsageDescription" = "扫描 Entrixy 访客钥匙的二维码";
+"NSCameraUsageDescription" = "扫描 Entrixy 密钥、公司和控制器的二维码";
 "NSBluetoothAlwaysUsageDescription" = "查找、配对和控制附近的 Entrixy 控制器";
-"NSFaceIDUsageDescription" = "确认 Entrixy 中受保护的操作";
+"NSFaceIDUsageDescription" = "登录 Entrixy 并确认对对象的操作";
 "NSLocationWhenInUseUsageDescription" = "获取已配置规则所需的对象坐标、接近路线及当前 Wi-Fi 网络";
 "NSLocationAlwaysAndWhenInUseUsageDescription" = "应用在后台时执行您配置的接近规则";
 "NSLocalNetworkUsageDescription" = "连接本地网络中的控制器、Webhook 和摄像头";

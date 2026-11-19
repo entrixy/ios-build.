@@ -7,15 +7,42 @@ import json
 from pathlib import Path
 import plistlib
 import struct
+import subprocess
 import tempfile
 import unittest
 from unittest.mock import patch
 import zlib
 from export_ui_review import export_review
 from test_simulator import review_test_products
+from capture_simulator import create_booted_device
 
 
 class ReviewPipelineTests(unittest.TestCase):
+    def testUIServiceStallIsRecoveredBeforeAnyTestStarts(self):
+        commands = []
+        def execute(*args, **kwargs):
+            commands.append(args)
+            if args[1:3] == ('simctl', 'create'):
+                return 'first' if sum(c[1:3] == ('simctl', 'create') for c in commands) == 1 else 'second'
+            if args[1:4] == ('simctl', 'ui', 'first'):
+                raise subprocess.TimeoutExpired(args, 60)
+            return ''
+        with patch('capture_simulator.run', side_effect=execute), patch.dict('os.environ', {'GITHUB_ACTIONS':'true'}):
+            result = create_booted_device('tests', 'iphone', 'runtime', appearance='light')
+        self.assertEqual(result, 'second')
+        self.assertIn(('xcrun','simctl','delete','first'), commands)
+        self.assertIn(('killall','-9','com.apple.CoreSimulator.CoreSimulatorService'), commands)
+        self.assertEqual(commands[-1], ('xcrun','simctl','ui','second','appearance','light'))
+
+    def testRepeatedPreparationFailureStopsInsteadOfStartingTests(self):
+        def execute(*args, **kwargs):
+            if args[1:3] == ('simctl','create'): return 'device'
+            if args[1:3] == ('simctl','ui'): raise subprocess.TimeoutExpired(args,60)
+            return ''
+        with patch('capture_simulator.run',side_effect=execute),patch.dict('os.environ',{'GITHUB_ACTIONS':'false'}):
+            with self.assertRaises(subprocess.TimeoutExpired):
+                create_booted_device('tests','iphone','runtime',appearance='light')
+
     def testReviewConfigurationPreservesOriginalProductsAndAddsCaptureOnlyToUITarget(self):
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)

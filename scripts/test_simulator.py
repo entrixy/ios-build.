@@ -45,11 +45,10 @@ def main():
     sdk = subprocess.check_output(['xcrun', '--sdk', 'iphonesimulator', '--show-sdk-version'], text=True).strip()
     runtimes = json.loads(subprocess.check_output(['xcrun', 'simctl', 'list', 'runtimes', '--json']))['runtimes']
     runtime = next(r['identifier'] for r in runtimes if r.get('isAvailable') and '.iOS-' in r['identifier'] and (r['version'] == sdk or r['version'].startswith(sdk + '.')))
-    device = create_booted_device('isolated unit tests', 'com.apple.CoreSimulator.SimDeviceType.iPhone-16', runtime)
+    device = create_booted_device('isolated unit tests', 'com.apple.CoreSimulator.SimDeviceType.iPhone-16', runtime, appearance='light')
     result = Path('.local-checks/TestResults/combined-review.xcresult')
     tests_succeeded = False
     try:
-        subprocess.run(['xcrun','simctl','ui',device,'appearance','light'],check=True,timeout=30)
         command = ['xcodebuild', '-destination', 'id=' + device,
             '-parallel-testing-enabled', 'NO', 'test-without-building' if args.use_built_tests else 'test']
         if args.review_captures:

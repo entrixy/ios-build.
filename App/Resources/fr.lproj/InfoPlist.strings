@@ -1,6 +1,6 @@
-"NSCameraUsageDescription" = "Scanner le QR code d’une clé invité Entrixy";
+"NSCameraUsageDescription" = "Scanner les codes QR des clés, entreprises et contrôleurs Entrixy";
 "NSBluetoothAlwaysUsageDescription" = "Détecter, associer et contrôler vos contrôleurs Entrixy à proximité";
-"NSFaceIDUsageDescription" = "Confirmer les actions protégées dans Entrixy";
+"NSFaceIDUsageDescription" = "Se connecter à Entrixy et confirmer les actions sur les objets";
 "NSLocationWhenInUseUsageDescription" = "Coordonnées des objets, trajets d’approche et Wi-Fi actuel pour vos règles";
 "NSLocationAlwaysAndWhenInUseUsageDescription" = "Exécuter vos règles d’approche lorsque l’application est en arrière-plan";
 "NSLocalNetworkUsageDescription" = "Se connecter à vos contrôleurs, webhooks et caméras sur le réseau local";
