@@ -1211,3 +1211,82 @@ unverified; Team/BundleID signing question still unanswered.
 Public Apple references used to verify the actual public integration:
 https://developer.apple.com/documentation/widgetkit/adding-interactivity-to-widgets-and-live-activities
 https://developer.apple.com/documentation/widgetkit/making-a-configurable-widget
+
+
+### C05 — position corners source
+
+Ported original Android OpenPositionCorners.kt geometry (14radius/3shoulder/4stroke,
+64canvas/56avatar) to CatalogStatusAvatar without clipping the outer half of the
+stroke. The status dot now has the same64pt outer-container anchor as Android,
+with its centre47pt into the avatar; it no longer sits4pt too far inwards.
+OPEN-only corners read current owner/guest positions; BLE additionally requires
+fresh reachability and verified proximity position. No command, readiness or
+authority changes. Existing owner/guest direction tests add observational position
+assertions without new scenarios. Full Swift frontend parse/diff passed; Apple
+SDK/test/visual acceptance pending. Final product captures still deferred.
+
+
+## 19.11.2026 — one substantial background/notification/UI/capture batch
+
+User explicitly rejected tiny CI loops and stopping after status. From this batch:
+implement a coherent block, run local checks once, one Apple build/native/UI review
+with screenshots produced AT the asserted states. Do not push a snapshot for every
+small change or replay every route in a second capture simulator. Existing source
+CI jobs were read to completion, not cancelled: c3ce/d09 run44414977345 actual283core,
+Debug+widget/Release/isolation/168native0(15.078s); all4WidgetFlowTests passed.
+UI783/16b run44414135852 actual20/18pass/2fail: diagnostics AX snapshot, code switch
+hit target. Home privacy switch now passed. Failures remain failures.
+
+New BackgroundActionScope pins one object, allowed local transport and ungated
+template to monotonic8s(BLE)/20s(location) wake authority. It is not Codable and
+never grants app.canManageGuestAccess, unlocks entry, edits settings or restores
+a pending command. OS refusal/expiration revoke scope before cancellation. Full
+owner material, current guest revision/grant, conditions, authenticated proximity,
+fresh nonce, durable proof+journal/disarm and single FIRE remain checked. Scoped
+own phone-webhook uses open-only, persists before POST, and cannot replay lost reply.
+
+Live runtime is shared between scene and actual OS location/Bluetooth relaunch.
+Background evaluation is event-driven, no pretend always-running timer or WSS.
+Always location requested only for configured geo; passive central restoration
+restores only a filtered scan, never a write. Batched location fixes feed corridor
+history in order; only a current arrival can create action authority. BLE transport
+can retrieve a peripheral from a fresh authenticated passive discovery, avoiding
+an unnecessary second5s scan during a short wake window. No connection by name.
+
+Background advertisement coalescing MUST NOT infer exit from silence. iOS path
+suspends the continuous-gap evidence and rearms only after3 actual authenticated
+far RSSI samples separated by5s over10s, with5dBm hysteresis. This is a documented
+conservative adaptation to public iOS delivery, not a claim that background scan
+frequency equals Android. No observation/restart/wake gap alone rearms a gate.
+BLE with PIN/confirmation is manual-only in both phases, matching actual Android
+BleScanReceiver lines291/456. No invented automatic code popup.
+
+Foreground-required calls/network scenarios use bounded local navigation notices;
+returning to the app never executes a stored physical command. Notification delegate
+is shared with the existing5s owner-call cancellation so neither service overwrites
+the other. Remote APNs/always-on background WSS and silent iPhone SIM calls are NOT
+implemented. Physical OS scheduling/radio/permissions still require a real phone.
+
+Shared AppDialogSurface now has ONE measured content tree, short intrinsic height
+or a bounded scroller. ViewThatFits no longer instantiates observed dialog controls
+twice. Entry switch has a stable accessibility ID and bounded small scroll increments
+without removing the wrong-code/persistence assertions. Real UI acceptance pending.
+
+Test products compile once; ci/review-batch and ordinary main CI run hosted+UI in
+one fresh iPhone16/light simulator with --use-built-tests --review-captures.32named
+XCTest checkpoint screenshots export original bytes from the SAME xcresult, once
+per state, source SHA/test identifier/hash preserved. A failed/partial run cannot
+be declared complete; no separate capture replay or dark/light duplicates. These32
+current shared routes do not cover every62-node final Android requirement. Final
+visual review/gallery replacement remain separate and pending.
+
+Local289core0(6new background scope/rearm cases),4 isolated pipeline contracts0,
+allApp/shared/extension/hosted/UI syntax,7Product tables934keys,Python AST/YAML and
+actionlint passed. New5hosted SOURCE cases background BLE/no UI authority/expiry/
+manual-only gated BLE and lost-reply/expired own-local webhook. Expected173native
++20UI+32captures are NOT Apple results yet. No real controllers/calls/servers fired.
+
+Apple public references for OS limits/entry points:
+https://developer.apple.com/library/archive/documentation/NetworkingInternetWeb/Conceptual/CoreBluetooth_concepts/CoreBluetoothBackgroundProcessingForIOSApps/PerformingTasksWhileYourAppIsInTheBackground.html
+https://developer.apple.com/documentation/uikit/extending-your-app-s-background-execution-time
+https://developer.apple.com/documentation/corelocation/handling-location-updates-in-the-background

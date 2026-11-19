@@ -121,6 +121,61 @@ private final class BLEOwnerStorage: StateStorage {
         XCTAssertFalse(try XCTUnwrap(restarted.conditionReadiness(target)).ready)
         XCTAssertEqual(restarted.journal.count,1)
     }
+    func testBackgroundAutomaticBLEFiresOnceWithoutEnablingManualOrSettingsAccess() async throws {
+        var template = AutomationTemplate(); template.bleEnabled = true
+        let (storage,central,app,object,_) = try fixture(template:template)
+        app.bleControl = BLEOwnerControlModel(app:app,transport:central); defer { app.suspend() }
+        let entry = CatalogObject.owned(app.owners[0],object), target = entry.target
+        app.automation.receiveBLE(try XCTUnwrap(central.discoveries[0].manufacturerPayload),rssi:-45)
+        let proof = try XCTUnwrap(app.conditionReadiness(target)); XCTAssertTrue(proof.ready)
+        try await app.setActionCode("1234")
+        let locked = try await app.configureEntryLock(enabled:true,biometric:false,code:"")
+        XCTAssertTrue(locked); app.entryDidBackground(now:100); app.checkEntryLock(now:161)
+        XCTAssertTrue(app.appLocked)
+        app.suspend(preserveAutomation:true); app.backgroundMonitoring = true
+        let scope = try XCTUnwrap(app.beginBackgroundAutomatic(entry,readiness:proof,duration:8))
+        XCTAssertFalse(app.canManageGuestAccess); XCTAssertFalse(app.isForeground)
+        XCTAssertNil(app.ownerActionIntent(server:"fixture.invalid",objectID:object.id))
+        XCTAssertFalse(app.saveOwnerActionPolicy(server:"fixture.invalid",objectID:object.id,expected:object.localPolicy,confirmation:false,authentication:"none"))
+        await app.performAutomaticAction(entry,readiness:proof)
+        XCTAssertEqual(central.channel.writes.count,1); XCTAssertEqual(storage.state?.journal?.count,1)
+        XCTAssertTrue(app.bleAutomationDisarmed.contains(target.id))
+        app.endBackgroundAutomatic(scope)
+        await app.performAutomaticAction(entry,readiness:proof)
+        XCTAssertEqual(central.channel.writes.count,1); XCTAssertFalse(app.canManageGuestAccess)
+        XCTAssertTrue(app.appLocked)
+    }
+    func testBackgroundWindowRevokedAfterNonceCannotFireOrWriteJournalAndCannotRetry() async throws {
+        var template = AutomationTemplate(); template.bleEnabled = true
+        let (_,central,app,object,_) = try fixture(template:template)
+        app.bleControl = BLEOwnerControlModel(app:app,transport:central); defer { app.suspend() }
+        let entry = CatalogObject.owned(app.owners[0],object)
+        app.automation.receiveBLE(try XCTUnwrap(central.discoveries[0].manufacturerPayload),rssi:-45)
+        let proof = try XCTUnwrap(app.conditionReadiness(entry.target))
+        app.suspend(preserveAutomation:true); app.backgroundMonitoring = true
+        let scope = try XCTUnwrap(app.beginBackgroundAutomatic(entry,readiness:proof,duration:8))
+        central.channel.beforeNonce = { app.endBackgroundAutomatic(scope) }
+        await app.performAutomaticAction(entry,readiness:proof)
+        XCTAssertEqual(central.connects,1); XCTAssertTrue(central.channel.writes.isEmpty); XCTAssertTrue(app.journal.isEmpty)
+        XCTAssertTrue(app.bleAutomationDisarmed.contains(entry.target.id))
+        await app.performAutomaticAction(entry,readiness:proof)
+        XCTAssertEqual(central.connects,1)
+    }
+    func testAutomaticBLEWithCodeOrConfirmationIsManualOnlyAsOnAndroid() async throws {
+        for auth in [false,true] {
+            var template = AutomationTemplate(); template.bleEnabled = true
+            template.authEnabled = auth; template.confirmEnabled = !auth
+            let (_,central,app,object,_) = try fixture(template:template)
+            app.bleControl = BLEOwnerControlModel(app:app,transport:central)
+            defer { app.suspend() }
+            let entry = CatalogObject.owned(app.owners[0],object)
+            app.automation.receiveBLE(try XCTUnwrap(central.discoveries[0].manufacturerPayload),rssi:-45)
+            let proof = try XCTUnwrap(app.conditionReadiness(entry.target)); XCTAssertTrue(proof.ready)
+            await app.performAutomaticAction(entry,readiness:proof)
+            XCTAssertTrue(central.channel.writes.isEmpty); XCTAssertEqual(central.connects,0)
+            XCTAssertNil(app.actionPrompt); XCTAssertTrue(app.bleAutomationDisarmed.contains(entry.target.id))
+        }
+    }
     func testForgedPassiveFramesAndLatchStorageFailureCannotStartGATT() async throws {
         var template = AutomationTemplate(); template.bleEnabled = true
         let (storage,central,app,object,_) = try fixture(template:template)

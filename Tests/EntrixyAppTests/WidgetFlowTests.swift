@@ -30,6 +30,9 @@ private final class WidgetAccessMemory: StateStorage {
         inbox.setReady(true); await inbox.dispatchPending()
         let prompt = try XCTUnwrap(app.actionPrompt)
         XCTAssertEqual(prompt.target,app.controlObjects[0].target)
+        // A second tap while the first gate is open cannot wait behind that
+        // gate and become another physical command after the user confirms.
+        XCTAssertFalse(inbox.enqueue(id))
         XCTAssertTrue(app.journal.isEmpty); app.dismissActionPrompt(prompt.id)
         XCTAssertFalse(inbox.enqueue(id,id:invocation)); await inbox.dispatchPending(); XCTAssertNil(app.actionPrompt)
         XCTAssertEqual(storage.state.identity,Data(repeating:28,count:32)); XCTAssertTrue(storage.state.journal?.isEmpty ?? true)

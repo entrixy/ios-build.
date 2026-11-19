@@ -56,9 +56,9 @@ Core245 Apple/Debug также прошли. Новый BLE Info и код в р
 | C02 | Карточка действия | GuestCatalogControlCard / OwnerCatalogControlCard | Прямой тап, индикатор на аватаре, scoped policy; компактный ActionPrompt ожидает свежей Apple/UI-проверки. |
 | C03 | Ручной запуск | AppModel.actionIntent/ownerActionIntent → execute | Существующие guards/PIN/биометрия/one-shot сохраняются. |
 | C04 | Состояние контроллера | CatalogStatusAvatar / BLEPassiveObserver / BLEProximityRuntime | Свежие подписанные BLE observations и RSSI debounce в foreground; фон/реальное радио не подтверждены. |
-| C05 | Положение объекта | OwnerControlModel.positions / ActionLink.positions | Данные и выбор направления есть; углы-индикаторы ещё не перенесены. |
+| C05 | Положение объекта | OwnerControlModel.positions / ActionLink.positions | Исходные4 уголка OPEN поверх аватара,64/56pt и статус-точка как Android; BLE только при свежем reachable observation. Данные/выбор направления сохраняются; новая source/UI-проверка ожидается. |
 | C06 | Камера в карточке | ObjectControlCard / ObjectCameraStream / CameraVideoProxy | Поток в той же карточке, showWhen, scoped camera entitlement; JPEG/MJPEG/native HLS/MP4, auth bridge проверен транспортными тестами. Декодирование камеры/другие форматы не приняты. |
-| C07 | Готовность автоматизации | AutomationEditor / AutomationCoordinator / AutomationRuntime | Geo route/zone, текущий Wi-Fi/time/BLE, latch/rearm; неподдержанный Wi-Fi scan не имитируется. Gated auto source6b42489 ждёт Apple; фон не завершён. |
+| C07 | Готовность автоматизации | AutomationEditor / AutomationCoordinator / AutomationRuntime | Geo route/zone, Wi-Fi/time/BLE, latch/rearm. Source ограниченного background BLE/owner-local-webhook подключён; iOS Wi-Fi scan/постоянный WSS не имитируются. Новый Apple/device прогон ожидается. |
 | C08 | Подсказки/баннер | Нет полного production route | Разделить readiness ОС и promo cache/события. |
 | O01 | Общий список | ObjectSettingsRows + ObjectCatalogPreferences | Один смешанный список; onMove сохраняет порядок; стандартный режим изменения порядка iOS. |
 | O02 | Свой обычный объект, раскрытие | ObjectSettingsRows → OwnerObjectEditor / AutomationEditor | Редактор типа, автонастройки, удаление; новая UI-проверка переходов ещё ожидается. |
@@ -88,7 +88,7 @@ Core245 Apple/Debug также прошли. Новый BLE Info и код в р
 | Y04 | Резервная копия | BackupSettingsSection / BackupPresentation / BackupManager | Native/Android inspect, preview, encrypted export, claims/checkpoints, merge и напоминание; real cross-device migration не принят. |
 | Y05 | Серверы | ServerSettingsSection / ServerSettingsDialog / OwnerServerSettings | Inline список, selected host, access code/account link/unlink/local forget и owner-loss guards. Клиентские fixtures прошли; live pwa_login.php восстановлен (site875d2b6), negative HTTP contract проверен без cookies; успешный реальный login/link ещё не принят. |
 | Y06 | Сети приватности | ServerPrivacyRouter / NetworkPrivacySettingsSection / scoped backup / encrypted bundles | Proxy153 green; live startup и home UI подключены в source, актуальные native/UI19 ещё проверяются. iOS17 — только cellular при правилах, iOS16 — запрет серверных подключений; hardware acceptance остаётся. |
-| Y07 | Подсказки ОС | PhoneReadinessCard / PhoneReadiness / PhoneRequirements | Conditional geo/precision/BLE/notify requirements, explicit requests and app settings; Linux truth table passed, native/device checks pending. Always не запрашивается до подключения фонового runtime. |
+| Y07 | Подсказки ОС | PhoneReadinessCard / PhoneReadiness / PhoneRequirements | Conditional geo/precision/BLE/notify requirements, явные запросы и Settings; базовый native168 прошёл. Source Always теперь связан с работающим callback runtime; BLE без geo его не требует. Новый Apple/device прогон ожидается. |
 | Y08 | Разработчик | HelpScreen 7 taps / DeveloperSettingsSection | Manual technical send/off as Android; UI pending. Android FCM/geo debug tools не объявлены перенесёнными; DEBUG capture routes остаются отдельно от Release. |
 | G01 | Свои выданные доступы | GuestsHub.OwnerGuestsScreen | Android People/Companies/Presets, conditional tabs, scoped cards и передаваемые доступы подключены; полная UI/E2E-приёмка остаётся. |
 | G02 | Карточка гостя | GuestPersonCard / IssueOwnerKeyScreen / OwnerDelegatedKeyScreen | Раскрытие, редактирование/clone/QR/share/message/pause/delete; общая визуальная проверка всех состояний остаётся. |
@@ -113,7 +113,7 @@ Core245 Apple/Debug также прошли. Новый BLE Info и код в р
 | E03 | Автотриггер | AutomationCoordinator / ActionPrompt / executeActionPrompt | Единый foreground manual/automatic confirm/PIN/biometry, одно согласие на frozen intent, cancel consumes arrival; latest source6b42489 ещё не Apple-исполнен. |
 | E04 | Ключ принят/отклонён | KeyImportScreen / DelegationInboxScreen | Есть bind/errors/pending; полный readiness/welcome ещё не перенесён. |
 | E05 | Восстановление | BackupPresentation / BackupRestorePlan / backup reminder | Preview/restore/preflight/checkpoints/reminder подключены, системный файл sharing; реальный перенос между устройствами не принят. |
-| W01 | Виджет | WidgetKit/AppIntent iOS17, source; Apple/device pending | Общий каталог представления, исходные аватары; foreground-only action через текущую policy/entry/PIN/confirm. TTL60с, consume-before-dispatch, нет fire URL/ключей в extension. Android service в фоне этим не перенесён. |
+| W01 | Виджет | WidgetKit/AppIntent iOS17, source; Apple/device pending | Общий каталог представления, исходные аватары; action в приложении через текущую policy/entry/PIN/confirm. Базовый Apple168 прошёл; device pending. TTL60с, consume-before-dispatch, нет fire URL/ключей в extension. Android service в фоне этим не перенесён. |
 
 ## Приёмка этого изменения
 

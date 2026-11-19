@@ -46,7 +46,7 @@ private struct ObjectWidgetView: View {
                         }
                         .frame(width:56,height:56).clipShape(RoundedRectangle(cornerRadius:14))
                         .overlay(alignment:.bottomTrailing) { Circle().fill(statusColor).frame(width:10,height:10).offset(x:-8,y:-8) }
-                    } else { Image("icon-key").resizable().scaledToFit().frame(width:56,height:56) }
+                    } else { Image("widget-launcher").resizable().scaledToFit().frame(width:56,height:56) }
                 }.accessibilityHidden(true)
                 Text(entry.object?.label ?? "Entrixy").font(.headline).multilineTextAlignment(.center).lineLimit(3)
                     .foregroundStyle(.primary)

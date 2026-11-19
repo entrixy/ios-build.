@@ -942,3 +942,5 @@
 "ios_perm_notifications" = "Notificaciones de solicitudes de invitados";
 "ios_perm_settings" = "Abrir ajustes del iPhone";
 "ios_perm_allow" = "Permitir";
+
+"ios_auto_foreground_notice" = "Se ha cumplido una condición de automatización. Abre Entrixy para comprobar el objeto y realizar la acción.";

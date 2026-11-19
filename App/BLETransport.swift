@@ -36,13 +36,15 @@ enum BLETransportFailure: LocalizedError {
 }
 
 @MainActor protocol BLECentralTransport: AnyObject {
+    func prime(_ discovery: BLEDiscovery, at date: Date)
     func scan(seconds: TimeInterval) async throws -> [BLEDiscovery]
     func connect(_ discoveryID: UUID, pairing: Bool) async throws -> any BLEChannel
     func stop()
 }
+extension BLECentralTransport { func prime(_ discovery: BLEDiscovery, at date: Date) {} }
 
-/// Foreground-only transport. The manager is created on the first explicit
-/// operation, so constructing the app does not request Bluetooth permission.
+/// Shared manual/scoped-automatic transport. The manager is created only on an
+/// authorized operation, so constructing the app never requests permission.
 @MainActor final class CoreBluetoothTransport: NSObject, BLECentralTransport, CBCentralManagerDelegate {
     private var central: CBCentralManager?
     private var ready: CheckedContinuation<Void, Error>?
@@ -53,6 +55,11 @@ enum BLETransportFailure: LocalizedError {
     private var operationID: UUID?
     private var readyTimer: Task<Void, Never>?
     private var scanTimer: Task<Void, Never>?
+    private var observed: [UUID:(BLEDiscovery,Date)] = [:]
+    func prime(_ discovery: BLEDiscovery, at date: Date) {
+        observed = observed.filter { date.timeIntervalSince($0.value.1) < 2 }
+        if observed.count < 64 { observed[discovery.id] = (discovery,date) }
+    }
 
     private func begin() throws -> UUID {
         guard operationID == nil, connection == nil else { throw BLETransportFailure.busy }
@@ -85,6 +92,16 @@ enum BLETransportFailure: LocalizedError {
             try Task.checkCancellation()
             guard operationID == id else { throw BLETransportFailure.cancelled }
             discoveries.removeAll(); peripherals.removeAll()
+            let recent = observed.values.filter { let age = Date().timeIntervalSince($0.1); return age >= 0 && age < 2 }.map(\.0)
+            if !recent.isEmpty {
+                let known = manager.retrievePeripherals(withIdentifiers:recent.map(\.id))
+                for peripheral in known { peripherals[peripheral.identifier] = peripheral }
+                let found = recent.filter { peripherals[$0.id] != nil }
+                if !found.isEmpty {
+                    discoveries = Dictionary(uniqueKeysWithValues:found.map { ($0.id,$0) })
+                    return found
+                }
+            }
             return try await withCheckedThrowingContinuation { continuation in
                 scanner = continuation
                 manager.scanForPeripherals(withServices: [CBUUID(string: BLECrypto.service)], options: nil)

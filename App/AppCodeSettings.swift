@@ -25,7 +25,7 @@ struct AppCodeSettingsSection: View {
                 if !model.hasActionCode { model.codePrompt = AppCodePrompt(action:.setup(enableLock:true)) }
                 else if !enabled { model.codePrompt = AppCodePrompt(action:.lock(false)) }
                 else { apply(enabled:enabled,biometric:model.appEntryBiometricEnabled) }
-            }))
+            })).accessibilityIdentifier("entry-lock-toggle")
             Text(ProductText.string("ios_entry_lock_hint")).font(.footnote).foregroundStyle(Brand.secondaryInk)
             Toggle(ProductText.string("auth_use_biometric"),isOn:Binding(get:{ model.appEntryBiometricEnabled },set:{ enabled in
                 if enabled { model.codePrompt = AppCodePrompt(action:.biometric(true)) }

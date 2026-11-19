@@ -119,6 +119,7 @@ final class AppModel: ObservableObject {
     lazy var blePairing = BLEPairingModel(app: self, transport: bleTransport)
     lazy var bleGuestControl = BLEGuestControlModel(app: self, transport: bleTransport)
     private var bleAuthorizedIntent: UUID?
+    private var bleAuthorizedAutomaticTarget: ObjectReference?
     lazy var bleControl = BLEOwnerControlModel(app: self, transport: bleTransport)
     lazy var messages = MessageManager(app: self)
     @Published private(set) var incomingMessages: [SavedMessage] = []
@@ -146,6 +147,9 @@ final class AppModel: ObservableObject {
     private var watchers: [String: Task<Void, Never>] = [:]
     private var generations: [String: UUID] = [:]
     private var foreground = true
+    var isForeground: Bool { foreground }
+    var backgroundMonitoring = false
+    var backgroundActionScope: BackgroundActionScope?
     private var resumeRequested = false
     private var syncFailure: String?
 
@@ -288,8 +292,13 @@ final class AppModel: ObservableObject {
                 key.state != .revoked && key.state != .paused && (key.callPreferences ?? [:]).values.contains { $0.reaction == "notify" }
             }
         }
-        // Foreground runtime cannot justify requesting Always location. Enable
-        // that requirement only when the bounded background path is connected.
+        needs.backgroundLocation = needs.location && controlObjects.contains { entry in
+            (try? automationContext(.object(entry.target)).template.geoEnabled) == true
+        }
+        needs.notifications = needs.notifications || controlObjects.contains { entry in
+            guard let t = try? automationContext(.object(entry.target)).template else { return false }
+            return t.geoEnabled || t.bleEnabled
+        }
         return needs
     }
 
@@ -718,7 +727,7 @@ final class AppModel: ObservableObject {
     }
     func guestBLEMaterial(_ intent: ActionIntent) throws -> BLEGuestGrant {
         guard objectIsVisible(.received(guestID: intent.guestID, objectID: intent.object.id)),
-              canManageGuestAccess, !busy, let guest = guests.first(where: { $0.id == intent.guestID }),
+              allowsAction(.received(guestID:intent.guestID,objectID:intent.object.id),automatic:intent.automatic), !busy, let guest = guests.first(where: { $0.id == intent.guestID }),
               !guest.paused, guest.objects.contains(intent.object), let cache = guest.bleCache,
               cache.revision == intent.revision else { throw BLETransportFailure.cancelled }
         let target = ObjectReference.received(guestID:intent.guestID,objectID:intent.object.id)
@@ -761,7 +770,7 @@ final class AppModel: ObservableObject {
         var updated = guests; updated[i].bleCache = cache
         let actionKey = "ble-guest:" + UUID().uuidString
         let previous = journal
-        journal.insert(JournalEntry(who: "Я", what: intent.object.label, actionKey: actionKey,
+        journal.insert(JournalEntry(who: intent.automatic ? ProductText.string("journal_who_geo") : "Я", what: intent.object.label, actionKey: actionKey,
             result: "Результат Bluetooth-команды не получен", level: "warning"), at: 0)
         journal = Array(journal.prefix(500))
         let priorLatches = bleAutomationDisarmed
@@ -771,8 +780,11 @@ final class AppModel: ObservableObject {
         noteAutomationAttempt(.received(guestID:intent.guestID,objectID:intent.object.id))
         return actionKey
     }
-    func isBLEGuestAuthorized(_ id: UUID) -> Bool { canManageGuestAccess && bleAuthorizedIntent == id }
-    func finishBLEGuestAuthorization(_ id: UUID) { if bleAuthorizedIntent == id { bleAuthorizedIntent = nil } }
+    func isBLEGuestAuthorized(_ id: UUID) -> Bool {
+        guard bleAuthorizedIntent == id else { return false }
+        return canManageGuestAccess || bleAuthorizedAutomaticTarget.map { allowsAction($0,automatic:true) } == true
+    }
+    func finishBLEGuestAuthorization(_ id: UUID) { if bleAuthorizedIntent == id { bleAuthorizedIntent = nil; bleAuthorizedAutomaticTarget = nil } }
 
     func refreshOwnerBLEDecision(server: String, record: BLERevocation) async {
         guard canManageGuestAccess, !ownerBusy, !busy else { return }
@@ -810,9 +822,9 @@ final class AppModel: ObservableObject {
         guard ownerAccessIsUsable(server) else { rejectOwnerAction(object.id, ProductText.string("ios_server_ownership_lost")); return false }
         do {
             let target = ObjectReference.owned(server:server,objectID:object.id)
-            if object.kind == "ble", activeOwnerAction?.automatic == true {
+            if activeOwnerAction?.automatic == true {
                 guard let evidence = automaticPermits[target], automaticEvidenceValid(evidence,target:target),
-                      !automation.bleOpenish(target) else { return false }
+                      object.kind != "ble" || !automation.bleOpenish(target) else { return false }
             }
             let policy = try OwnerManualPolicy(object.localPolicy, readiness: conditionReadiness(target))
             if let reason = policy.blockedReason { rejectOwnerAction(object.id, reason); return false }
@@ -825,8 +837,14 @@ final class AppModel: ObservableObject {
             return true
         } catch { rejectOwnerAction(object.id, "Не удалось проверить защищённые правила владельца."); return false }
     }
+    func ownerPhysicalActionAllowed(server: String, objectID: UUID) -> Bool {
+        if canManageGuestAccess { return true }
+        guard let intent = activeOwnerAction, intent.automatic, intent.server == server, intent.object.id == objectID,
+              owners.first(where:{ $0.server == server })?.objects?.first(where:{ $0.id == objectID }) == intent.object else { return false }
+        return allowsAction(.owned(server:server,objectID:objectID),automatic:true)
+    }
     func beginBLEOwnerAction(server: String, objectID: UUID, proofHash: String) throws -> String {
-        guard canManageGuestAccess, let i = owners.firstIndex(where: { $0.server == server }),
+        guard ownerPhysicalActionAllowed(server:server,objectID:objectID), let i = owners.firstIndex(where: { $0.server == server }),
               let j = owners[i].objects?.firstIndex(where: { $0.id == objectID }),
               let object = owners[i].objects?[j], object.kind == "ble", object.ownerCardAvailable,
               !(object.bleProofs ?? []).contains(proofHash), ownerManualActionAllowed(object, server: server, action: .toggle) else { throw GuestCrypto.Failure.invalidEnvelope }
@@ -837,7 +855,7 @@ final class AppModel: ObservableObject {
         updated[i].objects![j].bleProofs = Array(((object.bleProofs ?? []) + [proofHash]).suffix(64))
         let actionKey = "ble-owner:" + UUID().uuidString
         let previous = journal
-        journal.insert(JournalEntry(who: "Я", what: label, actionKey: actionKey,
+        journal.insert(JournalEntry(who: ownerActionWho(server:server,objectID:objectID), what: label, actionKey: actionKey,
             result: "Результат Bluetooth-команды не получен", level: "warning"), at: 0)
         journal = Array(journal.prefix(500))
         let priorLatches = bleAutomationDisarmed
@@ -1680,6 +1698,8 @@ final class AppModel: ObservableObject {
     }
 
     func resume() async {
+        if backgroundMonitoring { stopBackgroundCommand() }
+        backgroundMonitoring = false; backgroundActionScope = nil
         foreground = true
         scheduleOwnerSettingsRefresh()
         automation.resume()
@@ -1694,7 +1714,8 @@ final class AppModel: ObservableObject {
         delegationInbox.resume()
     }
 
-    func suspend() {
+    func suspend(preserveAutomation: Bool = false) {
+        backgroundMonitoring = false; backgroundActionScope = nil
         diagnosticConsentPrompt = false; diagnostics.pause()
         networkPrivacyPrompt = nil
         bleInformationTarget = nil
@@ -1703,7 +1724,8 @@ final class AppModel: ObservableObject {
         codePrompt = nil
         serverPrompt = nil
         backupPresentation.cancel()
-        automation.suspend(); automaticPermits.removeAll()
+        if preserveAutomation { automation.pauseForBackground() } else { automation.suspend() }
+        automaticPermits.removeAll()
         ownerSettingsTask?.cancel(); ownerSettingsTask = nil; ownerSettingsTaskGeneration = nil
         delegationInbox.suspend()
         ownerControl.suspend()
@@ -1715,6 +1737,7 @@ final class AppModel: ObservableObject {
         bleControl.suspend()
         bleGuestControl.suspend()
         bleAuthorizedIntent = nil
+        bleAuthorizedAutomaticTarget = nil
         authorizedIntent = nil; activeOwnerAction = nil
         foreground = false
         resumeRequested = false
@@ -2067,7 +2090,7 @@ extension AppModel {
         actionRejections.removeValue(forKey: guestID + "|" + object.id)
         do {
             if object.kind == "ble" {
-                guard canManageGuestAccess, !busy, !bleGuestControl.busy,
+                guard allowsAction(.received(guestID:guestID,objectID:object.id),automatic:automatic), !busy, !bleGuestControl.busy,
                       let guest = guests.first(where: { $0.id == guestID }), !guest.paused,
                       guest.objects.contains(object), let cache = guest.bleCache else { throw ActionDenied.message("Защищённый Bluetooth-пропуск не сохранён. Обновите ключ через интернет.") }
                 let material = try cache.open(key: guest.invite.bundleKey)
@@ -2112,6 +2135,7 @@ extension AppModel {
             let authenticated = authorizedIntent == intent.id; authorizedIntent = nil
             guard fresh.policy.authentication == nil || authenticated else { rejectAction(guestID: intent.guestID, object: intent.object, message: "Требуется подтверждение личности."); return }
             bleAuthorizedIntent = intent.id
+            bleAuthorizedAutomaticTarget = intent.automatic ? .received(guestID:intent.guestID,objectID:intent.object.id) : nil
             await bleGuestControl.execute(intent)
             return
         }
@@ -2325,7 +2349,7 @@ extension AppModel {
         if automatic && !automaticPermitValid(.owned(server:server,objectID:objectID)) { return nil }
         ownerActionRejections.removeValue(forKey: objectID)
         do {
-            guard foreground, canManageGuestAccess, !busy, !ownerBusy,
+            guard allowsAction(.owned(server:server,objectID:objectID),automatic:automatic), !busy, !ownerBusy,
                   let owner = owners.first(where: { $0.server == server && $0.ownershipLost != true }),
                   let object = owner.objects?.first(where: { $0.id == objectID }),
                   !owner.registrationPending || object.kind == "ble", object.ownerCardAvailable, !owner.isMoving(objectID) else {
@@ -2518,6 +2542,21 @@ extension AppModel {
 
 
 extension AppModel {
+    /// Observational presentation state only. It never authorizes a command.
+    func objectPosition(_ entry: CatalogObject) -> String? {
+        guard ["ble","device","webhook"].contains(entry.kind) else { return nil }
+        if entry.kind == "ble" {
+            // Android hides OPEN corners when a BLE controller is no longer
+            // reachable; an old observation must not remain visibly open.
+            guard objectAvailability(entry) == .ready else { return nil }
+            return automation.blePosition(entry.target)
+        }
+        switch entry {
+        case let .owned(owner,object):
+            return object.numberID.flatMap { ownerControl.positions[owner.server]?[$0] }
+        case let .received(guest,object): return actionLinks[guest.id]?.positions[object.numberID]
+        }
+    }
     /// Observational presentation state only. It never authorizes a command.
     func noteBLESighting(_ target: ObjectReference, sleepSeconds: UInt8? = nil) {
         let window = sleepSeconds.map { min(60, max(5, Int($0) * 5 + 5)) } ?? 60
@@ -2841,7 +2880,7 @@ extension AppModel {
 
 extension AppModel {
     func setBLEAutomationArmed(_ target: ObjectReference, armed: Bool) throws {
-        guard canManageGuestAccess else { throw BLETransportFailure.cancelled }
+        guard canObserveAutomation, catalogObject(target)?.kind == "ble" else { throw BLETransportFailure.cancelled }
         let prior = bleAutomationDisarmed
         if armed { bleAutomationDisarmed.remove(target.id) } else { bleAutomationDisarmed.insert(target.id) }
         guard bleAutomationDisarmed != prior else { return }

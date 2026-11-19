@@ -14,13 +14,14 @@ import EntrixyCore
     init(app: AppModel, transport: (any BLECentralTransport)? = nil) {
         self.app = app; self.transport = transport ?? CoreBluetoothTransport()
     }
+    func noteDiscovery(_ row: BLEDiscovery, at date: Date) { transport.prime(row,at:date) }
     func suspend() {
         generation = UUID(); transport.stop(); busy = false
         if let currentObject { messages[currentObject] = "Операция остановлена. Отправленная команда автоматически не повторится." }
         currentObject = nil
     }
     func execute(server: String, objectID: UUID) async {
-        guard !busy, app.canManageGuestAccess,
+        guard !busy, app.ownerPhysicalActionAllowed(server:server,objectID:objectID),
               let owner = app.owners.first(where: { $0.server == server && $0.ownershipLost != true }),
               let object = owner.objects?.first(where: { $0.id == objectID }), object.kind == "ble",
               object.ownerCardAvailable,
@@ -35,7 +36,7 @@ import EntrixyCore
             let secret = try GuestCrypto.decrypt(key: owner.masterKey, envelope: wrapped)
             messages[objectID] = "Поиск контроллера поблизости…"
             let found = try await transport.scan(seconds: 5)
-            guard generation == current, app.canManageGuestAccess, app.ownerAccessIsUsable(server) else { throw BLETransportFailure.cancelled }
+            guard generation == current, app.ownerPhysicalActionAllowed(server:server,objectID:objectID), app.ownerAccessIsUsable(server) else { throw BLETransportFailure.cancelled }
             // Never connect by name alone. Owner-secret HMAC authenticates the
             // advertised DID, then a fresh GATT nonce is used for the one write.
             let matching = found.filter { discovery in
@@ -57,9 +58,9 @@ import EntrixyCore
             messages[objectID] = "Подключение Bluetooth…"
             let connection = try await transport.connect(discovery.id, pairing: false); channel = connection
             let hasResults = try await connection.enableResults()
-            try await applyDecisions(connection, server: server, deviceID: deviceID, secret: secret, hasResults: hasResults, generation: current)
+            try await applyDecisions(connection, server: server, deviceID: deviceID, secret: secret, hasResults: hasResults, generation: current, objectID:objectID)
             let nonce = try await connection.read(BLECrypto.nonceCharacteristic)
-            guard generation == current, app.canManageGuestAccess else { throw BLETransportFailure.cancelled }
+            guard generation == current, app.ownerPhysicalActionAllowed(server:server,objectID:objectID) else { throw BLETransportFailure.cancelled }
             var session = try BLECommandSession(credential: .owner(secret), now: uptime(), epoch: epoch())
             try session.prepare(nonce: nonce, now: uptime(), epoch: epoch())
             let frame = try session.consume(now: uptime(), epoch: epoch())
@@ -117,13 +118,13 @@ import EntrixyCore
         }
     }
     private func applyDecisions(_ connection: any BLEChannel, server: String, deviceID: UInt32, secret: Data,
-                                hasResults: Bool, generation current: UUID) async throws {
+                                hasResults: Bool, generation current: UUID, objectID: UUID? = nil) async throws {
         let records = (app.owners.first(where: { $0.server == server })?.bleRevocations ?? [])
             .filter { $0.deviceID == deviceID && $0.controllerResult == nil }.sorted { $0.version > $1.version }
         guard records.isEmpty || hasResults else { throw BLETransportFailure.unsupported }
         let started = uptime()
         for record in records.prefix(16) {
-            guard generation == current, app.canManageGuestAccess, app.ownerAccessIsUsable(server), uptime() - started < 20,
+            guard generation == current, (app.canManageGuestAccess || objectID.map { app.ownerPhysicalActionAllowed(server:server,objectID:$0) } == true), app.ownerAccessIsUsable(server), uptime() - started < 20,
                   app.owners.first(where: { $0.server == server })?.bleRevocations?.contains(where: { $0.id == record.id && $0.version == record.version && $0.signature == record.signature }) == true,
                   try record.verify(ownerSecret: secret) else { throw BLETransportFailure.cancelled }
             try await connection.write(record.frame, to: BLECrypto.revokeCharacteristic)

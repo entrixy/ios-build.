@@ -474,12 +474,12 @@ final class OwnerControlModel: ObservableObject {
         }
     }
     func phoneWebhookReady(server: String, objectID: UUID) -> Bool {
-        active && !webhookInFlight.contains(.owned(server: server, objectID: objectID))
+        (active || app.backgroundActionScope?.target == .owned(server:server,objectID:objectID)) && !webhookInFlight.contains(.owned(server: server, objectID: objectID))
     }
     func phoneWebhook(server: String, objectID: UUID, action requested: GuestAction = .open, request: OwnerPhoneRequest? = nil) async {
         defer { if let request { acceptedWebhookRequests.remove(request.id) } }
         let target = ObjectReference.owned(server: server, objectID: objectID)
-        guard active, app.canManageGuestAccess, !webhookInFlight.contains(target),
+        guard (active || !app.isForeground), app.ownerPhysicalActionAllowed(server:server,objectID:objectID), !webhookInFlight.contains(target),
               let owner = app.owners.first(where: { $0.server == server }),
               let object = owner.objects?.first(where: { $0.id == objectID && $0.kind == "webhook" && $0.pending == nil && $0.available != false }),
               object.routing["webhook_mode"] == "phone", let number = object.numberID,
@@ -505,7 +505,7 @@ final class OwnerControlModel: ObservableObject {
         let toggles = metadata?["wh_toggle"] as? Int == 1
         let action = PhoneWebhook.action(requested: direction, toggles: toggles, position: positions[server]?[number])
         guard let body = try? PhoneWebhook.request(numberID: number, action: action, secret: secret),
-              active, app.canManageGuestAccess, !webhookInFlight.contains(target),
+              app.ownerPhysicalActionAllowed(server:server,objectID:objectID), !webhookInFlight.contains(target),
               app.owners.first(where: { $0.server == server })?.objects?.first(where: { $0.id == objectID }) == object else { return }
         webhookInFlight.insert(target)
         defer { webhookInFlight.remove(target); webhookTasks.removeValue(forKey: target) }

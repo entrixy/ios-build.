@@ -8,25 +8,31 @@ This repository is private working source; no new distribution license is assign
 
 The full Android port remains the active task. The gallery still contains the old
 19-frame catalogue; a new full native screenshot batch follows functional completion.
-Latest verified app: native `12cd038`, public `bd40d03`,
-[Apple run44412545161](https://github.com/entrixy/ios-build./actions/runs/44412545161):
-279 core tests, Debug/test bundles, Release/isolation and164 hosted native tests passed.
-This includes live privacy routing, consented diagnostics and conditional phone readiness.
-It does not prove physical radio, background execution or OS MetricKit delivery.
+Latest verified app: native `c3ce3bb`, public `d09e8ba`,
+[Apple run44414977345](https://github.com/entrixy/ios-build./actions/runs/44414977345):
+283 core tests, Debug/test bundles including the widget extension, Release/isolation
+and168 hosted native tests passed. All four widget lifecycle/policy/export cases passed.
+This does not prove physical widget configuration or background radio operation.
+UI source `783635d` / public `16b4e86` ran20 scenarios:18passed,2failed
+(diagnostic-dialog accessibility snapshot and entry-lock switch hit target).
 
-UI source `b053d3b` / public `3988205` ran20 scenarios:17 passed,3 failed
-(diagnostic-dialog AX timeout, entry-lock switch lookup and home-network switch tap).
-The next UI run retains the assertions and targets nested native switch controls;
-its outcome is pending. Previous `1927187` / `04154a7` passed all17 earlier UI cases.
+The current larger batch connects OS-event-driven background BLE and own local
+webhooks with short per-object automatic authority, expiration/cancellation,
+Core Location batches and passive Bluetooth restoration. PIN-protected BLE stays
+manual-only, as in Android. Calls and other routes requiring foreground produce a
+local navigation notification; persistent background WSS/APNs is not implemented.
+The manual/entry/settings guards remain separate. Physical-device behavior is pending.
+The batch also fixes the shared dialog's duplicated content tree and the code-toggle
+locator, and keeps the original widget launcher artwork and Android OPEN corners.
 
-Current source adds the native configurable iOS17 widget, sharing presentation only.
-Its foreground AppIntent uses the same entry lock, current object policy, PIN and
-confirmation as a card; requests expire and are consumed before dispatch, without
-persisted/replayed fire commands or URL-scheme authority. This is not Android's
-background service behavior. Linux283 core and syntax checks passed; the extension's
-Apple build, hosted widget flows and on-device configuration remain pending.
-App Group/device provisioning is not configured. Full background/notifications,
-remaining parity/device/release gates and the final screenshot batch are incomplete.
+CI now builds test products once, runs hosted native and UI cases in ONE simulator
+pass, and records32 named screenshots directly at the UI checkpoints. No separate
+product-screen replay or duplicate light/dark variants. Exported PNGs retain their
+original bytes, source SHA and test identifier; partial/failed runs cannot claim a
+complete screenshot review. Final visual/parity acceptance and gallery publication
+remain separate. Local289 core tests, four pipeline contract checks, syntax and
+workflow checks passed; exact-current Apple173/native+UI20/capture32 is pending.
+Full background/device/release gates and the full Android port remain incomplete.
 Detailed scope and evidence: [FUNCTIONAL_PORT.md](docs/FUNCTIONAL_PORT.md).
 
 ### Historical catalogue checkpoint — 16 November 2026

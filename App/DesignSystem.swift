@@ -134,18 +134,31 @@ struct ActionRejectionFeedback: ViewModifier {
 }
 
 
-/// Common centered Android dialog surface; task forms retain their own sheets.
+private struct DialogContentHeight: PreferenceKey {
+    static var defaultValue: CGFloat = 0
+    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) { value = max(value,nextValue()) }
+}
+
+/// One content tree for layout, interaction and accessibility. A tall dialog
+/// scrolls; constructing two copies of its observed controls in ViewThatFits
+/// can leave the accessibility snapshot evaluating both copies indefinitely.
 struct AppDialogSurface<Content: View>: View {
     @ViewBuilder let content: () -> Content
+    @State private var contentHeight: CGFloat = 0
     var body: some View {
         GeometryReader { proxy in
             ZStack {
                 Color.black.opacity(0.35).ignoresSafeArea().contentShape(Rectangle()).onTapGesture { }
                     .accessibilityHidden(true)
-                ViewThatFits(in: .vertical) {
-                    content()
-                    ScrollView { content() }
-                }.padding(24).frame(width: min(max(0, proxy.size.width - 32), 420))
+                ScrollView {
+                    content().frame(maxWidth:.infinity,alignment:.leading).fixedSize(horizontal:false,vertical:true)
+                        .background(GeometryReader { size in Color.clear.preference(key:DialogContentHeight.self,value:size.size.height) })
+                }.scrollIndicators(.hidden)
+                    .frame(height:min(contentHeight > 0 ? contentHeight : max(1,proxy.size.height-88),max(1,proxy.size.height-88)))
+                    .onPreferenceChange(DialogContentHeight.self) { height in
+                        if abs(contentHeight-height) > 0.5 { contentHeight = height }
+                    }
+                    .padding(24).frame(width: min(max(0, proxy.size.width - 32), 420))
                     .background(Color(uiColor: .secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 20))
                     .padding(.vertical, 20)
                     .accessibilityElement(children: .contain).accessibilityAddTraits(.isModal)

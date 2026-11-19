@@ -7,6 +7,7 @@ xcuserdata/
 *.mobileprovision
 .env
 .DS_Store
+__pycache__/
 
 .local-checks/
 *.xcodeproj/

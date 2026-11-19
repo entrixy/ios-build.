@@ -367,12 +367,14 @@ final class OwnerAccountTests: XCTestCase {
         channel.emit(["type": "devices_online", "device_ids": [9]])
         channel.emit(["type": "obj_state_update", "num_id": 7, "position": "open"])
         try await waitForOwner { control.positions["owner.invalid"]?[7] == "open" }
+        XCTAssertEqual(model.objectPosition(.owned(model.owners[0],object)),"open")
         let close = try XCTUnwrap(model.ownerActionIntent(server: "owner.invalid", objectID: object.id))
         XCTAssertEqual(close.action, .close)
         XCTAssertFalse(close.policy.confirmation)
         XCTAssertTrue(channel.writes.isEmpty)
         channel.emit(["type": "obj_state_update", "num_id": 7, "position": "closed"])
         try await waitForOwner { control.positions["owner.invalid"]?[7] == "closed" }
+        XCTAssertEqual(model.objectPosition(.owned(model.owners[0],object)),"closed")
         await model.execute(close)
         XCTAssertTrue(channel.writes.isEmpty)
         XCTAssertTrue(model.journal.isEmpty)

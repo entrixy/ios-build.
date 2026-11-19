@@ -1,7 +1,7 @@
 name: iOS functional port compilation
 "on":
   push:
-    branches: [ci/functional-port, ci/automation-runtime, ci/ui-review, ci/ui-review-arm, ci/native-review-arm]
+    branches: [ci/functional-port, ci/automation-runtime, ci/ui-review, ci/ui-review-arm, ci/native-review-arm, ci/review-batch]
   workflow_dispatch:
 permissions:
   contents: read
@@ -10,7 +10,7 @@ concurrency:
   cancel-in-progress: true
 jobs:
   compile:
-    runs-on: ${{ (github.ref == 'refs/heads/ci/ui-review-arm' || github.ref == 'refs/heads/ci/native-review-arm') && 'macos-15' || 'macos-15-intel' }}
+    runs-on: ${{ (github.ref == 'refs/heads/ci/ui-review-arm' || github.ref == 'refs/heads/ci/native-review-arm' || github.ref == 'refs/heads/ci/review-batch') && 'macos-15' || 'macos-15-intel' }}
     timeout-minutes: 45
     env:
       DEVELOPER_DIR: /Applications/Xcode_26.3.app/Contents/Developer
@@ -48,11 +48,14 @@ jobs:
             .local-checks/DerivedData/Build/Products/Debug-iphonesimulator/Entrixy.app \
             .local-checks/ReleaseDerivedData/Build/Products/Release-iphonesimulator/Entrixy.app
       - name: Verify native transactions without capture or UI automation
-        if: ${{ !startsWith(github.ref, 'refs/heads/ci/ui-review') }}
+        if: ${{ !startsWith(github.ref, 'refs/heads/ci/ui-review') && github.ref != 'refs/heads/ci/review-batch' }}
         run: python3 scripts/test_simulator.py --only-native --use-built-tests 2>&1 | tee .local-checks/ci/native-tests.log
       - name: Verify native UI routes without taking a product screenshot batch
         if: startsWith(github.ref, 'refs/heads/ci/ui-review')
         run: python3 scripts/test_simulator.py --only-ui --use-built-tests 2>&1 | tee .local-checks/ci/ui-tests.log
+      - name: Verify native and UI scenarios with original screenshots in the same simulator pass
+        if: github.ref == 'refs/heads/ci/review-batch'
+        run: python3 scripts/test_simulator.py --use-built-tests --review-captures 2>&1 | tee .local-checks/ci/combined-review.log
       - name: Retain compilation evidence
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02

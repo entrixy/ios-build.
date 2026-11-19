@@ -2,6 +2,13 @@ import XCTest
 
 final class NavigationUITests: XCTestCase {
     private var activeApp: XCUIApplication?
+    private static var capturedStates = Set<String>()
+    private func reviewCapture(_ state: String) {
+        guard ProcessInfo.processInfo.environment["ENTRIXY_REVIEW_CAPTURE"] == "1",
+              Self.capturedStates.insert(state).inserted else { return }
+        let frame = XCTAttachment(screenshot:XCUIScreen.main.screenshot())
+        frame.name = "review-" + state; frame.lifetime = .keepAlways; add(frame)
+    }
     override func setUp() { continueAfterFailure = false }
     override func tearDown() {
         if (testRun?.failureCount ?? 0) > 0 {
@@ -37,13 +44,26 @@ final class NavigationUITests: XCTestCase {
         let thumb = row.switches.firstMatch
         return thumb.exists ? thumb : row
     }
+    private func bringIntoView(_ row: XCUIElement, in app: XCUIApplication) {
+        let list = app.collectionViews.firstMatch
+        for _ in 0..<22 {
+            if row.exists && nativeSwitch(row).isHittable { return }
+            let view = list.exists ? list : app
+            let down = row.exists && row.frame.maxY < view.frame.minY
+            let start = view.coordinate(withNormalizedOffset:CGVector(dx:0.5,dy:down ? 0.4 : 0.7))
+            let end = view.coordinate(withNormalizedOffset:CGVector(dx:0.5,dy:down ? 0.7 : 0.4))
+            start.press(forDuration:0.05,thenDragTo:end)
+        }
+    }
     func testEmptyProfileAndModalCancellation() {
         let app = launch("empty")
         assertBottom(app, ["settings", "journal"])
+        reviewCapture("settings-empty")
         app.segmentedControls.buttons["Ключи"].tap()
         app.buttons["Добавить ключ"].tap()
         XCTAssertTrue(app.descendants(matching: .any)["inviteInput"].waitForExistence(timeout: 5))
         XCTAssertTrue(app.buttons["Отмена"].isHittable)
+        reviewCapture("add-key")
         app.buttons["Отмена"].tap()
         assertBottom(app, ["settings", "journal"])
         app.segmentedControls.buttons["Объекты"].tap()
@@ -54,6 +74,7 @@ final class NavigationUITests: XCTestCase {
         assertBottom(app, ["settings", "journal"])
         app.buttons["main-tab-journal"].tap()
         XCTAssertTrue(app.staticTexts["Журнал пуст. Здесь будут появляться вызовы."].waitForExistence(timeout: 5))
+        reviewCapture("journal")
     }
     func testHomeNetworkConsentAndRemovalUseSystemSectionAndPreserveReceivedKeys() {
         let app = launch("network-privacy")
@@ -68,6 +89,7 @@ final class NavigationUITests: XCTestCase {
         XCTAssertTrue(row.waitForExistence(timeout:5))
         let toggle = nativeSwitch(row)
         XCTAssertTrue(toggle.exists); XCTAssertTrue(toggle.isHittable); XCTAssertEqual(toggle.value as? String,"0")
+        reviewCapture("home-network")
         toggle.tap()
         let enabled = XCTNSPredicateExpectation(predicate:NSPredicate { _,_ in toggle.value as? String == "1" },object:toggle)
         XCTAssertEqual(XCTWaiter.wait(for:[enabled],timeout:5),.completed)
@@ -90,6 +112,7 @@ final class NavigationUITests: XCTestCase {
         assertBottom(app,["settings","journal"])
         app.segmentedControls.buttons["Система"].tap()
         XCTAssertTrue(app.buttons["theme-light"].waitForExistence(timeout:10)); app.buttons["theme-light"].tap()
+        reviewCapture("system")
         assertBottom(app,["settings","journal"])
         app.buttons["main-tab-journal"].tap()
         XCTAssertTrue(app.staticTexts["Журнал пуст. Здесь будут появляться вызовы."].waitForExistence(timeout:5))
@@ -100,6 +123,7 @@ final class NavigationUITests: XCTestCase {
         app.launch(); activeApp = app
         let later = app.buttons["diagnostic-consent-later"], allow = app.buttons["diagnostic-consent-allow"]
         XCTAssertTrue(later.waitForExistence(timeout:15)); XCTAssertTrue(allow.isHittable)
+        reviewCapture("crash-consent")
         XCTAssertEqual(later.frame.height,allow.frame.height,accuracy:1); later.tap()
         XCTAssertTrue(app.buttons["main-tab-settings"].waitForExistence(timeout:10))
         let row = app.descendants(matching:.any).matching(identifier:"diagnostics-consent-switch").firstMatch
@@ -109,7 +133,9 @@ final class NavigationUITests: XCTestCase {
         let enabled = XCTNSPredicateExpectation(predicate:NSPredicate { _,_ in control.value as? String == "1" },object:control)
         XCTAssertEqual(XCTWaiter.wait(for:[enabled],timeout:5),.completed)
         XCTAssertFalse(app.buttons["diagnostics-send"].exists)
+        reviewCapture("diagnostic-settings")
         app.buttons["header-help"].tap()
+        reviewCapture("help")
         let version = app.descendants(matching:.any).matching(identifier:"help-version").firstMatch
         for _ in 0..<14 { if version.exists && version.isHittable { break }; app.swipeUp() }
         XCTAssertTrue(version.isHittable)
@@ -120,6 +146,7 @@ final class NavigationUITests: XCTestCase {
         for _ in 0..<14 { if send.exists && send.isHittable { break }; app.swipeUp() }
         XCTAssertTrue(send.isHittable); send.tap()
         XCTAssertTrue(app.staticTexts["Технический журнал отправлен."].waitForExistence(timeout:10))
+        reviewCapture("developer-report")
         let off = app.buttons["developer-disable"]
         for _ in 0..<4 { if off.isHittable { break }; app.swipeUp() }
         XCTAssertTrue(off.isHittable); off.tap()
@@ -140,9 +167,11 @@ final class NavigationUITests: XCTestCase {
                 XCTAssertTrue(app.secureTextFields["Код Entrixy"].exists)
                 XCTAssertTrue(app.secureTextFields["Повторите код"].exists)
                 XCTAssertFalse(app.buttons["action-confirmation-submit"].isEnabled)
+                reviewCapture("action-code-setup")
             } else {
                 XCTAssertTrue(app.buttons["action-confirmation-submit"].isEnabled)
                 XCTAssertLessThan(app.buttons["Отмена"].frame.maxY-dialog.frame.minY,app.frame.height * 0.6)
+                reviewCapture("action-confirmation")
             }
             app.buttons["Отмена"].tap()
             XCTAssertFalse(dialog.exists)
@@ -159,6 +188,7 @@ final class NavigationUITests: XCTestCase {
         XCTAssertTrue(code.waitForExistence(timeout:20)); XCTAssertEqual(code.value as? String,"A1B2C3D4")
         XCTAssertTrue(app.staticTexts.matching(NSPredicate(format:"label CONTAINS %@","factory.invalid:8443")).firstMatch.exists)
         XCTAssertTrue(app.textFields["Название"].exists)
+        reviewCapture("device-claim")
         app.buttons["Отмена"].tap()
         assertBottom(app,["settings","journal"])
         XCTAssertTrue(app.staticTexts["Пока нет объектов"].exists)
@@ -171,6 +201,7 @@ final class NavigationUITests: XCTestCase {
         XCTAssertTrue(app.staticTexts.matching(NSPredicate(format:"label BEGINSWITH %@","Данных пока нет")).firstMatch.waitForExistence(timeout:10))
         XCTAssertFalse(app.staticTexts["Заряд батареи"].exists)
         XCTAssertFalse(app.staticTexts["0%"].exists)
+        reviewCapture("ble-information")
         app.buttons["Закрыть"].tap()
         XCTAssertTrue(info.waitForExistence(timeout:10))
         assertBottom(app,["control","settings","guests","journal"])
@@ -181,6 +212,7 @@ final class NavigationUITests: XCTestCase {
         let key = app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH %@", "received-key-")).firstMatch
         XCTAssertTrue(key.waitForExistence(timeout: 5)); key.tap()
         XCTAssertTrue(app.buttons["Обновить данные"].waitForExistence(timeout: 5))
+        reviewCapture("received-key-detail")
         assertBottom(app, ["control", "settings", "journal"])
         app.navigationBars.buttons.firstMatch.tap()
         XCTAssertTrue(key.waitForExistence(timeout: 5))
@@ -196,6 +228,7 @@ final class NavigationUITests: XCTestCase {
         XCTAssertTrue(owner.segmentedControls.buttons["Пресеты"].waitForExistence(timeout: 15))
         assertBottom(owner, ["control", "settings", "guests", "journal"])
         XCTAssertTrue(owner.buttons["issue-guest"].exists)
+        reviewCapture("guests-owner")
     }
     func testDelegatingGuestAvailabilityAndControlSwitch() {
         let guest = launch("delegating-guests")
@@ -203,6 +236,7 @@ final class NavigationUITests: XCTestCase {
         assertBottom(guest, ["control", "settings", "guests", "journal"])
         XCTAssertTrue(guest.buttons["pass-received-access"].exists)
         XCTAssertFalse(guest.buttons["issue-guest"].exists)
+        reviewCapture("guests-delegating")
         guest.buttons["main-tab-control"].tap()
         let card = guest.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", "Ворота во двор.")).firstMatch
         XCTAssertTrue(card.waitForExistence(timeout: 15))
@@ -218,6 +252,7 @@ final class NavigationUITests: XCTestCase {
         let old = field.value as? String ?? ""
         field.typeText(String(repeating: XCUIKeyboardKey.delete.rawValue, count: old.count) + "Yard\n")
         XCTAssertEqual(field.value as? String,"Yard")
+        reviewCapture("object-rename")
         app.buttons["Сохранить"].tap()
         let row = app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH %@", "object-settings-guest:")).firstMatch
         XCTAssertTrue(row.waitForExistence(timeout: 10))
@@ -230,6 +265,8 @@ final class NavigationUITests: XCTestCase {
         XCTAssertTrue(row.waitForExistence(timeout: 10))
         if !app.buttons["Скрыть"].exists { row.tap() }
         app.buttons["Скрыть"].tap()
+        XCTAssertTrue(app.buttons["Скрыть объект"].waitForExistence(timeout:5))
+        reviewCapture("object-hide")
         app.buttons["Скрыть объект"].tap()
         XCTAssertTrue(app.staticTexts["Пока нет объектов"].waitForExistence(timeout: 10))
         assertBottom(app, ["settings", "journal"])
@@ -249,6 +286,7 @@ final class NavigationUITests: XCTestCase {
         XCTAssertTrue(app.buttons["Найти контроллеры"].waitForExistence(timeout: 10))
         XCTAssertEqual(app.textFields["Название объекта"].value as? String, "BLE Yard")
         XCTAssertTrue(app.buttons["Отмена"].exists)
+        reviewCapture("ble-pairing")
         // No scan, pairing or physical command is issued by this test.
     }
     func testMixedObjectsUseTheSameInterleavedOrderInBothRoots() {
@@ -259,12 +297,14 @@ final class NavigationUITests: XCTestCase {
         let ble = row("Дверь Bluetooth"), own = row("Ворота во двор"), guest = row("Гостевой въезд")
         XCTAssertTrue(ble.waitForExistence(timeout: 10)); XCTAssertTrue(own.exists); XCTAssertTrue(guest.exists)
         XCTAssertLessThan(ble.frame.minY, own.frame.minY); XCTAssertLessThan(own.frame.minY, guest.frame.minY)
+        reviewCapture("settings-objects")
         app.buttons["main-tab-control"].tap()
         func card(_ name: String) -> XCUIElement { app.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", name + ".")).firstMatch }
         let bleCard = card("Дверь Bluetooth"), ownCard = card("Ворота во двор"), guestCard = card("Гостевой въезд")
         XCTAssertTrue(bleCard.waitForExistence(timeout: 10)); XCTAssertTrue(ownCard.exists); XCTAssertTrue(guestCard.exists)
         XCTAssertLessThan(bleCard.frame.minY, ownCard.frame.minY); XCTAssertLessThan(ownCard.frame.minY, guestCard.frame.minY)
         assertBottom(app, ["control", "settings", "guests", "journal"])
+        reviewCapture("control")
     }
     func testObjectCreationUsesAndroidTypeOrderAndDefaultCall() {
         let app = launch("empty")
@@ -276,6 +316,7 @@ final class NavigationUITests: XCTestCase {
         XCTAssertTrue(app.textFields["Номер для звонка"].exists)
         XCTAssertTrue(app.buttons["Добавить из контактов"].exists)
         XCTAssertGreaterThan(app.textFields["Название"].frame.minY, types.last!.frame.minY)
+        reviewCapture("add-object-call")
     }
     func testActualWebhookEditorContainsAndroidFieldsAndAutomationRoute() {
         let app = launch("owner-expanded")
@@ -285,10 +326,12 @@ final class NavigationUITests: XCTestCase {
         XCTAssertFalse(app.staticTexts["Значок объекта"].exists)
         XCTAssertFalse(app.buttons["Сохранить защиту"].exists)
         XCTAssertTrue(app.buttons["owner-object-automation"].isHittable)
+        reviewCapture("object-webhook-edit")
         app.buttons["owner-object-automation"].tap()
         XCTAssertTrue(app.staticTexts["Условия"].waitForExistence(timeout: 10))
         XCTAssertTrue(app.staticTexts["Wi-Fi"].exists)
         XCTAssertTrue(app.buttons["Закрыть"].exists)
+        reviewCapture("automation-owner")
         app.buttons["Закрыть"].tap()
         XCTAssertTrue(app.buttons["owner-object-automation"].waitForExistence(timeout: 10))
     }
@@ -299,6 +342,7 @@ final class NavigationUITests: XCTestCase {
         avatar.tap()
         for index in 1...8 { XCTAssertTrue(app.buttons["Иконка \(index)"].waitForExistence(timeout: 10)) }
         XCTAssertTrue(app.buttons["Загрузить иконку"].exists)
+        reviewCapture("object-avatar")
         app.buttons["Отмена"].tap()
         XCTAssertTrue(app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH %@", "object-settings-owner:")).firstMatch.waitForExistence(timeout: 10))
     }
@@ -312,12 +356,15 @@ final class NavigationUITests: XCTestCase {
         XCTAssertTrue(app.buttons["Автоматизация для гостя"].exists)
         XCTAssertTrue(app.buttons["Доступ к объекту"].exists)
         XCTAssertFalse(app.switches["Подтверждать нажатие перед открытием"].exists)
+        reviewCapture("guest-issue-object")
         app.buttons["Автоматизация для гостя"].tap()
         XCTAssertTrue(app.staticTexts["Условия"].waitForExistence(timeout: 10))
+        reviewCapture("automation-guest")
         app.buttons["Закрыть"].tap()
         app.buttons["Доступ к объекту"].tap()
         XCTAssertTrue(app.switches.matching(NSPredicate(format: "label CONTAINS %@", "Только для приложения")).firstMatch.waitForExistence(timeout: 10))
         XCTAssertTrue(app.switches.matching(NSPredicate(format: "label CONTAINS %@", "Разрешить передавать дальше")).firstMatch.exists)
+        reviewCapture("guest-access-limits")
         app.buttons["ОК"].firstMatch.tap()
         app.buttons["Отмена"].tap()
         XCTAssertTrue(app.buttons["issue-guest"].waitForExistence(timeout: 10))
@@ -331,9 +378,11 @@ final class NavigationUITests: XCTestCase {
         XCTAssertTrue(pass.waitForExistence(timeout:15)); pass.tap()
         let object = app.buttons.matching(NSPredicate(format:"identifier BEGINSWITH %@","pass-object-")).firstMatch
         XCTAssertTrue(object.waitForExistence(timeout:10)); XCTAssertFalse(app.pickers["Сервер"].exists)
+        reviewCapture("access-pass")
         object.tap(); app.buttons["Настройки доступа"].tap()
         XCTAssertTrue(app.staticTexts["Получатель передать доступ дальше не сможет"].waitForExistence(timeout:10))
         XCTAssertFalse(app.switches.matching(NSPredicate(format:"label CONTAINS %@","Только для приложения")).firstMatch.exists)
+        reviewCapture("passed-access-limits")
         app.buttons["ОК"].tap(); app.buttons["Отмена"].tap()
         assertBottom(app,["control","settings","guests","journal"])
     }
@@ -349,6 +398,7 @@ final class NavigationUITests: XCTestCase {
         XCTAssertTrue(host.waitForExistence(timeout:10)); XCTAssertTrue(host.isEnabled)
         XCTAssertTrue(app.textFields["Почта"].exists); XCTAssertTrue(app.secureTextFields["Пароль"].exists)
         XCTAssertFalse(app.navigationBars.buttons["Отмена"].exists)
+        reviewCapture("server-account")
         app.buttons["Отмена"].tap()
         XCTAssertTrue(add.waitForExistence(timeout:10)); assertBottom(app,["settings","journal"])
     }
@@ -356,15 +406,12 @@ final class NavigationUITests: XCTestCase {
     func testEntryLockSettingsUseCompactCodeDialogsAndWrongCodeCannotDisableLock() {
         let app = launch("empty")
         app.segmentedControls.buttons["Система"].tap()
-        let lock = app.switches.matching(NSPredicate(format:"label CONTAINS %@","Спрашивать код при входе")).firstMatch
+        let lock = app.descendants(matching:.any).matching(identifier:"entry-lock-toggle").firstMatch
         // iOS exposes the whole labelled row and its actual UISwitch as nested
         // Switch elements. Activate the real control, rather than the row's
         // geometric centre (which is the label, outside the switch hit region).
         func tapLock() {
-            for _ in 0..<12 {
-                if lock.exists && nativeSwitch(lock).isHittable { break }
-                app.swipeUp()
-            }
+            bringIntoView(lock,in:app)
             let thumb = nativeSwitch(lock)
             XCTAssertTrue(thumb.isHittable); thumb.tap()
         }
@@ -380,6 +427,7 @@ final class NavigationUITests: XCTestCase {
         XCTAssertTrue(current.waitForExistence(timeout:10)); current.tap(); current.typeText("0000")
         app.buttons["ОК"].tap()
         XCTAssertTrue(app.staticTexts["Неверный код"].waitForExistence(timeout:10))
+        reviewCapture("entry-code-rejected")
         app.buttons["Отмена"].tap()
         XCTAssertEqual(lock.value as? String,"1")
         tapLock(); XCTAssertTrue(current.waitForExistence(timeout:10))

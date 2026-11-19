@@ -12,6 +12,7 @@ import EntrixyCore
     init(app: AppModel, transport: (any BLECentralTransport)? = nil) {
         self.app = app; self.transport = transport ?? CoreBluetoothTransport()
     }
+    func noteDiscovery(_ row: BLEDiscovery, at date: Date) { transport.prime(row,at:date) }
     func cancel(guestID: String) { if activeGuest == guestID { suspend() } }
     func suspend() {
         generation = UUID(); busy = false; activeGuest = nil; transport.stop()

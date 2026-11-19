@@ -172,6 +172,7 @@ final class ActionFlowTests: XCTestCase {
         XCTAssertEqual(model.objectActionTitle(guestID: guest.id, object: object), "Открыть")
         XCTAssertEqual(model.actionIntent(guestID: guest.id, object: object)?.title, "Открыть")
         try await model.receiveTestController(Data(#"{"type":"obj_state_update","num_id":7,"position":"open"}"#.utf8), guestID: guest.id)
+        XCTAssertEqual(model.objectPosition(.received(guest,object)),"open")
         model.errorMessage = "existing notice"
         for _ in 0..<20 { XCTAssertEqual(model.objectActionTitle(guestID: guest.id, object: object), "Закрыть") }
         XCTAssertEqual(model.errorMessage, "existing notice")

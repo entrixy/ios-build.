@@ -77,6 +77,37 @@ private struct OfflineWebhookOwnerAPI: OwnerTransport {
         XCTAssertEqual(body["action"] as? String,"open")
         XCTAssertTrue(app.automaticPermits.isEmpty)
     }
+    func testBoundedBackgroundWebhookUsesOpenOnlyAndKeepsLostReplyWithoutRetry() async throws {
+        let (template,proof) = routeProof()
+        let (storage,app,object,sender) = try fixture(template:template,toggles:true)
+        defer { app.suspend() }
+        let entry = CatalogObject.owned(app.owners[0],object)
+        app.suspend(preserveAutomation:true); app.backgroundMonitoring = true
+        let scope = try XCTUnwrap(app.beginBackgroundAutomatic(entry,readiness:proof,duration:20))
+        XCTAssertFalse(app.canManageGuestAccess); XCTAssertFalse(app.isForeground)
+        sender.loseReply = true
+        sender.beforeSend = { XCTAssertEqual(storage.state?.journal?.count,1); XCTAssertFalse(app.canManageGuestAccess) }
+        await app.performAutomaticAction(entry,readiness:proof)
+        app.endBackgroundAutomatic(scope)
+        await app.performAutomaticAction(entry,readiness:proof)
+        XCTAssertEqual(sender.calls.count,1); XCTAssertEqual(app.journal.count,1)
+        let body = try XCTUnwrap(JSONSerialization.jsonObject(with:sender.calls[0].1) as? [String:Any])
+        XCTAssertEqual(body["action"] as? String,"open")
+        XCTAssertEqual(app.journal.first?.who,ProductText.string("journal_who_geo"))
+        XCTAssertNil(app.ownerActionIntent(server:"fixture.invalid",objectID:object.id))
+    }
+    func testExpiredBackgroundScopeCannotDispatchWebhookOrAcquireManualAuthority() async throws {
+        let (template,proof) = routeProof()
+        let (_,app,object,sender) = try fixture(template:template)
+        defer { app.suspend() }
+        let entry = CatalogObject.owned(app.owners[0],object)
+        app.suspend(preserveAutomation:true); app.backgroundMonitoring = true
+        let scope = try XCTUnwrap(app.beginBackgroundAutomatic(entry,readiness:proof,duration:20))
+        app.endBackgroundAutomatic(scope)
+        await app.performAutomaticAction(entry,readiness:proof)
+        XCTAssertTrue(sender.calls.isEmpty); XCTAssertTrue(app.journal.isEmpty)
+        XCTAssertFalse(app.canManageGuestAccess); XCTAssertNil(app.ownerActionIntent(server:"fixture.invalid",objectID:object.id))
+    }
     func testAutomaticRouteCannotBypassChangedConfirmationOrExpiredEvidence() async throws {
         let (template,proof) = routeProof(at:Date().addingTimeInterval(-4))
         let (_,app,object,sender) = try fixture(template:template)

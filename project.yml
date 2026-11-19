@@ -87,6 +87,7 @@ targets:
       - path: WidgetShared
       - path: WidgetResources
       - path: App/Assets.xcassets
+      - path: WidgetAssets.xcassets
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.entrixy.ios.widget

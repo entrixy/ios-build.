@@ -1,6 +1,7 @@
 import Foundation
 import Combine
 import CoreLocation
+import CoreBluetooth
 import EntrixyCore
 
 /// Observes rules separately from the command transports. Every candidate goes
@@ -17,14 +18,25 @@ import EntrixyCore
     private var sending = false
     private var trackingLocation = false
     private var lastNetworkRefresh = Date.distantPast
+    private var background = false
+    private var backgroundTask: Task<Void,Never>?
+    private var backgroundGeneration = UUID()
+    private let window = BackgroundExecutionWindow()
+    private var lastWake = Date.distantPast
+    private var outsideRadio = BLEBackgroundRearm()
+    private var routeArrivals: [ObjectReference:AutomationReadiness] = [:]
     init(app: AppModel) { self.app = app }
 
     func setWorking(_ value: Bool) { working = value }
     func beginEditing() { editors += 1 }
     func endEditing() { editors = max(0,editors-1) }
     func resume() {
+        guard app.canManageGuestAccess else { suspend(); return }
+        backgroundGeneration = UUID()
+        background = false; backgroundTask?.cancel(); backgroundTask = nil; window.end()
         guard task == nil else { return }
         bleObserver.onAdvertisement = { [weak self] bytes,rssi in self?.receiveBLE(bytes,rssi:rssi) }
+        bleObserver.onDiscovery = { [weak self] row in self?.receiveDiscovery(row) }
         task = Task { [weak self] in
             while !Task.isCancelled {
                 guard let self else { return }
@@ -34,20 +46,78 @@ import EntrixyCore
         }
     }
     func suspend() {
+        backgroundGeneration = UUID()
+        background = false; backgroundTask?.cancel(); backgroundTask = nil; window.end()
         task?.cancel(); task = nil
         bleObserver.setEnabled(false); proximity = BLEProximityRuntime()
         if trackingLocation { app.automationSensors.trackLocation(enabled:false,background:false) }
         trackingLocation = false
         readiness.removeAll()
+        routeArrivals.removeAll(); outsideRadio.reset()
         // A resumed session must observe a fresh outside entry. Neither stale
         // GPS/Wi-Fi nor a process restart is an automatic command retry.
         runtime = AutomationRuntime(sessionStarted:Date().timeIntervalSince1970)
+    }
+    func pauseForBackground() {
+        backgroundGeneration = UUID()
+        task?.cancel(); task = nil; backgroundTask?.cancel(); backgroundTask = nil; window.end()
+        // Keep genuine route history and durable BLE disarm state across the
+        // scene transition. Ending a foreground session is not a physical exit.
+        sending = false
+    }
+    func enterBackground() {
+        background = true
+        let contexts = app.controlObjects.compactMap { try? app.automationContext(.object($0.target)) }
+        bleObserver.onAdvertisement = { [weak self] bytes,rssi in self?.receiveBLE(bytes,rssi:rssi) }
+        bleObserver.onDiscovery = { [weak self] row in self?.receiveDiscovery(row) }
+        bleObserver.setEnabled(CBManager.authorization == .allowedAlways && contexts.contains { $0.isBLE && $0.template.bleEnabled })
+        let needsGeo = contexts.contains { $0.template.geoEnabled }
+        if needsGeo {
+            let sensors = app.automationSensors
+            sensors.onLocation = { [weak self] location in self?.receive(location) }
+            let allowed = sensors.locationAuthorization == .authorizedAlways
+            sensors.trackLocation(enabled:allowed,background:allowed); trackingLocation = allowed
+        } else if trackingLocation {
+            app.automationSensors.trackLocation(enabled:false,background:false); trackingLocation = false
+        }
+    }
+    private func wake(bluetooth: Bool) {
+        guard background, app.canObserveAutomation, backgroundTask == nil, Date().timeIntervalSince(lastWake) >= 0.5 else { return }
+        let generation = UUID(); backgroundGeneration = generation
+        let seconds: TimeInterval = bluetooth ? 8 : 20
+        guard window.begin(seconds:seconds,expiration:{ [weak self] in
+            guard self?.backgroundGeneration == generation else { return }
+            self?.app.stopBackgroundCommand(); self?.backgroundTask?.cancel()
+        }) else { return }
+        lastWake = Date()
+        backgroundTask = Task { [weak self] in
+            guard let self else { return }
+            defer {
+                if self.backgroundGeneration == generation {
+                    self.app.endBackgroundAutomatic(); self.window.end(); self.backgroundTask = nil
+                }
+            }
+            if self.app.controlObjects.contains(where:{ (try? self.app.automationContext(.object($0.target)).template.wifiEnabled) == true }) {
+                self.app.automationSensors.refreshNetwork()
+            }
+            await self.tick(backgroundDuration:seconds)
+        }
     }
     func receive(_ location: CLLocation) {
         guard location.horizontalAccuracy >= 0, abs(location.timestamp.timeIntervalSinceNow) <= 30 else { return }
         runtime.receive(AutomationLocationFix(latitude:location.coordinate.latitude,longitude:location.coordinate.longitude,
             accuracyM:Float(location.horizontalAccuracy),speedMps:Float(location.speed),
             timestampMS:Int64(max(0,location.timestamp.timeIntervalSince1970*1000))))
+        // Feed every real batched fix through the corridor matcher in order.
+        // Keep a fresh arrival until the wake task runs; historical fixes may
+        // rebuild the route buffer but cannot become a delayed physical action.
+        for entry in app.controlObjects {
+            guard let context = try? app.automationContext(.object(entry.target)), context.template.geoEnabled,
+                  context.template.geoMode == "route" else { continue }
+            let result = inspect(entry.target,template:context.template,isBLE:context.isBLE)
+            if result.routeMatched, abs(location.timestamp.timeIntervalSinceNow) <= 2 { routeArrivals[entry.target] = result }
+        }
+        if background { wake(bluetooth:false) }
     }
     func inspect(_ target: ObjectReference, template: AutomationTemplate, isBLE: Bool, date: Date = Date()) -> AutomationReadiness {
         var network: AutomationWiFiNetwork?
@@ -72,6 +142,8 @@ import EntrixyCore
         }
         let result = runtime.evaluate(key:target.id,template:template,date:date,wifiMatches:matches,wifiRequired:required,
             bleReady:isBLE ? (proximity.sample(target.id,at:date.timeIntervalSince1970)?.near(radiusM:template.bleRadiusM,at:date.timeIntervalSince1970) == true) : nil)
+        if !isBLE, let arrival = routeArrivals[target], arrival.template == template,
+           date >= arrival.evaluatedAt, date.timeIntervalSince(arrival.evaluatedAt) <= 2 { return arrival }
         return isBLE ? result.forBLE(armed:!app.bleAutomationDisarmed.contains(target.id)) : result
     }
     func resetBLEContinuity() { proximity.suspend() }
@@ -82,26 +154,45 @@ import EntrixyCore
         proximity.sample(target.id,at:date.timeIntervalSince1970)?.observation.position
     }
     func receiveBLE(_ payload: Data, rssi: Int) {
-        guard app.canManageGuestAccess else { return }
+        guard app.canObserveAutomation else { return }
         let now = Date().timeIntervalSince1970
+        if background {
+            // iOS coalesces background advertisements. A silent interval is not
+            // evidence of leaving radio range, and must NEVER rearm a FIRE.
+            proximity.suspend()
+        }
         for entry in app.controlObjects where entry.kind == "ble" {
             guard let observation = try? app.authenticatedBLEObservation(entry,payload:payload) else { continue }
             let rearm = proximity.receive(key:entry.target.id,observation:observation,rssi:rssi,now:now)
-            if rearm && !app.bleControl.busy && !app.bleGuestControl.busy { try? app.setBLEAutomationArmed(entry.target,armed:true) }
+            let backgroundRearm: Bool
+            if background, let template = try? app.automationContext(.object(entry.target)).template {
+                backgroundRearm = outsideRadio.receive(key:entry.target.id,rssi:rssi,radiusM:template.bleRadiusM,now:now)
+            } else { backgroundRearm = false }
+            if (rearm || backgroundRearm) && !app.bleControl.busy && !app.bleGuestControl.busy { try? app.setBLEAutomationArmed(entry.target,armed:true) }
             app.noteBLESighting(entry.target,sleepSeconds:observation.sleepSeconds)
         }
+        if background { wake(bluetooth:true) }
     }
-    func consume(_ target: ObjectReference, route: Bool, date: Date = Date()) { runtime.consume(target.id,route:route,at:date) }
-    private func tick() async {
-        guard app.canManageGuestAccess, !Task.isCancelled else { return }
+    private func receiveDiscovery(_ row: BLEDiscovery) {
+        guard let payload = row.manufacturerPayload, app.canObserveAutomation,
+              app.controlObjects.contains(where:{ (try? app.authenticatedBLEObservation($0,payload:payload)) != nil }) else { return }
+        let now = Date()
+        app.bleControl.noteDiscovery(row,at:now); app.bleGuestControl.noteDiscovery(row,at:now)
+        receiveBLE(payload,rssi:row.rssi)
+    }
+    func consume(_ target: ObjectReference, route: Bool, date: Date = Date()) {
+        routeArrivals.removeValue(forKey:target); runtime.consume(target.id,route:route,at:date)
+    }
+    private func tick(backgroundDuration: TimeInterval? = nil) async {
+        guard app.canObserveAutomation, !Task.isCancelled else { return }
         let entries = app.controlObjects
         var contexts: [(CatalogObject,AutomationSettingsContext)] = []
         for entry in entries {
             if let context = try? app.automationContext(.object(entry.target)) { contexts.append((entry,context)) }
         }
-        bleObserver.setEnabled(contexts.contains { $0.1.isBLE })
+        if !background { bleObserver.setEnabled(contexts.contains { $0.1.isBLE }) }
         let needsGeo = contexts.contains { $0.1.template.geoEnabled }
-        if needsGeo != trackingLocation {
+        if !background && needsGeo != trackingLocation {
             if needsGeo { app.automationSensors.onLocation = { [weak self] location in self?.receive(location) } }
             app.automationSensors.trackLocation(enabled:needsGeo,background:false); trackingLocation = needsGeo
         }
@@ -120,15 +211,33 @@ import EntrixyCore
             if context.isBLE && bleOpenish(entry.target) {
                 try? app.setBLEAutomationArmed(entry.target,armed:false); continue
             }
+            let gated = context.template.authEnabled || context.template.confirmEnabled || context.template.requireConfirmation == true
+            if context.isBLE && gated {
+                // BleScanReceiver: an object protected with PIN/confirmation is
+                // manual-only, in foreground too. Do not invent an auto dialog.
+                try? app.setBLEAutomationArmed(entry.target,armed:false); continue
+            }
             // Android consumes a route seen while editing/on another tab, so
             // switching back later does not unexpectedly open the old arrival.
-            if (!working && !context.isBLE) || editors > 0 || app.actionPrompt != nil || app.bleInformationTarget != nil || app.objectRemovalTarget != nil || app.objectAvatarTarget != nil {
+            if (!background && !working && !context.isBLE) || editors > 0 || app.hasTaskDialog {
                 if result.routeMatched { consume(entry.target,route:true) }
                 continue
             }
             guard !sending, !app.busy, !app.ownerBusy, !app.blePairing.busy else { continue }
             sending = true
-            await app.performAutomaticAction(entry,readiness:result)
+            if background, let duration = backgroundDuration {
+                guard window.valid else { sending = false; return }
+                if let scopeID = app.beginBackgroundAutomatic(entry,readiness:result,duration:min(duration,window.remaining)) {
+                    await app.performAutomaticAction(entry,readiness:result)
+                    app.endBackgroundAutomatic(scopeID)
+                } else if !context.isBLE {
+                    // iOS cannot silently dial a SIM call or maintain Android's
+                    // permanent host service. Bring the person to the ordinary
+                    // protected card instead of claiming a physical success.
+                    consume(entry.target,route:result.routeMatched)
+                    await AutomationNotifications.show(label:app.objectLabel(entry),target:entry.target)
+                }
+            } else { await app.performAutomaticAction(entry,readiness:result) }
             sending = false
         }
     }
@@ -140,7 +249,7 @@ extension AppModel {
         return automaticEvidenceValid(permit,target:target,date:date,maximumAge:actionPromptRetainsAutomaticEvidence(target) ? 30 : 2)
     }
     func automaticEvidenceValid(_ permit: AutomationReadiness, target: ObjectReference, date: Date = Date(), maximumAge: TimeInterval = 30) -> Bool {
-        guard canManageGuestAccess, permit.ready, date >= permit.evaluatedAt,
+        guard allowsAction(target,automatic:true), permit.ready, date >= permit.evaluatedAt,
               date.timeIntervalSince(permit.evaluatedAt) <= maximumAge,
               let context = try? automationContext(.object(target)), context.template == permit.template else { return false }
         if permit.routeMatched { return true }
@@ -157,11 +266,14 @@ extension AppModel {
         return automation.inspect(target,template:context.template,isBLE:context.isBLE,date:date)
     }
     func performAutomaticAction(_ entry: CatalogObject, readiness: AutomationReadiness) async {
-        guard canManageGuestAccess, !busy, !ownerBusy, !hasTaskDialog,
+        guard allowsAction(entry.target,automatic:true), !busy, !ownerBusy, !hasTaskDialog,
               let context = try? automationContext(.object(entry.target)), context.template == readiness.template,
               (automaticConsumedAt[entry.target].map { readiness.evaluatedAt > $0 } ?? true),
               readiness.ready, Date() >= readiness.evaluatedAt, Date().timeIntervalSince(readiness.evaluatedAt) <= 2 else { return }
         let gated = context.template.authEnabled || context.template.confirmEnabled || context.template.requireConfirmation == true
+        if context.isBLE && gated {
+            try? setBLEAutomationArmed(entry.target,armed:false); return
+        }
         automaticPermits[entry.target] = readiness
         var retainedForPrompt = false
         defer { if !retainedForPrompt { automaticPermits.removeValue(forKey:entry.target) } }

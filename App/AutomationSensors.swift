@@ -92,10 +92,13 @@ struct AutomationWiFiNetwork: Equatable {
     }
 
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        guard let latest = locations.last(where: { $0.horizontalAccuracy >= 0 && abs($0.timestamp.timeIntervalSinceNow) < 30 }) else { return }
+        let fresh = locations.filter { $0.horizontalAccuracy >= 0 && abs($0.timestamp.timeIntervalSinceNow) < 30 }.sorted { $0.timestamp < $1.timestamp }
+        guard let latest = fresh.last else { return }
         location = latest
         if latest.horizontalAccuracy <= 100 { finishLocation(.success(latest)) }
-        onLocation?(latest)
+        // Core Location can deliver a batch after waking the app. Preserve the
+        // real route order instead of replacing the corridor with its last fix.
+        for fix in fresh { onLocation?(fix) }
     }
 
     func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {

@@ -24,7 +24,8 @@ extension Notification.Name { static let entrixyWidgetAction = Notification.Name
     func bind(_ app: AppModel) { self.app = app }
     func setReady(_ value: Bool) { ready = value; if value { start() } }
     @discardableResult func enqueue(_ objectID: String, id: UUID = UUID()) -> Bool {
-        guard !dispatching, queue.enqueue(objectID:objectID,id:id,at:now()) else { return false }
+        guard !dispatching, app?.hasTaskDialog != true,
+              queue.enqueue(objectID:objectID,id:id,at:now()) else { return false }
         start(); return true
     }
     func cancel() { ready = false; queue.cancel(); taskGeneration = UUID(); task?.cancel(); task = nil }

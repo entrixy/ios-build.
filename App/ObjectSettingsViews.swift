@@ -29,12 +29,20 @@ struct CatalogStatusAvatar: View {
     var body: some View {
         TimelineView(.periodic(from: .now, by: 1)) { _ in
             let status = model.objectAvailability(entry)
-            CatalogAvatar(entry: entry, size: 56)
+            let open = model.objectPosition(entry) == "open"
+            ZStack {
+                CatalogAvatar(entry: entry, size: 56)
+                if open {
+                    OpenPositionCorners().stroke(Color(red:149/255,green:193/255,blue:31/255),style:StrokeStyle(lineWidth:4,lineCap:.round))
+                        .accessibilityHidden(true)
+                }
+            }.frame(width:64,height:64)
                 .overlay(alignment: .bottomTrailing) {
                     Circle().fill(color(status)).frame(width: 10, height: 10)
                         .offset(x: -8, y: -8)
                 }
-                .accessibilityElement(children: .ignore).accessibilityLabel(description(status))
+                .accessibilityElement(children: .ignore)
+                .accessibilityLabel(description(status) + (open ? ". " + ProductText.string("guest_socket_opened") : ""))
         }
     }
     private func color(_ status: CatalogAvailability) -> Color {
@@ -48,6 +56,29 @@ struct CatalogStatusAvatar: View {
         case .neutral: return "HTTPS-запрос"
         case .unknown: return "Доступность ещё не проверена"
         }
+    }
+}
+
+/// The four original Android OpenPositionCorners paths: 14pt radius, 3pt
+/// shoulders, 4pt inset in a 64pt canvas around the 56pt avatar. No clipping.
+private struct OpenPositionCorners: Shape {
+    func path(in rect: CGRect) -> Path {
+        let m: CGFloat = 4, r: CGFloat = 14, e: CGFloat = 3
+        let x = rect.minX, y = rect.minY, w = rect.maxX, h = rect.maxY
+        var p = Path()
+        p.move(to:CGPoint(x:x+m,y:y+m+r+e)); p.addLine(to:CGPoint(x:x+m,y:y+m+r))
+        p.addQuadCurve(to:CGPoint(x:x+m+r,y:y+m),control:CGPoint(x:x+m,y:y+m))
+        p.addLine(to:CGPoint(x:x+m+r+e,y:y+m))
+        p.move(to:CGPoint(x:w-m-r-e,y:y+m)); p.addLine(to:CGPoint(x:w-m-r,y:y+m))
+        p.addQuadCurve(to:CGPoint(x:w-m,y:y+m+r),control:CGPoint(x:w-m,y:y+m))
+        p.addLine(to:CGPoint(x:w-m,y:y+m+r+e))
+        p.move(to:CGPoint(x:w-m,y:h-m-r-e)); p.addLine(to:CGPoint(x:w-m,y:h-m-r))
+        p.addQuadCurve(to:CGPoint(x:w-m-r,y:h-m),control:CGPoint(x:w-m,y:h-m))
+        p.addLine(to:CGPoint(x:w-m-r-e,y:h-m))
+        p.move(to:CGPoint(x:x+m+r+e,y:h-m)); p.addLine(to:CGPoint(x:x+m+r,y:h-m))
+        p.addQuadCurve(to:CGPoint(x:x+m,y:h-m-r),control:CGPoint(x:x+m,y:h-m))
+        p.addLine(to:CGPoint(x:x+m,y:h-m-r-e))
+        return p
     }
 }
 

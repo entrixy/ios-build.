@@ -4,6 +4,7 @@ import EntrixyCore
 
 @main
 struct EntrixyApp: App {
+    @UIApplicationDelegateAdaptor(EntrixyLifecycleDelegate.self) private var lifecycle
     @AppStorage("entrixy.appearance") private var appearance = "system"
     var body: some Scene {
         WindowGroup {
@@ -38,7 +39,7 @@ private struct LiveAppRoot: View {
     init() {
         // Keep router construction inside StateObject's deferred initializer.
         // Rebuilding this View must not replace the retained model's global gate.
-        _model = StateObject(wrappedValue:AppModel(privacyRouter:ServerPrivacyRouter()))
+        _model = StateObject(wrappedValue:LiveAppRuntime.model())
     }
     var body: some View {
         Group {
@@ -48,10 +49,14 @@ private struct LiveAppRoot: View {
         .environmentObject(model)
         .background(AppPrivacyShield(enabled: model.appLockEnabled, covered: phase != .active).frame(width: 0, height: 0))
         .task {
+            AppNotificationRouting.shared.install()
             model.checkEntryLock(); WidgetActionInbox.shared.bind(model)
             try? widgetPublisher.publish(model)
-            _ = await model.prepareServerRouting(); await model.resume()
-            WidgetActionInbox.shared.setReady(true); model.diagnostics.activate()
+            if phase == .background { model.enterBackground() }
+            else {
+                _ = await model.prepareServerRouting(); await model.resume()
+                WidgetActionInbox.shared.setReady(true); model.diagnostics.activate()
+            }
         }
         .onReceive(model.objectWillChange.debounce(for:.milliseconds(250),scheduler:RunLoop.main)) { _ in try? widgetPublisher.publish(model) }
         .onReceive(model.ownerControl.objectWillChange.debounce(for:.milliseconds(250),scheduler:RunLoop.main)) { _ in try? widgetPublisher.publish(model) }
@@ -64,11 +69,15 @@ private struct LiveAppRoot: View {
                     WidgetActionInbox.shared.setReady(true); model.diagnostics.activate()
                 }
             } else if value == .background {
-                WidgetActionInbox.shared.cancel(); model.entryDidBackground(); model.suspend()
+                WidgetActionInbox.shared.cancel(); model.entryDidBackground(); model.enterBackground()
                 try? widgetPublisher.publish(model,forceOffline:true)
             }
         }
-        .onChange(of:model.appLocked) { if !$0 { model.diagnostics.activate() } }
+        .onChange(of:model.appLocked) { locked in
+            if !locked && phase == .active {
+                Task { await model.resume(); WidgetActionInbox.shared.setReady(true); model.diagnostics.activate() }
+            }
+        }
     }
 }
 
@@ -151,6 +160,9 @@ struct RootView: View {
             if let url { pendingURL = nil; receiveURL(url) }
         }
         .onReceive(NotificationCenter.default.publisher(for:.entrixyWidgetAction)) { _ in
+            selectedTab = model.navigationState.resolve(.control); userPickedTab = true
+        }
+        .onReceive(NotificationCenter.default.publisher(for:.entrixyAutomationFocus)) { _ in
             selectedTab = model.navigationState.resolve(.control); userPickedTab = true
         }
         .onChange(of:model.canManageGuestAccess) { if $0 { model.diagnostics.offerConsent() } }

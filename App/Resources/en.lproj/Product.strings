@@ -942,3 +942,5 @@
 "ios_perm_notifications" = "Guest request notifications";
 "ios_perm_settings" = "Open iPhone settings";
 "ios_perm_allow" = "Allow";
+
+"ios_auto_foreground_notice" = "An automation condition matched. Open Entrixy to check the object and perform the action.";
