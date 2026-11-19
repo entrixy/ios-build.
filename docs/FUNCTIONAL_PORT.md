@@ -1692,3 +1692,18 @@ Linux308core0,19Nov08:58:59UTC. The first run exposed a test-only Date() boundar
 race in the promo age fixture (not product clock logic); the fixture now uses one
 frozen timestamp and the complete308-case suite passed. Hosted count185/UI26/45
 unchanged. Apple SDK/runtime remains pending for this followup.
+
+
+### Apple compiler result for the full source package
+
+Nativefecd4f8/public3d0a54c, run44492370596/job135450988200:
+308Apple core passed(1.379s); the new app sources reached native compilation and
+Widget target compiled. Build-for-testing failed in ONE new hosted test callback:
+OwnerAccountTests.swift329 inferred a throwing closure where the mock requires
+(OwnerOperation,Data)->Void. There were no hosted/UI executions or new captures;
+Release/device archive correctly skipped. The explicit old-key rejection check
+now uses do/catch + XCTFail on successful decryption, preserving the assertion
+without throwing from the wire callback. No product logic/crypto vector was
+changed for that compiler fix. Linux syntax/diff passed; next Apple result pending.
+The native-renderer size probe and corrected screenshot-size documentation also
+join the next source; original XCTest images remain untouched.

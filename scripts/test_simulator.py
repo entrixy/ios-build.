@@ -1,12 +1,38 @@
 #!/usr/bin/env python3
 """Run hosted native unit tests on a disposable simulator, isolated from live preview."""
 import argparse
+import hashlib
 import json
 import plistlib
 from pathlib import Path
 import subprocess
+import struct
 from capture_simulator import create_booted_device, cleanup_device
 from export_ui_review import export_review
+
+
+def device_screen_probe(device):
+    """Read the full native renderer without reopening or replaying a scenario.
+
+    XCUIScreen's current iPhone16 PNGs are1178 pixels wide. Keep that evidence
+    untouched and measure simctl separately before choosing Store assets.
+    This post-test diagnostic may show another foreground surface; it is never
+    automatically treated as a gallery or App Store product screenshot.
+    """
+    root = Path('.local-checks/ci'); root.mkdir(parents=True, exist_ok=True)
+    target = root / 'native-device-probe.png'
+    subprocess.run(['xcrun','simctl','io',device,'screenshot','--type=png',str(target)],check=True,timeout=30)
+    data = target.read_bytes()
+    if data[:8] != b'\x89PNG\r\n\x1a\n' or len(data) < 29:
+        raise RuntimeError('Invalid native renderer probe')
+    width,height = struct.unpack('>II',data[16:24])
+    report = {'kind':'native-renderer-diagnostic','width':width,'height':height,
+        'has_alpha_channel':data[25] in [4,6], 'sha256':hashlib.sha256(data).hexdigest(),
+        'matches_iphone16_store_size':(width,height)==(1179,2556),
+        'product_content_review':'pending','is_submission_asset':False,
+        'replayed_or_relaunched':False}
+    (root / 'native-device-probe.json').write_text(json.dumps(report,indent=2)+'\n')
+    print('Full native renderer probe:',width,height,'; product/content acceptance remains pending',flush=True)
 
 
 def review_test_products(products):
@@ -83,6 +109,10 @@ def main():
         raise
     finally:
         try:
+            if args.review_captures:
+                try: device_screen_probe(device)
+                except (OSError,RuntimeError,subprocess.SubprocessError) as error:
+                    print('Could not read native renderer probe:',error,flush=True)
             if args.review_captures and result.exists():
                 if tests_succeeded:
                     export_review(result,Path('.local-checks/ci/screenshots'),tests_succeeded=True)

@@ -337,7 +337,10 @@ final class OwnerAccountTests: XCTestCase {
                 XCTAssertEqual(saved.issuedKeys![1].pending, nil)
                 let json = try! JSONSerialization.jsonObject(with: body) as! [String:Any]
                 XCTAssertEqual(json["data_cipher"] as? String, saved.objects![0].keyRotation?.cipher)
-                XCTAssertThrowsError(try GuestCrypto.decrypt(key: oldKey, envelope: json["data_cipher"] as! String))
+                do {
+                    _ = try GuestCrypto.decrypt(key: oldKey, envelope: json["data_cipher"] as! String)
+                    XCTFail("The revoked recipient's old key decrypted the new metadata")
+                } catch { }
             }
         }
         await model.revokeOwnerKey(server: before.server, keyID: removed.id)

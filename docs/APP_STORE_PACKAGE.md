@@ -36,11 +36,14 @@ Primary source checked19November2026:
 ## Screenshots
 
 Use original native review PNGs and their exact source/hash report. Preserve the
-single light iPhone16 frame per state. The existing review resolution1179×2556
-appears in Apple's current medium Dynamic Island table; the current required
-device section names that class. Do not invent a requirement to duplicate every
-screen on another device or resize/retouch screenshots. Verify the accepted
-asset specification again in the actual App Store Connect account at upload.
+single light iPhone16 frame per state. Apple's current medium Dynamic Island
+format table includes1179×2556. HOWEVER the actual fc190f0 XCTest PNGs measured
+1178×2556; do not label those Store-ready or resize/retouch them. A separate raw
+simctl full-renderer diagnostic after the same UI pass will measure the device
+output without relaunching or replaying any state. It remains diagnostic (its
+foreground content is not automatically a product/Store acceptance). Recheck the
+actual App Store Connect asset specification at upload and select original native
+frames only after both dimensions and visible content pass review.
 
 Primary source checked19November2026:
 [Apple screenshot specifications](https://developer.apple.com/help/app-store-connect/reference/app-information/screenshot-specifications).
