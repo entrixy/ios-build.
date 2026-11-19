@@ -8,30 +8,36 @@ This repository is private working source; no new distribution license is assign
 
 The full Android port remains the active task. The gallery still contains the old
 19-frame catalogue; a new full native screenshot batch follows functional completion.
-Latest verified app: native `c3ce3bb`, public `d09e8ba`,
-[Apple run44414977345](https://github.com/entrixy/ios-build./actions/runs/44414977345):
-283 core tests, Debug/test bundles including the widget extension, Release/isolation
-and168 hosted native tests passed. All four widget lifecycle/policy/export cases passed.
-This does not prove physical widget configuration or background radio operation.
-UI source `783635d` / public `16b4e86` ran20 scenarios:18passed,2failed
-(diagnostic-dialog accessibility snapshot and entry-lock switch hit target).
+Latest coherent Apple batch: native `3d3d578`, public `b021825`,
+[run44470840973](https://github.com/entrixy/ios-build./actions/runs/44470840973):
+289 core tests, Debug including widget/test products, Release/isolation and all173
+hosted native tests passed. The same simulator pass executed20 UI scenarios:
+19passed; diagnostic consent failed because the accessibility snapshot timed out.
+The entry-code and Home network switch scenarios passed. The overall run failed.
+It exported28 original checkpoint PNGs with source/test identifiers; four diagnostic
+checkpoints were not reached. This partial set is not the published gallery or
+complete visual acceptance.
 
-The current larger batch connects OS-event-driven background BLE and own local
-webhooks with short per-object automatic authority, expiration/cancellation,
-Core Location batches and passive Bluetooth restoration. PIN-protected BLE stays
-manual-only, as in Android. Calls and other routes requiring foreground produce a
-local navigation notification; persistent background WSS/APNs is not implemented.
-The manual/entry/settings guards remain separate. Physical-device behavior is pending.
-The batch also fixes the shared dialog's duplicated content tree and the code-toggle
-locator, and keeps the original widget launcher artwork and Android OPEN corners.
+The batch connects OS-event-driven background BLE and own local webhooks with
+short per-object automatic authority and expiration/cancellation. PIN/confirmation
+BLE remains manual-only, following Android. Calls and other foreground-only routes
+produce a local navigation notification; persistent background WSS/APNs is absent.
+Manual, entry and settings guards remain separate. Real-device acceptance is pending.
 
-CI now builds test products once, runs hosted native and UI cases in ONE simulator
-pass, and records32 named screenshots directly at the UI checkpoints. No separate
-product-screen replay or duplicate light/dark variants. Exported PNGs retain their
-original bytes, source SHA and test identifier; partial/failed runs cannot claim a
-complete screenshot review. Final visual/parity acceptance and gallery publication
-remain separate. Local289 core tests, four pipeline contract checks, syntax and
-workflow checks passed; exact-current Apple173/native+UI20/capture32 is pending.
+Current followups add authenticated key acceptance/welcome, conditional Android
+Home location/widget hints, app/widget required API manifests, a final authority
+check after durable storage and before physical writes, and additional actual
+issued-key/QR/message/presets/companies/sounds/backup review routes. The modal now
+occupies a sibling of the accessibility-hidden navigation tree; this is a proposed
+fix for the remaining snapshot failure, not an accepted runtime result.
+
+CI builds test products once, verifies Release once, then runs hosted and UI cases
+in ONE simulator pass with original screenshot attachments at the UI checkpoints.
+No separate screen replay or duplicate light/dark variants. Latest local292 core
+and four pipeline contract checks passed. Next exact-source Apple verification
+expects176 hosted cases,24 UI scenarios and42 distinct checkpoint PNGs; these
+followups have not yet passed Apple compilation/runtime. Final visual/parity
+acceptance and gallery publication remain separate.
 Full background/device/release gates and the full Android port remain incomplete.
 Detailed scope and evidence: [FUNCTIONAL_PORT.md](docs/FUNCTIONAL_PORT.md).
 

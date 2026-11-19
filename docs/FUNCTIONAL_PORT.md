@@ -1297,3 +1297,77 @@ pendingRestore. The fix exposes only a read-only storageAllowsAutomation predica
 inside AppModel (same storageReady && pendingRestore==nil guard), preserving the
 private restore state and command barriers. No hosted/UI/screenshot result exists
 for this failed build. The same coherent review batch is rerun after this fix.
+
+
+## Key acceptance/welcome — next coherent UI block, source pending Apple
+
+Ported MainActivity.keyJustAdded: authenticated bundle welcome is bounded16KiB and
+stored with the protected SavedGuest/backup, never read from unauthenticated display
+metadata. A single common compact KeyAcceptanceDialog shows owner message and only
+the imported key's effective Wi-Fi/geo readiness, dismissible only by OK. No logo
+or toolbar cancellation, no command, popup auto-dismiss or second identity. Safe
+detected http/https/mailto links remain explicit user interactions; no HTML/scripts.
+
+KeyImportScreen no longer dismisses merely because credentials were saved. It waits
+for a fresh verified snapshot during that import; pending/unavailable binding keeps
+the form and a truthful message, with the same durable credentials available for
+retry. AppModel.add now obeys the ordinary foreground/unlocked/no-restore guard.
+A ready accepted key presents the welcome after the import sheet disappears.
+
+Two hosted SOURCE cases cover protected welcome persistence/no command/no popup on
+relaunch, and background import refusal without bind/identity replacement. One new
+native UI scenario verifies owner message/only-OK dismissal/bottom navigation and
+adds exactly one screenshot, key-accepted, in the same test. Next expected totals
+175hosted/21UI/33PNG are SOURCE counts, not Apple results. All App/hosted/UI syntax
+and updated pipeline contract checks passed. The active32-state background batch
+was NOT cancelled for this UI work; collect its exact results before combining.
+
+
+### Home hints — source following the actual Android HomeScreen
+
+Connected HomeLocationWarning only for active geo rules: the original location
+quality text appears after240s without an80m-or-better fix while callbacks are
+still live within90s. No provider callbacks means quiet, not a fabricated warning.
+This diagnostic does not grant/change automatic action readiness. Core Location
+sensor stays lazy when no geo rules exist. The Android frozen-position/independent
+motion branch is not claimed ported without a real independent motion signal.
+
+HomeWidgetHint uses actual WidgetCenter configurations and measured content/viewport
+height. It is one caption at the bottom of Control only when no configured widget
+exists and the entire list plus caption fits, with no second panel/background/button.
+Unknown WidgetKit status and iOS16(no17extension) show no claim. Original seven-language
+Android texts retained. Marketing promo cache/view/click tracking is still pending.
+
+Linux292core0(3newGPSqualityboundary/recovery/out-of-ordercases), allApp/extension/
+hosted/UI syntax, four updated capture pipeline contracts, diff checks passed.
+This Home/welcome/required-API manifest block is not in the active32-state CI and
+awaits its own combined current-source acceptance; don't cancel the ongoing run.
+
+### Background final-write deadline follow-up
+
+A synchronous protected-state save can cross the monotonic lease deadline before
+its expiration callback executes. Recheck scope immediately AFTER durable BLE
+proof/journal persistence and immediately BEFORE FIRE/POST. The owner's sole
+expected in-flight object mutation is the consumed BLE proof ledger; secret,
+policy, IDs and routing remain pinned. HTTP task checks again when it starts.
+A new hosted SOURCE case revokes the scope from the storage callback after the
+proof is durable, asserting one connection, zero FIRE writes, retained proof/journal
+and disarmed latch. Expected next native176; Apple runtime pending. No physical
+retry is added and no existing assertion is weakened.
+
+### Expanded native UI review in the next combined batch
+
+Added one DEBUG/simulator-only issued-key profile using the actual encrypted
+OwnerIssuedKey constructor and an inert controller.invalid owner. The native UI
+now visits existing-key edit, original QR rendering, message composer, revoke
+confirmation/cancel, presets/companies, sounds and backup-password controls. It
+never sends a message, revokes a key, exports a backup, scans/pairs or performs
+an object action. No real identity/credential or watermark is seeded in images.
+Stable action IDs were added only for message fields/send and company scanning.
+
+There are now24 UI scenarios and42 unique screenshot checkpoints, all taken in
+the same interaction pass, with deduplication and source provenance. These are
+SOURCE counts; the active earlier20/32 batch is preserved until its result. New
+syntax, four pipeline contract checks and diff checks passed. No new screenshots
+have yet been claimed, visually accepted or published. This remains a current
+feature review, not proof of every device-dependent Android scenario.

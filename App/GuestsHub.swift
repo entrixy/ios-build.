@@ -143,6 +143,7 @@ struct OwnerGuestsScreen: View {
                 Button { task = .company(nil) } label: { Label(ProductText.string("guests_add_org"),systemImage:"plus") }.buttonStyle(PrimaryActionStyle()).disabled(model.ownerBusy || model.companyBusy)
             }
             Button { scanning = true } label: { Label(ProductText.string("guests_org_scan"),systemImage:"qrcode.viewfinder") }.buttonStyle(SecondaryActionStyle()).disabled(model.companyBusy)
+                .accessibilityIdentifier("company-scan")
         }
     }
     private func open(_ company: KnownCompany) {

@@ -104,6 +104,7 @@ struct RootView: View {
     }
 
     var body: some View {
+        ZStack {
         VStack(spacing: 0) {
             NavigationStack {
                 Group {
@@ -120,9 +121,14 @@ struct RootView: View {
             AppBottomNavigation(selection: $selectedTab, tabs: model.navigationState.tabs) { userPickedTab = true }
         }
         .accessibilityHidden(model.hasTaskDialog)
+        .allowsHitTesting(!model.hasTaskDialog)
         .overlay { BackupFlowHost(flow:model.backupPresentation) }
-        .overlay {
+        // Keep the modal a sibling of the hidden navigation tree. An overlay
+        // on an accessibility-hidden ancestor can inherit that ancestor's
+        // accessibility state while UIKit is resolving the settings List.
+        Group {
             if let prompt = model.actionPrompt { ActionConfirmation(request:prompt).id(prompt.id) }
+            else if let accepted = model.keyAcceptance { KeyAcceptanceDialog(sensors:model.automationSensors,presentation:accepted).id(accepted.id) }
             else if model.diagnosticConsentPrompt { DiagnosticConsentDialog(service:model.diagnostics) }
             else if let prompt = model.serverPrompt { ServerSettingsDialog(prompt:prompt).id(prompt.id) }
             else if let network = model.networkPrivacyPrompt { NetworkPrivacyDialog(network:network) }
@@ -140,6 +146,7 @@ struct RootView: View {
                     } else { companyObjectFlow = company }
                 }
             } else { OwnerPhoneRequestDialog(control: model.ownerControl) }
+        }
         }
         .background(Color(uiColor: .systemGroupedBackground).ignoresSafeArea())
         .onChange(of: model.navigationState) { value in

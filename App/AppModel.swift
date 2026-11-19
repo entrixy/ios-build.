@@ -16,11 +16,12 @@ final class AppModel: ObservableObject {
     @Published private(set) var networkPrivacy = try! NetworkPrivacyPreferences()
     @Published var networkPrivacyPrompt: PrivacyNetwork?
     @Published var diagnosticConsentPrompt = false
+    @Published var keyAcceptance: KeyAcceptance?
     lazy var diagnostics = AppDiagnostics(app:self)
     var hasTaskDialog: Bool {
         actionPrompt != nil || bleInformationTarget != nil || objectRemovalTarget != nil || objectAvatarTarget != nil
         || ownerGuestRequestPending || companyRequestID != nil || guestRemovalTarget != nil || codePrompt != nil
-        || backupPromptPending || serverPrompt != nil || networkPrivacyPrompt != nil || diagnosticConsentPrompt
+        || backupPromptPending || serverPrompt != nil || networkPrivacyPrompt != nil || diagnosticConsentPrompt || keyAcceptance != nil
     }
     let privacyRouter: ServerPrivacyRouter?
     private var unsavedGuestNetworkRestrictions = Set<String>()
@@ -690,6 +691,9 @@ final class AppModel: ObservableObject {
             guest.requiresBLEExitOnRestore = false
         }
         guard let contents = try JSONSerialization.jsonObject(with: bundle) as? [String: Any] else { throw GuestCrypto.Failure.invalidEnvelope }
+        guard contents["welcome"] == nil || contents["welcome"] is String,
+              ((contents["welcome"] as? String)?.utf8.count ?? 0) <= 16384 else { throw GuestCrypto.Failure.invalidEnvelope }
+        guest.welcome = contents["welcome"] as? String
         let templates = contents["templates"] as? [String: [String: Any]] ?? [:]
         let ble = contents["ble"] as? [[String: Any]] ?? []
         guard contents["templates"] == nil || contents["templates"] is [String: [String: Any]],
@@ -841,7 +845,12 @@ final class AppModel: ObservableObject {
     func ownerPhysicalActionAllowed(server: String, objectID: UUID) -> Bool {
         if canManageGuestAccess { return true }
         guard let intent = activeOwnerAction, intent.automatic, intent.server == server, intent.object.id == objectID,
-              owners.first(where:{ $0.server == server })?.objects?.first(where:{ $0.id == objectID }) == intent.object else { return false }
+              let current = owners.first(where:{ $0.server == server })?.objects?.first(where:{ $0.id == objectID }) else { return false }
+        // The sole expected mutation during an authorized BLE operation is its
+        // durable consumed-nonce ledger. Secret, policy, identity and routing
+        // must still match the frozen intent after that write completes.
+        var expected = intent.object; expected.bleProofs = current.bleProofs
+        guard current == expected else { return false }
         return allowsAction(.owned(server:server,objectID:objectID),automatic:true)
     }
     func beginBLEOwnerAction(server: String, objectID: UUID, proofHash: String) throws -> String {
@@ -1603,7 +1612,7 @@ final class AppModel: ObservableObject {
     }
 
     func add(_ text: String) async -> Bool {
-        guard storageReady, !busy else { return false }
+        guard canManageGuestAccess, !busy else { return false }
         do {
             let invite = try GuestInvite.parse(text)
             if let source = androidPendingGuests.first(where:{ $0.id == invite.id }) {

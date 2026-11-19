@@ -59,7 +59,7 @@ Core245 Apple/Debug также прошли. Новый BLE Info и код в р
 | C05 | Положение объекта | OwnerControlModel.positions / ActionLink.positions | Исходные4 уголка OPEN поверх аватара,64/56pt и статус-точка как Android; BLE только при свежем reachable observation. Данные/выбор направления сохраняются; новая source/UI-проверка ожидается. |
 | C06 | Камера в карточке | ObjectControlCard / ObjectCameraStream / CameraVideoProxy | Поток в той же карточке, showWhen, scoped camera entitlement; JPEG/MJPEG/native HLS/MP4, auth bridge проверен транспортными тестами. Декодирование камеры/другие форматы не приняты. |
 | C07 | Готовность автоматизации | AutomationEditor / AutomationCoordinator / AutomationRuntime | Geo route/zone, Wi-Fi/time/BLE, latch/rearm. Source ограниченного background BLE/owner-local-webhook подключён; iOS Wi-Fi scan/постоянный WSS не имитируются. Новый Apple/device прогон ожидается. |
-| C08 | Подсказки/баннер | Нет полного production route | Разделить readiness ОС и promo cache/события. |
+| C08 | Подсказки/баннер | HomeLocationWarning / HomeWidgetHint / PhoneReadinessCard | Source: классический плохой GPS по Android80m/240s/90s; widget hint только без виджета и при полностью помещающемся списке. Права в Settings. Promo cache/события и frozen-GPS/motion остаются отдельно. |
 | O01 | Общий список | ObjectSettingsRows + ObjectCatalogPreferences | Один смешанный список; onMove сохраняет порядок; стандартный режим изменения порядка iOS. |
 | O02 | Свой обычный объект, раскрытие | ObjectSettingsRows → OwnerObjectEditor / AutomationEditor | Редактор типа, автонастройки, удаление; новая UI-проверка переходов ещё ожидается. |
 | O03 | Входящий обычный объект, раскрытие | ReceivedObjectNameScreen / AutomationEditor / hideReceivedObject | Локальное имя/скрытие и scoped incoming three-way overrides, force bounds; ключ/соседние объекты сохраняются. |
@@ -111,7 +111,7 @@ Core245 Apple/Debug также прошли. Новый BLE Info и код в р
 | E01 | Общие окна сети | RootView.errorMessage + inline action rejection | Общие ошибки отдельно от inline outcome; полный event coordinator ещё не реализован. |
 | E02 | Запрос гостя владельцу | OwnerPhoneRequestDialog / OwnerControlModel / OwnerPhoneNotifications | Компактный foreground approve/decline и 5sec cancelable notify; background/APNs/device-проверка остаётся. |
 | E03 | Автотриггер | AutomationCoordinator / ActionPrompt / executeActionPrompt | Единый foreground manual/automatic confirm/PIN/biometry, одно согласие на frozen intent, cancel consumes arrival; latest source6b42489 ещё не Apple-исполнен. |
-| E04 | Ключ принят/отклонён | KeyImportScreen / DelegationInboxScreen | Есть bind/errors/pending; полный readiness/welcome ещё не перенесён. |
+| E04 | Ключ принят/отклонён | KeyImportScreen / DelegationInboxScreen | KeyAcceptanceDialog: welcome только из authenticated bundle, readiness по правилам именно этого ключа, только OK; сохранённый неподтверждённый ключ не считается принятым. Новый source/UI тест ожидают Apple. |
 | E05 | Восстановление | BackupPresentation / BackupRestorePlan / backup reminder | Preview/restore/preflight/checkpoints/reminder подключены, системный файл sharing; реальный перенос между устройствами не принят. |
 | W01 | Виджет | WidgetKit/AppIntent iOS17, source; Apple/device pending | Общий каталог представления, исходные аватары; action в приложении через текущую policy/entry/PIN/confirm. Базовый Apple168 прошёл; device pending. TTL60с, consume-before-dispatch, нет fire URL/ключей в extension. Android service в фоне этим не перенесён. |
 

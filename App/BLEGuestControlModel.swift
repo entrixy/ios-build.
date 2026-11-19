@@ -92,6 +92,8 @@ import EntrixyCore
             let frame = try session.consume(now: uptime(), epoch: currentEpoch())
             guard let proof = session.proofHash else { throw BLETransportFailure.invalidValue }
             actionKey = try app.beginBLEGuestAction(intent, proofHash: proof)
+            guard generation == current,
+                  app.allowsAction(.received(guestID:intent.guestID,objectID:intent.object.id),automatic:intent.automatic) else { throw BLETransportFailure.cancelled }
             messages[key] = "Отправка одного импульса…"
             try await connection.write(frame, to: BLECrypto.fireCharacteristic)
             guard generation == current else { await connection.close(); return }

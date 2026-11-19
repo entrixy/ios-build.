@@ -14,6 +14,8 @@ enum StageTwoCapture: String, CaseIterable {
     case ownerBLEObjects = "owner-ble-objects"
     case networkPrivacy = "network-privacy"
     case diagnostics
+    case keyAccepted = "key-accepted"
+    case ownerIssued = "owner-issued"
     static var current: Self? {
         let args = ProcessInfo.processInfo.arguments
         guard let i = args.firstIndex(of: "--stage-two"), args.indices.contains(i + 1) else { return nil }
@@ -28,9 +30,9 @@ enum StageTwoCapture: String, CaseIterable {
         }
     }
     var mainTab: AppTab {
-        switch self { case .guestControl, .ownerControl, .ownerConfirmation, .ownerCodeConfirmation: return .control; case .ownerGuests, .delegatingGuests: return .guests; case .journal: return .journal; default: return .settings }
+        switch self { case .guestControl, .ownerControl, .ownerConfirmation, .ownerCodeConfirmation, .keyAccepted: return .control; case .ownerGuests, .delegatingGuests, .ownerIssued: return .guests; case .journal: return .journal; default: return .settings }
     }
-    var isOwner: Bool { [.ownerObjects, .ownerGuests, .addServer, .ownerExpanded, .addObject, .objectDelete, .ownerControl, .mixedObjects, .ownerConfirmation, .ownerCodeConfirmation, .ownerBLEObjects].contains(self) }
+    var isOwner: Bool { [.ownerObjects, .ownerGuests, .addServer, .ownerExpanded, .addObject, .objectDelete, .ownerControl, .mixedObjects, .ownerConfirmation, .ownerCodeConfirmation, .ownerBLEObjects, .ownerIssued].contains(self) }
     var isEmpty: Bool { [.empty, .addKey, .deviceClaim].contains(self) }
 }
 private final class StageTwoStorage: StateStorage {
@@ -53,6 +55,7 @@ struct StageTwoRoot: View {
                 guest.objects = try! JSONDecoder().decode([GuestObject].self, from: Data(#"[{"id":"n:7","numberID":7,"kind":"device","label":"Гостевой въезд","avatarType":"preset:0"},{"id":"b:8","numberID":8,"kind":"ble","label":"Дверь Bluetooth","avatarType":"preset:2"}]"#.utf8))
             }
             guest.incomingDepth = route == .delegatingGuests ? 1 : 0
+            if route == .keyAccepted { guest.welcome = "Добро пожаловать! Въезд со стороны двора."; guest.checkedAt = Date() }
             state.guests = [guest]
         }
         if route.isOwner {
@@ -65,7 +68,13 @@ struct StageTwoRoot: View {
             object.numberID = 7; object.pending = nil; object.available = true; object.revision = 1
             if route == .ownerConfirmation { object.localPolicy = Data(#"{"confirm_on":true}"#.utf8) }
             if route == .ownerCodeConfirmation { object.localPolicy = Data(#"{"auth_on":true,"auth":"pin"}"#.utf8) }
-            owner.objects = [object]; state.owners = [owner]
+            owner.objects = [object]
+            if route == .ownerIssued {
+                var key = try! OwnerIssuedKey(owner:owner,label:"Анна",numberIDs:[7],welcome:"Добро пожаловать во двор.",nativeOnly:false,confirmation:false)
+                key.keyID = 21; key.effectiveNumberIDs = [7]; key.state = .active; key.pending = nil; key.sent = true
+                owner.issuedKeys = [key]
+            }
+            state.owners = [owner]
         }
         if route == .mixedObjects, let owner = state.owners?.first, let object = owner.objects?.first, let guest = state.guests.first {
             state.objectPreferences = ObjectCatalogPreferences(order: [
@@ -93,6 +102,7 @@ struct StageTwoRoot: View {
             .task {
                 // Production RootView and screens; fixture data never calls resume/bind/send.
                 if route == .diagnostics { model.diagnostics.activate() }
+                if route == .keyAccepted, let guest = model.guests.first { model.presentKeyAcceptance(guest.id) }
                 if route == .objectDelete, let target = model.catalogObjects().first?.target { model.objectRemovalTarget = target }
                 let status: [String: Any] = ["ready": model.storageReady, "route": route.rawValue,
                     "tabs": model.navigationState.tabs.map(\.rawValue), "owners": model.owners.count,

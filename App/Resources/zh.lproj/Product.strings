@@ -944,3 +944,5 @@
 "ios_perm_allow" = "允许";
 
 "ios_auto_foreground_notice" = "自动化条件已满足。请打开 Entrixy，检查对象状态并执行操作。";
+
+"ios_key_import_pending" = "密钥已保存在此 iPhone 上，但服务器尚未确认访问权限。请检查连接后重新添加，已保存的密钥不会改变。";

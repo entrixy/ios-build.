@@ -24,6 +24,20 @@ def main():
         raise RuntimeError('Debug executable does not contain the expected capture entry point')
     if any(marker in release for marker in MARKERS):
         raise RuntimeError('Release executable contains isolated fixture/bootstrap code')
+    def required_reasons(bundle, expected):
+        manifest = plistlib.loads((bundle / 'PrivacyInfo.xcprivacy').read_bytes())
+        declared = {row['NSPrivacyAccessedAPIType']:set(row['NSPrivacyAccessedAPITypeReasons'])
+                    for row in manifest.get('NSPrivacyAccessedAPITypes', [])}
+        for category, reasons in expected.items():
+            if not set(reasons).issubset(declared.get(category,set())):
+                raise RuntimeError('Built bundle is missing required API reasons: ' + category)
+    required_reasons(args.release_app, {
+        'NSPrivacyAccessedAPICategoryUserDefaults':['CA92.1'],
+        'NSPrivacyAccessedAPICategorySystemBootTime':['35F9.1'],
+        'NSPrivacyAccessedAPICategoryFileTimestamp':['C617.1','3B52.1']})
+    required_reasons(args.release_app / 'PlugIns/EntrixyWidget.appex', {
+        'NSPrivacyAccessedAPICategoryFileTimestamp':['C617.1']})
+    print('Required API manifests verified in the actual Release app and widget bundles')
     print('Release fixture/bootstrap isolation verified in built executable')
 
 

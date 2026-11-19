@@ -76,6 +76,69 @@ final class NavigationUITests: XCTestCase {
         XCTAssertTrue(app.staticTexts["Журнал пуст. Здесь будут появляться вызовы."].waitForExistence(timeout: 5))
         reviewCapture("journal")
     }
+    func testAcceptedKeyShowsOwnerWelcomeUntilOKAndKeepsBottomNavigation() {
+        let app = XCUIApplication()
+        app.launchArguments = ["--stage-two","key-accepted","-AppleLanguages","(ru)","-AppleLocale","ru_RU"]
+        app.launch(); activeApp = app
+        let title = app.staticTexts["key-accepted-title"]
+        XCTAssertTrue(title.waitForExistence(timeout:20))
+        XCTAssertTrue(app.staticTexts["Владелец пишет:"].exists)
+        XCTAssertTrue(app.descendants(matching:.any).matching(identifier:"key-owner-welcome").firstMatch.exists)
+        reviewCapture("key-accepted")
+        app.coordinate(withNormalizedOffset:CGVector(dx:0.95,dy:0.15)).tap()
+        XCTAssertTrue(title.exists)
+        app.buttons["key-accepted-ok"].tap()
+        XCTAssertFalse(title.exists); assertBottom(app,["control","settings","journal"])
+    }
+    func testExistingGuestEditQRMessageAndRemovalUseTheSameIssuedKeyWithoutSending() {
+        let app = launch("owner-issued")
+        let row = app.buttons.matching(NSPredicate(format:"identifier BEGINSWITH %@","guest-card-")).firstMatch
+        XCTAssertTrue(row.waitForExistence(timeout:10)); XCTAssertTrue(row.label.contains("Анна")); row.tap()
+        XCTAssertTrue(app.buttons["Изменить"].isEnabled)
+        reviewCapture("guest-issued-actions")
+        app.buttons["Изменить"].tap()
+        XCTAssertTrue(app.textFields.matching(NSPredicate(format:"value == %@","Анна")).firstMatch.waitForExistence(timeout:10))
+        XCTAssertTrue(app.buttons["Сохранить"].exists)
+        reviewCapture("guest-issued-edit")
+        app.buttons["Отмена"].tap(); XCTAssertTrue(row.waitForExistence(timeout:10))
+        app.buttons["QR"].tap()
+        XCTAssertTrue(app.navigationBars["QR"].waitForExistence(timeout:10))
+        XCTAssertTrue(app.buttons["Копировать"].exists); reviewCapture("guest-issued-qr")
+        app.buttons["Закрыть"].tap()
+        app.buttons["Отправить сообщение"].tap()
+        XCTAssertTrue(app.descendants(matching:.any).matching(identifier:"message-text").firstMatch.waitForExistence(timeout:10))
+        XCTAssertFalse(app.buttons["message-send"].isEnabled); reviewCapture("message-compose")
+        app.buttons["Отмена"].tap()
+        app.buttons["Удалить"].tap()
+        XCTAssertTrue(app.staticTexts["Удалить ключ?"].waitForExistence(timeout:10)); reviewCapture("guest-revoke-confirmation")
+        app.buttons["Отмена"].tap(); XCTAssertTrue(row.exists)
+        assertBottom(app,["control","settings","guests","journal"])
+    }
+    func testGuestPresetsAndCompaniesKeepRootNavigationAndShowActualAccessControls() {
+        let app = launch("owner-guests")
+        app.segmentedControls.buttons["Пресеты"].tap()
+        XCTAssertTrue(app.staticTexts["Доступ для новых ключей"].waitForExistence(timeout:10))
+        XCTAssertTrue(app.switches.matching(NSPredicate(format:"label CONTAINS %@","Разрешить передавать дальше")).firstMatch.exists)
+        reviewCapture("guest-presets")
+        app.segmentedControls.buttons["Компании"].tap()
+        XCTAssertTrue(app.buttons["company-scan"].waitForExistence(timeout:10))
+        reviewCapture("guest-companies")
+        assertBottom(app,["control","settings","guests","journal"])
+    }
+    func testSoundSettingsAndBackupPasswordFormUseRealControlsWithoutExporting() {
+        let app = launch("empty")
+        app.segmentedControls.buttons["Звуки"].tap()
+        XCTAssertTrue(app.sliders.firstMatch.waitForExistence(timeout:10))
+        XCTAssertGreaterThan(app.switches.count,0); reviewCapture("sounds")
+        app.segmentedControls.buttons["Система"].tap()
+        let create = app.buttons["Создать копию"]
+        bringIntoView(create,in:app); XCTAssertTrue(create.isHittable); create.tap()
+        XCTAssertTrue(app.secureTextFields["Пароль копии"].waitForExistence(timeout:10))
+        XCTAssertTrue(app.secureTextFields["Повторите пароль"].exists)
+        XCTAssertFalse(app.buttons["Сохранить"].isEnabled); reviewCapture("backup-password")
+        app.buttons["Отмена"].tap()
+        assertBottom(app,["settings","journal"])
+    }
     func testHomeNetworkConsentAndRemovalUseSystemSectionAndPreserveReceivedKeys() {
         let app = launch("network-privacy")
         let row = app.descendants(matching:.any).matching(identifier:"privacy-cellular-consent").firstMatch

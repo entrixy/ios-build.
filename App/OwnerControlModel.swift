@@ -513,9 +513,13 @@ final class OwnerControlModel: ObservableObject {
         let entry = JournalEntry(who: who, what: metadata?["label"] as? String ?? "Объект", actionKey: actionKey,
             result: "Результат запроса не получен", level: "warning")
         app.recordAction(entry)
-        guard app.journal.contains(where: { $0.id == entry.id }) else { return }
+        guard app.journal.contains(where: { $0.id == entry.id }), app.ownerPhysicalActionAllowed(server:server,objectID:objectID) else { return }
         app.noteAutomationAttempt(.owned(server:server,objectID:objectID))
-        let task = Task { try await webhook.send(url: url, body: body) }
+        let task = Task {
+            try Task.checkCancellation()
+            guard app.ownerPhysicalActionAllowed(server:server,objectID:objectID) else { throw BLETransportFailure.cancelled }
+            return try await webhook.send(url:url,body:body)
+        }
         webhookTasks[target] = task
         do {
             let result = try await task.value

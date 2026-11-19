@@ -11,6 +11,7 @@ struct KeyImportScreen: View {
     @State private var photo: PhotosPickerItem?
     @State private var readingPhoto = false
     @State private var importError: String?
+    @State private var acceptedGuestID: String?
     private var delegation: DelegationLink? { try? DelegationLink.parse(input) }
     private var invite: GuestInvite? { try? GuestInvite.parse(input) }
 
@@ -52,19 +53,26 @@ struct KeyImportScreen: View {
                     else {
                     Button {
                         Task {
-                            if await model.add(input) { input = ""; dismiss() }
+                            let started = Date(), id = invite?.id
+                            if await model.add(input), let id, let guest = model.guests.first(where:{ $0.id == id }),
+                               let checked = guest.checkedAt,checked >= started {
+                                acceptedGuestID = id; input = ""; dismiss()
+                            } else if model.errorMessage == nil {
+                                importError = ProductText.string(id.map { key in model.guests.contains(where:{ $0.id == key }) } == true ? "ios_key_import_pending" : "key_rejected_title")
+                            }
                             else { importError = model.errorMessage; model.errorMessage = nil }
                         }
                     } label: {
                         ActionButtonLabel(title: "Добавить ключ", busy: model.busy)
                     }
                     .buttonStyle(PrimaryActionStyle())
-                    .disabled(invite == nil || model.busy || readingPhoto)
+                    .disabled(invite == nil || model.busy || readingPhoto || !model.canManageGuestAccess)
                     }
                 }.padding(DesignMetrics.pageInset)
             }
             .background(Color(uiColor: .systemGroupedBackground))
             .navigationTitle("Добавить ключ").navigationBarTitleDisplayMode(.inline)
+            .onDisappear { if let id = acceptedGuestID { model.presentKeyAcceptance(id) } }
             .sheetDismissFooter(disabled: model.busy || readingPhoto) { dismiss() }
             .sheet(isPresented: $scanning) { QRScannerScreen { value in accept(value); scanning = false } }
             .onChange(of: photo) { value in

@@ -944,3 +944,5 @@
 "ios_perm_allow" = "Allow";
 
 "ios_auto_foreground_notice" = "An automation condition matched. Open Entrixy to check the object and perform the action.";
+
+"ios_key_import_pending" = "The key is saved on this iPhone, but the server has not confirmed access. Check your connection and try adding it again; the saved key will stay the same.";

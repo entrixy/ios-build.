@@ -15,6 +15,9 @@ struct ControlScreen: View {
             } else {
                 ScrollView {
                     LazyVStack(alignment: .leading, spacing: 16) {
+                        if model.controlObjects.contains(where:{ (try? model.automationContext(.object($0.target)).template.geoEnabled) == true }) {
+                            HomeLocationWarning(sensors:model.automationSensors)
+                        }
                         ForEach(entries) { entry in
                             switch entry {
                             case let .owned(owner, object):
@@ -25,9 +28,10 @@ struct ControlScreen: View {
                         if !query.isEmpty && entries.isEmpty {
                             Text("Ничего не найдено").foregroundStyle(.secondary).frame(maxWidth: .infinity).padding(32)
                         }
-                    }.padding(20)
+                    }.padding(20).measureControlContent()
                 }.background(Color(uiColor: .systemGroupedBackground))
                     .refreshable { await model.refreshOwners(); await model.refresh() }
+                    .modifier(HomeWidgetHint())
             }
         }
         .searchable(text: $query, placement: .navigationBarDrawer(displayMode: .automatic), prompt: "Найти объект")

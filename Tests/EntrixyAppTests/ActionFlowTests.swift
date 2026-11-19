@@ -16,22 +16,46 @@ final class ActionFlowTests: XCTestCase {
         SecItemDelete([kSecClass as String: kSecClassGenericPassword, kSecAttrService as String: service] as CFDictionary)
         super.tearDown()
     }
-    @MainActor private func fixture(template: [String: Any] = [:],imported: AndroidIncomingAutomation? = nil) async throws -> (AppModel, RecordingController, SavedGuest, GuestObject) {
+    @MainActor private func fixture(template: [String: Any] = [:],imported: AndroidIncomingAutomation? = nil,welcome: String? = nil) async throws -> (AppModel, RecordingController, SavedGuest, GuestObject) {
         let invite = try GuestInvite.parse("https://example.invalid/key#AAECAwQFBgcICQoLDA0ODxAREhMUFRYX" + String(repeating: "A", count: 43))
         let guest = SavedGuest(invite:invite,androidAutomation:imported.map { ["7":$0] })
         let store = KeychainStore(service: service)
         try store.save(SavedState(identity: Data(repeating: 53, count: 32), guests: [guest]))
         let model = AppModel(storage: store)
         let key = Data(repeating: 8, count: 32)
-        let bundle: [String: Any] = ["obj_keys": ["7": GuestCrypto.base64URL(key)], "templates": ["7": template],
+        var bundle: [String: Any] = ["obj_keys": ["7": GuestCrypto.base64URL(key)], "templates": ["7": template],
             "sock": ["7": ["guest_id": 513, "token": Data([1, 2, 1]).base64EncodedString(),
                 "sig": Data(repeating: 4, count: 16).base64EncodedString(), "gkey": Data(0..<32).base64EncodedString()]]]
+        if let welcome { bundle["welcome"] = welcome }
         let cipher = try GuestCrypto.encrypt(key: key, plaintext: JSONSerialization.data(withJSONObject: ["label": "Тестовый контроллер"]))
         let snapshot = try JSONSerialization.data(withJSONObject: ["type": "guest_ok", "mode": "on", "numbers": [["id": 7, "type": "device", "device_id": 9, "data_cipher": cipher]]])
         let controller = RecordingController()
         try model.attachTestController(controller, guestID: guest.id, bundle: JSONSerialization.data(withJSONObject: bundle), snapshot: snapshot)
         try await model.receiveTestController(Data(#"{"type":"devices_online","device_ids":[9]}"#.utf8), guestID: guest.id)
         return (model, controller, guest, try XCTUnwrap(model.guests.first?.objects.first))
+    }
+    @MainActor func testOwnerWelcomeComesFromAuthenticatedBundleAndSurvivesRelaunchWithoutCommands() async throws {
+        let message = "Въезд со двора. https://entrixy.com/"
+        let (app,controller,guest,_) = try await fixture(welcome:message); defer { app.suspend() }
+        XCTAssertEqual(app.guests[0].welcome,message)
+        let saved = try XCTUnwrap(KeychainStore(service:service).load())
+        XCTAssertEqual(saved.guests.first?.welcome,message)
+        app.presentKeyAcceptance(guest.id)
+        XCTAssertEqual(app.keyAcceptance?.guestID,guest.id); XCTAssertTrue(app.hasTaskDialog)
+        XCTAssertTrue(controller.sent.isEmpty); XCTAssertTrue(app.journal.isEmpty)
+        app.keyAcceptance = nil; XCTAssertFalse(app.hasTaskDialog)
+        let restored = AppModel(storage:KeychainStore(service:service)); defer { restored.suspend() }
+        XCTAssertEqual(restored.guests.first?.welcome,message); XCTAssertNil(restored.keyAcceptance)
+        XCTAssertEqual(try KeychainStore(service:service).load()?.identity,saved.identity)
+    }
+    @MainActor func testBackgroundKeyImportCannotBindOrReplaceStoredCredentials() async throws {
+        let (app,controller,guest,_) = try await fixture(); app.suspend()
+        let identity = try KeychainStore(service:service).load()?.identity
+        let link = "https://" + guest.invite.server + "/key#" + guest.invite.userKey + GuestCrypto.base64URL(guest.invite.bundleKey)
+        let accepted = await app.add(link)
+        XCTAssertFalse(accepted); XCTAssertEqual(app.guests.count,1)
+        XCTAssertTrue(controller.sent.isEmpty); XCTAssertTrue(app.journal.isEmpty)
+        XCTAssertEqual(try KeychainStore(service:service).load()?.identity,identity)
     }
     @MainActor func testImportedAndroidPINChoiceIsAppliedOnlyAfterFreshBundleAndPersistsWithoutSending() async throws {
         let local = try AutomationTemplate(data:Data(#"{"auth_on":true,"auth":"pin"}"#.utf8))

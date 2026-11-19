@@ -66,6 +66,7 @@ import EntrixyCore
             let frame = try session.consume(now: uptime(), epoch: epoch())
             guard let proof = session.proofHash else { throw BLETransportFailure.invalidValue }
             actionKey = try app.beginBLEOwnerAction(server: server, objectID: objectID, proofHash: proof)
+            guard generation == current, app.ownerPhysicalActionAllowed(server:server,objectID:objectID) else { throw BLETransportFailure.cancelled }
             // No suspension between durable intent and this sole fire write.
             messages[objectID] = "Отправка одного импульса…"
             try await connection.write(frame, to: BLECrypto.fireCharacteristic)

@@ -84,6 +84,7 @@ struct ComposeMessageScreen: View {
                 Section {
                     AppField("Текст сообщения") {
                         TextField("Текст сообщения", text: $text, axis: .vertical).lineLimit(3...6)
+                            .accessibilityIdentifier("message-text")
                     }
                     Text("\(text.count) / 500").font(.caption).foregroundStyle(Brand.secondaryInk)
                     if let notice = manager.message { Text(notice).font(.subheadline).foregroundStyle(Brand.secondaryInk) }
@@ -97,6 +98,7 @@ struct ComposeMessageScreen: View {
                     } label: { ActionButtonLabel(title: "Отправить сообщение", busy: manager.busy) }
                         .buttonStyle(PrimaryActionStyle())
                         .disabled(text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || text.count > 500 || text.utf8.count > 2048)
+                        .accessibilityIdentifier("message-send")
                 } header: { Text("Сообщение получателю") } footer: { Text("Отправка на сервер ещё не подтверждает доставку или чтение получателем.") }
             }.disabled(manager.busy)
             .navigationTitle("Написать сообщение").navigationBarTitleDisplayMode(.inline)

@@ -944,3 +944,5 @@
 "ios_perm_allow" = "Permitir";
 
 "ios_auto_foreground_notice" = "Uma condição de automação foi atendida. Abra o Entrixy para verificar o objeto e executar a ação.";
+
+"ios_key_import_pending" = "A chave está salva neste iPhone, mas o servidor ainda não confirmou o acesso. Verifique a conexão e adicione-a novamente; a chave salva será mantida.";

@@ -2,6 +2,7 @@ import Foundation
 import Combine
 import CoreLocation
 import NetworkExtension
+import EntrixyCore
 
 struct AutomationWiFiNetwork: Equatable {
     let ssid: String
@@ -23,6 +24,8 @@ struct AutomationWiFiNetwork: Equatable {
     private var requestTimeout: Task<Void, Never>?
     private var tracking = false
     private var backgroundTrackingRequested = false
+    private var quality = LocationQualityMonitor()
+    func locationUnreliable(at date: Date = Date()) -> Bool { quality.unreliable(at:date) }
 
     override init() {
         super.init()
@@ -63,6 +66,7 @@ struct AutomationWiFiNetwork: Equatable {
     }
 
     func trackLocation(enabled: Bool, background: Bool) {
+        if enabled && !tracking { quality.reset(at:Date()) }
         tracking = enabled
         backgroundTrackingRequested = enabled && background
         if !enabled { manager.stopUpdatingLocation(); manager.stopMonitoringSignificantLocationChanges(); return }
@@ -98,7 +102,7 @@ struct AutomationWiFiNetwork: Equatable {
         if latest.horizontalAccuracy <= 100 { finishLocation(.success(latest)) }
         // Core Location can deliver a batch after waking the app. Preserve the
         // real route order instead of replacing the corridor with its last fix.
-        for fix in fresh { onLocation?(fix) }
+        for fix in fresh { quality.receive(at:fix.timestamp,accuracy:fix.horizontalAccuracy); onLocation?(fix) }
     }
 
     func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {

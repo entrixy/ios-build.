@@ -5,10 +5,12 @@ import EntrixyCore
 private final class BLEOwnerStorage: StateStorage {
     var state: SavedState?
     var failing = false
+    var afterSave: ((SavedState) -> Void)?
     func load() throws -> SavedState? { state }
     func save(_ state: SavedState) throws {
         if failing { throw KeychainStore.Failure(status: -1) }
         self.state = state
+        afterSave?(state)
     }
 }
 @MainActor private final class OwnerBLEChannel: BLEChannel {
@@ -160,6 +162,24 @@ private final class BLEOwnerStorage: StateStorage {
         XCTAssertTrue(app.bleAutomationDisarmed.contains(entry.target.id))
         await app.performAutomaticAction(entry,readiness:proof)
         XCTAssertEqual(central.connects,1)
+    }
+    func testWindowRevokedDuringDurableProofSaveCannotWriteFireAfterStorageReturns() async throws {
+        var template = AutomationTemplate(); template.bleEnabled = true
+        let (storage,central,app,object,_) = try fixture(template:template)
+        app.bleControl = BLEOwnerControlModel(app:app,transport:central); defer { app.suspend() }
+        let entry = CatalogObject.owned(app.owners[0],object)
+        app.automation.receiveBLE(try XCTUnwrap(central.discoveries[0].manufacturerPayload),rssi:-45)
+        let proof = try XCTUnwrap(app.conditionReadiness(entry.target))
+        app.suspend(preserveAutomation:true); app.backgroundMonitoring = true
+        let scope = try XCTUnwrap(app.beginBackgroundAutomatic(entry,readiness:proof,duration:8))
+        storage.afterSave = { saved in
+            if saved.journal?.first?.actionKey.hasPrefix("ble-owner:") == true { app.endBackgroundAutomatic(scope) }
+        }
+        await app.performAutomaticAction(entry,readiness:proof)
+        XCTAssertEqual(central.connects,1); XCTAssertTrue(central.channel.writes.isEmpty)
+        XCTAssertEqual(storage.state?.journal?.count,1)
+        XCTAssertEqual(storage.state?.owners?.first?.objects?.first?.bleProofs?.count,1)
+        XCTAssertTrue(app.bleAutomationDisarmed.contains(entry.target.id))
     }
     func testAutomaticBLEWithCodeOrConfirmationIsManualOnlyAsOnAndroid() async throws {
         for auth in [false,true] {

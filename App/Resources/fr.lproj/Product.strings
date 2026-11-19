@@ -944,3 +944,5 @@
 "ios_perm_allow" = "Autoriser";
 
 "ios_auto_foreground_notice" = "Une condition d’automatisation est remplie. Ouvrez Entrixy pour vérifier l’objet et effectuer l’action.";
+
+"ios_key_import_pending" = "La clé est enregistrée sur cet iPhone, mais le serveur n’a pas encore confirmé l’accès. Vérifiez la connexion et ajoutez-la à nouveau ; la clé enregistrée sera conservée.";

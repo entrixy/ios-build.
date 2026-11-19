@@ -13,29 +13,28 @@
 они не ограничивают текущую разрешённую работу. Полный результат ещё не готов.
 Актуальные функциональные границы и проверки — [FUNCTIONAL_PORT.md](FUNCTIONAL_PORT.md).
 
-Последняя полная функциональная Apple-проверка: native `c3ce3bb`, public `d09e8ba`,
-[CI44414977345](https://github.com/entrixy/ios-build./actions/runs/44414977345):
-283core,Debug/test bundles с WidgetKit extension,Release/isolation,168hosted без ошибок,
-включая4 widget lifecycle/policy/export cases. Физическая установка/выбор объекта
-виджета и App Group provisioning ещё не приняты. UI783635d/public16b4e86 исполнил20:
-18прошли,2ошибки(AX диалога диагностики, hit target переключателя входа).
+Последний общий Apple-прогон: native `3d3d578`, public `b021825`,
+[CI44470840973](https://github.com/entrixy/ios-build./actions/runs/44470840973):
+289core, Debug с WidgetKit/test bundles, Release/isolation и173hosted без ошибок.
+В том же simulator pass прошли19 из20 UI-сценариев; диагностика упала на чтении
+accessibility snapshot диалога. Переключатели входа и домашней сети прошли.
+Общий результат — failure. Экспортированы28 оригинальных PNG, четыре состояния
+диагностики не достигнуты. Этот частичный комплект не опубликован и не принят.
 
-Текущий большой блок подключает ограниченную фоновую автоматику BLE/своего
-локального webhook по реальным callbacks Core Location/CoreBluetooth, короткую
-полномочность одного target/template, отзыв до отмены транспорта и неизменённые
-UI/manual/entry guards. PIN/confirm BLE — только вручную, как Android. При коалесцировании
-фоновых BLE advertisements разрыв времени не доказывает выход: вместо опасного
-авто-rearm используются3 реальных дальних RSSI-наблюдения с гистерезисом.
-Background SIM-call/постоянный WSS/APNs не заявлены реализованными; для требующих
-foreground сценариев есть локальное уведомление, открывающее обычный защищённый UI.
+Текущие followups: приветствие из проверенного bundle/подтверждение приёма ключа,
+Android Home GPS/widget hints, required API manifests app/widget, проверка фоновой
+полномочности после durable save перед FIRE/POST, расширение UI маршрутов выданного
+ключа, QR, сообщения, пресетов, компаний, звуков и пароля копии. Диалог вынесен
+в отдельного соседа скрытого navigation tree; исправление AX ещё требует прогона.
+Локальные292core и4 pipeline contract checks прошли. Следующий общий Apple-пакет
+ожидает176hosted/24UI/42PNG — это ещё не результат исполнения.
 
-По указанию пользователя CI объединён: один build-for-testing, одна Release-проверка,
-один simulator pass hosted+UI со32 именованными PNG в самих сценариях. Отдельного
-повторного обхода экранов нет. PNG не ретушируются; SHA/source/test сохраняются.
-Частичная/упавшая проверка не становится завершённым комплектом. Локальные289core,
-4 pipeline contract checks,syntax и actionlint прошли. Apple173native/UI20/capture32
-актуального блока ещё не исполнены. Код разрешений Always подключён к реальному
-фоновому runtime, а не запрашивается для одного BLE без geo.
+Фоновая автоматика ограничена реальными Core Location/CoreBluetooth событиями,
+коротким разрешением одного target/template и отдельными manual/UI guards.
+PIN/confirm BLE остаётся ручным. Коалесцирование рекламы не доказывает выход:
+для rearm нужны3 дальних наблюдения с гистерезисом. SIM-call, постоянный WSS/APNs
+в фоне не заявлены. Уведомление открывает защищённый UI, не ставит FIRE в очередь.
+Физическая приёмка и полный перенос Android остаются открыты.
 
 App Group `group.com.entrixy.ios` и окончательные Bundle IDs должны быть настроены
 в Apple Developer team перед device signing. Подпись/профили не настроены.
@@ -719,3 +718,18 @@ Linux127coretests0failures (.local-checks/owner-backup-merge-tests.log),4 нов
 merge cases. Native restore-into-existing-owner case добавлен, Apple execution нет.
 App/native syntax parse passed. CI configuration пока не менялась: ждём Annotations
 failedrun#49. Изменения послеf983daa сохранены локальными коммитами до диагностики CI.
+
+## Required-reason API manifests — source, device archive pending
+
+App/Resources/PrivacyInfo.xcprivacy declares actual app-local defaults(CA92.1),
+monotonic elapsed-time/nonce/entry/wake timers(35F9.1), metadata of private cache/
+App Group files(C617.1) and user-selected document/audio/backup files(3B52.1).
+Widget/PrivacyInfo.xcprivacy separately declares App Group file metadata(C617.1).
+The Release isolation check now requires those manifests in the BUILT app and
+embedded widget. XML/plist validation passed locally; Apple packaging is pending.
+These are required-API reasons only, not a completed data-collection questionnaire,
+a claim of No Data Collected, tracking/privacy-label approval, or export classification.
+
+References checked against current Apple documentation:
+https://developer.apple.com/documentation/technotes/tn3183-adding-required-reason-api-entries-to-your-privacy-manifest
+https://developer.apple.com/documentation/bundleresources/app-privacy-configuration/nsprivacyaccessedapitypes/nsprivacyaccessedapitype
