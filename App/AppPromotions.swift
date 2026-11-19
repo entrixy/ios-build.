@@ -155,20 +155,20 @@ struct PromotionCard: View {
                     HStack(spacing:12) {
                         if let icon = promo.iconURL { PromotionPicture(service:service,url:icon,height:72).frame(width:72) }
                         VStack(alignment:.leading,spacing:2) {
-                            Text(promo.title).font(.system(size:16,weight:.semibold))
+                            Text(promo.title).font(.system(size:16,weight:.semibold)).accessibilityIdentifier("promotion-title")
                             if let body = promo.body { Text(body).font(.system(size:12)).opacity(0.8).lineLimit(4) }
                         }.frame(maxWidth:.infinity,alignment:.leading)
                         if let button = promo.buttonText {
                             Button { clicked(promo) } label: { Text(button).font(.subheadline.weight(.semibold)) }
                                 .buttonStyle(SecondaryActionStyle()).accessibilityIdentifier("promotion-action")
+                                .fixedSize(horizontal:true,vertical:false)
                         }
                     }.padding(14).foregroundStyle(color(promo.textColor,fallback:.white))
                         .background(color(promo.backgroundColor,fallback:Color(red:26/255,green:86/255,blue:168/255)),in:RoundedRectangle(cornerRadius:16))
                         .contentShape(RoundedRectangle(cornerRadius:16))
                         .onTapGesture { if promo.buttonText == nil { clicked(promo) } }
                 }
-            }.accessibilityIdentifier("promotion-card")
-                .task(id:promo.id) { service.viewed(id:promo.id) }
+            }.task(id:promo.id) { service.viewed(id:promo.id) }
         }
     }
 }

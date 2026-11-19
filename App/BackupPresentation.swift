@@ -157,19 +157,19 @@ struct BackupFlowHost: View {
         switch prompt {
         case .export:
             VStack(spacing:12) {
-                HStack(spacing:12) {
+                EqualActionRow {
                     Button(ProductText.string("btn_save")) { Task { await flow.prepareExport(send:false) } }.buttonStyle(SecondaryActionStyle())
                     Button(ProductText.string("backup_send")) { Task { await flow.prepareExport(send:true) } }.buttonStyle(PrimaryActionStyle())
                 }.disabled(flow.password.count < 8 || flow.password != flow.repeated)
                 Button(ProductText.string("btn_cancel")) { flow.cancel() }.buttonStyle(SecondaryActionStyle())
             }
         case .password:
-            HStack(spacing:12) {
+            EqualActionRow {
                 Button(ProductText.string("btn_cancel")) { flow.cancel() }.buttonStyle(SecondaryActionStyle())
                 Button(ProductText.string("ios_backup_check")) { Task { await flow.inspect() } }.buttonStyle(PrimaryActionStyle()).disabled(flow.password.isEmpty)
             }
         case .review:
-            HStack(spacing:12) {
+            EqualActionRow {
                 Button(ProductText.string("btn_cancel")) { flow.cancel() }.buttonStyle(SecondaryActionStyle())
                 Button(ProductText.string("ios_backup_transfer")) { Task { await flow.restore() } }.buttonStyle(PrimaryActionStyle()).disabled(manager.preview == nil)
             }
@@ -235,6 +235,12 @@ extension SavedState {
             values.insert("owner:" + owner.server + ":" + GuestCrypto.hash(owner.masterKey + Data(((owner.credentials?.deviceID ?? "") + (owner.credentials?.deviceSecret ?? "")).utf8)))
             for object in owner.objects ?? [] {
                 values.insert("object:" + owner.server + ":" + GuestCrypto.hash(Data((object.wrappedKey + (object.wrappedBLESecret ?? "") + (object.wrappedDeviceCredentials ?? "")).utf8)))
+                if let rotation = object.keyRotation {
+                    // Mark stale when the next key is prepared/shared, before
+                    // its metadata acknowledgement. A backup made in flight
+                    // already covers the committed key and needs no new prompt.
+                    values.insert("object:" + owner.server + ":" + GuestCrypto.hash(Data((rotation.wrappedKey + (object.wrappedBLESecret ?? "") + (object.wrappedDeviceCredentials ?? "")).utf8)))
+                }
             }
             for key in owner.issuedKeys ?? [] { values.insert("issued:" + owner.server + ":" + GuestCrypto.hash(Data(key.wrappedSecrets.utf8) + (key.company?.publicKey ?? Data()))) }
             for key in owner.androidKeys ?? [] { values.insert("android-key:" + owner.server + ":" + String(key.serverKeyID) + ":" + GuestCrypto.hash(Data(((key.userKey ?? "") + (key.wrappedBundleKey ?? "")).utf8))) }
@@ -270,7 +276,7 @@ struct BackupSettingsSection: View {
                 if manager.hasPendingRestore {
                     Button(ProductText.string("ios_backup_continue")) { Task { await flow.restore() } }.buttonStyle(PrimaryActionStyle()).actionListRow()
                 } else {
-                    HStack(spacing:12) {
+                    EqualActionRow {
                         Button(ProductText.string("backup_create")) { flow.beginExport() }.buttonStyle(PrimaryActionStyle())
                         Button(ProductText.string("backup_restore")) { flow.beginImport() }.buttonStyle(SecondaryActionStyle())
                     }.actionListRow()

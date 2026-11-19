@@ -406,7 +406,7 @@ private struct OwnerObjectEditorForm: View {
                         if credentials != nil { showingCredentials = true } else { noCredentials = true }
                     } catch { model.errorMessage = "Не удалось прочитать сохранённые параметры устройства." }
                 } label: { Label(ProductText.string("edit_object_share_device"), systemImage: "square.and.arrow.up") }
-                    .buttonStyle(SecondaryActionStyle()).actionListRow()
+                    .buttonStyle(SecondaryActionStyle()).actionListRow().accessibilityIdentifier("device-share-credentials")
             }
             Section {
                 Button {

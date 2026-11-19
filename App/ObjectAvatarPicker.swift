@@ -42,11 +42,11 @@ struct ObjectAvatarPicker: View {
                     }
                 }
         } footer: {
-                HStack(spacing: 12) {
-                    Button(ProductText.string("btn_cancel")) { dismiss() }.buttonStyle(SecondaryActionStyle()).disabled(saving)
+                EqualActionRow {
+                    Button(ProductText.string("btn_cancel")) { dismiss() }.buttonStyle(SecondaryActionStyle()).disabled(saving).accessibilityIdentifier("avatar-cancel")
                     PhotosPicker(selection: $photo, matching: .images) {
                         Text(ProductText.string("avatar_picker_custom"))
-                    }.buttonStyle(PrimaryActionStyle()).disabled(saving || model.ownerBusy)
+                    }.buttonStyle(PrimaryActionStyle()).disabled(saving || model.ownerBusy).accessibilityIdentifier("avatar-upload")
                 }
         }
     }

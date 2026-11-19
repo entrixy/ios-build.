@@ -80,11 +80,12 @@ struct ObjectCameraFields: View {
                 Text(ProductText.string("snap_title"))
                 Text(ProductText.string("snap_hint")).font(.footnote).foregroundStyle(Brand.secondaryInk)
             }
-        }
+        }.accessibilityIdentifier("object-camera-enabled")
         if camera.enabled {
             AppField(ProductText.string("snap_url_label")) {
                 TextField("https://cam.example.com/snap.jpg",text:$camera.url)
                     .keyboardType(.URL).textInputAutocapitalization(.never).autocorrectionDisabled()
+                    .accessibilityIdentifier("object-camera-url")
             }
             Text(ProductText.string(camera.url.isEmpty ? "snap_type_unknown" : video ? "snap_type_video" : "snap_type_jpeg"))
                 .font(.footnote).foregroundStyle(Brand.secondaryInk)

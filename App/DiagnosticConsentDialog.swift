@@ -3,14 +3,63 @@ import UIKit
 
 /// Native controls provide an explicit bounded accessibility tree for the consent
 /// panel. The SwiftUI provider repeatedly timed out even in a separate modal host.
-struct DiagnosticConsentDialog: UIViewControllerRepresentable {
+struct DiagnosticConsentPresenter: UIViewControllerRepresentable {
     @EnvironmentObject private var model: AppModel
+    @Environment(\.scenePhase) private var phase
     @ObservedObject var service: AppDiagnostics
-    func makeUIViewController(context:Context) -> DiagnosticConsentController { DiagnosticConsentController() }
-    func updateUIViewController(_ controller:DiagnosticConsentController,context:Context) {
-        controller.configure(ready:service.ready && model.canManageGuestAccess,
-                             error:service.message.map { ProductText.string($0) }) { service.setConsent($0) }
+    func makeUIViewController(context:Context) -> DiagnosticConsentPresentationController { DiagnosticConsentPresentationController() }
+    func updateUIViewController(_ controller:DiagnosticConsentPresentationController,context:Context) {
+        controller.app = model; controller.service = service; controller.sceneActive = phase == .active; controller.schedule()
     }
+    static func dismantleUIViewController(_ controller:DiagnosticConsentPresentationController,coordinator:()) { controller.stop() }
+}
+
+/// Present the actual UIKit controller, without an AnyView/UIHostingController/
+/// UIViewControllerRepresentable stack around its accessibility tree.
+@MainActor final class DiagnosticConsentPresentationController: UIViewController {
+    weak var app: AppModel?
+    weak var service: AppDiagnostics?
+    var sceneActive = false
+    private var dialog: DiagnosticConsentController?
+    private var dismissing = false
+    private var scheduled = false
+    private var stopped = false
+    override func loadView() { view = UIView(); view.backgroundColor = .clear; view.isUserInteractionEnabled = false }
+    override func viewDidAppear(_ animated:Bool) { super.viewDidAppear(animated); schedule() }
+    func schedule() {
+        guard !scheduled,!stopped else { return }; scheduled = true
+        Task { @MainActor [weak self] in
+            await Task.yield()
+            guard let self else { return }; scheduled = false
+            if !stopped { refresh() }
+        }
+    }
+    private func configure(_ controller:DiagnosticConsentController,app:AppModel,service:AppDiagnostics) {
+        controller.configure(ready:service.ready && app.canManageGuestAccess,
+                             error:service.message.map { ProductText.string($0) }) { [weak service] value in _ = service?.setConsent(value) }
+    }
+    private func refresh() {
+        guard let app,let service else { return }
+        if let dialog {
+            configure(dialog,app:app,service:service)
+            guard !dismissing,(!sceneActive || !app.diagnosticConsentPrompt || !app.canManageGuestAccess) else { return }
+            dismissing = true
+            dialog.dismiss(animated:true) { [weak self] in self?.dialog = nil; self?.dismissing = false; self?.schedule() }
+            return
+        }
+        guard sceneActive,app.diagnosticConsentPrompt,app.canManageGuestAccess,
+              let window = view.window,window.windowScene?.activationState == .foregroundActive,
+              var presenter = window.rootViewController else { return }
+        while let next = presenter.presentedViewController { presenter = next }
+        guard !(presenter is UIAlertController),!presenter.isBeingPresented,!presenter.isBeingDismissed,
+              presenter.viewIfLoaded?.window != nil else { return }
+        let next = DiagnosticConsentController(); configure(next,app:app,service:service)
+        next.modalPresentationStyle = .overFullScreen; next.modalTransitionStyle = .crossDissolve
+        next.overrideUserInterfaceStyle = presenter.traitCollection.userInterfaceStyle
+        next.view.accessibilityViewIsModal = true
+        dialog = next; presenter.present(next,animated:true)
+    }
+    func stop() { stopped = true; dialog?.dismiss(animated:false); dialog = nil }
 }
 
 private final class ConsentActionButton: UIButton {
@@ -69,7 +118,8 @@ private final class ConsentActionButton: UIButton {
             button.titleLabel?.font = .preferredFont(forTextStyle:.headline)
             button.titleLabel?.adjustsFontForContentSizeCategory = true
             button.titleLabel?.numberOfLines = 0
-            button.contentEdgeInsets = UIEdgeInsets(top:12,left:14,bottom:12,right:14)
+            button.contentEdgeInsets = UIEdgeInsets(top:DesignMetrics.actionVerticalPadding,left:DesignMetrics.actionHorizontalPadding,
+                bottom:DesignMetrics.actionVerticalPadding,right:DesignMetrics.actionHorizontalPadding)
             button.layer.cornerRadius = DesignMetrics.actionRadius; button.clipsToBounds = true
             button.heightAnchor.constraint(greaterThanOrEqualToConstant:DesignMetrics.primaryHeight).isActive = true
             button.setTitleColor(UIColor(Brand.secondaryInk),for:.disabled)

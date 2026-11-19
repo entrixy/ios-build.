@@ -158,9 +158,7 @@ struct RootView: View {
         }
         }
         .background(Color(uiColor: .systemGroupedBackground).ignoresSafeArea())
-        .background(NativeTaskOverlay(isPresented:model.diagnosticConsentPrompt) {
-            DiagnosticConsentDialog(service:model.diagnostics).environmentObject(model).ignoresSafeArea()
-        }.frame(width:0,height:0))
+        .background(DiagnosticConsentPresenter(service:model.diagnostics).frame(width:0,height:0))
         .background(IncomingMessagePresenter(manager:model.messages).frame(width:0,height:0))
         .onChange(of: model.navigationState) { value in
             if !userPickedTab && value.hasActions && selectedTab == .settings { selectedTab = .control }

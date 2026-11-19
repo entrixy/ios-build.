@@ -53,9 +53,9 @@ struct GuestBLELifetimeEditor: View {
             VStack(alignment: .leading, spacing: 20) {
                 Text(label).foregroundStyle(Brand.secondaryInk)
                 let index = BLETokenLifetime.levels.firstIndex(of: seconds) ?? 5
-                Text(ProductText.string(keys[index])).font(.title2).frame(maxWidth: .infinity)
+                Text(ProductText.string(keys[index])).font(.title2).frame(maxWidth: .infinity).accessibilityIdentifier("guest-ble-lifetime-value")
                 Slider(value: Binding(get: { Double(index) }, set: { seconds = BLETokenLifetime.levels[Int($0)] }),
-                    in: 0...Double(BLETokenLifetime.levels.count-1), step: 1)
+                    in: 0...Double(BLETokenLifetime.levels.count-1), step: 1).accessibilityIdentifier("guest-ble-lifetime")
                 HStack { Text(ProductText.string(keys[0])); Spacer(); Text(ProductText.string(keys.last!)) }.font(.footnote)
                 Text(ProductText.string("guest_key_ttl_note")).font(.footnote).foregroundStyle(Brand.secondaryInk)
                 Spacer(minLength: 0)
@@ -89,7 +89,7 @@ struct GuestInvocationEditor: View {
                             Toggle(ProductText.string("guest_call_react_title"), isOn: Binding(get: { preference.reaction != "off" }, set: { enabled in
                                 if enabled { preference.reaction = rememberedReaction }
                                 else { rememberedReaction = preference.reaction; preference.reaction = "off" }
-                            }))
+                            })).accessibilityIdentifier("guest-call-enabled")
                             if preference.reaction != "off" {
                                 ForEach(["confirm","notify","auto"], id: \.self) { mode in
                                     Button {
@@ -104,7 +104,7 @@ struct GuestInvocationEditor: View {
                                             Image(systemName: preference.reaction == mode ? "largecircle.fill.circle" : "circle")
                                             Text(ProductText.string("guest_call_react_" + mode)).frame(maxWidth: .infinity, alignment: .leading)
                                         }.foregroundStyle(Brand.ink).frame(minHeight: 48).contentShape(Rectangle())
-                                    }.buttonStyle(.plain)
+                                    }.buttonStyle(.plain).accessibilityIdentifier("guest-call-reaction-" + mode)
                                 }
                                 Divider()
                                 Toggle(isOn: $preference.serveDuringCall) {

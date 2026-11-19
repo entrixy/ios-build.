@@ -74,7 +74,7 @@ struct AppCodeDialog: View {
 
             }.disabled(working || !model.canManageGuestAccess)
         } footer: {
-                HStack(spacing:12) {
+                EqualActionRow {
                     Button(ProductText.string("btn_cancel")) { model.codePrompt = nil }.buttonStyle(SecondaryActionStyle())
                     Button { submit() } label: { ActionButtonLabel(title:ProductText.string(settingUp ? "btn_save" : "btn_ok"),busy:working) }.buttonStyle(PrimaryActionStyle()).disabled(!ready)
                 }.disabled(working || !model.canManageGuestAccess)

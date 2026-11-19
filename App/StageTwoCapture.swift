@@ -12,6 +12,7 @@ enum StageTwoCapture: String, CaseIterable {
     case ownerConfirmation = "owner-confirmation", ownerCodeConfirmation = "owner-code-confirmation"
     case deviceClaim = "device-claim"
     case ownerBLEObjects = "owner-ble-objects"
+    case ownerCallGuests = "owner-call-guests", ownerDeviceObjects = "owner-device-objects"
     case networkPrivacy = "network-privacy"
     case diagnostics
     case keyAccepted = "key-accepted"
@@ -35,9 +36,9 @@ enum StageTwoCapture: String, CaseIterable {
         }
     }
     var mainTab: AppTab {
-        switch self { case .guestControl, .ownerControl, .ownerConfirmation, .ownerCodeConfirmation, .keyAccepted, .incomingMessage, .promotion: return .control; case .ownerGuests, .delegatingGuests, .ownerIssued: return .guests; case .journal: return .journal; default: return .settings }
+        switch self { case .guestControl, .ownerControl, .ownerConfirmation, .ownerCodeConfirmation, .keyAccepted, .incomingMessage, .promotion: return .control; case .ownerGuests, .delegatingGuests, .ownerIssued, .ownerCallGuests: return .guests; case .journal: return .journal; default: return .settings }
     }
-    var isOwner: Bool { [.ownerObjects, .ownerGuests, .addServer, .ownerExpanded, .addObject, .objectDelete, .ownerControl, .mixedObjects, .ownerConfirmation, .ownerCodeConfirmation, .ownerBLEObjects, .ownerIssued, .promotion].contains(self) }
+    var isOwner: Bool { [.ownerObjects, .ownerGuests, .addServer, .ownerExpanded, .addObject, .objectDelete, .ownerControl, .mixedObjects, .ownerConfirmation, .ownerCodeConfirmation, .ownerBLEObjects, .ownerIssued, .promotion, .ownerCallGuests, .ownerDeviceObjects].contains(self) }
     var isEmpty: Bool { [.empty, .addKey, .deviceClaim].contains(self) }
 }
 private final class StageTwoStorage: StateStorage {
@@ -69,12 +70,25 @@ struct StageTwoRoot: View {
         }
         if route.isOwner {
             var owner = try! OwnerAccount(importing: "controller.invalid", masterKey: Data(repeating: 22, count: 32), credentials: OwnerCredentials(deviceID: String(repeating: "a", count: 32), deviceSecret: String(repeating: "b", count: 64)))
-            let confirmationRoute = route == .ownerConfirmation || route == .ownerCodeConfirmation
+            let confirmationRoute = route == .ownerConfirmation || route == .ownerCodeConfirmation || route == .ownerCallGuests
             var object = try! OwnerObject(masterKey: owner.masterKey, label: "Ворота во двор", kind: confirmationRoute ? "call" : "webhook", phone: confirmationRoute ? "+10000000000" : "", url: confirmationRoute ? "" : "https://actuator.invalid/open", secret: confirmationRoute ? "" : "public-capture-secret")
             if route == .ownerBLEObjects {
                 object = try! OwnerObject(importing:object.id,numberID:7,kind:"ble",cipher:object.cipher,wrappedKey:object.wrappedKey,masterKey:owner.masterKey,bleSecret:Data(repeating:9,count:32),bleDeviceID:123)
             }
+            if route == .ownerDeviceObjects {
+                object = try! OwnerObject(masterKey:owner.masterKey,label:"Ворота во двор",kind:"device",registerDevice:true)
+                object.sent = true
+                try! object.acceptDeviceRegistration(id:9,key:String(repeating:"c",count:32),secret:String(repeating:"d",count:32),masterKey:owner.masterKey)
+            }
             object.numberID = 7; object.pending = nil; object.available = true; object.revision = 1
+            if route == .ownerExpanded {
+                // Configured rule data, never a simulated current GPS/network fix.
+                var policy = try! AutomationTemplate(data:object.localPolicy)
+                policy.geoLat = 55.75; policy.geoLon = 37.62
+                policy.wifiConnectSsid = "Двор"; policy.wifiConnectBssid = "aa:bb:cc:dd:ee:ff"
+                policy.wifiBssids = ["aa:bb:cc:dd:ee:ff"]; policy.wifiSsids = ["Двор"]; policy.wifiMinMatch = 1
+                object.localPolicy = try! policy.data()
+            }
             if route == .ownerConfirmation { object.localPolicy = Data(#"{"confirm_on":true}"#.utf8) }
             if route == .ownerCodeConfirmation { object.localPolicy = Data(#"{"auth_on":true,"auth":"pin"}"#.utf8) }
             owner.objects = [object]
@@ -98,7 +112,7 @@ struct StageTwoRoot: View {
             UserDefaults.standard.set(false,forKey:"entrixy.developerMode")
             app.diagnostics = AppDiagnostics(app:app,storage:StageDiagnosticStorage(),api:StageDiagnosticAPI(),usesMetricKit:false)
         }
-        if route == .ownerConfirmation || route == .ownerCodeConfirmation {
+        if route == .ownerConfirmation || route == .ownerCodeConfirmation || route == .ownerCallGuests {
             // No resume/live factory or actual telephone handoff in these UI routes.
             app.ownerControl = OwnerControlModel(app:app,dialer:{ _ in false })
         }

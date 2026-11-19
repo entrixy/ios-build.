@@ -8,6 +8,8 @@ enum DesignMetrics {
     static let actionRadius: CGFloat = 12
     static let primaryHeight: CGFloat = 48
     static let secondaryHeight: CGFloat = 48
+    static let actionHorizontalPadding: CGFloat = 14
+    static let actionVerticalPadding: CGFloat = 12
     static let dialogPadding: CGFloat = 24
     static let dialogMargin: CGFloat = 16
     static let dialogMaxWidth: CGFloat = 420
@@ -37,6 +39,8 @@ struct PrimaryActionStyle: ButtonStyle {
     @Environment(\.isEnabled) private var isEnabled
     func makeBody(configuration: Configuration) -> some View {
         configuration.label.font(.headline)
+            .multilineTextAlignment(.center)
+            .padding(.horizontal, DesignMetrics.actionHorizontalPadding).padding(.vertical, DesignMetrics.actionVerticalPadding)
             .foregroundStyle(isEnabled ? (configuration.role == .destructive ? Color.white : Color(uiColor: .systemBackground)) : Brand.secondaryInk)
             .frame(maxWidth: .infinity).frame(minHeight: DesignMetrics.primaryHeight)
             .background(isEnabled ? (configuration.role == .destructive ? AppPalette.destructive : Brand.ink) : Color(uiColor: .tertiarySystemFill),
@@ -53,8 +57,9 @@ struct SecondaryActionStyle: ButtonStyle {
     @Environment(\.isEnabled) private var isEnabled
     func makeBody(configuration: Configuration) -> some View {
         configuration.label.font(.body.weight(.semibold))
+            .multilineTextAlignment(.center)
             .foregroundStyle(isEnabled ? (configuration.role == .destructive ? Color.white : Brand.ink) : Brand.secondaryInk)
-            .padding(.horizontal, 14)
+            .padding(.horizontal, DesignMetrics.actionHorizontalPadding).padding(.vertical, DesignMetrics.actionVerticalPadding)
             .frame(maxWidth: .infinity, minHeight: DesignMetrics.secondaryHeight)
             .background(isEnabled ? (configuration.role == .destructive ? AppPalette.destructive : AppPalette.secondary) : Color(uiColor: .systemGray5), in: RoundedRectangle(cornerRadius: DesignMetrics.actionRadius))
             .opacity(configuration.isPressed ? 0.8 : 1)
@@ -67,6 +72,38 @@ struct CardActionStyle: ButtonStyle {
     }
 }
 
+/// Equal-width actions also share the tallest measured height. Long localized
+/// labels and Dynamic Type may grow a row without squeezing text to its edges.
+struct EqualActionRow<Content:View>: View {
+    @Environment(\.layoutDirection) private var direction
+    @ViewBuilder let content: () -> Content
+    var body: some View { EqualActionLayout(direction:direction) { content() } }
+}
+
+private struct EqualActionLayout: Layout {
+    let direction: LayoutDirection
+    private let gap = DesignMetrics.dialogActionGap
+    init(direction:LayoutDirection) { self.direction = direction }
+    func sizeThatFits(proposal:ProposedViewSize,subviews:Subviews,cache:inout ()) -> CGSize {
+        guard !subviews.isEmpty else { return .zero }
+        let count = CGFloat(subviews.count)
+        let natural = subviews.map { $0.sizeThatFits(.unspecified).width }.max() ?? 0
+        let width = max(0,proposal.width ?? (natural*count+gap*(count-1)))
+        let cellWidth = max(0,(width-gap*(count-1))/count)
+        let height = subviews.map { $0.sizeThatFits(ProposedViewSize(width:cellWidth,height:nil)).height }.max() ?? 0
+        return CGSize(width:width,height:max(DesignMetrics.primaryHeight,height))
+    }
+    func placeSubviews(in bounds:CGRect,proposal:ProposedViewSize,subviews:Subviews,cache:inout ()) {
+        guard !subviews.isEmpty else { return }
+        let cellWidth = max(0,(bounds.width-gap*CGFloat(subviews.count-1))/CGFloat(subviews.count))
+        for index in subviews.indices {
+            let column = direction == .rightToLeft ? subviews.count-1-index : index
+            subviews[index].place(at:CGPoint(x:bounds.minX+CGFloat(column)*(cellWidth+gap),y:bounds.minY),anchor:.topLeading,
+                proposal:ProposedViewSize(width:cellWidth,height:bounds.height))
+        }
+    }
+}
+
 struct ActionButtonLabel: View {
     let title: String
     var busy = false
@@ -75,7 +112,7 @@ struct ActionButtonLabel: View {
         HStack(spacing: 10) {
             if busy { ProgressView().controlSize(.small).tint(isEnabled ? Color(uiColor: .systemBackground) : Brand.secondaryInk) }
             Text(title).multilineTextAlignment(.center)
-        }.padding(.horizontal, 12)
+        }
     }
 }
 
@@ -215,7 +252,7 @@ struct AppConfirmationDialog: View {
 
             }
         } footer: {
-                HStack(spacing: 12) {
+                EqualActionRow {
                     Button(ProductText.string("btn_cancel"), action: cancel).buttonStyle(SecondaryActionStyle())
                     Button(role: destructive ? .destructive : nil, action: confirm) { Text(actionTitle) }
                         .buttonStyle(PrimaryActionStyle())

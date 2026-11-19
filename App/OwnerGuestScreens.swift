@@ -146,7 +146,8 @@ struct IssueOwnerKeyScreen: View {
                         .accessibilityAddTraits(selected ? .isSelected : [])
                     if selected {
                         if ["call", "webhook", "ble"].contains(object.kind) {
-                            objectButton("hand.tap", label: ProductText.string("guests_call_cfg_desc")) { task = .invocation(entry.target) }
+                            objectButton("hand.tap", label: ProductText.string(object.kind == "ble" ? "guest_key_ttl_title" : "guests_call_cfg_desc")) { task = .invocation(entry.target) }
+                                .accessibilityIdentifier("guest-object-invocation-" + entry.target.id)
                         }
                         if !forCompany {
                             objectButton("arrow.triangle.2.circlepath", label: ProductText.string("guests_automation_desc")) { task = .automation(entry.target) }

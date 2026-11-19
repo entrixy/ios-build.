@@ -60,7 +60,7 @@ struct ActionConfirmation: View {
 
             }.disabled(working || !isCurrent)
         } footer: {
-                HStack(spacing:12) {
+                EqualActionRow {
                     Button(ProductText.string("btn_cancel")) { close() }.buttonStyle(SecondaryActionStyle())
                     if needsSetup || authentication == nil || allowsPIN {
                         Button { submit() } label: {

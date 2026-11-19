@@ -22,7 +22,7 @@ struct OwnerPhoneRequestDialog: View {
 
                 }
             } footer: {
-                    HStack(spacing: 12) {
+                    EqualActionRow {
                         Button(ProductText.string("confirm_decline"), role: .destructive) { Task { await control.decline(request) } }
                             .buttonStyle(SecondaryActionStyle())
                         Button {

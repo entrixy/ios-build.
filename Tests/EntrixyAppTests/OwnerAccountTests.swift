@@ -324,12 +324,16 @@ final class OwnerAccountTests: XCTestCase {
         _ = await model.createOwnerKey(server: "owner.invalid", label: "Первый", numberIDs: [7], welcome: "", nativeOnly: false, confirmation: true)
         _ = await model.createOwnerKey(server: "owner.invalid", label: "Второй", numberIDs: [7], welcome: "Добро пожаловать", nativeOnly: false, confirmation: true)
         let before = model.owners[0], removed = before.issuedKeys![0], remaining = before.issuedKeys![1]
+        let priorBackupMaterial = storage.state!.backupMaterialIDs
+        var preparedBackupMaterial = Set<String>()
         let oldKey = try GuestCrypto.decrypt(key: before.masterKey, envelope: before.objects![0].wrappedKey)
         var operations: [OwnerOperation] = []
         api.beforeMutation = { operation, body in
             operations.append(operation)
             let saved = storage.state!.owners![0]
             if operation == .update {
+                preparedBackupMaterial = storage.state!.backupMaterialIDs
+                XCTAssertFalse(preparedBackupMaterial.isSubset(of:priorBackupMaterial))
                 XCTAssertTrue(operations.contains(.keyEdit))
                 XCTAssertEqual(saved.objects![0].keyRotation?.sent, true)
                 let bundle = try! saved.issuedKeys![1].bundle(masterKey: saved.masterKey)
@@ -350,6 +354,7 @@ final class OwnerAccountTests: XCTestCase {
         XCTAssertEqual(after.issuedKeys![0].bundleCipher, removed.bundleCipher)
         XCTAssertEqual(after.issuedKeys![1].wrappedSecrets, remaining.wrappedSecrets)
         XCTAssertEqual(after.issuedKeys![1].guestID, remaining.guestID)
+        XCTAssertTrue(storage.state!.backupMaterialIDs.isSubset(of:preparedBackupMaterial))
         XCTAssertTrue(model.journal.isEmpty)
     }
 
@@ -743,15 +748,21 @@ final class OwnerAccountTests: XCTestCase {
             "vouch_sig": try DelegationProof.vouch(userKey: pair.userKey, server: owner.server, childID: 18, signPublic: pub, guestPublic: recipient.publicKey),
             "objects": [try KeyObjectAccess(depth: 1, pool: 3).json(id: 7)], "needs_bundle": 1])
         var uploadedCipher: String?
+        var delegatedWrites = 0, rootRefreshes = 0
         api.loseKeyEditReply = true
         api.beforeMutation = { operation, body in
-            if operation == .keyEdit {
+            let uploaded = try? JSONSerialization.jsonObject(with: body) as? [String: Any]
+            if operation == .keyEdit, uploaded?["id"] as? Int == 18 {
+                delegatedWrites += 1
                 XCTAssertEqual(storage.state?.owners?[0].delegatedKeys?[0].sent, true)
                 let stored = storage.state?.owners?[0].delegatedKeys?[0].bundleCipher
-                let uploaded = try? JSONSerialization.jsonObject(with: body) as? [String: Any]
                 XCTAssertEqual(stored, uploaded?["bundle_cipher"] as? String)
                 uploadedCipher = stored
                 XCTAssertFalse(String(decoding: body, as: UTF8.self).contains(user))
+            } else if operation == .keyEdit, uploaded?["id"] as? Int == 17 {
+                rootRefreshes += 1
+                XCTAssertEqual(storage.state?.owners?[0].delegatedKeys?[0].state,.revoked)
+                XCTAssertEqual(storage.state?.owners?[0].issuedKeys?[0].sent,true)
             }
         }
         // No extra owner tap: synchronization fulfills a vouched recipient.
@@ -772,7 +783,10 @@ final class OwnerAccountTests: XCTestCase {
         api.loseKeyEditReply = false
         await relaunched.revokeDelegatedKey(server: owner.server, keyID: prepared.id)
         XCTAssertEqual(relaunched.owners[0].delegatedKeys?[0].state, .revoked)
-        XCTAssertEqual(api.keyMutations, 3)
+        XCTAssertEqual(api.keyMutations, 4) // Descendant revoke also refreshes the remaining root's object key.
+        XCTAssertEqual(delegatedWrites,1); XCTAssertEqual(rootRefreshes,1)
+        XCTAssertEqual(relaunched.owners[0].issuedKeys?[0].wrappedSecrets,root.wrappedSecrets)
+        XCTAssertEqual(relaunched.owners[0].issuedKeys?[0].guestID,root.guestID)
         XCTAssertNil(try relaunched.owners[0].authorizedGuest(keyID: 18, numberID: 7))
         XCTAssertTrue(relaunched.journal.isEmpty)
     }

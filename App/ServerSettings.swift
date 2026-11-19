@@ -104,7 +104,7 @@ struct ServerSettingsDialog: View {
 
             }.disabled(working || model.ownerBusy || model.busy || !model.canManageGuestAccess)
         } footer: {
-                HStack(spacing:12) {
+                EqualActionRow {
                     Button(ProductText.string("btn_cancel"),action:close).buttonStyle(SecondaryActionStyle())
                     Button { save() } label: { ActionButtonLabel(title:ProductText.string(editingHost == nil ? "btn_add" : "btn_save"),busy:working) }.buttonStyle(PrimaryActionStyle()).disabled(server.trimmingCharacters(in:.whitespacesAndNewlines).isEmpty)
                 }.disabled(working || model.ownerBusy || model.busy || !model.canManageGuestAccess)

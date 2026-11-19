@@ -82,7 +82,7 @@ struct AutomationEditor: View {
                         Text(text(value == "any" ? "automation_combine_any" : "automation_combine_all"))
                             .foregroundStyle(Brand.ink).frame(maxWidth: .infinity, alignment: .leading)
                     }.padding(.vertical, 6)
-                }.buttonStyle(.plain)
+                }.buttonStyle(.plain).accessibilityIdentifier("automation-combine-" + value)
             }
         }.padding(16).background(Color(uiColor: .secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 16))
     }
@@ -109,7 +109,7 @@ struct AutomationEditor: View {
                         if enabled == \.confirmEnabled { $0.requireConfirmation = on }
                     }
                     if enabled == \.authEnabled, on, (!c.issued || c.isBLE), !model.hasActionCode { codeSetup = true }
-                })).labelsHidden().disabled(locked)
+                })).labelsHidden().disabled(locked).accessibilityIdentifier("automation-rule-" + symbol)
             }
             if value && (!c.issued || decision != .own) { content() }
         }.padding(16).background(Color(uiColor: .secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 16))
@@ -181,7 +181,7 @@ private struct AutomationGeoFields: View {
                     showingMap = true
                 } label: {
                     Label(geometry.corridors.isEmpty ? ProductText.string("automation_geo_draw_route") : ProductText.string("automation_geo_route_count",geometry.corridors.count), systemImage: "pencil.tip")
-                }.buttonStyle(SecondaryActionStyle())
+                }.buttonStyle(SecondaryActionStyle()).accessibilityIdentifier("automation-geo-map")
             }
             if geometry.corridors.isEmpty {
                 let maximum = context.incoming && t.geoLevel == .force ? min(200,max(10,t.ownerRadiusMaxM ?? t.radiusM ?? 200)) : 200
@@ -219,7 +219,7 @@ private struct AutomationWiFiFields: View {
             Picker(ProductText.string("guest_tpl_wifi_mode"), selection: Binding(get: { t.wifiMode }, set: { value in change { $0.wifiMode = value } })) {
                 Text(ProductText.string("automation_wifi_mode_connect")).tag("connect")
                 Text(ProductText.string("automation_wifi_mode_fp")).tag("fingerprint")
-            }.pickerStyle(.segmented).disabled(readOnly)
+            }.pickerStyle(.segmented).disabled(readOnly).accessibilityIdentifier("automation-wifi-mode")
             if t.wifiMode == "connect" {
                 if !t.wifiConnectSsid.isEmpty {
                     HStack {
@@ -279,11 +279,12 @@ private struct AutomationTimeFields: View {
                 VStack(spacing: 8) {
                     HStack {
                         DatePicker("", selection: time(index, end: false), displayedComponents: .hourAndMinute).labelsHidden().environment(\.timeZone, TimeZone(secondsFromGMT: 0)!)
-                        if all { Text("–"); DatePicker("", selection: time(index,end: true), displayedComponents: .hourAndMinute).labelsHidden().environment(\.timeZone, TimeZone(secondsFromGMT: 0)!) }
+                            .accessibilityIdentifier("automation-time-start-" + String(index))
+                        if all { Text("–"); DatePicker("", selection: time(index,end: true), displayedComponents: .hourAndMinute).labelsHidden().environment(\.timeZone, TimeZone(secondsFromGMT: 0)!).accessibilityIdentifier("automation-time-end-" + String(index)) }
                         Spacer(minLength: 0)
                         if !readOnly {
                             Button(role: .destructive) { var rows = template.timeEntries; rows.remove(at: index); save(rows) } label: { Image(systemName: "xmark") }
-                                .accessibilityLabel(ProductText.string("btn_delete"))
+                                .accessibilityLabel(ProductText.string("btn_delete")).accessibilityIdentifier("automation-time-delete-" + String(index))
                         }
                     }
                     HStack(spacing: 4) {
@@ -303,7 +304,7 @@ private struct AutomationTimeFields: View {
             if !readOnly {
                 Button(ProductText.string(all ? "automation_time_add_interval" : "automation_time_add_time")) {
                     save(template.timeEntries + [AutomationTimeEntry(weekdays:[2,3,4,5,6],fromMin:480,toMin:all ? 600:480)])
-                }.buttonStyle(SecondaryActionStyle())
+                }.buttonStyle(SecondaryActionStyle()).accessibilityIdentifier("automation-time-add")
             }
         }
     }
@@ -321,7 +322,7 @@ private struct AutomationTimeFields: View {
         })
     }
     private func dayName(_ day: Int) -> String {
-        let formatter = DateFormatter(); formatter.locale = Locale(identifier: UserDefaults.standard.string(forKey:"entrixy.language") ?? Locale.current.identifier)
+        let formatter = DateFormatter(); formatter.locale = Locale(identifier:ProductText.language)
         return formatter.shortWeekdaySymbols[day-1]
     }
 }
@@ -346,7 +347,7 @@ private struct AutomationCodeSetup: View {
 
             }.disabled(working || !model.canManageGuestAccess)
         } footer: {
-                HStack(spacing:12) {
+                EqualActionRow {
                     Button(ProductText.string("btn_cancel"),action:close).buttonStyle(SecondaryActionStyle())
                     Button {
                         guard !working, model.canManageGuestAccess else { return }

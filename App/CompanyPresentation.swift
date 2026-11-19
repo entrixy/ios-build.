@@ -81,7 +81,7 @@ struct CompanyRequestDialog: View {
 
             }
         } footer: {
-                HStack(spacing:12) {
+                EqualActionRow {
                     Button(ProductText.string("org_ask_later")) { model.companyRequestID = nil }.buttonStyle(SecondaryActionStyle())
                     Button(ProductText.string(granted ? "org_ask_open_list" : (hasObjects ? "org_ask_grant" : "org_ask_add_object"))) { action(granted,hasObjects) }.buttonStyle(PrimaryActionStyle())
                 }

@@ -72,6 +72,55 @@ final class NavigationUITests: XCTestCase {
             start.press(forDuration:0.05,thenDragTo:end)
         }
     }
+    @discardableResult private func setAutomationRule(_ symbol:String,to enabled:Bool,in app:XCUIApplication) -> XCUIElement {
+        let row = app.descendants(matching:.any).matching(identifier:"automation-rule-"+symbol).firstMatch
+        XCTAssertTrue(row.waitForExistence(timeout:10)); bringIntoView(row,in:app)
+        let control = nativeSwitch(row), expected = enabled ? "1" : "0"
+        if control.value as? String != expected { control.tap() }
+        let changed = XCTNSPredicateExpectation(predicate:NSPredicate { _,_ in control.value as? String == expected },object:control)
+        XCTAssertEqual(XCTWaiter.wait(for:[changed],timeout:5),.completed)
+        return control
+    }
+    private func inspectObjectConditions(_ app:XCUIApplication) {
+        setAutomationRule("location",to:true,in:app)
+        let route = app.buttons["automation-geo-map"]
+        XCTAssertTrue(route.waitForExistence(timeout:10)); bringIntoView(route,in:app)
+        reviewCapture("automation-geo",settledBy:route)
+        route.tap()
+        let map = app.maps["automation-route-map"], draw = app.buttons["route-map-draw"]
+        XCTAssertTrue(map.waitForExistence(timeout:15)); XCTAssertTrue(draw.isEnabled); draw.tap()
+        XCTAssertFalse(app.buttons["route-map-save"].isEnabled)
+        map.coordinate(withNormalizedOffset:CGVector(dx:0.35,dy:0.40)).press(forDuration:0.1,
+            thenDragTo:map.coordinate(withNormalizedOffset:CGVector(dx:0.65,dy:0.60)))
+        let count = app.staticTexts["route-map-count"]
+        let drawn = XCTNSPredicateExpectation(predicate:NSPredicate { _,_ in count.label.contains("1") },object:count)
+        XCTAssertEqual(XCTWaiter.wait(for:[drawn],timeout:10),.completed)
+        XCTAssertTrue(app.buttons["route-map-save"].isEnabled)
+        reviewCapture("automation-route-map",settledBy:app.buttons["route-map-save"])
+        app.buttons["route-map-save"].tap()
+        XCTAssertTrue(route.waitForExistence(timeout:10)); XCTAssertTrue(route.label.contains("1"))
+        setAutomationRule("location",to:false,in:app)
+
+        let wifi = setAutomationRule("wifi",to:true,in:app)
+        let modes = app.segmentedControls["automation-wifi-mode"]
+        XCTAssertTrue(modes.waitForExistence(timeout:10)); bringIntoView(modes,in:app)
+        reviewCapture("automation-wifi-connect",settledBy:wifi)
+        modes.buttons.element(boundBy:1).tap()
+        reviewCapture("automation-wifi-fingerprint",settledBy:modes)
+        setAutomationRule("wifi",to:false,in:app)
+
+        setAutomationRule("clock",to:true,in:app)
+        let add = app.buttons["automation-time-add"]
+        XCTAssertTrue(add.waitForExistence(timeout:10)); bringIntoView(add,in:app); add.tap()
+        XCTAssertTrue(app.descendants(matching:.any).matching(identifier:"automation-time-start-0").firstMatch.waitForExistence(timeout:10))
+        reviewCapture("automation-time-point",settledBy:add)
+        let remove = app.buttons["automation-time-delete-0"]; bringIntoView(remove,in:app); remove.tap()
+        let all = app.buttons["automation-combine-all"]; bringIntoView(all,in:app); all.tap()
+        bringIntoView(add,in:app); add.tap()
+        XCTAssertTrue(app.descendants(matching:.any).matching(identifier:"automation-time-end-0").firstMatch.waitForExistence(timeout:10))
+        reviewCapture("automation-time-interval",settledBy:add)
+        setAutomationRule("clock",to:false,in:app)
+    }
     func testEmptyProfileAndModalCancellation() {
         let app = launch("empty")
         assertBottom(app, ["settings", "journal"])
@@ -315,6 +364,18 @@ final class NavigationUITests: XCTestCase {
         app.buttons["Закрыть"].tap()
         XCTAssertTrue(info.waitForExistence(timeout:10))
         assertBottom(app,["control","settings","guests","journal"])
+        app.buttons["main-tab-guests"].tap(); app.buttons["issue-guest"].tap()
+        let object = app.buttons.matching(NSPredicate(format:"identifier BEGINSWITH %@","guest-object-owner:")).firstMatch
+        XCTAssertTrue(object.waitForExistence(timeout:10)); object.tap()
+        app.buttons.matching(NSPredicate(format:"identifier BEGINSWITH %@","guest-object-invocation-")).firstMatch.tap()
+        let lifetime = app.sliders["guest-ble-lifetime"], value = app.staticTexts["guest-ble-lifetime-value"]
+        XCTAssertTrue(lifetime.waitForExistence(timeout:10)); let previous = value.label
+        lifetime.adjust(toNormalizedSliderPosition:0)
+        let changed = XCTNSPredicateExpectation(predicate:NSPredicate { _,_ in value.label != previous },object:value)
+        XCTAssertEqual(XCTWaiter.wait(for:[changed],timeout:5),.completed)
+        reviewCapture("guest-ble-lifetime",settledBy:lifetime)
+        app.buttons["Закрыть"].tap(); app.buttons["Отмена"].tap()
+        XCTAssertFalse(app.buttons.matching(NSPredicate(format:"identifier BEGINSWITH %@","guest-card-")).firstMatch.exists)
     }
     func testGuestNestedBackAndRootSwitch() {
         let app = launch("guest-keys")
@@ -450,8 +511,47 @@ final class NavigationUITests: XCTestCase {
         XCTAssertTrue(app.staticTexts["Wi-Fi"].exists)
         XCTAssertTrue(app.buttons["Закрыть"].exists)
         reviewCapture("automation-owner")
+        inspectObjectConditions(app)
         app.buttons["Закрыть"].tap()
         XCTAssertTrue(app.buttons["owner-object-automation"].waitForExistence(timeout: 10))
+        let camera = app.descendants(matching:.any).matching(identifier:"object-camera-enabled").firstMatch
+        bringIntoView(camera,in:app); nativeSwitch(camera).tap()
+        let address = app.textFields["object-camera-url"]
+        XCTAssertTrue(address.waitForExistence(timeout:10)); bringIntoView(address,in:app)
+        for _ in 0..<5 {
+            if address.frame.minY <= app.frame.height*0.30 { break }
+            app.coordinate(withNormalizedOffset:CGVector(dx:0.5,dy:0.72)).press(forDuration:0.05,
+                thenDragTo:app.coordinate(withNormalizedOffset:CGVector(dx:0.5,dy:0.48)))
+        }
+        reviewCapture("object-camera-settings",settledBy:address)
+    }
+
+    func testCallGuestPreferencesAndDeviceAccessUseActualEditorsWithoutIssuingOrConnecting() {
+        let app = launch("owner-call-guests")
+        app.buttons["issue-guest"].tap()
+        let object = app.buttons.matching(NSPredicate(format:"identifier BEGINSWITH %@","guest-object-owner:")).firstMatch
+        XCTAssertTrue(object.waitForExistence(timeout:10)); object.tap()
+        app.buttons.matching(NSPredicate(format:"identifier BEGINSWITH %@","guest-object-invocation-")).firstMatch.tap()
+        let reaction = app.descendants(matching:.any).matching(identifier:"guest-call-enabled").firstMatch
+        XCTAssertTrue(reaction.waitForExistence(timeout:10))
+        if nativeSwitch(reaction).value as? String != "1" { nativeSwitch(reaction).tap() }
+        XCTAssertTrue(app.buttons["guest-call-reaction-confirm"].waitForExistence(timeout:10))
+        XCTAssertTrue(app.buttons["guest-call-reaction-auto"].exists)
+        reviewCapture("guest-call-preferences",settledBy:app.buttons["guest-call-reaction-confirm"])
+        app.buttons["Закрыть"].tap(); app.buttons["Отмена"].tap()
+        XCTAssertFalse(app.buttons.matching(NSPredicate(format:"identifier BEGINSWITH %@","guest-card-")).firstMatch.exists)
+
+        let device = launch("owner-device-objects")
+        device.buttons.matching(NSPredicate(format:"identifier BEGINSWITH %@","object-settings-owner:")).firstMatch.tap()
+        device.buttons.matching(NSPredicate(format:"identifier BEGINSWITH %@","object-edit-owner:")).firstMatch.tap()
+        let share = device.buttons["device-share-credentials"]
+        XCTAssertTrue(share.waitForExistence(timeout:10)); bringIntoView(share,in:device)
+        reviewCapture("object-device-settings",settledBy:share); share.tap()
+        XCTAssertTrue(device.staticTexts["Код устройства"].waitForExistence(timeout:10))
+        XCTAssertTrue(device.buttons["Копировать"].exists)
+        reviewCapture("device-access-parameters",settledBy:device.buttons["Готово"])
+        device.buttons["Готово"].tap()
+        XCTAssertTrue(share.waitForExistence(timeout:10))
     }
     func testAvatarPickerOpensFromAvatarAndKeepsObjectRow() {
         let app = launch("owner-objects")
@@ -460,7 +560,12 @@ final class NavigationUITests: XCTestCase {
         avatar.tap()
         for index in 1...8 { XCTAssertTrue(app.buttons["Иконка \(index)"].waitForExistence(timeout: 10)) }
         XCTAssertTrue(app.buttons["Загрузить иконку"].exists)
-        reviewCapture("object-avatar")
+        let avatarCancel = app.buttons["avatar-cancel"], avatarUpload = app.buttons["avatar-upload"]
+        XCTAssertTrue(avatarCancel.isHittable); XCTAssertTrue(avatarUpload.isHittable)
+        XCTAssertEqual(avatarCancel.frame.height,avatarUpload.frame.height,accuracy:1)
+        XCTAssertEqual(avatarCancel.frame.width,avatarUpload.frame.width,accuracy:1)
+        XCTAssertGreaterThanOrEqual(avatarUpload.frame.height,48)
+        reviewCapture("object-avatar",settledBy:avatarUpload)
         app.buttons["Отмена"].tap()
         XCTAssertTrue(app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH %@", "object-settings-owner:")).firstMatch.waitForExistence(timeout: 10))
     }

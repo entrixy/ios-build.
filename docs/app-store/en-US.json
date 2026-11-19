@@ -1,0 +1,21 @@
+{
+  "locale": "en-US",
+  "status": "prepared-draft",
+  "upload_ready": false,
+  "fields": {
+    "name": "Entrixy",
+    "subtitle": "Keys and access control",
+    "promotionalText": "Your access objects, guest keys and access settings together in one app.",
+    "description": "Entrixy helps you manage gates, barriers, doors and other compatible access objects. Add your own object or a key received from its owner.\n\nUse a compatible Bluetooth controller, a webhook or a telephone call. Issue guest keys, configure access for individual objects and pass access on within the limits set by the owner.\n\nSet location, Wi-Fi and schedule conditions, action confirmation, a code and biometric authentication. View action history and connect a compatible object camera. Save an encrypted backup to transfer your access.\n\nControl requires compatible equipment or a configured server and valid access. Automatic actions depend on permissions and iOS capabilities. Telephone calls are handed to the system Phone app.",
+    "keywords": "gate,barrier,door,lock,keys,access,bluetooth,webhook",
+    "supportURL": "https://entrixy.com/guide/",
+    "marketingURL": "https://entrixy.com/",
+    "privacyPolicyURL": "https://entrixy.com/privacy"
+  },
+  "pending": [
+    "final native and device acceptance",
+    "iOS privacy policy update and data declarations",
+    "confirmed publisher/account identifiers",
+    "reviewer access and encryption classification"
+  ]
+}

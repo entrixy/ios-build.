@@ -24,10 +24,10 @@ struct AutomationRouteMap: View {
                 .safeAreaInset(edge: .bottom) { controls }
                 .navigationTitle(text("corridor_title")).navigationBarTitleDisplayMode(.inline)
                 .toolbar {
-                    ToolbarItem(placement: .cancellationAction) { Button(text("limit_dialog_close")) { dismiss() } }
+                    ToolbarItem(placement: .cancellationAction) { Button(text("limit_dialog_close")) { dismiss() }.accessibilityIdentifier("route-map-close") }
                     if !readOnly {
                         ToolbarItem(placement: .confirmationAction) {
-                            Button(text("btn_save")) { save(gate, routes); dismiss() }.disabled(drawing)
+                            Button(text("btn_save")) { save(gate, routes); dismiss() }.disabled(drawing).accessibilityIdentifier("route-map-save")
                         }
                     }
                 }
@@ -49,6 +49,7 @@ struct AutomationRouteMap: View {
             }
             Text(ProductText.string(readOnly ? "corridor_count_fmt" : "corridor_count_max_fmt", routes.count, 6))
                 .frame(maxWidth: .infinity, alignment: .leading)
+                .accessibilityIdentifier("route-map-count")
             if !readOnly {
                 Button {
                     if drawing { drawing = false }
@@ -56,9 +57,9 @@ struct AutomationRouteMap: View {
                 } label: {
                     Label(text(drawing ? "corridor_cancel_draw" : routes.count >= 6 ? "corridor_limit_reached" : "corridor_draw"),
                         systemImage: drawing ? "xmark" : "pencil.tip")
-                }.buttonStyle(PrimaryActionStyle()).disabled(!drawing && (gate == nil || routes.count >= 6))
+                }.buttonStyle(PrimaryActionStyle()).disabled(!drawing && (gate == nil || routes.count >= 6)).accessibilityIdentifier("route-map-draw")
                 if !drawing {
-                    HStack(spacing: 10) {
+                    EqualActionRow {
                         Button(text("corridor_delete_route"), role: .destructive) { if !routes.isEmpty { routes.removeLast() } }
                             .buttonStyle(SecondaryActionStyle()).disabled(routes.isEmpty)
                         Button(text("corridor_move_gate")) { relocating = true }.buttonStyle(SecondaryActionStyle()).disabled(gate == nil)
@@ -80,6 +81,7 @@ private struct RouteMapCanvas: UIViewRepresentable {
     func makeCoordinator() -> Coordinator { Coordinator(self) }
     func makeUIView(context: Context) -> MKMapView {
         let view = MKMapView(); view.delegate = context.coordinator; view.showsUserLocation = true
+        view.accessibilityIdentifier = "automation-route-map"
         let tap = UITapGestureRecognizer(target: context.coordinator, action: #selector(Coordinator.tap(_:)))
         tap.cancelsTouchesInView = false; view.addGestureRecognizer(tap)
         let stroke = UIPanGestureRecognizer(target: context.coordinator, action: #selector(Coordinator.stroke(_:)))
