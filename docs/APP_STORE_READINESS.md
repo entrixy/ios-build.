@@ -22,13 +22,14 @@ accessibility query. Отдельный modal host НЕ устранил оши�
 failure.40/44 оригинальных PNG экспортированы, четыре состояния диагностики не
 достигнуты; новая галерея не опубликована/не принята.
 
-Следующий source сохраняет тексты/actions/readiness/тестовые assertions согласия,
-но внутри панели использует UIKit labels/buttons и явный порядок доступности;
-дизайн, геометрия, размеры/цвет/нажатие кнопок используют общие DesignMetrics.
-Также включены стабильный момент снимка, завершение общих fixed footers и
-двухрядный footer резервной копии вместо переноса слова в тесном ряду. Apple SDK/
-runtime/новые точные пиксели этих followups пока pending. Counts179hosted/25UI/44PNG
-не меняются. Галерея отклоняет incomplete/failed report и проверяет source/hash.
+Новый результат: native `e2d7b01`, public `dc29234`,
+[CI44482890600](https://github.com/entrixy/ios-build./actions/runs/44482890600):
+295core, Debug/test bundles, Release/privacy/isolation прошли. UIKit содержимое
+согласия с явным AX-порядком скомпилировано, но runtime не начался: cold boot
+симулятора завершился terminal migration failure, затем завис UI service.
+179hosted/25UI/44PNG в этом запуске НЕ выполнялись. Подготовка темы перенесена
+в ограниченный recovery cold boot ДО сценариев; шесть pipeline contracts прошли.
+Фиксация кадра и footer изменений пока требуют живого UI-прогона.
 
 Ограниченная фоновая BLE/свои local webhook, обычные entry/manual guards, UIKit
 очередь сообщений, frozen GPS/Core Motion и четыре widget lifecycle cases имеют
@@ -40,7 +41,8 @@ PIN/confirm BLE ручной; коалесцирование рекламы не
 Для следующего source-пакета добавлен unsigned Release archive с iphoneos SDK
 (приложение + виджет). Проверяются не только arm64, но и физическая iOS platform
 в Mach-O, privacy manifests, fixture isolation и отсутствие provisioning/signatures.
-Это исходник CI, ещё не результат сборки архива. Сам архив/IPA не публикуется;
+Архив фактически собран в CI44482890600: SDK26.2, arm64, iphoneos; приложение
+com.entrixy.ios/iOS16, виджет com.entrixy.ios.widget/iOS17. Сам архив/IPA не публикуется;
 сохраняются лог и metadata с upload_ready=false. Подпись, устройство, TestFlight
 и App Store остаются отдельными неподтверждёнными шагами.
 

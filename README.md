@@ -18,12 +18,19 @@ modal host DID NOT resolve that failure. The overall run failed;40/44 original
 checkpoint PNGs exported, with four diagnostic states missing. No new gallery
 publication or complete visual acceptance is claimed.
 
-The next source uses UIKit labels/buttons and an explicit four-element native
-accessibility order inside that consent panel, retaining its exact texts, service
-calls, readiness guards and existing test assertions. Its geometry, palette,
-button sizes and pressed states share the dialog design metrics with SwiftUI.
-This targets the still-failing internal accessibility provider; SDK/runtime proof
-is pending. Existing incoming messages already passed their actual UI scenario.
+Latest build evidence: native `e2d7b01`, public `dc29234`,
+[run44482890600](https://github.com/entrixy/ios-build./actions/runs/44482890600)
+passed Apple295 core, Debug/test bundles and Release/privacy checks. It ALSO
+successfully archived the app and widget for physical iPhone SDK26.2, arm64,
+minimum iOS16/17 respectively. The archive is unsigned, fixture-isolated and
+privacy manifests are packaged; signing, device testing and upload remain pending.
+The simulator's cold boot reported terminal migration failure and its UI service
+hung BEFORE any hosted/UI scenario. No179/25/44 runtime result belongs to that run.
+
+UIKit consent labels/buttons with explicit accessibility order now compile and
+archive, but their runtime verification remains pending. Simulator appearance is
+now prepared inside bounded cold-boot recovery, before any test scenario starts.
+Six isolated pipeline contracts cover successful exports and preparation failures.
 
 Further visual followups wait for stable visible geometry before original screen
 capture, retain the fixed action footer throughout all compact task dialogs, and
@@ -42,13 +49,13 @@ CI builds test products once, verifies Release once, then runs hosted and UI cas
 in ONE simulator pass with original screenshots at the UI checkpoints. No separate
 screen replay or duplicate light/dark variants. The next source expects179 hosted
 cases,25 UI scenarios and44 distinct frames. The remaining consent-provider/footer/capture followups
-have not yet passed Apple SDK/runtime. Final visual/parity acceptance and gallery
+have passed Apple SDK compilation; their runtime/visual proof is pending. Final visual/parity acceptance and gallery
 publication remain separate. Gallery preparation refuses partial or failed runs.
 The next CI source also archives Release for the physical iPhone SDK, without
 signing or an IPA export. It verifies arm64 AND the Mach-O physical iOS platform
 (a simulator can also be arm64), app/widget identifiers and privacy manifests,
 fixture isolation and absence of provisioning/signatures. Only build evidence is
-retained in CI; archive compilation itself is still pending. This is not signing,
+retained in CI; archive compilation passed in run44482890600. This is not signing,
 a physical-device test, TestFlight or an upload-ready build.
 Full background/device/release gates and the full Android port remain incomplete.
 Detailed scope and evidence: [FUNCTIONAL_PORT.md](docs/FUNCTIONAL_PORT.md).
