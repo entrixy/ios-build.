@@ -86,7 +86,8 @@ struct FileNativePushInboxStorage: NativePushInboxStorage {
             unregister(); askedRegistration = false; registration = nil; successful.removeAll()
         }
         guard let registration = previousRegistration else { return }
-        let fingerprint = app.backupFingerprint(server:invite.server), api = self.api, pending = worker
+        guard let fingerprint = try? app.backupFingerprint(server:invite.server) else { return }
+        let api = self.api, pending = worker
         Task { [weak self,weak model = app] in
             // The durable local deletion comes first; do not race an in-flight
             // registration or retain removed credentials in a persistent queue.
@@ -159,8 +160,13 @@ struct FileNativePushInboxStorage: NativePushInboxStorage {
         let selected = Array(eligible(now:now).prefix(8))
         for guest in selected {
             guard !Task.isCancelled,active,generation == ticket,app.canManageGuestAccess,app.guests.contains(where:{$0.id == guest.id && $0.invite == guest.invite}) else { return }
-            let identity = guest.id, fingerprint = app.backupFingerprint(server:guest.invite.server)
+            let identity = guest.id
             let registerID = "register:"+identity, messageID = "message:"+identity
+            guard let fingerprint = try? app.backupFingerprint(server:guest.invite.server) else {
+                retryAfter[registerID] = Date().addingTimeInterval(60)
+                retryAfter[messageID] = Date().addingTimeInterval(60)
+                return
+            }
             // APNs identifies this app installation across servers. Never give
             // that token to an arbitrary self-hosted access server automatically.
             if guest.invite.server == "entrixy.com",let registration,now.timeIntervalSince(successful[identity] ?? .distantPast) >= 7*86400,now >= (retryAfter[registerID] ?? .distantPast) {
