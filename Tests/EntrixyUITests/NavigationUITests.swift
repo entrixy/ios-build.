@@ -93,6 +93,17 @@ final class NavigationUITests: XCTestCase {
         XCTAssertTrue(app.staticTexts["Журнал пуст. Здесь будут появляться вызовы."].waitForExistence(timeout: 5))
         reviewCapture("journal")
     }
+
+    func testHomePromotionUsesTheWorkingControlLayoutWithoutOpeningExternalContent() {
+        let app = launch("promotion")
+        let action = app.buttons["promotion-action"]
+        XCTAssertTrue(action.waitForExistence(timeout:10)); XCTAssertTrue(action.isHittable)
+        XCTAssertTrue(app.staticTexts["Доступ для ваших гостей"].exists)
+        assertBottom(app,["control","settings","guests","journal"])
+        reviewCapture("control-promotion",settledBy:action)
+        app.buttons["main-tab-settings"].tap()
+        XCTAssertTrue(app.buttons["main-tab-control"].isHittable)
+    }
     func testIncomingOwnerMessageUsesCompactOverlayUntilCloseAndDoesNotRunAnAction() {
         let app = XCUIApplication()
         app.launchArguments = ["--stage-two","incoming-message","-AppleLanguages","(ru)","-AppleLocale","ru_RU"]
@@ -203,7 +214,7 @@ final class NavigationUITests: XCTestCase {
     }
     func testOrdinaryEmptyStartupAndThemeChangeKeepTheLiveRootInteractive() {
         let app = XCUIApplication()
-        app.launchArguments = ["-AppleLanguages","(ru)","-AppleLocale","ru_RU"]
+        app.launchArguments = ["--ui-offline-promotions","-AppleLanguages","(ru)","-AppleLocale","ru_RU"]
         app.launch(); activeApp = app
         let later = app.buttons["diagnostic-consent-later"]
         if later.waitForExistence(timeout:5) { later.tap() }

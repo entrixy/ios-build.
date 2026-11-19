@@ -14,7 +14,11 @@ public struct OwnerObject: Codable, Identifiable, Equatable {
     public var numberID: Int?
     public let kind: String
     public var cipher: String
-    public let wrappedKey: String
+    public var wrappedKey: String
+    public var previousWrappedKey: String?
+    public var keyEpoch: Int?
+    public var keyRotationQueued: Bool?
+    public var keyRotation: OwnerObjectKeyRotation?
     public var revision: Int64?
     public var available: Bool?
     public var pending: OwnerOperation?
@@ -73,9 +77,11 @@ public struct OwnerObject: Codable, Identifiable, Equatable {
 
     public init(importing id: UUID, numberID: Int, kind: String, cipher: String, wrappedKey: String,
                 masterKey: Data, phone: String? = nil, routing: [String: String] = [:],
-                socketSecret: Data? = nil, bleSecret: Data? = nil, bleDeviceID: UInt32? = nil, localPolicy: Data? = nil) throws {
+                socketSecret: Data? = nil, bleSecret: Data? = nil, bleDeviceID: UInt32? = nil, localPolicy: Data? = nil,
+                previousWrappedKey: String? = nil, keyEpoch: Int? = nil) throws {
         self.id = id; self.numberID = numberID; self.kind = kind; self.cipher = cipher; self.wrappedKey = wrappedKey
         self.localPhone = phone; self.routing = routing; self.pending = nil; self.sent = false; self.available = false
+        self.previousWrappedKey = previousWrappedKey; self.keyEpoch = keyEpoch
         if let socketSecret {
             guard socketSecret.count == 32 else { throw GuestCrypto.Failure.invalidKey }
             wrappedSocketSecret = try GuestCrypto.encrypt(key: masterKey, plaintext: socketSecret)
@@ -100,6 +106,7 @@ public struct OwnerObject: Codable, Identifiable, Equatable {
     }
 
     public func validate(masterKey: Data) throws {
+        try validateKeyRotation(masterKey: masterKey)
         guard ["call", "webhook", "device", "ble"].contains(kind), numberID == nil || numberID! > 0,
               pending != nil || (numberID != nil && !sent),
               revision == nil || revision! >= 0,
@@ -155,7 +162,7 @@ public struct OwnerObject: Codable, Identifiable, Equatable {
     }
     public mutating func updatePresentation(label: String, preset: Int?, masterKey: Data) throws {
         if let preset { guard (0...7).contains(preset) else { throw GuestCrypto.Failure.invalidEnvelope } }
-        guard pending == nil, numberID != nil, revision != nil, available != false,
+        guard pending == nil, !hasKeyRotation, numberID != nil, revision != nil, available != false,
               !label.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty, label.utf8.count <= 512 else { throw GuestCrypto.Failure.invalidEnvelope }
         var contents = try metadata(masterKey: masterKey)
         contents["label"] = label.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -231,6 +238,7 @@ public extension OwnerAccount {
                     continue
                 }
                 if let row, let cipher = row["data_cipher"] as? String {
+                    object.acceptKeyRotation(cipher: cipher)
                     if object.pending == .update && object.sent && object.cipher == cipher {
                         object.pending = nil; object.sent = false; object.editBaseline = nil; object.pendingRouting = nil; object.pendingHasAvatar = nil
                     }

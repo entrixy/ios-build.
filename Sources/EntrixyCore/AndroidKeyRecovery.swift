@@ -80,8 +80,10 @@ public extension OwnerAccount {
                 if let map = bundle["obj_keys"] as? [String: String] {
                     for number in network {
                         guard let object = objects?.first(where: { $0.numberID == number && $0.kind != "ble" }),
-                              let encoded = map[String(number)],
-                              try GuestCrypto.decodeBase64URL(encoded) == GuestCrypto.decrypt(key: masterKey, envelope: object.wrappedKey) else { throw GuestCrypto.Failure.invalidKey }
+                              let encoded = map[String(number)] else { throw GuestCrypto.Failure.invalidKey }
+                        let supplied = try GuestCrypto.decodeBase64URL(encoded)
+                        let candidates = [object.wrappedKey, object.keyRotation?.wrappedKey, object.previousWrappedKey].compactMap { $0 }
+                        guard try candidates.contains(where: { try GuestCrypto.decrypt(key: masterKey, envelope: $0) == supplied }) else { throw GuestCrypto.Failure.invalidKey }
                     }
                 } else if !network.isEmpty { throw GuestCrypto.Failure.invalidEnvelope }
                 var guestIDs = Set(ble.map { Int($0.guestID) })

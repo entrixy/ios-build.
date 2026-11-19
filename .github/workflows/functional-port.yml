@@ -58,13 +58,21 @@ jobs:
       - name: Verify native and UI scenarios with original screenshots in the same simulator pass
         if: github.ref == 'refs/heads/ci/review-batch'
         run: python3 scripts/test_simulator.py --use-built-tests --review-captures 2>&1 | tee .local-checks/ci/combined-review.log
-      - name: Archive unsigned Release for physical iPhone and verify app/widget packaging
-        if: ${{ always() && github.ref == 'refs/heads/ci/review-batch' && steps.debug_build.outcome == 'success' && steps.release_build.outcome == 'success' }}
-        run: python3 scripts/archive_device_release.py 2>&1 | tee .local-checks/ci/device-release.log
       - name: Retain compilation evidence
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
           name: functional-port-build-evidence
           path: .local-checks/ci/
+          retention-days: 3
+      - name: Archive unsigned Release for physical iPhone and verify app/widget packaging
+        if: ${{ always() && github.ref == 'refs/heads/ci/review-batch' && steps.debug_build.outcome == 'success' && steps.release_build.outcome == 'success' }}
+        run: python3 scripts/archive_device_release.py 2>&1 | tee .local-checks/ci/device-release.log
+      - name: Retain physical iPhone archive evidence
+        if: always() && github.ref == 'refs/heads/ci/review-batch'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: iphone-release-evidence
+          path: .local-checks/ci/device-release.*
+          if-no-files-found: ignore
           retention-days: 3

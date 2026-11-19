@@ -53,13 +53,17 @@ public enum AndroidOwnerAdapter {
             if result[ref.server] == nil { result[ref.server] = try OwnerAccount(importing: ref.server, masterKey: master, credentials: nil) }
             let wrapped = try document.string("e2ee_obj_\(localID)")
             let sourceCipher = try document.string("e2ee_obj_blob_\(localID)")
+            let previousWrapped = try document.string("e2ee_obj_prev_\(localID)")
+            let pendingCipher = try document.string("pending_rotated_cipher_\(localID)")
+            let epoch = try document.integer("e2ee_obj_epoch_\(localID)") ?? 1
+            guard epoch > 0, epoch <= Int32.max else { throw GuestCrypto.Failure.invalidEnvelope }
             guard wrapped != nil || sourceCipher == nil else { throw GuestCrypto.Failure.invalidKey }
             let objectKey: Data
             if let wrapped { objectKey = try GuestCrypto.decrypt(key: master, envelope: wrapped); guard objectKey.count == 32 else { throw GuestCrypto.Failure.invalidKey } }
             else { objectKey = GuestCrypto.randomBytes(count: 32) }
             let metadata: [String: Any]
-            if let sourceCipher {
-                guard let fields = try JSONSerialization.jsonObject(with: GuestCrypto.decrypt(key: objectKey, envelope: sourceCipher)) as? [String: Any] else { throw GuestCrypto.Failure.invalidEnvelope }
+            if let candidate = pendingCipher ?? sourceCipher {
+                guard let fields = try JSONSerialization.jsonObject(with: GuestCrypto.decrypt(key: objectKey, envelope: candidate)) as? [String: Any] else { throw GuestCrypto.Failure.invalidEnvelope }
                 metadata = fields
             } else { metadata = ["label": row["label"] as? String ?? "Объект", "avatar_type": "preset:3"] }
             var routing: [String: String] = [:]
@@ -92,10 +96,22 @@ public enum AndroidOwnerAdapter {
                     policy = try JSONSerialization.data(withJSONObject: value, options: .sortedKeys)
                 } else { policy = nil }
             } else { policy = nil }
+            let inFlight = pendingCipher != nil && sourceCipher != pendingCipher
+                && sourceCipher.map { (try? GuestCrypto.decrypt(key: objectKey, envelope: $0)) == nil } == true
+            if inFlight { guard previousWrapped != nil, sourceCipher != nil, wrapped != nil, epoch > 1, kind != "ble" else { throw GuestCrypto.Failure.invalidEnvelope } }
             var object = try OwnerObject(importing: stableID(server: ref.server, numberID: ref.numberID), numberID: ref.numberID,
                 kind: kind, cipher: sourceCipher ?? GuestCrypto.encrypt(key: objectKey, plaintext: JSONSerialization.data(withJSONObject: metadata, options: .sortedKeys)),
-                wrappedKey: wrapped ?? GuestCrypto.encrypt(key: master, plaintext: objectKey), masterKey: master,
-                phone: phone, routing: routing, socketSecret: socket, bleSecret: bleSecret, bleDeviceID: bleDID, localPolicy: policy)
+                wrappedKey: (inFlight ? previousWrapped : wrapped) ?? GuestCrypto.encrypt(key: master, plaintext: objectKey), masterKey: master,
+                phone: phone, routing: routing, socketSecret: socket, bleSecret: bleSecret, bleDeviceID: bleDID, localPolicy: policy,
+                previousWrappedKey: inFlight ? nil : previousWrapped, keyEpoch: Int(epoch) - (inFlight ? 1 : 0))
+            if inFlight, let wrapped, let pendingCipher, let sourceCipher {
+                object.keyRotation = OwnerObjectKeyRotation(wrappedKey: wrapped, sourceCipher: sourceCipher,
+                    cipher: pendingCipher, avatarCipher: nil, epoch: Int(epoch), sent: true)
+            } else if pendingCipher != nil { object.cipher = pendingCipher! }
+            if let queued = document.entries["pending_object_rotations"] {
+                guard case .strings(let ids) = queued else { throw GuestCrypto.Failure.invalidEnvelope }
+                object.keyRotationQueued = !inFlight && pendingCipher == nil && ids.contains(String(localID))
+            }
             object.localConfiguration = try document.ownerLocalConfiguration(localID:localID)
             result[ref.server]!.objects = (result[ref.server]!.objects ?? []) + [object]
             if let bleDID, let bleSecret {

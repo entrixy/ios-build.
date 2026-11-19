@@ -17,6 +17,10 @@ enum StageTwoCapture: String, CaseIterable {
     case keyAccepted = "key-accepted"
     case ownerIssued = "owner-issued"
     case incomingMessage = "incoming-message"
+    case promotion
+    @MainActor static func offlinePromotions(for app:AppModel) -> AppPromotions {
+        AppPromotions(app:app,storage:StagePromotionStorage(empty:true),api:StagePromotionAPI())
+    }
     static var current: Self? {
         let args = ProcessInfo.processInfo.arguments
         guard let i = args.firstIndex(of: "--stage-two"), args.indices.contains(i + 1) else { return nil }
@@ -31,9 +35,9 @@ enum StageTwoCapture: String, CaseIterable {
         }
     }
     var mainTab: AppTab {
-        switch self { case .guestControl, .ownerControl, .ownerConfirmation, .ownerCodeConfirmation, .keyAccepted, .incomingMessage: return .control; case .ownerGuests, .delegatingGuests, .ownerIssued: return .guests; case .journal: return .journal; default: return .settings }
+        switch self { case .guestControl, .ownerControl, .ownerConfirmation, .ownerCodeConfirmation, .keyAccepted, .incomingMessage, .promotion: return .control; case .ownerGuests, .delegatingGuests, .ownerIssued: return .guests; case .journal: return .journal; default: return .settings }
     }
-    var isOwner: Bool { [.ownerObjects, .ownerGuests, .addServer, .ownerExpanded, .addObject, .objectDelete, .ownerControl, .mixedObjects, .ownerConfirmation, .ownerCodeConfirmation, .ownerBLEObjects, .ownerIssued].contains(self) }
+    var isOwner: Bool { [.ownerObjects, .ownerGuests, .addServer, .ownerExpanded, .addObject, .objectDelete, .ownerControl, .mixedObjects, .ownerConfirmation, .ownerCodeConfirmation, .ownerBLEObjects, .ownerIssued, .promotion].contains(self) }
     var isEmpty: Bool { [.empty, .addKey, .deviceClaim].contains(self) }
 }
 private final class StageTwoStorage: StateStorage {
@@ -88,6 +92,7 @@ struct StageTwoRoot: View {
         }
         if route == .networkPrivacy { state.networkPrivacy = try! NetworkPrivacyPreferences(own:[PrivacyNetwork(ssid:"Home fixture")]) }
         let app = AppModel(storage:StageTwoStorage(state),privacyRouter:route == .networkPrivacy ? ServerPrivacyRouter() : nil)
+        if route == .promotion { app.promotions = AppPromotions(app:app,storage:StagePromotionStorage(),api:StagePromotionAPI()) }
         if route == .incomingMessage { app.messages = MessageManager(app:app,acknowledgements:StageMessageAcknowledgements()) }
         if route == .diagnostics {
             UserDefaults.standard.set(false,forKey:"entrixy.developerMode")
@@ -108,6 +113,7 @@ struct StageTwoRoot: View {
             .task {
                 // Production RootView and screens; fixture data never calls resume/bind/send.
                 if route == .diagnostics { model.diagnostics.activate() }
+                if route == .promotion { model.promotions.activate() }
                 if route == .keyAccepted, let guest = model.guests.first { model.presentKeyAcceptance(guest.id) }
                 if route == .objectDelete, let target = model.catalogObjects().first?.target { model.objectRemovalTarget = target }
                 let status: [String: Any] = ["ready": model.storageReady, "route": route.rawValue,
@@ -122,6 +128,21 @@ private final class StageDiagnosticStorage: DiagnosticStorage {
     private var state = DiagnosticState()
     func load() throws -> DiagnosticState { state }
     func save(_ state: DiagnosticState) throws { try state.validate(); self.state = state }
+}
+private final class StagePromotionStorage: PromotionStorage {
+    private var state: PromotionState = {
+        var state = PromotionState()
+        state.cached = try! Promotion(json:["id":7,"title":"Доступ для ваших гостей","body":"Передавайте ключи и настраивайте доступ для каждого объекта.","button_text":"Подробнее","button_url":"https://entrixy.com/guide/","display_mode":"until_click"])
+        state.cachedAt = Date(); state.cachedLanguage = ProductText.language
+        return state
+    }()
+    init(empty:Bool = false) { if empty { state.cached = nil } }
+    func load() throws -> PromotionState { state }
+    func save(_ state:PromotionState) throws { self.state = state }
+}
+private struct StagePromotionAPI: PromotionTransport {
+    func fetch(_ body:Data) async throws -> Promotion? { throw URLError(.notConnectedToInternet) }
+    func view(id:Int,count:Int,installID:UUID) async throws { }
 }
 private struct StageMessageAcknowledgements: GuestMessageTransport {
     func acknowledgeMessage(invite:GuestInvite,fingerprint:String,kind:MessageAcknowledgement,hash:String) async throws {}

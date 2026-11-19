@@ -34,6 +34,11 @@ private final class WidgetAccessMemory: StateStorage {
         app.setLocalTaskDialog(second,presented:false)
         XCTAssertFalse(app.hasTaskDialog)
         await inbox.dispatchPending(); XCTAssertNil(app.actionPrompt)
+        app.diagnosticConsentPrompt = true
+        XCTAssertTrue(app.hasTaskDialog); XCTAssertFalse(app.hasInlineRootDialog)
+        XCTAssertFalse(inbox.enqueue(id)); await inbox.dispatchPending(); XCTAssertNil(app.actionPrompt)
+        app.diagnosticConsentPrompt = false
+        await inbox.dispatchPending(); XCTAssertNil(app.actionPrompt)
         // Only a new explicit tap after dismissal can reach the ordinary gate.
         XCTAssertTrue(inbox.enqueue(id)); await inbox.dispatchPending(); XCTAssertNotNil(app.actionPrompt)
         XCTAssertTrue(storage.state.journal?.isEmpty ?? true)

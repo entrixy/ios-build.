@@ -6,5 +6,7 @@
     <array><string>group.com.entrixy.ios</string></array>
     <key>com.apple.developer.networking.wifi-info</key>
     <true/>
+    <key>com.apple.developer.associated-domains</key>
+    <array><string>applinks:entrixy.com</string></array>
 </dict>
 </plist>

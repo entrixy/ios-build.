@@ -2,7 +2,7 @@ import Foundation
 
 public extension OwnerObject {
     mutating func updateAvatar(preset: Int?, jpeg: Data?, masterKey: Data) throws {
-        guard pending == nil, numberID != nil, revision != nil, available != false,
+        guard pending == nil, !hasKeyRotation, numberID != nil, revision != nil, available != false,
               (preset != nil) != (jpeg != nil), preset.map({ (0...7).contains($0) }) ?? true,
               jpeg.map({ !$0.isEmpty && $0.count <= 524_288 }) ?? true else { throw GuestCrypto.Failure.invalidEnvelope }
         let key = try GuestCrypto.decrypt(key: masterKey, envelope: wrappedKey)

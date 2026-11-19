@@ -12,6 +12,7 @@ import struct
 
 SCREENS = {
     'control': ('Управление', 'Объекты'),
+    'control-promotion': ('Карточка Entrixy в управлении', 'Объекты'),
     'settings-objects': ('Настройки объектов', 'Объекты'),
     'settings-empty': ('Настройки без объектов', 'Объекты'),
     'add-object-call': ('Добавить объект', 'Объекты'),

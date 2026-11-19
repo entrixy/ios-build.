@@ -26,6 +26,10 @@ public extension OwnerAccount {
                   current.numberID == nil || incoming.numberID == nil || current.numberID == incoming.numberID,
                   current.bleDeviceID == incoming.bleDeviceID else { throw GuestCrypto.Failure.invalidEnvelope }
             try sameSecret(current.wrappedKey, incoming.wrappedKey)
+            // Never replace a newer in-flight rotation with an older backup, or
+            // silently adopt a conflicting generation over local protected state.
+            if let rotation = incoming.keyRotation, current.keyRotation != rotation { throw GuestCrypto.Failure.invalidEnvelope }
+            if (incoming.keyEpoch ?? 1) != (current.keyEpoch ?? 1) { throw GuestCrypto.Failure.invalidEnvelope }
             try sameSecret(current.wrappedBLESecret, incoming.wrappedBLESecret)
             try sameSecret(current.wrappedSocketSecret, incoming.wrappedSocketSecret)
             try sameSecret(current.wrappedDeviceCredentials, incoming.wrappedDeviceCredentials)
@@ -39,6 +43,7 @@ public extension OwnerAccount {
                 throw GuestCrypto.Failure.invalidEnvelope
             }
             var result = current
+            if incoming.keyRotationQueued == true { result.keyRotationQueued = true }
             if current.pending == .create, incoming.pending == nil, let numberID = incoming.numberID, current.cipher == incoming.cipher {
                 result.numberID = numberID; result.pending = nil; result.sent = false; result.revision = incoming.revision
             } else if result.pending != nil { result.sent = current.sent || incoming.sent }

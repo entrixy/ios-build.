@@ -55,18 +55,21 @@ private struct LiveAppRoot: View {
             if phase == .background { model.enterBackground() }
             else {
                 _ = await model.prepareServerRouting(); await model.resume()
-                WidgetActionInbox.shared.setReady(true); model.diagnostics.activate()
+                WidgetActionInbox.shared.setReady(true); model.diagnostics.activate(); model.promotions.activate()
             }
         }
         .onReceive(model.objectWillChange.debounce(for:.milliseconds(250),scheduler:RunLoop.main)) { _ in try? widgetPublisher.publish(model) }
         .onReceive(model.ownerControl.objectWillChange.debounce(for:.milliseconds(250),scheduler:RunLoop.main)) { _ in try? widgetPublisher.publish(model) }
         .onOpenURL { pendingURL = $0 }
+        .onContinueUserActivity(NSUserActivityTypeBrowsingWeb) { activity in
+            if let url = activity.webpageURL { pendingURL = url }
+        }
         .onChange(of: phase) { value in
             if value == .active {
                 model.checkEntryLock()
                 Task {
                     _ = await model.prepareServerRouting(); await model.resume()
-                    WidgetActionInbox.shared.setReady(true); model.diagnostics.activate()
+                    WidgetActionInbox.shared.setReady(true); model.diagnostics.activate(); model.promotions.activate()
                 }
             } else if value == .background {
                 WidgetActionInbox.shared.cancel(); model.entryDidBackground(); model.enterBackground()
@@ -75,7 +78,7 @@ private struct LiveAppRoot: View {
         }
         .onChange(of:model.appLocked) { locked in
             if !locked && phase == .active {
-                Task { await model.resume(); WidgetActionInbox.shared.setReady(true); model.diagnostics.activate() }
+                Task { await model.resume(); WidgetActionInbox.shared.setReady(true); model.diagnostics.activate(); model.promotions.activate() }
             }
         }
     }
@@ -127,7 +130,7 @@ struct RootView: View {
                     }
                 }
         }
-        .accessibilityHidden(model.hasRootDialog)
+        .accessibilityHidden(model.hasInlineRootDialog)
         .allowsHitTesting(!model.hasRootDialog)
         .overlay { BackupFlowHost(flow:model.backupPresentation) }
         // Keep the modal a sibling of the hidden navigation tree. An overlay
@@ -156,7 +159,7 @@ struct RootView: View {
         }
         .background(Color(uiColor: .systemGroupedBackground).ignoresSafeArea())
         .background(NativeTaskOverlay(isPresented:model.diagnosticConsentPrompt) {
-            DiagnosticConsentDialog(service:model.diagnostics).environmentObject(model)
+            DiagnosticConsentDialog(service:model.diagnostics).environmentObject(model).ignoresSafeArea()
         }.frame(width:0,height:0))
         .background(IncomingMessagePresenter(manager:model.messages).frame(width:0,height:0))
         .onChange(of: model.navigationState) { value in
@@ -183,6 +186,7 @@ struct RootView: View {
             selectedTab = model.navigationState.resolve(.control); userPickedTab = true
         }
         .onChange(of:model.canManageGuestAccess) { if $0 { model.diagnostics.offerConsent() } }
+        .onChange(of:language) { _ in model.promotions.languageChanged() }
         .sheet(isPresented: $adding) { KeyImportScreen(input: $input) }
         .sheet(item:$deviceClaimFlow,onDismiss:{
             defer { claimCreatedDevice = nil }

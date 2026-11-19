@@ -22,6 +22,7 @@ private final class RecordingOwnerAPI: OwnerTransport {
     var keyRows: [[String: Any]] = []
     var loseKeyReply = false
     var loseKeyEditReply = false
+    var loseObjectUpdateReply = false
     var loseMessageReply = false
     private(set) var keyMutations = 0
     var beforeMutation: ((OwnerOperation, Data) -> Void)?
@@ -90,6 +91,7 @@ private final class RecordingOwnerAPI: OwnerTransport {
         case .update:
             rows[0]["data_cipher"] = json["data_cipher"]
             rows[0]["data_cipher_revision"] = 101
+            if loseObjectUpdateReply { throw URLError(.networkConnectionLost) }
         case .delete: rows = []
         }
         return Data(#"{"ok":true}"#.utf8)
@@ -286,6 +288,13 @@ final class OwnerAccountTests: XCTestCase {
         api.beforeMutation = { operation, body in
             let owner = storage.state!.owners![0]
             let key = owner.issuedKeys![0]
+            if operation == .update {
+                XCTAssertEqual(key.state, .revoked)
+                XCTAssertEqual(owner.objects![0].keyRotation?.sent, true)
+                let json = try? JSONSerialization.jsonObject(with: body) as? [String: Any]
+                XCTAssertEqual(json?["data_cipher"] as? String, owner.objects![0].keyRotation?.cipher)
+                return
+            }
             XCTAssertEqual(key.pending, operation)
             XCTAssertTrue(key.sent)
             XCTAssertEqual(try? key.request(masterKey: owner.masterKey), body)
@@ -304,6 +313,83 @@ final class OwnerAccountTests: XCTestCase {
         XCTAssertEqual(model.owners[0].issuedKeys![0].state, .revoked)
         XCTAssertThrowsError(try model.owners[0].issuedKeys![0].link(server: owner.server, masterKey: owner.masterKey))
         XCTAssertEqual(api.keyMutations, 4)
+        XCTAssertTrue(model.journal.isEmpty)
+    }
+
+    @MainActor func testRevocationDeliversRemainingBundleBeforePublishingExactRotatedObject() async throws {
+        let storage = OwnerMemoryStorage(), api = RecordingOwnerAPI()
+        let model = AppModel(storage: storage, ownerAPI: api)
+        _ = await model.addOwner(server: "owner.invalid", accessCode: "")
+        _ = await model.createOwnerObject(server: "owner.invalid", label: "Ворота", kind: "call", phone: "+15550000001", url: "", secret: "", claimCode: "")
+        _ = await model.createOwnerKey(server: "owner.invalid", label: "Первый", numberIDs: [7], welcome: "", nativeOnly: false, confirmation: true)
+        _ = await model.createOwnerKey(server: "owner.invalid", label: "Второй", numberIDs: [7], welcome: "Добро пожаловать", nativeOnly: false, confirmation: true)
+        let before = model.owners[0], removed = before.issuedKeys![0], remaining = before.issuedKeys![1]
+        let oldKey = try GuestCrypto.decrypt(key: before.masterKey, envelope: before.objects![0].wrappedKey)
+        var operations: [OwnerOperation] = []
+        api.beforeMutation = { operation, body in
+            operations.append(operation)
+            let saved = storage.state!.owners![0]
+            if operation == .update {
+                XCTAssertTrue(operations.contains(.keyEdit))
+                XCTAssertEqual(saved.objects![0].keyRotation?.sent, true)
+                let bundle = try! saved.issuedKeys![1].bundle(masterKey: saved.masterKey)
+                XCTAssertEqual((bundle["obj_keys_prev"] as? [String:String])?["7"], GuestCrypto.base64URL(oldKey))
+                XCTAssertEqual(saved.issuedKeys![1].pending, nil)
+                let json = try! JSONSerialization.jsonObject(with: body) as! [String:Any]
+                XCTAssertEqual(json["data_cipher"] as? String, saved.objects![0].keyRotation?.cipher)
+                XCTAssertThrowsError(try GuestCrypto.decrypt(key: oldKey, envelope: json["data_cipher"] as! String))
+            }
+        }
+        await model.revokeOwnerKey(server: before.server, keyID: removed.id)
+        XCTAssertEqual(operations, [.keyRevoke,.keyEdit,.update])
+        let after = model.owners[0]
+        XCTAssertEqual(after.objects![0].keyEpoch, 2); XCTAssertNil(after.objects![0].keyRotation)
+        XCTAssertEqual(after.issuedKeys![0].bundleCipher, removed.bundleCipher)
+        XCTAssertEqual(after.issuedKeys![1].wrappedSecrets, remaining.wrappedSecrets)
+        XCTAssertEqual(after.issuedKeys![1].guestID, remaining.guestID)
+        XCTAssertTrue(model.journal.isEmpty)
+    }
+
+    @MainActor func testLostRotatedMetadataReplyReconcilesAfterRestartWithoutRegenerationOrReplay() async throws {
+        let storage = OwnerMemoryStorage(), api = RecordingOwnerAPI()
+        let model = AppModel(storage: storage, ownerAPI: api)
+        _ = await model.addOwner(server: "owner.invalid", accessCode: "")
+        _ = await model.createOwnerObject(server: "owner.invalid", label: "Ворота", kind: "call", phone: "+15550000001", url: "", secret: "", claimCode: "")
+        _ = await model.createOwnerKey(server: "owner.invalid", label: "Гость", numberIDs: [7], welcome: "", nativeOnly: false, confirmation: true)
+        api.loseObjectUpdateReply = true
+        await model.revokeOwnerKey(server: "owner.invalid", keyID: model.owners[0].issuedKeys![0].id)
+        let pending = try XCTUnwrap(storage.state?.owners?[0].objects?[0].keyRotation)
+        XCTAssertTrue(pending.sent)
+        let mutations = api.mutations
+        model.suspend()
+        let restarted = AppModel(storage: storage, ownerAPI: api)
+        await restarted.refreshOwners()
+        XCTAssertEqual(api.mutations, mutations)
+        XCTAssertNil(restarted.owners[0].objects![0].keyRotation)
+        XCTAssertEqual(restarted.owners[0].objects![0].wrappedKey, pending.wrappedKey)
+        XCTAssertEqual(restarted.owners[0].objects![0].cipher, pending.cipher)
+        XCTAssertTrue(restarted.journal.isEmpty)
+    }
+
+    @MainActor func testUnconfirmedRemainingBundleHoldsObjectCipherUntilFreshSnapshot() async throws {
+        let storage = OwnerMemoryStorage(), api = RecordingOwnerAPI()
+        let model = AppModel(storage: storage, ownerAPI: api)
+        _ = await model.addOwner(server: "owner.invalid", accessCode: "")
+        _ = await model.createOwnerObject(server: "owner.invalid", label: "Ворота", kind: "call", phone: "+15550000001", url: "", secret: "", claimCode: "")
+        for label in ["Первый","Второй"] {
+            _ = await model.createOwnerKey(server: "owner.invalid", label: label, numberIDs: [7], welcome: "", nativeOnly: false, confirmation: true)
+        }
+        let original = model.owners[0].objects![0].cipher
+        api.loseKeyEditReply = true
+        await model.revokeOwnerKey(server: "owner.invalid", keyID: model.owners[0].issuedKeys![0].id)
+        XCTAssertEqual(api.rows[0]["data_cipher"] as? String, original)
+        let pending = try XCTUnwrap(model.owners[0].objects![0].keyRotation)
+        XCTAssertFalse(pending.sent)
+        let keyMutations = api.keyMutations
+        await model.refreshOwners()
+        XCTAssertEqual(api.keyMutations, keyMutations)
+        XCTAssertEqual(api.rows[0]["data_cipher"] as? String, pending.cipher)
+        XCTAssertNil(model.owners[0].objects![0].keyRotation)
         XCTAssertTrue(model.journal.isEmpty)
     }
 

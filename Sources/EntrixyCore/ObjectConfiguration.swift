@@ -112,7 +112,7 @@ public struct OwnerObjectEditBaseline: Codable, Equatable {
 
 public extension OwnerObject {
     mutating func updateConfiguration(_ draft: OwnerObjectEdit, masterKey: Data) throws {
-        guard cipher == draft.cipher, revision == draft.revision, pending == nil,
+        guard cipher == draft.cipher, revision == draft.revision, pending == nil, !hasKeyRotation,
               numberID != nil, revision != nil, available != false else {
             throw GuestCrypto.Failure.invalidEnvelope
         }

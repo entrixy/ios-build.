@@ -156,9 +156,11 @@ public struct OwnerIssuedKey: Codable, Identifiable, Equatable {
                 continue
             }
             guard ["phone", "webhook_url", "webhook_secret"].allSatisfy({ metadata[$0] == nil || metadata[$0] is NSNull }) else { throw GuestCrypto.Failure.invalidEnvelope }
-            keys[id] = GuestCrypto.base64URL(try GuestCrypto.decrypt(key: owner.masterKey, envelope: object.wrappedKey))
-            epochs[id] = oldEpochs[id] ?? 1
-            if let old = oldPrevious[id] {
+            keys[id] = GuestCrypto.base64URL(try GuestCrypto.decrypt(key: owner.masterKey, envelope: object.keyRotation?.wrappedKey ?? object.wrappedKey))
+            epochs[id] = object.keyRotation?.epoch ?? object.keyEpoch ?? oldEpochs[id] ?? 1
+            if let wrapped = object.keyRotation == nil ? object.previousWrappedKey : object.wrappedKey {
+                previous[id] = GuestCrypto.base64URL(try GuestCrypto.decrypt(key: owner.masterKey, envelope: wrapped))
+            } else if let old = oldPrevious[id] {
                 guard try GuestCrypto.decodeBase64URL(old).count == 32 else { throw GuestCrypto.Failure.invalidKey }
                 previous[id] = old
             }

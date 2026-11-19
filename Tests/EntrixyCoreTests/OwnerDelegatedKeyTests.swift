@@ -3,6 +3,29 @@ import XCTest
 @testable import EntrixyCore
 
 final class OwnerDelegatedKeyTests: XCTestCase {
+    func testRotationUpdatesKnownPausedDescendantWithoutReactivatingItOrReplacingIdentity() throws {
+        var owner = try owner()
+        var child = try row(owner:owner,recipient:BundleKeySeal.makeRecipient())
+        try owner.reconcileDelegatedKeys(snapshot([child]))
+        let original = try XCTUnwrap(owner.delegatedKeys?.first)
+        child = confirmed(child,record:original)
+        try owner.reconcileDelegatedKeys(snapshot([child]))
+        owner.objects![0].keyRotationQueued = true
+        try owner.prepareObjectKeyRotations()
+        owner.issuedKeys![0].state = .paused
+        child["mode"] = "off"
+        try owner.reconcileDelegatedKeys(snapshot([child]))
+        let refreshed = try XCTUnwrap(owner.delegatedKeys?.first)
+        XCTAssertEqual(refreshed.id,original.id); XCTAssertEqual(refreshed.guestID,original.guestID)
+        XCTAssertEqual(refreshed.wrappedBundleKey,original.wrappedBundleKey)
+        XCTAssertNotEqual(refreshed.bundleCipher,original.bundleCipher)
+        XCTAssertEqual(refreshed.bundleDeliveryConfirmed,false)
+        child = confirmed(child,record:refreshed)
+        try owner.reconcileDelegatedKeys(snapshot([child]))
+        XCTAssertEqual(owner.delegatedKeys?.first?.state,.unavailable)
+        XCTAssertEqual(owner.delegatedKeys?.first?.bundleDeliveryConfirmed,true)
+        XCTAssertEqual((try owner.delegatedKeys![0].bundle(masterKey:owner.masterKey)["obj_epoch"] as? [String:Int])?["7"],2)
+    }
     func testNativeOnlyDelegationIsAcceptedOnlyWhenItKeepsTheLocallyIssuedRestriction() throws {
         var owner = try owner(), root = try XCTUnwrap(owner.issuedKeys?.first)
         let native = try KeyObjectAccess(nativeOnly:true,depth:2,pool:8)

@@ -42,7 +42,8 @@ private final class ConsentActionButton: UIButton {
 
     override func loadView() {
         view = UIView(); view.backgroundColor = UIColor.black.withAlphaComponent(DesignMetrics.dialogDimOpacity)
-        view.accessibilityViewIsModal = true
+        // The presented host supplies the modal AX boundary. This child only
+        // supplies its explicit leaf order, not a second nested modal boundary.
         panel.backgroundColor = .secondarySystemGroupedBackground
         panel.layer.cornerRadius = DesignMetrics.dialogCorner
         panel.translatesAutoresizingMaskIntoConstraints = false; view.addSubview(panel)

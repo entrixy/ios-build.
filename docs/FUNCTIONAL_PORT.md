@@ -1585,3 +1585,95 @@ in all seven InfoPlist localizations and the generated base Info. No new permiss
 request timing or feature was added. Existing text had described only guest QR and
 object actions despite the additional implemented routes. This source metadata
 followup is outside activedc29234; the next device archive packages the final text.
+
+
+## 19 November: object metadata key rotation
+
+Source now follows executable Android Vault.rotateObjectKey and the root revoke/
+scope removal call sites (ordinary pause does not rotate). OwnerObjectKeyRotation
+persists the exact wrapped next key, generation, ciphertext and avatar before any
+network mutation. Existing metadata stays readable with the active key until a
+fresh server snapshot confirms the exact replacement. Remaining encrypted bundles
+carry both next/current keys, preserving guest signing identity, DID, K_guest,
+welcome and object rules. Every remaining recipient must acknowledge that bundle
+before number_update. Known paused descendants receive bundle delivery without
+reactivating control; unknown Android slots/unresolved creates hold publication.
+
+Revoke/scope acknowledgement and the queued rotation share one protected save.
+Lost replies/restart reuse the same key/cipher; a second confirmed access loss
+queues the next generation. Only one previous generation remains after commit.
+Custom avatars are re-encrypted with that generation; editing serializes behind
+rotation. A concurrent unrelated metadata change holds publication rather than
+silently overwriting it. Backup conflicts reject replacement/downgrade. Android
+previous/epoch/pending cipher slots import into the same resumable state.
+
+Actual Linux:303 core tests passed,19Nov08:30:45UTC, including8 new rotation,
+paused-descendant and Android checkpoint cases. Whole native source syntax parses.
+Three new hosted integration cases (source only) check bundle-before-object order,
+lost metadata reply/restart without replay, and an unconfirmed remaining bundle.
+Expected next hosted total182; Apple SDK/runtime of this block is still pending.
+Current CI44486818161/publicfc190f0 is the earlier9932f07 snapshot: it does NOT
+include rotation. Its295Core/Debug/Release passed; combined179/25/44 is running.
+The most recent completed iPhone SDK archive proof remains CI44482890600.
+
+
+## 19 November: Android Home promotion catalogue
+
+AppPromotions/PromotionCard now occupy Android HomeScreen's slot before object
+cards. Promo data and view reports go only to trusted Entrixy endpoints, never a
+custom access server. Server content/colours/icon/banner/CTA, cache TTL including
+null result, until_click and server-filtered date_range are preserved. Banner
+height stays absent until the real image loads; HTTPS image reads are bounded,
+credential-free, redirect-free and use the same server privacy gate. Images are
+not redrawn. Clicks persist before opening trusted /api/go.php?pid=, so a storage
+failure cannot falsely hide a card. No system browser is opened by automated UI.
+
+A separately persisted installation UUID/first-seen/cache/click/view state is
+excluded from backup and unrelated to access identity. Unreadable state sends
+nothing and never regenerates an installation identity. Coarse has_call/webhook/
+device/guest/new_install tags and age-days follow Android; names, server hosts,
+SSID/BSSID, locations, keys and account credentials never enter a report. Views
+persist before POST, acknowledge subtracting only sent counts (server cap50),
+retain failure counts, and obey the global daily boundary. Foreground tasks and
+image reads cancel on suspend; offline refresh preserves the previous card.
+
+Actual Linux307core0,19Nov08:41:23UTC. Four new core cases cover cache/identity,
+request allowlist, malformed content and trusted API/privacy gate. Three new
+hosted SOURCE cases cover commit-before-navigation, failed/daily view delivery,
+and unreadable install state/offline cache; total next expected185hosted.
+One UI source case/capture control-promotion uses the production ControlScreen
+with an isolated catalogue transport: next26UI/45originalPNG. Six pipeline
+contracts passed; native Swift syntax parses. Apple SDK/runtime of promotions
+and the preceding rotation block is still pending, not a completed acceptance.
+
+App Store data declarations MUST include the actual install UUID, usage tags,
+age and view/click behaviour and server IP/access logs as applicable; no claim of
+No Data Collected or completed privacy-label review is made. No new report or
+promotion view was sent to the live service by development tools/tests.
+
+
+## Actual review outcome before the next coherent package
+
+Native9932f07/publicfc190f0, CI44486818161/job135432228290:295Apple core,
+Debug/Release/privacy/isolation and179hosted0(12.653s) passed. UI25:24passed,
+1 diagnostic initial AX query timeout178.205s; overall901.956s. Native UIKit
+labels/buttons DID NOT resolve the failure.40/44 original PNGs retained, missing
+crash-consent/diagnostic-settings/help/developer-report. Unsigned physical iPhone
+archive passed again. Artifact14513615340 SHA256
+c255952e0878d4bdeb52b5b25abce1bc178eb80d44561390929c409a07407a19.
+No new gallery publication/complete acceptance.
+
+Next source distinguishes inline root dialogs from UIKit-presented modal hosts:
+only inline dialogs set SwiftUI navigation accessibilityHidden. ALL dialogs still
+block hit testing, automatics and widget entry. Native UIKit hosts keep their own
+modal AX boundary; the consent child has an explicit leaf order, not another
+nested modal boundary. Consent fills the safe areas, fixing white status/home
+strips visible in the actual failure PNG. Existing assertions are unchanged;
+existing diagnostic/widget hosted cases check that the independent action barrier
+is retained. This is a source fix awaiting Apple UI proof, not a proven root cause.
+
+The next single Apple snapshot includes BOTH functional blocks (rotation and
+promotions), release association, footer/capture fixes and this AX lifetime fix:
+307core/185hosted/26UI/45PNG expected. No intermediate-source cancellation or
+separate screenshot replay. Interaction evidence uploads before independent
+iphoneos archive evidence, so its result no longer waits behind that archive.

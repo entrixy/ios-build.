@@ -26,9 +26,16 @@ final class AppModel: ObservableObject {
     }
     var hasTaskDialog: Bool { hasRootDialog || !localTaskDialogs.isEmpty }
     var hasRootDialog: Bool {
+        hasInlineRootDialog || diagnosticConsentPrompt || incomingMessagePromptID != nil
+    }
+    /// UIKit presented controllers own their accessibility modal boundary. Do
+    /// Keep the initial NavigationStack's provider attached; the presented host
+    /// determines which accessibility tree is exposed to avoid double hiding.
+    /// Hit testing and action authority still use ALL root/task dialogs.
+    var hasInlineRootDialog: Bool {
         actionPrompt != nil || bleInformationTarget != nil || objectRemovalTarget != nil || objectAvatarTarget != nil
         || ownerGuestRequestPending || companyRequestID != nil || guestRemovalTarget != nil || codePrompt != nil
-        || backupPromptPending || serverPrompt != nil || networkPrivacyPrompt != nil || diagnosticConsentPrompt || keyAcceptance != nil || incomingMessagePromptID != nil
+        || backupPromptPending || serverPrompt != nil || networkPrivacyPrompt != nil || keyAcceptance != nil
     }
     let privacyRouter: ServerPrivacyRouter?
     private var unsavedGuestNetworkRestrictions = Set<String>()
@@ -130,6 +137,7 @@ final class AppModel: ObservableObject {
     private var bleAuthorizedAutomaticTarget: ObjectReference?
     lazy var bleControl = BLEOwnerControlModel(app: self, transport: bleTransport)
     lazy var messages = MessageManager(app: self)
+    lazy var promotions = AppPromotions(app:self)
     @Published private(set) var incomingMessages: [SavedMessage] = []
     @Published private(set) var outgoingMessages: [OutgoingMessage] = []
     @Published private(set) var passedAccess: [PassedAccess] = []
@@ -1026,7 +1034,8 @@ final class AppModel: ObservableObject {
             let snapshot = try OwnerSnapshot.decode(data)
             guard pendingRestore == nil else { return }
             guard let index = owners.firstIndex(where: { $0.server == host && $0.ownershipLost != true && $0.credentials == credentials }) else { return }
-            let previousObjects = owners[index].objects ?? []
+            let previousOwner = owners[index]
+            let previousObjects = previousOwner.objects ?? []
             var updated = owners
             try updated[index].reconcileObjects(snapshot)
             try updated[index].reconcileAccount(snapshot)
@@ -1034,6 +1043,11 @@ final class AppModel: ObservableObject {
             try updated[index].reconcileAndroidKeys(snapshot)
             try updated[index].reconcileIssuedKeys(snapshot)
             let unverified = try updated[index].reconcileDelegatedKeys(snapshot)
+            updated[index].queueObjectKeyRotations(after: previousOwner)
+            try updated[index].prepareObjectKeyRotations()
+            if updated[index].hasObjectKeyRotations {
+                _ = try updated[index].reconcileDelegatedKeys(snapshot)
+            }
             try updated[index].reconcileBLERestoration()
             updated[index].lastSynced = Date()
             try saveOwners(updated)
@@ -1159,6 +1173,48 @@ final class AppModel: ObservableObject {
                 ownerKeyMessages[key.id] = "Настройки сохранены на iPhone. Обновление гостевого ключа ожидает синхронизации."
             }
         }
+        await flushOwnerObjectKeyRotations(server: server)
+    }
+
+    /// Android Vault.rotateObjectKey: bundles first, encrypted metadata second.
+    /// Metadata retries reuse the SAME durable key/cipher, never an opening.
+    private func flushOwnerObjectKeyRotations(server: String) async {
+        guard canManageGuestAccess,
+              let owner = owners.first(where: { $0.server == server && $0.ownershipLost != true }) else { return }
+        for id in (owner.objects ?? []).filter({ $0.keyRotation != nil }).map(\.id) {
+            let retryID = server + "|rotation:" + id.uuidString
+            if let next = ownerBundleRetryAfter[retryID], next > Date() { continue }
+            do {
+                guard canManageGuestAccess,
+                      let i = owners.firstIndex(where: { $0.server == server && $0.ownershipLost != true }),
+                      let credentials = owners[i].credentials,
+                      let j = owners[i].objects?.firstIndex(where: { $0.id == id }),
+                      let snapshot = ownerSnapshots[server],
+                      try owners[i].canPublishKeyRotation(objectID: id, snapshot: snapshot),
+                      let rotation = owners[i].objects![j].keyRotation,
+                      let number = owners[i].objects![j].numberID,
+                      let revision = owners[i].objects![j].revision else { continue }
+                var updated = owners
+                updated[i].objects![j].keyRotation?.sent = true
+                try saveOwners(updated) // No network before this checkpoint.
+                guard canManageGuestAccess, owners[i].credentials == credentials else { return }
+                deferOwnerSettingsRetry(retryID)
+                let body = try JSONSerialization.data(withJSONObject: ["id": number,
+                    "data_cipher": rotation.cipher, "data_cipher_ts_check": revision], options: .sortedKeys)
+                let data = try await ownerAPI.mutate(server: server, credentials: credentials,
+                    fingerprint: backupFingerprint(server: server), operation: .update, body: body)
+                guard let reply = try JSONSerialization.jsonObject(with: data) as? [String: Any],
+                      (reply["ok"] as? NSNumber)?.boolValue == true else { throw GuestCrypto.Failure.invalidEnvelope }
+                await syncOwner(server)
+                if owners.first(where: { $0.server == server })?.objects?.first(where: { $0.id == id })?.keyRotation == nil {
+                    ownerBundleRetryAfter.removeValue(forKey: retryID); ownerBundleRetryAttempts.removeValue(forKey: retryID)
+                    ownerObjectMessages.removeValue(forKey: id)
+                }
+            } catch {
+                deferOwnerSettingsRetry(retryID)
+                ownerObjectMessages[id] = "Смена ключа объекта ожидает синхронизации. Сохранённые ключи и запись не потеряны."
+            }
+        }
     }
 
     private func deferOwnerSettingsRetry(_ id: String) {
@@ -1168,14 +1224,14 @@ final class AppModel: ObservableObject {
     }
 
     private func scheduleOwnerSettingsRefresh() {
-        guard ownerSettingsTask == nil, foreground, owners.contains(where: { !($0.bundleRefreshQueue ?? [:]).isEmpty }) else { return }
+        guard ownerSettingsTask == nil, foreground, owners.contains(where: { !($0.bundleRefreshQueue ?? [:]).isEmpty || $0.hasObjectKeyRotations }) else { return }
         let generation = UUID()
         ownerSettingsTaskGeneration = generation
         ownerSettingsTask = Task { [weak self] in
             while !Task.isCancelled {
                 do { try await Task.sleep(nanoseconds: 30_000_000_000) } catch { break }
                 guard let self, self.foreground else { break }
-                guard self.owners.contains(where: { !($0.bundleRefreshQueue ?? [:]).isEmpty }) else { break }
+                guard self.owners.contains(where: { !($0.bundleRefreshQueue ?? [:]).isEmpty || $0.hasObjectKeyRotations }) else { break }
                 guard !self.ownerBusy, !self.busy, self.pendingRestore == nil else { continue }
                 self.ownerBusy = true
                 for server in self.owners.map(\.server) {
@@ -1204,6 +1260,8 @@ final class AppModel: ObservableObject {
                 for keyID in roots + leaves { try updated[index].queueBLEDecision(keyID: keyID, revoked: true, restrictingObjectIDs: [numberID]) }
             }
             updated[index].objects![offset].pending = .delete
+            updated[index].objects![offset].keyRotation = nil
+            updated[index].objects![offset].keyRotationQueued = nil
             updated[index].objects![offset].sent = false
             try saveOwners(updated)
             _ = await sendOwnerObject(server: server, objectID: objectID)
@@ -1422,6 +1480,7 @@ final class AppModel: ObservableObject {
             _ = try await ownerAPI.mutate(server: server, credentials: credentials,
                 fingerprint: backupFingerprint(server: server), operation: .keyRevoke, body: body)
             await syncOwner(server)
+            await flushOwnerObjectSettings(server: server)
         } catch { ownerDelegationMessages[keyID] = "Отзыв не подтверждён. На этом iPhone ключ заблокирован; обновите данные сервера." }
     }
 
@@ -1474,7 +1533,9 @@ final class AppModel: ObservableObject {
             try updated[index].issuedKeys![offset].edit(owner: owner, label: label, numberIDs: numberIDs, welcome: welcome, confirmation: confirmation, access: access, settings: settings)
             if settings != nil { updated[index].issuedKeys![offset].objectSettingsToken = updated[index].bundleRefreshQueue?[keyID.uuidString] }
             try saveOwners(updated)
-            return await sendOwnerKey(server: server, keyID: keyID)
+            let saved = await sendOwnerKey(server: server, keyID: keyID)
+            await flushOwnerObjectSettings(server: server)
+            return saved
         } catch { errorMessage = "Не удалось подготовить изменение. Проверьте выбранные объекты и состояние ключа."; return false }
     }
 
@@ -1528,6 +1589,7 @@ final class AppModel: ObservableObject {
             updated[index].issuedKeys![offset].sent = false
             try saveOwners(updated)
             _ = await sendOwnerKey(server: server, keyID: keyID)
+            await flushOwnerObjectSettings(server: server)
         } catch { errorMessage = "Не удалось сохранить отзыв. Доступ ещё не подтверждён как отозванный." }
     }
 
@@ -1734,7 +1796,7 @@ final class AppModel: ObservableObject {
     func suspend(preserveAutomation: Bool = false) {
         backgroundMonitoring = false; backgroundActionScope = nil
         incomingMessagePromptID = nil; localTaskDialogs.removeAll()
-        diagnosticConsentPrompt = false; diagnostics.pause()
+        diagnosticConsentPrompt = false; diagnostics.pause(); promotions.pause()
         networkPrivacyPrompt = nil
         bleInformationTarget = nil
         if let prompt = actionPrompt { dismissActionPrompt(prompt.id) }

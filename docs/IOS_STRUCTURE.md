@@ -98,9 +98,9 @@ Core245 Apple/Debug также прошли. Новый BLE Info и код в р
 | G06 | Автонастройки конкретного гостя | GuestObjectSettings / AutomationEditor(.issued) / saveAutomation | Отдельные шаблоны host/key/object, root bounds и force; не смешиваются с owner/incoming настройками. |
 | G07 | Реакция владельца на запрос | GuestInvocationEditor / OwnerCallPreference / OwnerPhoneNotifications | Auto/confirm/notify/off и serveDuringCall; проверенные foreground guards, реальная доставка/звонок в фоне не приняты. |
 | G08 | Срок BLE-пропуска | BLETokenLifetimes / GuestObjectSettings / renewOwnerBLEKey | 11 TTL от1ч до30д; выбор не продлевает текущий токен, explicit renew сохраняет identity. |
-| G09 | Pause/resume/revoke | GuestPersonCard / GuestRemovalDialog / BLEPermissionsScreen | Pause/resume/revoke, durable signed BLE decisions; corporate keys тоже имеют scope, hardware delivery не принята. |
+| G09 | Pause/resume/revoke | GuestPersonCard / GuestRemovalDialog / BLEPermissionsScreen | Pause/resume/revoke, durable signed BLE decisions; corporate scopes и новая bundle-first object-key rotation после подтверждённого отзыва/снятия scope. Обычная pause не ротирует. Rotation локально307core/новый Apple pending; hardware delivery не принята. |
 | G10 | QR/share | InviteQRCode / системный ShareLink | Существующий QR/share ссылки-ключа. |
-| G11 | Сообщение | MessageScreens / MessageManager / SavedMessage | Защищённые сообщения + очередь входящего overlay как Android; readAt сохраняется при Close, ACK после commit; unread остаётся после ухода в фон. UIKit host поверх текущей формы, общая AppDialogSurface. Новые source/UI тесты ещё ожидают Apple. |
+| G11 | Сообщение | MessageScreens / MessageManager / SavedMessage | Защищённые сообщения + очередь входящего overlay как Android; readAt сохраняется при Close, ACK после commit; unread остаётся после ухода в фон. UIKit host поверх текущей формы, общая AppDialogSurface. Два новых hosted и UI Close/очередь прошли в179/25 source98d4676; полного Android↔iOS E2E/APNs нет. |
 | G12 | Компании | CompanyPresentation / KnownCompany / VerifiedCompanyPress | host/id + verified signing pin, profile/claim/grant UI; real server E2E и полная визуальная приёмка остаются. |
 | G13 | Преднастройки | GuestPresets / OwnerGuestDefaults | Defaults для новых ключей и scoped explicit clone; старые ключи не меняются при сохранении defaults. |
 | G14 | Передать ключ | PassedGuestsSection / PassAccessForm / PassManager | Полученный источник и свежий verified allowance, native-only наследуется; protected group/secret/identity сохраняются. |
@@ -108,10 +108,10 @@ Core245 Apple/Debug также прошли. Новый BLE Info и код в р
 | G16 | Подтверждение цепочки | DelegationInbox / OwnerDelegatedKey / automatic bundle fulfilment | Подписи/vouch/full parent chain/scope до публикации сохранённой связки; live cross-platform E2E ещё не принят. |
 | J01 | Журнал действий | JournalScreen / JournalEntry / DelegatedJournalLedger | Action history и локальное отображаемое имя; не записывать UI sync. |
 | H01 | Помощь | AppHeaderActions / HelpScreen / ProductText | Общая помощь и язык с исходными флагами, native lower navigation; оставшаяся L10n/полная проверка ссылок отдельно. |
-| E01 | Общие окна сети | RootView.errorMessage + inline action rejection | Оставшиеся alert/confirmationMenu переведены на общий компактный TaskDialog, независимые presentation barriers не пропускают автоматику/Widget; сообщения и root/task priority разделены. Новый source ещё ожидает Apple. |
+| E01 | Общие окна сети | RootView.errorMessage + inline action rejection | Оставшиеся alert/confirmationMenu переведены на общий компактный TaskDialog, независимые presentation barriers не пропускают автоматику/Widget; сообщения и root/task priority разделены. Общий dialog barrier hosted case прошёл в179; финальные footer/dim пиксели отдельно проверяются новым прогоном. |
 | E02 | Запрос гостя владельцу | OwnerPhoneRequestDialog / OwnerControlModel / OwnerPhoneNotifications | Компактный foreground approve/decline и 5sec cancelable notify; background/APNs/device-проверка остаётся. |
-| E03 | Автотриггер | AutomationCoordinator / ActionPrompt / executeActionPrompt | Единый foreground manual/automatic confirm/PIN/biometry, одно согласие на frozen intent, cancel consumes arrival; latest source6b42489 ещё не Apple-исполнен. |
-| E04 | Ключ принят/отклонён | KeyImportScreen / DelegationInboxScreen | KeyAcceptanceDialog: welcome только из authenticated bundle, readiness по правилам именно этого ключа, только OK; сохранённый неподтверждённый ключ не считается принятым. Новый source/UI тест ожидают Apple. |
+| E03 | Автотриггер | AutomationCoordinator / ActionPrompt / executeActionPrompt | Единый foreground manual/automatic confirm/PIN/biometry, одно согласие на frozen intent, cancel consumes arrival; bounded BLE/local webhook фон, deadlines и manual guards прошли hosted; ОС/реальное устройство отдельно. |
+| E04 | Ключ принят/отклонён | KeyImportScreen / DelegationInboxScreen | KeyAcceptanceDialog: welcome только из authenticated bundle, readiness по правилам именно этого ключа, только OK; сохранённый неподтверждённый ключ не считается принятым. Welcome hosted/UI прошли в source98d4676; физические permissions отдельно. |
 | E05 | Восстановление | BackupPresentation / BackupRestorePlan / backup reminder | Preview/restore/preflight/checkpoints/reminder подключены, системный файл sharing; реальный перенос между устройствами не принят. |
 | W01 | Виджет | WidgetKit/AppIntent iOS17, source; Apple/device pending | Общий каталог представления, исходные аватары; action в приложении через текущую policy/entry/PIN/confirm. Базовый Apple168 прошёл; device pending. TTL60с, consume-before-dispatch, нет fire URL/ключей в extension. Android service в фоне этим не перенесён. |
 
@@ -150,3 +150,12 @@ Core142, Debug, Release с изоляцией DEBUG-фикстур, native81 и 
 автонастройки своего/выданного/входящего объекта, их редакторы и runtime, камера,
 полные поля типов, компании, foreground/background BLE scanner и виджет остаются
 пробелами соответствующих узлов. Наличие строки в карте не означает готовую функцию.
+
+
+## Home catalogue source — 19 November
+
+ControlScreen inserts AppPromotions/PromotionCard before object cards, matching
+Android HomeScreen. Trusted catalogue/cache/banner/CTA/until_click and bounded
+view delivery are connected; coarse installation metadata is separate from access
+identity and excluded from backup. Actual Linux307core; hosted/UI expected185/26,
+including control-promotion checkpoint45. New Apple SDK/runtime/pixel proof pending.

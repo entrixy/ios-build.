@@ -2,6 +2,25 @@ import XCTest
 @testable import EntrixyCore
 
 final class AndroidOwnerAdapterTests: XCTestCase {
+    func testPendingAndroidRotationPreservesExactGenerationAndCipherWithoutReplacingKeys() throws {
+        let master = Data(repeating: 7, count: 32), old = Data(repeating: 8, count: 32), fresh = Data(repeating: 9, count: 32)
+        let clear = Data(#"{"label":"Ворота","avatar_type":"preset:1"}"#.utf8)
+        let oldCipher = try GuestCrypto.encrypt(key: old, plaintext: clear)
+        let nextCipher = try GuestCrypto.encrypt(key: fresh, plaintext: clear)
+        let previous = try GuestCrypto.encrypt(key: master, plaintext: old), current = try GuestCrypto.encrypt(key: master, plaintext: fresh)
+        let values = ["e2ee_master_key":GuestCrypto.base64URL(master), "backup_server_host":"owner.invalid",
+            "owner_accounts":try json([["host":"owner.invalid","id":String(repeating:"a",count:32),"secret":String(repeating:"b",count:64)]]),
+            "host_numbers":try json([["id":7,"host":"owner.invalid","type":"call","phone":"+15550000001"]] as [[String:Any]]),
+            "e2ee_obj_7":current,"e2ee_obj_prev_7":previous,"e2ee_obj_blob_7":oldCipher,"pending_rotated_cipher_7":nextCipher]
+        let source = try document(values, integers:["e2ee_obj_epoch_7":5])
+        let owner = try XCTUnwrap(AndroidOwnerAdapter.owners(from:source).first)
+        let object = try XCTUnwrap(owner.objects?.first)
+        XCTAssertEqual(object.wrappedKey,previous); XCTAssertEqual(object.cipher,oldCipher)
+        XCTAssertEqual(object.keyEpoch,4); XCTAssertEqual(object.keyRotation?.epoch,5)
+        XCTAssertEqual(object.keyRotation?.wrappedKey,current); XCTAssertEqual(object.keyRotation?.cipher,nextCipher)
+        XCTAssertEqual(object.keyRotation?.sent,true); try owner.validate()
+        XCTAssertEqual(try JSONDecoder().decode(OwnerAccount.self,from:JSONEncoder().encode(owner)),owner)
+    }
     private let master = Data(repeating: 7, count: 32)
     private func document(_ values: [String: String], integers: [String: Int] = [:]) throws -> AndroidBackupDocument {
         var entries: [String: Any] = values.mapValues { ["t": "s", "v": $0] }

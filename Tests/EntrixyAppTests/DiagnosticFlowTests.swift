@@ -45,6 +45,8 @@ private final class DiagnosticAccessMemory: StateStorage {
         service.receive([try crash()],periodBegin:Date().addingTimeInterval(1))
         XCTAssertTrue(state.state.reports.isEmpty); XCTAssertTrue(api.reports.isEmpty)
         service.activate(); XCTAssertTrue(app.diagnosticConsentPrompt)
+        XCTAssertTrue(app.hasTaskDialog); XCTAssertTrue(app.hasRootDialog)
+        XCTAssertFalse(app.hasInlineRootDialog)
         XCTAssertTrue(service.setConsent(false)); XCTAssertFalse(app.diagnosticConsentPrompt)
         service.record(.connection_failed)
         await service.sendManual()

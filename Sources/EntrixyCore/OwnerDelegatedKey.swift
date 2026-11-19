@@ -23,6 +23,8 @@ public struct OwnerDelegatedKey: Codable, Identifiable, Equatable {
     public var label: String
     public var revocationPending: Bool?
     public var revocationSent: Bool?
+    /// Exact bundle acknowledgement is separate from whether control is paused.
+    public var bundleDeliveryConfirmed: Bool?
 
     public func validate(masterKey: Data) throws {
         guard keyID > 0, parentKeyID > 0, keyID != parentKeyID, (1...65535).contains(guestID),
@@ -55,6 +57,7 @@ private struct DelegationAuthority {
     let bundle: [String: Any]
     let label: String
     let ancestors: Set<Int>
+    let paused: Bool
 }
 
 public extension OwnerAccount {
@@ -64,6 +67,7 @@ public extension OwnerAccount {
     mutating func reconcileDelegatedKeys(_ snapshot: OwnerSnapshot) throws -> Int {
         var records = delegatedKeys ?? []
         for i in records.indices where records[i].state != .revoked {
+            records[i].bundleDeliveryConfirmed = false
             let row = snapshot.keyRows.first { ($0["id"] as? Int) == records[i].keyID }
             if records[i].revocationPending == true && (row == nil || (row?["enabled"] as? NSNumber)?.boolValue == false) {
                 records[i].state = .revoked; records[i].revocationPending = false; records[i].revocationSent = false
@@ -71,7 +75,8 @@ public extension OwnerAccount {
         }
         var authorities: [Int: DelegationAuthority] = [:]
         for key in issuedKeys ?? [] {
-            guard let id = key.keyID, key.pending == nil, key.state == .active || key.state == .restricted,
+            guard let id = key.keyID, key.pending == nil,
+                  key.state == .active || key.state == .restricted || (key.state == .paused && hasObjectKeyRotations),
                   let chosen = key.grantedAccess, let effective = key.access else { continue }
             var limits: [String: KeyObjectAccess] = [:]
             for number in key.effectiveNumberIDs ?? key.numberIDs {
@@ -83,7 +88,7 @@ public extension OwnerAccount {
             let pair = try key.secrets(masterKey: masterKey)
             authorities[id] = DelegationAuthority(keyID: id, rootID: key.id,
                 signPublic: try GuestCrypto.signingKey(userKey: pair.userKey).publicKey.rawRepresentation,
-                access: limits, bundle: try key.bundle(masterKey: masterKey), label: key.label, ancestors: [id])
+                access: limits, bundle: try key.bundle(masterKey: masterKey), label: key.label, ancestors: [id], paused: key.state == .paused)
         }
         let rows = snapshot.keyRows.filter { ($0["parent_key_id"] as? Int ?? 0) > 0 }
         var processed = Set<Int>()
@@ -116,7 +121,9 @@ public extension OwnerAccount {
                     }
                     continue
                 }
-                guard enabled, mode == "auto" || mode == "notify" || mode == "confirm" else { continue }
+                guard enabled, mode == "auto" || mode == "notify" || mode == "confirm" || (mode == "off" && hasObjectKeyRotations && sameRecipient != nil) else { continue }
+                if parent.paused && sameRecipient == nil { continue }
+                let paused = parent.paused || mode == "off"
                 guard let networkIDs = row["number_ids"] as? [Any],
                       let limits = try KeyObjectAccess.decode(row["objects"]) else { continue }
                 let rawIDs = networkIDs + (row["ble_ids"] as? [Any] ?? [])
@@ -170,16 +177,17 @@ public extension OwnerAccount {
                 let confirmed = row["bundle_cipher"] as? String == record.bundleCipher
                     && row["key_cipher"] as? String == record.keyCipher
                     && (row["needs_bundle"] as? NSNumber)?.boolValue == false
-                record.state = confirmed ? .ready : .awaiting
+                record.state = confirmed ? (paused ? .unavailable : .ready) : .awaiting
+                record.bundleDeliveryConfirmed = confirmed
                 record.confirmedNumberIDs = confirmed ? ids : []
                 if confirmed { record.sent = false }
                 for i in records.indices where records[i].keyID == keyID && records[i].id != record.id { records[i].state = .revoked }
                 if let index = sameRecipient { records[index] = record } else { records.append(record) }
-                accepted.insert(keyID)
+                if mode != "off" { accepted.insert(keyID) }
                 if confirmed {
                     authorities[keyID] = DelegationAuthority(keyID: keyID, rootID: parent.rootID,
                         signPublic: try GuestCrypto.decodeBase64URL(sp), access: limits, bundle: expected,
-                        label: record.label, ancestors: parent.ancestors.union([keyID]))
+                        label: record.label, ancestors: parent.ancestors.union([keyID]), paused: paused)
                 }
             }
             if !progress { break }

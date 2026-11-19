@@ -10,7 +10,13 @@ import EntrixyCore
     private static var retained: AppModel?
     static func model() -> AppModel {
         if let retained { return retained }
-        let app = AppModel(privacyRouter:ServerPrivacyRouter()); retained = app; return app
+        let app = AppModel(privacyRouter:ServerPrivacyRouter())
+        #if DEBUG && targetEnvironment(simulator)
+        if ProcessInfo.processInfo.arguments.contains("--ui-offline-promotions") {
+            app.promotions = StageTwoCapture.offlinePromotions(for:app)
+        }
+        #endif
+        retained = app; return app
     }
 }
 

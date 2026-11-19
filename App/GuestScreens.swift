@@ -18,6 +18,7 @@ struct ControlScreen: View {
                         if model.controlObjects.contains(where:{ (try? model.automationContext(.object($0.target)).template.geoEnabled) == true }) {
                             HomeLocationWarning(sensors:model.automationSensors)
                         }
+                        PromotionCard(service:model.promotions)
                         ForEach(entries) { entry in
                             switch entry {
                             case let .owned(owner, object):
@@ -30,7 +31,7 @@ struct ControlScreen: View {
                         }
                     }.padding(20).measureControlContent()
                 }.background(Color(uiColor: .systemGroupedBackground))
-                    .refreshable { await model.refreshOwners(); await model.refresh() }
+                    .refreshable { await model.refreshOwners(); await model.refresh(); model.promotions.activate() }
                     .modifier(HomeWidgetHint())
             }
         }
