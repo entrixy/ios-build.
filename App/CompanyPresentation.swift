@@ -78,11 +78,13 @@ struct CompanyRequestDialog: View {
                     }
                 }
                 Text(ProductText.string(granted ? "org_ask_granted_body" : (hasObjects ? "org_ask_body" : "org_ask_no_objects")))
+
+            }
+        } footer: {
                 HStack(spacing:12) {
                     Button(ProductText.string("org_ask_later")) { model.companyRequestID = nil }.buttonStyle(SecondaryActionStyle())
                     Button(ProductText.string(granted ? "org_ask_open_list" : (hasObjects ? "org_ask_grant" : "org_ask_add_object"))) { action(granted,hasObjects) }.buttonStyle(PrimaryActionStyle())
                 }
-            }
         }
     }
 }

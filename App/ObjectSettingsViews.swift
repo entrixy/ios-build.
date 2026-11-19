@@ -205,9 +205,11 @@ struct BLEInformationDialog: View {
                         Text(ProductText.string("ble_info_updated_fmt",max(0,Int(timeline.date.timeIntervalSince(info.observedAt)))))
                             .font(.footnote).foregroundStyle(Brand.secondaryInk)
                     } else { Text(ProductText.string("ble_info_no_data")).font(.body) }
-                    Button(ProductText.string("btn_close")) { model.bleInformationTarget = nil }.buttonStyle(SecondaryActionStyle())
+
                 }
             }
+        } footer: {
+            Button(ProductText.string("btn_close")) { model.bleInformationTarget = nil }.buttonStyle(SecondaryActionStyle())
         }
     }
     private func hardware(_ value: UInt8) -> String {

@@ -19,6 +19,9 @@ struct OwnerPhoneRequestDialog: View {
                     if object.kind == "call" {
                         Text("iPhone запросит подтверждение телефонного звонка.").font(.footnote).foregroundStyle(Brand.secondaryInk)
                     }
+
+                }
+            } footer: {
                     HStack(spacing: 12) {
                         Button(ProductText.string("confirm_decline"), role: .destructive) { Task { await control.decline(request) } }
                             .buttonStyle(SecondaryActionStyle())
@@ -28,8 +31,7 @@ struct OwnerPhoneRequestDialog: View {
                         } label: { ActionButtonLabel(title: ProductText.string("confirm_allow"), busy: approving) }
                             .buttonStyle(PrimaryActionStyle())
                     }.disabled(approving)
-                }
-            }
+        }
         }
     }
 }

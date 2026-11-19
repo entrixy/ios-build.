@@ -3,9 +3,26 @@ import XCTest
 final class NavigationUITests: XCTestCase {
     private var activeApp: XCUIApplication?
     private static var capturedStates = Set<String>()
-    private func reviewCapture(_ state: String) {
+    private func reviewCapture(_ state: String, settledBy reference: XCUIElement? = nil) {
         guard ProcessInfo.processInfo.environment["ENTRIXY_REVIEW_CAPTURE"] == "1",
               Self.capturedStates.insert(state).inserted else { return }
+        // Existence/enabled queries can succeed while a sheet or expanding row
+        // is still moving. Keep the original screen capture, after bounded
+        // geometric stability; the animated brand itself remains enabled.
+        guard let app = activeApp else { XCTFail("Missing app for native checkpoint"); return }
+        let anchor = reference ?? app.windows.firstMatch
+        var previous = CGRect.null
+        var unchangedSince = Date()
+        let settled = XCTNSPredicateExpectation(predicate:NSPredicate { _,_ in
+            guard anchor.exists, anchor.isHittable else { unchangedSince = Date(); return false }
+            let current = anchor.frame
+            guard !current.isEmpty else { unchangedSince = Date(); return false }
+            if current != previous { previous = current; unchangedSince = Date(); return false }
+            return Date().timeIntervalSince(unchangedSince) >= 0.6
+        },object:anchor)
+        guard XCTWaiter.wait(for:[settled],timeout:8) == .completed else {
+            XCTFail("Native checkpoint did not reach a stable visible layout: " + state); return
+        }
         let frame = XCTAttachment(screenshot:XCUIScreen.main.screenshot())
         frame.name = "review-" + state; frame.lifetime = .keepAlways; add(frame)
     }
@@ -109,7 +126,7 @@ final class NavigationUITests: XCTestCase {
         let row = app.buttons.matching(NSPredicate(format:"identifier BEGINSWITH %@","guest-card-")).firstMatch
         XCTAssertTrue(row.waitForExistence(timeout:10)); XCTAssertTrue(row.label.contains("Анна")); row.tap()
         XCTAssertTrue(app.buttons["Изменить"].isEnabled)
-        reviewCapture("guest-issued-actions")
+        reviewCapture("guest-issued-actions",settledBy:app.buttons["issue-guest"])
         app.buttons["Изменить"].tap()
         XCTAssertTrue(app.textFields.matching(NSPredicate(format:"value == %@","Анна")).firstMatch.waitForExistence(timeout:10))
         XCTAssertTrue(app.buttons["Сохранить"].exists)
@@ -117,7 +134,7 @@ final class NavigationUITests: XCTestCase {
         app.buttons["Отмена"].tap(); XCTAssertTrue(row.waitForExistence(timeout:10))
         app.buttons["QR"].tap()
         XCTAssertTrue(app.navigationBars["QR"].waitForExistence(timeout:10))
-        XCTAssertTrue(app.buttons["Копировать"].exists); reviewCapture("guest-issued-qr")
+        XCTAssertTrue(app.buttons["Копировать"].exists); reviewCapture("guest-issued-qr",settledBy:app.buttons["Закрыть"])
         app.buttons["Закрыть"].tap()
         app.buttons["Отправить сообщение"].tap()
         XCTAssertTrue(app.descendants(matching:.any).matching(identifier:"message-text").firstMatch.waitForExistence(timeout:10))
@@ -149,7 +166,12 @@ final class NavigationUITests: XCTestCase {
         bringIntoView(create,in:app); XCTAssertTrue(create.isHittable); create.tap()
         XCTAssertTrue(app.secureTextFields["Пароль копии"].waitForExistence(timeout:10))
         XCTAssertTrue(app.secureTextFields["Повторите пароль"].exists)
-        XCTAssertFalse(app.buttons["Сохранить"].isEnabled); reviewCapture("backup-password")
+        XCTAssertFalse(app.buttons["Сохранить"].isEnabled)
+        let save = app.buttons["Сохранить"], send = app.buttons["Отправить"], cancel = app.buttons["Отмена"]
+        XCTAssertEqual(save.frame.height,send.frame.height,accuracy:1)
+        XCTAssertEqual(save.frame.minY,send.frame.minY,accuracy:1)
+        XCTAssertGreaterThanOrEqual(cancel.frame.minY,save.frame.maxY)
+        reviewCapture("backup-password",settledBy:cancel)
         app.buttons["Отмена"].tap()
         assertBottom(app,["settings","journal"])
     }
@@ -486,7 +508,7 @@ final class NavigationUITests: XCTestCase {
         let cancel = app.buttons["Отмена"]
         XCTAssertTrue(cancel.isHittable)
         XCTAssertTrue(app.frame.insetBy(dx:0,dy:1).contains(cancel.frame))
-        reviewCapture("server-account")
+        reviewCapture("server-account",settledBy:cancel)
         cancel.tap()
         XCTAssertTrue(add.waitForExistence(timeout:10)); assertBottom(app,["settings","journal"])
     }

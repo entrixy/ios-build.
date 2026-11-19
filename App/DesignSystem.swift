@@ -8,6 +8,14 @@ enum DesignMetrics {
     static let actionRadius: CGFloat = 12
     static let primaryHeight: CGFloat = 48
     static let secondaryHeight: CGFloat = 48
+    static let dialogPadding: CGFloat = 24
+    static let dialogMargin: CGFloat = 16
+    static let dialogMaxWidth: CGFloat = 420
+    static let dialogOuterInset: CGFloat = 20
+    static let dialogGap: CGFloat = 18
+    static let dialogActionGap: CGFloat = 12
+    static let dialogCorner: CGFloat = 20
+    static let dialogDimOpacity = 0.35
 }
 
 struct AppField<Content: View>: View {
@@ -162,10 +170,10 @@ struct AppDialogSurface<Content:View,Footer:View>: View {
     var body: some View {
         GeometryReader { proxy in
             ZStack {
-                Color.black.opacity(0.35).ignoresSafeArea().contentShape(Rectangle()).onTapGesture { }
+                Color.black.opacity(DesignMetrics.dialogDimOpacity).ignoresSafeArea().contentShape(Rectangle()).onTapGesture { }
                     .accessibilityHidden(true)
-                VStack(spacing:hasFooter ? 18 : 0) {
-                    let available = max(1,proxy.size.height-88-(hasFooter ? footerHeight+18 : 0))
+                VStack(spacing:hasFooter ? DesignMetrics.dialogGap : 0) {
+                    let available = max(1,proxy.size.height-2*(DesignMetrics.dialogOuterInset+DesignMetrics.dialogPadding)-(hasFooter ? footerHeight+DesignMetrics.dialogGap : 0))
                     ScrollView {
                         content().frame(maxWidth:.infinity,alignment:.leading).fixedSize(horizontal:false,vertical:true)
                             .background(GeometryReader { size in Color.clear.preference(key:DialogContentHeight.self,value:size.size.height) })
@@ -182,9 +190,9 @@ struct AppDialogSurface<Content:View,Footer:View>: View {
                             }
                     }
                 }
-                    .padding(24).frame(width: min(max(0, proxy.size.width - 32), 420))
-                    .background(Color(uiColor: .secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 20))
-                    .padding(.vertical, 20)
+                    .padding(DesignMetrics.dialogPadding).frame(width:min(max(0,proxy.size.width-2*DesignMetrics.dialogMargin),DesignMetrics.dialogMaxWidth))
+                    .background(Color(uiColor: .secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius:DesignMetrics.dialogCorner))
+                    .padding(.vertical,DesignMetrics.dialogOuterInset)
                     .accessibilityElement(children: .contain).accessibilityAddTraits(.isModal)
             }.frame(width: proxy.size.width, height: proxy.size.height)
         }

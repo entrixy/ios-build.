@@ -16,28 +16,6 @@ struct DiagnosticSettingsSection: View {
     }
 }
 
-struct DiagnosticConsentDialog: View {
-    @EnvironmentObject private var model: AppModel
-    @ObservedObject var service: AppDiagnostics
-    var body: some View {
-        AppDialogSurface {
-            VStack(alignment:.leading,spacing:18) {
-                Text(ProductText.string("crash_consent_title")).font(.title3.bold())
-                Text(ProductText.string("crash_consent_text"))
-                if let message = service.message { Text(ProductText.string(message)).font(.footnote).foregroundStyle(AppPalette.destructive) }
-
-            }.disabled(!service.ready || !model.canManageGuestAccess)
-        } footer: {
-                HStack(spacing:12) {
-                    Button(ProductText.string("crash_consent_later")) { service.setConsent(false) }
-                        .buttonStyle(SecondaryActionStyle()).accessibilityIdentifier("diagnostic-consent-later")
-                    Button(ProductText.string("crash_consent_allow")) { service.setConsent(true) }
-                        .buttonStyle(PrimaryActionStyle()).accessibilityIdentifier("diagnostic-consent-allow")
-                }.disabled(!service.ready || !model.canManageGuestAccess)
-        }
-    }
-}
-
 /// Same hidden seven-tap entry and manual send/off actions as Android.
 struct DeveloperSettingsSection: View {
     @EnvironmentObject private var model: AppModel

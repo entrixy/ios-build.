@@ -67,6 +67,10 @@ jobs:
       - name: Verify native and UI scenarios and capture their actual states in one simulator pass
         id: native_tests
         run: python3 scripts/test_simulator.py --use-built-tests --review-captures 2>&1 | tee .local-checks/ci/native-tests.log
+      - name: Archive unsigned Release for physical iPhone and verify app/widget packaging
+        if: ${{ always() && steps.debug_build.outcome == 'success' && steps.release_build.outcome == 'success' }}
+        id: device_archive
+        run: python3 scripts/archive_device_release.py 2>&1 | tee .local-checks/ci/device-release.log
       - name: Upload original screenshots from the interaction tests
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
@@ -99,7 +103,7 @@ jobs:
           data = {key: os.environ[key] for key in ['SOURCE_SHA', 'BUILD_RESULT', 'BUILD_URL']}
           steps = json.loads(os.environ['STEP_RESULTS'])
           data['checks'] = {name: steps.get(name, {}).get('outcome', 'skipped')
-                            for name in ['core_tests', 'debug_build', 'release_build', 'native_tests']}
+                            for name in ['core_tests', 'debug_build', 'release_build', 'native_tests', 'device_archive']}
           review_path = Path('.local-checks/ci/screenshots/review.json')
           review = json.loads(review_path.read_text()) if review_path.exists() else {}
           data['checks']['captures'] = 'success' if review.get('complete') else ('failure' if review else 'skipped')

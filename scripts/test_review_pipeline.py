@@ -34,7 +34,7 @@ class ReviewPipelineTests(unittest.TestCase):
     def exportFixture(self, *, duplicate=False, failed=False):
         source = Path(__file__).resolve().parents[1] / 'Tests/EntrixyUITests/NavigationUITests.swift'
         import re
-        states = set(re.findall(r'reviewCapture\("([a-z0-9-]+)"\)',source.read_text()))
+        states = set(re.findall(r'reviewCapture\("([a-z0-9-]+)"',source.read_text()))
         def chunk(kind,data): return struct.pack('>I',len(data))+kind+data+struct.pack('>I',zlib.crc32(kind+data)&0xffffffff)
         raw = b'\x89PNG\r\n\x1a\n'+chunk(b'IHDR',struct.pack('>IIBBBBB',1179,2556,8,0,0,0,0))
         raw += chunk(b'IDAT',zlib.compress((b'\0'+b'\xff'*1179)*2556))+chunk(b'IEND',b'')
@@ -50,6 +50,8 @@ class ReviewPipelineTests(unittest.TestCase):
 
     def testOriginalScreenshotsAreCopiedWithoutRetouchingAndAllStatesAreRequired(self):
         states,raw,export = self.exportFixture()
+        from prepare_ui_gallery import SCREENS
+        self.assertEqual(states,set(SCREENS))
         with tempfile.TemporaryDirectory() as temporary,patch('export_ui_review.subprocess.run',side_effect=export),contextlib.redirect_stdout(io.StringIO()):
             report = export_review('fixture.xcresult',temporary,tests_succeeded=True,source_sha='a'*40)
             self.assertTrue(report['complete']);self.assertEqual(len(report['captures']),len(states))

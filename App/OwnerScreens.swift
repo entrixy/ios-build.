@@ -362,19 +362,10 @@ private struct OwnerObjectEditorForm: View {
         .accessibilityHidden(serverModeWarning || deleting || confirmingMove)
         .overlay {
             if confirmingMove {
-                AppDialogSurface {
-                    VStack(alignment: .leading, spacing: 18) {
-                        Text(ProductText.string("ble_move_title", targetServer)).font(.title3.bold())
-                        Text(ProductText.string("ble_move_hint"))
-                        HStack(spacing: 12) {
-                            Button(ProductText.string("btn_cancel")) { confirmingMove = false }.buttonStyle(SecondaryActionStyle())
-                            Button(ProductText.string("ble_move_button")) {
-                                confirmingMove = false
-                                Task { if await model.moveBLEObject(server: server, objectID: objectID, to: targetServer) { dismiss() } }
-                            }.buttonStyle(PrimaryActionStyle())
-                        }
-                    }
-                }
+                AppConfirmationDialog(title:ProductText.string("ble_move_title",targetServer),message:ProductText.string("ble_move_hint"),actionTitle:ProductText.string("ble_move_button"),cancel:{ confirmingMove = false },confirm:{
+                    confirmingMove = false
+                    Task { if await model.moveBLEObject(server:server,objectID:objectID,to:targetServer) { dismiss() } }
+                })
             } else if serverModeWarning {
                 WebhookServerModeConfirmation(cancel: { serverModeWarning = false }, confirm: { draft.webhookMode = "server"; serverModeWarning = false })
             } else if deleting {

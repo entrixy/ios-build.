@@ -11,7 +11,7 @@ concurrency:
 jobs:
   compile:
     runs-on: ${{ (github.ref == 'refs/heads/ci/ui-review-arm' || github.ref == 'refs/heads/ci/native-review-arm' || github.ref == 'refs/heads/ci/review-batch') && 'macos-15' || 'macos-15-intel' }}
-    timeout-minutes: 45
+    timeout-minutes: 55
     env:
       DEVELOPER_DIR: /Applications/Xcode_26.3.app/Contents/Developer
     defaults:
@@ -30,6 +30,7 @@ jobs:
       - name: Generate project
         run: xcodegen generate
       - name: Compile application and test bundles without launching scenarios
+        id: debug_build
         run: |
           xcodebuild -project Entrixy.xcodeproj -scheme EntrixyTests \
             -configuration Debug -sdk iphonesimulator \
@@ -37,6 +38,7 @@ jobs:
             -derivedDataPath .local-checks/DerivedData \
             CODE_SIGNING_ALLOWED=YES CODE_SIGN_IDENTITY=- build-for-testing 2>&1 | tee .local-checks/ci/debug-build.log
       - name: Compile Release and verify fixture isolation
+        id: release_build
         if: ${{ !startsWith(github.ref, 'refs/heads/ci/ui-review') }}
         run: |
           xcodebuild -project Entrixy.xcodeproj -scheme Entrixy \
@@ -56,6 +58,9 @@ jobs:
       - name: Verify native and UI scenarios with original screenshots in the same simulator pass
         if: github.ref == 'refs/heads/ci/review-batch'
         run: python3 scripts/test_simulator.py --use-built-tests --review-captures 2>&1 | tee .local-checks/ci/combined-review.log
+      - name: Archive unsigned Release for physical iPhone and verify app/widget packaging
+        if: ${{ always() && github.ref == 'refs/heads/ci/review-batch' && steps.debug_build.outcome == 'success' && steps.release_build.outcome == 'success' }}
+        run: python3 scripts/archive_device_release.py 2>&1 | tee .local-checks/ci/device-release.log
       - name: Retain compilation evidence
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02

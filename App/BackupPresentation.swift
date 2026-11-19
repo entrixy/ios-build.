@@ -143,17 +143,39 @@ struct BackupFlowHost: View {
                         case .export: exportFields
                         case .password: importFields
                         case .review: review
-                        case .result:
-                            Text(flow.feedback ?? "")
-                            Button(ProductText.string("btn_ok")) { flow.cancel() }.buttonStyle(PrimaryActionStyle())
+                        case .result: Text(flow.feedback ?? "")
                         }
                     }
-                }
+                } footer: { promptActions(prompt) }
             }
         }.frame(maxWidth:.infinity,maxHeight:.infinity).allowsHitTesting(flow.prompt != nil || flow.working)
         .fileImporter(isPresented:$flow.importing,allowedContentTypes:[.entrixyIOSBackup,.data]) { result in Task { await flow.acceptFile(result) } }
         .fileExporter(isPresented:$flow.exporting,document:manager.exportData.map { EncryptedBackupDocument(bytes:$0) },contentType:.entrixyIOSBackup,defaultFilename:"Entrixy-\(Date().formatted(.iso8601.year().month().day().dateSeparator(.dash))).eib",onCompletion:flow.didExport)
         .sheet(item:$flow.sharing,onDismiss:flow.removeSharedFile) { item in BackupShareSheet(url:item.url,completion:flow.didShare) }
+    }
+    @ViewBuilder private func promptActions(_ prompt:BackupPresentation.Prompt) -> some View {
+        switch prompt {
+        case .export:
+            VStack(spacing:12) {
+                HStack(spacing:12) {
+                    Button(ProductText.string("btn_save")) { Task { await flow.prepareExport(send:false) } }.buttonStyle(SecondaryActionStyle())
+                    Button(ProductText.string("backup_send")) { Task { await flow.prepareExport(send:true) } }.buttonStyle(PrimaryActionStyle())
+                }.disabled(flow.password.count < 8 || flow.password != flow.repeated)
+                Button(ProductText.string("btn_cancel")) { flow.cancel() }.buttonStyle(SecondaryActionStyle())
+            }
+        case .password:
+            HStack(spacing:12) {
+                Button(ProductText.string("btn_cancel")) { flow.cancel() }.buttonStyle(SecondaryActionStyle())
+                Button(ProductText.string("ios_backup_check")) { Task { await flow.inspect() } }.buttonStyle(PrimaryActionStyle()).disabled(flow.password.isEmpty)
+            }
+        case .review:
+            HStack(spacing:12) {
+                Button(ProductText.string("btn_cancel")) { flow.cancel() }.buttonStyle(SecondaryActionStyle())
+                Button(ProductText.string("ios_backup_transfer")) { Task { await flow.restore() } }.buttonStyle(PrimaryActionStyle()).disabled(manager.preview == nil)
+            }
+        case .result:
+            Button(ProductText.string("btn_ok")) { flow.cancel() }.buttonStyle(PrimaryActionStyle())
+        }
     }
     private func promptTitle(_ prompt: BackupPresentation.Prompt) -> String {
         switch prompt { case .export,.result: return "backup_section"; case .password,.review: return "backup_restore" }
@@ -172,11 +194,6 @@ struct BackupFlowHost: View {
             if !flow.password.isEmpty, flow.password.count < 8 { Text(ProductText.string("backup_pass_short",8)).font(.footnote).foregroundStyle(AppPalette.destructive) }
             if !flow.repeated.isEmpty, flow.password != flow.repeated { Text(ProductText.string("backup_pass_mismatch")).font(.footnote).foregroundStyle(AppPalette.destructive) }
             if let feedback = flow.feedback { Text(feedback).font(.footnote).foregroundStyle(AppPalette.destructive) }
-            HStack(spacing:10) {
-                Button(ProductText.string("btn_cancel")) { flow.cancel() }.buttonStyle(SecondaryActionStyle())
-                Button(ProductText.string("btn_save")) { Task { await flow.prepareExport(send:false) } }.buttonStyle(SecondaryActionStyle()).disabled(flow.password.count < 8 || flow.password != flow.repeated)
-                Button(ProductText.string("backup_send")) { Task { await flow.prepareExport(send:true) } }.buttonStyle(PrimaryActionStyle()).disabled(flow.password.count < 8 || flow.password != flow.repeated)
-            }
         }
     }
     private var importFields: some View {
@@ -184,10 +201,6 @@ struct BackupFlowHost: View {
             Text(ProductText.string("ios_backup_transfer_hint")).font(.footnote).foregroundStyle(Brand.secondaryInk)
             password("backup_pass_label",value:$flow.password)
             if let feedback = flow.feedback { Text(feedback).font(.footnote).foregroundStyle(AppPalette.destructive) }
-            HStack(spacing:12) {
-                Button(ProductText.string("btn_cancel")) { flow.cancel() }.buttonStyle(SecondaryActionStyle())
-                Button(ProductText.string("ios_backup_check")) { Task { await flow.inspect() } }.buttonStyle(PrimaryActionStyle()).disabled(flow.password.isEmpty)
-            }
         }
     }
     @ViewBuilder private var review: some View {
@@ -197,10 +210,6 @@ struct BackupFlowHost: View {
             Text(ProductText.string("ios_backup_transfer_hint")).font(.footnote).foregroundStyle(Brand.secondaryInk)
             if let sounds = preview.eventSounds, !sounds.unavailableSamples.isEmpty {
                 Text(ProductText.string("ios_backup_missing_sounds",sounds.unavailableSamples.count)).font(.footnote).foregroundStyle(Brand.secondaryInk)
-            }
-            HStack(spacing:12) {
-                Button(ProductText.string("btn_cancel")) { flow.cancel() }.buttonStyle(SecondaryActionStyle())
-                Button(ProductText.string("ios_backup_transfer")) { Task { await flow.restore() } }.buttonStyle(PrimaryActionStyle())
             }
         }
     }

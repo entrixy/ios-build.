@@ -27,12 +27,7 @@ struct ObjectAvatarPicker: View {
                 }.disabled(saving || model.ownerBusy)
                 if saving { ProgressView().frame(maxWidth: .infinity) }
                 if let message { Text(message).foregroundStyle(.red) }
-                HStack(spacing: 12) {
-                    Button(ProductText.string("btn_cancel")) { dismiss() }.buttonStyle(SecondaryActionStyle()).disabled(saving)
-                    PhotosPicker(selection: $photo, matching: .images) {
-                        Text(ProductText.string("avatar_picker_custom"))
-                    }.buttonStyle(PrimaryActionStyle()).disabled(saving || model.ownerBusy)
-                }
+
             }
             .onChange(of: photo) { value in
                     guard let value else { return }
@@ -45,6 +40,13 @@ struct ObjectAvatarPicker: View {
                             else { message = model.errorMessage ?? ProductText.string("action_no_image") }
                         } catch { message = ProductText.string("action_no_image") }
                     }
+                }
+        } footer: {
+                HStack(spacing: 12) {
+                    Button(ProductText.string("btn_cancel")) { dismiss() }.buttonStyle(SecondaryActionStyle()).disabled(saving)
+                    PhotosPicker(selection: $photo, matching: .images) {
+                        Text(ProductText.string("avatar_picker_custom"))
+                    }.buttonStyle(PrimaryActionStyle()).disabled(saving || model.ownerBusy)
                 }
         }
     }

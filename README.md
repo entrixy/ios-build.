@@ -8,23 +8,28 @@ This repository is private working source; no new distribution license is assign
 
 The full Android port remains the active task. The gallery still contains the old
 19-frame catalogue; a new full native screenshot batch follows functional completion.
-Latest coherent Apple batch: native `c7fcaeb`, public `b575091`,
-[run44474873776](https://github.com/entrixy/ios-build./actions/runs/44474873776):
-292 core tests, Debug including widget/test products, Release/privacy-manifest
-packaging/isolation and all176 hosted native tests passed. The same simulator pass
-executed24 UI scenarios:23passed; diagnostic consent again timed out while reading
-the accessibility snapshot. The root-sibling change did not resolve that failure.
-The overall run failed. It exported38/42 original checkpoint PNGs; four diagnostic
-states were not reached. This partial set is not the published gallery.
+Latest coherent Apple batch: native `98d4676`, public `3b806d7`,
+[run44477923156](https://github.com/entrixy/ios-build./actions/runs/44477923156):
+295 core tests, Debug including motion/native-host/widget/test products, Release/
+privacy-manifest packaging/isolation and all179 hosted native tests passed. UI25:
+24passed, including the incoming-message queue/Close and local key deletion dialog.
+Diagnostic consent still timed out reading the accessibility snapshot. A separate
+modal host DID NOT resolve that failure. The overall run failed;40/44 original
+checkpoint PNGs exported, with four diagnostic states missing. No new gallery
+publication or complete visual acceptance is claimed.
 
-Current followups use a separate UIKit hosting layer for diagnostic consent's
-accessibility, while retaining the shared compact SwiftUI design and test assertions.
-The dialog surface now supports a fixed footer: long content scrolls while the
-form's actions remain fully visible, addressing a clipped server-form screenshot.
-All remaining task confirmation menus and alerts now use the shared compact design
-with independent guards against automatic/Widget entry. Authenticated incoming owner
-messages show an oldest-first overlay queue; read status commits on Close, before
-network acknowledgement, and a failed write keeps the message unread.
+The next source uses UIKit labels/buttons and an explicit four-element native
+accessibility order inside that consent panel, retaining its exact texts, service
+calls, readiness guards and existing test assertions. Its geometry, palette,
+button sizes and pressed states share the dialog design metrics with SwiftUI.
+This targets the still-failing internal accessibility provider; SDK/runtime proof
+is pending. Existing incoming messages already passed their actual UI scenario.
+
+Further visual followups wait for stable visible geometry before original screen
+capture, retain the fixed action footer throughout all compact task dialogs, and
+prevent a three-button backup row from hyphenating Save. These were actual defects
+found in the prior native PNGs. Gallery preparation validates source/hash/state
+coverage and rejects partial or failed runs. No screenshots were retouched.
 
 Background BLE and own local webhooks use short per-object automatic authority and
 expiration/cancellation. PIN/confirmation BLE remains manual-only, following Android.
@@ -36,9 +41,15 @@ inferring motion from GPS; local295 core tests passed, physical behavior is pend
 CI builds test products once, verifies Release once, then runs hosted and UI cases
 in ONE simulator pass with original screenshots at the UI checkpoints. No separate
 screen replay or duplicate light/dark variants. The next source expects179 hosted
-cases,25 UI scenarios and44 distinct frames. The motion/dialog/message followups
+cases,25 UI scenarios and44 distinct frames. The remaining consent-provider/footer/capture followups
 have not yet passed Apple SDK/runtime. Final visual/parity acceptance and gallery
 publication remain separate. Gallery preparation refuses partial or failed runs.
+The next CI source also archives Release for the physical iPhone SDK, without
+signing or an IPA export. It verifies arm64 AND the Mach-O physical iOS platform
+(a simulator can also be arm64), app/widget identifiers and privacy manifests,
+fixture isolation and absence of provisioning/signatures. Only build evidence is
+retained in CI; archive compilation itself is still pending. This is not signing,
+a physical-device test, TestFlight or an upload-ready build.
 Full background/device/release gates and the full Android port remain incomplete.
 Detailed scope and evidence: [FUNCTIONAL_PORT.md](docs/FUNCTIONAL_PORT.md).
 

@@ -1485,3 +1485,86 @@ the same actual assertions. Full Swift syntax/pipeline4/diff checks pass. New
 Apple SDK/runtime and exact pixels require the next combined batch, not a claim
 based on source. Next total295Core/179hosted/25UI/44PNG, including all earlier
 motion/shared-dialog/incoming-message followups; no separate screenshot replay.
+
+
+Review inspection followup: publicb575's guest-issued-actions frame was captured
+while the0.18s expansion was still fading/moving; existence/enabled assertions
+were already true. reviewCapture now waits for a hittable anchor with unchanged
+geometry for0.6s, bounded to8s, before taking the original XCUIScreen PNG. Guest
+expansion/QR/server footer use their actual action anchors. The brand animation
+is retained; no image editing/retouching, forced animation disable or screenshot
+replay was added. This followup is not in active public3b806d7 and requires the
+next exact-source capture batch; a passing route alone does not accept these pixels.
+
+
+Backup visual followup: actualb575 password PNG showed secondary Save hyphenated
+in a three-button row. The original Android export has Save/Send/Cancel; all actions
+remain. The common fixed footer now has equal-height Save/Send in one row and a
+full-width Cancel beneath, giving labels sufficient width. Password check/review/
+result actions also use the fixed footer. The existing UI case checks both parallel
+action frames and Cancel below, without exporting a file. No additional test route
+or duplicate screenshot; total44 states is unchanged. Not in public3b806d7; SDK and
+pixels require the next combined batch. The source split across acdacd0 and its
+review-check followup is combined into that snapshot.
+
+The same fixed-footer contract is applied to avatar upload/cancel, owner call
+approval, webhook execution warning, company request and BLE information; telemetry
+updates no longer rebuild the Close row inside the timeline. BLE migration uses
+the same AppConfirmationDialog and unchanged guarded move method. Together with
+code, server, welcome, incoming message, backup and generic confirmation/error
+components, all compact interactive AppDialogSurface call sites now use the shared
+fixed footer. Progress has no action. Source parsing/diff verification passed;
+these visual followups are outside public3b806d7 and await the next combined SDK/UI/
+capture snapshot. No isolated test run or duplicate screenshot variant was added.
+
+
+## Physical iPhone SDK Release archive — 19 November 2026, CI source
+
+Simulator compilation does not prove a device-targeted Release bundle. The next
+ci/review-batch/main workflow source now builds an UNSIGNED .xcarchive after the
+same hosted/UI/capture pass, with iphoneos SDK, generic iOS destination and arm64.
+No signing identity/profile, IPA export or App Store upload is requested. Both app
+and embedded widget are checked for iphoneos Info.plist platform, thin ARM64 Mach-O
+and LC_BUILD_VERSION physical IOS=2, correct identifier relationship, privacy
+manifest and absence of embedded.mobileprovision/_CodeSignature. arm64 alone is
+not accepted, because an Apple Silicon simulator is also arm64 (platform7).
+The existing Release fixture/privacy verification also runs against the actual
+archived device app. Only .local-checks/ci logs/metadata are retained; archive/
+derived binaries remain local ignored products, not committed or uploaded artifacts.
+Metadata explicitly keeps signed=false/upload_ready=false/device_tested=false.
+
+Locally checked the Mach-O gate with a known device header and rejected simulator,
+macOS and truncated load-command examples; Python syntax and actionlint pass.
+No local Xcode was available, so archive build/packaging is not yet claimed passed.
+Public3b806d7 is still running and excludes this script/workflow followup. Source
+counts remain295Core/179hosted/25UI/44PNG; no additional simulator replay/test set.
+
+
+## Actual179 native and24/25 UI; bounded native consent tree — 19 November 2026
+
+Native98d4676/public3b806d7, run44477923156/job135402863169:295Core,
+Debug/test products/motion/UIKit hosts/Widget, Release/privacy/isolation and
+179hosted0(11.001s) passed.25UI24passed; diagnostic first AX query still times out
+(line202,175.627s). Separate UIKit hosting DID NOT solve it. Incoming-message
+modal/Close passed31.969s, as did local key delete confirmation.40/44 original PNGs
+exported; missing four diagnostic states. Artifact14508532560 SHA25699bf787ca890d5ff3ecb133cc97c94ad8b02f0a1fbbb824fb2e599ac0e516174
+retained privately. Overall failure, no complete review/publication claim.
+
+The new consent content uses UILabel/UIButton in a UIKit controller with an
+explicit bounded accessibility order (title, body, Not Now, Allow; optional error).
+This removes its internal SwiftUI text/control accessibility providers after the
+separate-host change alone failed. It retains the exact localized text, consent
+storage/service method, guards and original UI test assertions. Native geometry,
+colors, minimum button heights and pressed states share DesignMetrics with the
+SwiftUI dialog; long content scrolls above the fixed actions, Dynamic Type uses
+preferred fonts. Unchanged presentation does not invalidate native labels again.
+This is another targeted SOURCE fix, not a proven root-cause/runtime result.
+
+The next whole batch includes all stable-capture, complete fixed-footer, backup
+layout and unsigned device-archive followups. Archive runs after the interaction
+pass when Debug/Release succeeded, independently of UI outcome; failure of one UI
+scenario must not prevent inspection of the physical-SDK package. It remains
+unsigned/upload_readyfalse, and the whole job still fails if UI failed. Swift syntax,
+actionlint and diff checks pass; no extra Core/runtime replay was run locally.
+Expected295Core/179hosted/25UI/44PNG plus actual iphoneos archive checks, all pending
+for the next exact-source snapshot.

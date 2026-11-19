@@ -16,7 +16,7 @@ def export_review(result, output, *, tests_succeeded, source_sha=None):
     output.mkdir(parents=True, exist_ok=True)
     source_sha = source_sha or os.environ.get('GITHUB_SHA') or subprocess.check_output(['git', 'rev-parse', 'HEAD'], text=True).strip()
     source = Path(__file__).resolve().parents[1] / 'Tests/EntrixyUITests/NavigationUITests.swift'
-    required = set(re.findall(r'reviewCapture\("([a-z0-9-]+)"\)', source.read_text()))
+    required = set(re.findall(r'reviewCapture\("([a-z0-9-]+)"', source.read_text()))
     frames = {}
     with tempfile.TemporaryDirectory(prefix='entrixy-ui-attachments-') as temporary:
         subprocess.run(['xcrun', 'xcresulttool', 'export', 'attachments', '--path', str(result), '--output-path', temporary], check=True, timeout=120)

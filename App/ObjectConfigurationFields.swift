@@ -43,11 +43,13 @@ struct WebhookServerModeConfirmation: View {
             VStack(alignment: .leading, spacing: 18) {
                 Text(ProductText.string("webhook_server_mode_title")).font(.title3.bold()).accessibilityAddTraits(.isHeader)
                 Text(ProductText.string("webhook_server_mode_warning"))
+
+            }
+        } footer: {
                 HStack(spacing: 12) {
                     Button(ProductText.string("btn_cancel"), action: cancel).buttonStyle(SecondaryActionStyle())
                     Button(ProductText.string("btn_ok"), action: confirm).buttonStyle(PrimaryActionStyle())
                 }
-            }
         }
     }
 }

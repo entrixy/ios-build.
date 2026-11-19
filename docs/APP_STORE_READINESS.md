@@ -13,29 +13,36 @@
 они не ограничивают текущую разрешённую работу. Полный результат ещё не готов.
 Актуальные функциональные границы и проверки — [FUNCTIONAL_PORT.md](FUNCTIONAL_PORT.md).
 
-Последний общий Apple-прогон: native `c7fcaeb`, public `b575091`,
-[CI44474873776](https://github.com/entrixy/ios-build./actions/runs/44474873776):
-292core, Debug с WidgetKit/test bundles, Release/privacy-manifest packaging/isolation
-и176hosted без ошибок. В том же pass прошли23 из24UI; чтение accessibility диалога
-диагностики снова timeout. Root-sibling исправление не устранило эту ошибку.
-Общий результат — failure. Экспортированы38/42 оригинальных PNG; четыре состояния
-диагностики не достигнуты. Этот частичный комплект не опубликован и не принят.
+Последний общий Apple-прогон: native `98d4676`, public `3b806d7`,
+[CI44477923156](https://github.com/entrixy/ios-build./actions/runs/44477923156):
+295core, Debug с motion/native UIKit hosts/WidgetKit/test bundles,
+Release/privacy/isolation и179hosted без ошибок. UI25:24прошли, включая новую
+очередь сообщений/Close и локальное удаление ключа. Диагностика снова timeout
+accessibility query. Отдельный modal host НЕ устранил ошибку. Общий результат —
+failure.40/44 оригинальных PNG экспортированы, четыре состояния диагностики не
+достигнуты; новая галерея не опубликована/не принята.
 
-Новый общий пакет: отдельный UIKit host диагностики с прежним общим дизайном,
-неподвижный footer общих окон (устраняет обрезание кнопок длинной формы сервера),
-единые оставшиеся confirmation/error окна, независимые task barriers, frozen GPS
-по реальному Core Motion и автоматическая очередь защищённых сообщений владельца
-с durable read-on-Close. Локальные295core и4 pipeline contract checks прошли.
-Следующий источник ожидает179hosted/25UI/44PNG; Apple SDK/runtime/визуальная приёмка
-этих followups ещё не подтверждены. Подготовка галереи отклоняет неполный/упавший
-прогон и проверяет source/hash/размеры/один кадр каждого состояния.
+Следующий source сохраняет тексты/actions/readiness/тестовые assertions согласия,
+но внутри панели использует UIKit labels/buttons и явный порядок доступности;
+дизайн, геометрия, размеры/цвет/нажатие кнопок используют общие DesignMetrics.
+Также включены стабильный момент снимка, завершение общих fixed footers и
+двухрядный footer резервной копии вместо переноса слова в тесном ряду. Apple SDK/
+runtime/новые точные пиксели этих followups пока pending. Counts179hosted/25UI/44PNG
+не меняются. Галерея отклоняет incomplete/failed report и проверяет source/hash.
 
-Фоновая автоматика ограничена реальными Core Location/CoreBluetooth событиями,
-коротким разрешением одного target/template и отдельными manual/UI guards.
-PIN/confirm BLE остаётся ручным. Коалесцирование рекламы не доказывает выход:
-для rearm нужны3 дальних наблюдения с гистерезисом. SIM-call, постоянный WSS/APNs
-в фоне не заявлены. Уведомление открывает защищённый UI, не ставит FIRE в очередь.
-Физическая приёмка и полный перенос Android остаются открыты.
+Ограниченная фоновая BLE/свои local webhook, обычные entry/manual guards, UIKit
+очередь сообщений, frozen GPS/Core Motion и четыре widget lifecycle cases имеют
+свою проверочную базу; физическая проверка их поведения остаётся отдельно.
+PIN/confirm BLE ручной; коалесцирование рекламы не означает выход. SIM-call,
+постоянный WSS/APNs в фоне не заявлены реализованными. Полный App Store результат
+ещё не готов.
+
+Для следующего source-пакета добавлен unsigned Release archive с iphoneos SDK
+(приложение + виджет). Проверяются не только arm64, но и физическая iOS platform
+в Mach-O, privacy manifests, fixture isolation и отсутствие provisioning/signatures.
+Это исходник CI, ещё не результат сборки архива. Сам архив/IPA не публикуется;
+сохраняются лог и metadata с upload_ready=false. Подпись, устройство, TestFlight
+и App Store остаются отдельными неподтверждёнными шагами.
 
 App Group `group.com.entrixy.ios` и окончательные Bundle IDs должны быть настроены
 в Apple Developer team перед device signing. Подпись/профили не настроены.
