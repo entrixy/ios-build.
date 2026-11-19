@@ -3,3 +3,6 @@
 "Choose an object from Entrixy." = "Choose an object from Entrixy.";
 "Use object" = "Use object";
 "Control an object from your Home Screen." = "Control an object from your Home Screen.";
+
+/* OS-rendered generic alert; message text remains protected in the app. */
+"ENTRIXY_NEW_MESSAGE" = "New message from key owner";

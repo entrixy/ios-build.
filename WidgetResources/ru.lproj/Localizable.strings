@@ -3,3 +3,6 @@
 "Choose an object from Entrixy." = "Выберите объект Entrixy.";
 "Use object" = "Управлять объектом";
 "Control an object from your Home Screen." = "Управление объектом с экрана «Домой».";
+
+/* OS-rendered generic alert; message text remains protected in the app. */
+"ENTRIXY_NEW_MESSAGE" = "Новое сообщение от владельца ключа";
