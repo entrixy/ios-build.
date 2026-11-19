@@ -108,10 +108,10 @@ final class NavigationUITests: XCTestCase {
         XCTAssertTrue(route.waitForExistence(timeout:10)); XCTAssertTrue(route.label.contains("1"))
         setAutomationRule("location",to:false,in:app)
 
-        let wifi = setAutomationRule("wifi",to:true,in:app)
+        setAutomationRule("wifi",to:true,in:app)
         let modes = app.segmentedControls["automation-wifi-mode"]
         XCTAssertTrue(modes.waitForExistence(timeout:10)); bringIntoView(modes,in:app)
-        reviewCapture("automation-wifi-connect",settledBy:wifi)
+        reviewCapture("automation-wifi-connect",settledBy:modes)
         modes.buttons.element(boundBy:1).tap()
         reviewCapture("automation-wifi-fingerprint",settledBy:modes)
         setAutomationRule("wifi",to:false,in:app)
@@ -120,11 +120,13 @@ final class NavigationUITests: XCTestCase {
         let add = app.buttons["automation-time-add"]
         XCTAssertTrue(add.waitForExistence(timeout:10)); bringIntoView(add,in:app); add.tap()
         XCTAssertTrue(app.descendants(matching:.any).matching(identifier:"automation-time-start-0").firstMatch.waitForExistence(timeout:10))
+        bringIntoView(add,in:app)
         reviewCapture("automation-time-point",settledBy:add)
         let remove = app.buttons["automation-time-delete-0"]; bringIntoView(remove,in:app); remove.tap()
         let all = app.buttons["automation-combine-all"]; bringIntoView(all,in:app); all.tap()
         bringIntoView(add,in:app); add.tap()
         XCTAssertTrue(app.descendants(matching:.any).matching(identifier:"automation-time-end-0").firstMatch.waitForExistence(timeout:10))
+        bringIntoView(add,in:app)
         reviewCapture("automation-time-interval",settledBy:add)
         setAutomationRule("clock",to:false,in:app)
     }

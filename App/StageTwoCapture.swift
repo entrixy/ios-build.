@@ -52,6 +52,11 @@ struct StageTwoRoot: View {
     @StateObject private var model: AppModel
     init(route: StageTwoCapture) {
         self.route = route
+        // StateObject owns the fixture factory. View reconstruction must not
+        // create discarded models or write UserDefaults observed by that view.
+        _model = StateObject(wrappedValue:Self.makeModel(route:route))
+    }
+    @MainActor private static func makeModel(route:StageTwoCapture) -> AppModel {
         var state = SavedState(identity: Data(repeating: 83, count: 32), guests: [])
         if !route.isEmpty && (!route.isOwner || route == .mixedObjects) {
             let invite = try! GuestInvite.parse("https://controller.invalid/key#AAECAwQFBgcICQoLDA0ODxAREhMUFRYX" + String(repeating: "A", count: 43))
@@ -117,7 +122,7 @@ struct StageTwoRoot: View {
             app.ownerControl = OwnerControlModel(app:app,dialer:{ _ in false })
         }
         if route == .delegatingGuests { app.passManager = PassManager(app:app,api:StageTwoDelegationAPI()) }
-        _model = StateObject(wrappedValue: app)
+        return app
     }
     var body: some View {
         RootView(initialTab: route.mainTab, showAddKey: route == .addKey,
