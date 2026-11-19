@@ -119,9 +119,10 @@ struct RootView: View {
             // Reserve a real sibling layout region. UIKit lists inside a
             // NavigationStack can cover an outer safeAreaInset's hit targets.
             AppBottomNavigation(selection: $selectedTab, tabs: model.navigationState.tabs) { userPickedTab = true }
+                .disabled(!model.localTaskDialogs.isEmpty).accessibilityHidden(!model.localTaskDialogs.isEmpty)
         }
-        .accessibilityHidden(model.hasTaskDialog)
-        .allowsHitTesting(!model.hasTaskDialog)
+        .accessibilityHidden(model.hasRootDialog)
+        .allowsHitTesting(!model.hasRootDialog)
         .overlay { BackupFlowHost(flow:model.backupPresentation) }
         // Keep the modal a sibling of the hidden navigation tree. An overlay
         // on an accessibility-hidden ancestor can inherit that ancestor's
@@ -129,7 +130,6 @@ struct RootView: View {
         Group {
             if let prompt = model.actionPrompt { ActionConfirmation(request:prompt).id(prompt.id) }
             else if let accepted = model.keyAcceptance { KeyAcceptanceDialog(sensors:model.automationSensors,presentation:accepted).id(accepted.id) }
-            else if model.diagnosticConsentPrompt { DiagnosticConsentDialog(service:model.diagnostics) }
             else if let prompt = model.serverPrompt { ServerSettingsDialog(prompt:prompt).id(prompt.id) }
             else if let network = model.networkPrivacyPrompt { NetworkPrivacyDialog(network:network) }
             else if let prompt = model.codePrompt { AppCodeDialog(request:prompt).id(prompt.id) }
@@ -149,6 +149,10 @@ struct RootView: View {
         }
         }
         .background(Color(uiColor: .systemGroupedBackground).ignoresSafeArea())
+        .background(NativeTaskOverlay(isPresented:model.diagnosticConsentPrompt) {
+            DiagnosticConsentDialog(service:model.diagnostics).environmentObject(model)
+        }.frame(width:0,height:0))
+        .background(IncomingMessagePresenter(manager:model.messages).frame(width:0,height:0))
         .onChange(of: model.navigationState) { value in
             if !userPickedTab && value.hasActions && selectedTab == .settings { selectedTab = .control }
             else { selectedTab = value.resolve(selectedTab) }
@@ -188,9 +192,7 @@ struct RootView: View {
             if model.owners.contains(where:{ $0.server == company.server && $0.credentials != nil }) { AddOwnerObjectScreen(server:company.server) }
             else { AddOwnerServerScreen(initialServer:company.server) }
         }
-        .alert("Entrixy", isPresented: Binding(get: { model.errorMessage != nil && !adding }, set: { if !$0 && !adding { model.errorMessage = nil } })) {
-            Button("Понятно") { model.errorMessage = nil }
-        } message: { Text(model.errorMessage ?? "") }
+        .appMessageDialog("Entrixy",message:model.errorMessage ?? "",actionTitle:"Понятно",isPresented:Binding(get: { model.errorMessage != nil && !adding }, set: { if !$0 && !adding { model.errorMessage = nil } }))
     }
     private func receiveURL(_ url: URL) {
         if url.isFileURL, ["eib","ekb"].contains(url.pathExtension.lowercased()) {

@@ -4,3 +4,4 @@
 "NSLocationWhenInUseUsageDescription" = "Object coordinates, approach routes and the current Wi-Fi network for your configured rules";
 "NSLocationAlwaysAndWhenInUseUsageDescription" = "Run your configured approach rules while the app is in the background";
 "NSLocalNetworkUsageDescription" = "Connect to your controllers, webhooks and cameras on the local network";
+"NSMotionUsageDescription" = "Detect frozen location readings while the phone moves, for your configured location rules";

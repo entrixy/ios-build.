@@ -196,8 +196,8 @@ struct PassedAccessDetail: View {
         .sheet(isPresented: Binding(get: { editingSource != nil }, set: { if !$0 { editingSource = nil } })) {
             if let source = editingSource { EditPassedObjects(manager: manager, accessID: accessID, sourceID: source) }
         }
-        .confirmationDialog("Отозвать весь доступ по этой ссылке и цепочке ниже неё?", isPresented: $revoking, titleVisibility: .visible) {
-            Button("Отозвать доступ", role: .destructive) { Task { await manager.revoke(accessID, retry: true) } }
+        .appConfirmationDialog("Отозвать доступ?",message:"Отозвать весь доступ по этой ссылке и цепочке ниже неё?",actionTitle:"Отозвать доступ",destructive:true,isPresented:$revoking) {
+            Task { await manager.revoke(accessID, retry: true) }
         }
     }
 }

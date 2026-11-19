@@ -4,3 +4,4 @@
 "NSLocationWhenInUseUsageDescription" = "Coordenadas dos objetos, percursos de aproximação e rede Wi-Fi atual para as suas regras";
 "NSLocationAlwaysAndWhenInUseUsageDescription" = "Executar as suas regras de aproximação com a aplicação em segundo plano";
 "NSLocalNetworkUsageDescription" = "Ligar aos seus controladores, webhooks e câmaras na rede local";
+"NSMotionUsageDescription" = "Detetar coordenadas bloqueadas durante o movimento para as suas regras de localização";

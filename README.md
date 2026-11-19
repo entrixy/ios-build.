@@ -8,36 +8,37 @@ This repository is private working source; no new distribution license is assign
 
 The full Android port remains the active task. The gallery still contains the old
 19-frame catalogue; a new full native screenshot batch follows functional completion.
-Latest coherent Apple batch: native `3d3d578`, public `b021825`,
-[run44470840973](https://github.com/entrixy/ios-build./actions/runs/44470840973):
-289 core tests, Debug including widget/test products, Release/isolation and all173
-hosted native tests passed. The same simulator pass executed20 UI scenarios:
-19passed; diagnostic consent failed because the accessibility snapshot timed out.
-The entry-code and Home network switch scenarios passed. The overall run failed.
-It exported28 original checkpoint PNGs with source/test identifiers; four diagnostic
-checkpoints were not reached. This partial set is not the published gallery or
-complete visual acceptance.
+Latest coherent Apple batch: native `c7fcaeb`, public `b575091`,
+[run44474873776](https://github.com/entrixy/ios-build./actions/runs/44474873776):
+292 core tests, Debug including widget/test products, Release/privacy-manifest
+packaging/isolation and all176 hosted native tests passed. The same simulator pass
+executed24 UI scenarios:23passed; diagnostic consent again timed out while reading
+the accessibility snapshot. The root-sibling change did not resolve that failure.
+The overall run failed. It exported38/42 original checkpoint PNGs; four diagnostic
+states were not reached. This partial set is not the published gallery.
 
-The batch connects OS-event-driven background BLE and own local webhooks with
-short per-object automatic authority and expiration/cancellation. PIN/confirmation
-BLE remains manual-only, following Android. Calls and other foreground-only routes
-produce a local navigation notification; persistent background WSS/APNs is absent.
-Manual, entry and settings guards remain separate. Real-device acceptance is pending.
+Current followups use a separate UIKit hosting layer for diagnostic consent's
+accessibility, while retaining the shared compact SwiftUI design and test assertions.
+The dialog surface now supports a fixed footer: long content scrolls while the
+form's actions remain fully visible, addressing a clipped server-form screenshot.
+All remaining task confirmation menus and alerts now use the shared compact design
+with independent guards against automatic/Widget entry. Authenticated incoming owner
+messages show an oldest-first overlay queue; read status commits on Close, before
+network acknowledgement, and a failed write keeps the message unread.
 
-Current followups add authenticated key acceptance/welcome, conditional Android
-Home location/widget hints, app/widget required API manifests, a final authority
-check after durable storage and before physical writes, and additional actual
-issued-key/QR/message/presets/companies/sounds/backup review routes. The modal now
-occupies a sibling of the accessibility-hidden navigation tree; this is a proposed
-fix for the remaining snapshot failure, not an accepted runtime result.
+Background BLE and own local webhooks use short per-object automatic authority and
+expiration/cancellation. PIN/confirmation BLE remains manual-only, following Android.
+Calls and other foreground-only routes produce a local navigation notification;
+persistent background WSS/APNs is absent. Entry/manual/settings guards stay separate.
+Independent Core Motion now supports Android's frozen-location warning without
+inferring motion from GPS; local295 core tests passed, physical behavior is pending.
 
 CI builds test products once, verifies Release once, then runs hosted and UI cases
-in ONE simulator pass with original screenshot attachments at the UI checkpoints.
-No separate screen replay or duplicate light/dark variants. Latest local292 core
-and four pipeline contract checks passed. Next exact-source Apple verification
-expects176 hosted cases,24 UI scenarios and42 distinct checkpoint PNGs; these
-followups have not yet passed Apple compilation/runtime. Final visual/parity
-acceptance and gallery publication remain separate.
+in ONE simulator pass with original screenshots at the UI checkpoints. No separate
+screen replay or duplicate light/dark variants. The next source expects179 hosted
+cases,25 UI scenarios and44 distinct frames. The motion/dialog/message followups
+have not yet passed Apple SDK/runtime. Final visual/parity acceptance and gallery
+publication remain separate. Gallery preparation refuses partial or failed runs.
 Full background/device/release gates and the full Android port remain incomplete.
 Detailed scope and evidence: [FUNCTIONAL_PORT.md](docs/FUNCTIONAL_PORT.md).
 

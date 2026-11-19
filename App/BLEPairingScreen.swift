@@ -73,15 +73,11 @@ private struct BLEPairingContent: View {
         }
         .navigationTitle("Bluetooth-контроллер").navigationBarTitleDisplayMode(.inline)
         .onDisappear { if model.busy { model.suspend() } }
-        .confirmationDialog("Привязать свой контроллер?", isPresented: Binding(get: { selected != nil }, set: { if !$0 { selected = nil } }), titleVisibility: .visible) {
-            if let selected {
-                Button("Привязать") {
-                    let id = selected.id; self.selected = nil
-                    Task { await model.pair(discoveryID: id, server: server, label: label) }
-                }
+        .appConfirmationDialog("Привязать свой контроллер?",message:"Убедитесь, что выбран ваш контроллер в режиме привязки. Его название не является проверкой подлинности.",actionTitle:"Привязать",isPresented:Binding(get:{ selected != nil },set:{ if !$0 { selected = nil } })) {
+            if let selected { let id = selected.id; self.selected = nil
+                Task { await model.pair(discoveryID:id,server:server,label:label) }
             }
-            Button("Отмена", role: .cancel) { selected = nil }
-        } message: { Text("Убедитесь, что выбран ваш контроллер в режиме привязки. Его название не является проверкой подлинности.") }
+        }
     }
     private func status(_ record: BLEPairingRecord) -> String {
         if record.objectID != nil { return "Объект сохранён. Состояние добавления — в списке «Мои объекты»." }

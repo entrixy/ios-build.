@@ -4,3 +4,4 @@
 "NSLocationWhenInUseUsageDescription" = "Координаты объекта, маршруты подхода и текущая Wi-Fi сеть для настроенных вами правил";
 "NSLocationAlwaysAndWhenInUseUsageDescription" = "Выполнение настроенных вами правил приближения к объекту, когда приложение свёрнуто";
 "NSLocalNetworkUsageDescription" = "Соединение с вашими контроллерами, вебхуками и камерами в локальной сети";
+"NSMotionUsageDescription" = "Обнаружение зависших координат при движении телефона для настроенных вами геоправил";

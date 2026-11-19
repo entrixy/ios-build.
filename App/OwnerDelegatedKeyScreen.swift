@@ -40,11 +40,11 @@ struct OwnerDelegatedKeyScreen: View {
             } else { Text("Переданный ключ недоступен").foregroundStyle(Brand.secondaryInk) }
         }
         .navigationTitle("Переданный доступ").navigationBarTitleDisplayMode(.inline)
-        .confirmationDialog("Отозвать доступ у этого получателя и всей цепочки ниже него?", isPresented: $revoking, titleVisibility: .visible) {
-            Button("Отозвать доступ", role: .destructive) { Task { await app.revokeDelegatedKey(server: server, keyID: keyID) } }
+        .appConfirmationDialog("Отозвать доступ?",message:"Отозвать доступ у этого получателя и всей цепочки ниже него?",actionTitle:"Отозвать доступ",destructive:true,isPresented:$revoking) {
+            Task { await app.revokeDelegatedKey(server: server, keyID: keyID) }
         }
-        .confirmationDialog("Передать ту же сохранённую связку повторно? Команда открытия не отправляется.", isPresented: $retrying, titleVisibility: .visible) {
-            Button("Передать связку") { Task { await app.approveDelegatedKey(server: server, keyID: keyID, retry: true) } }
+        .appConfirmationDialog("Передать связку?",message:"Передать ту же сохранённую связку повторно? Команда открытия не отправляется.",actionTitle:"Передать связку",isPresented:$retrying) {
+            Task { await app.approveDelegatedKey(server: server, keyID: keyID, retry: true) }
         }
     }
     private func objectLabel(_ id: Int) -> String {

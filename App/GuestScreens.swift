@@ -252,8 +252,8 @@ struct KeyDetailScreen: View {
             } else { EmptyScreen(image: "icon-key", title: "Ключ удалён", detail: "Вы можете добавить его снова по ссылке владельца.") }
         }
         .navigationTitle("Полученный ключ").navigationBarTitleDisplayMode(.inline)
-        .confirmationDialog("Удалить ключ и его объекты с этого iPhone?", isPresented: $removing, titleVisibility: .visible) {
-            Button("Удалить ключ", role: .destructive) { model.removeKey(guestID); if !model.guests.contains(where: { $0.id == guestID }) { dismiss() } }
+        .appConfirmationDialog("Удалить ключ?",message:"Удалить ключ и его объекты с этого iPhone?",actionTitle:"Удалить ключ",destructive:true,isPresented:$removing) {
+            model.removeKey(guestID); if !model.guests.contains(where: { $0.id == guestID }) { dismiss() }
         }
     }
 }

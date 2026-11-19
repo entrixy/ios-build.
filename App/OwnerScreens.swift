@@ -200,9 +200,7 @@ struct AddOwnerObjectScreen: View {
             }, cancelled: { contacts = false })
         }
         .sheetDismissFooter(disabled: model.ownerBusy) { dismiss() }
-        .alert("Entrixy", isPresented: Binding(get: { model.errorMessage != nil }, set: { if !$0 { model.errorMessage = nil } })) {
-            Button("Понятно") { model.errorMessage = nil }
-        } message: { Text(model.errorMessage ?? "") }
+        .appMessageDialog("Entrixy",message:model.errorMessage ?? "",actionTitle:"Понятно",isPresented:Binding(get: { model.errorMessage != nil }, set: { if !$0 { model.errorMessage = nil } }))
         .accessibilityHidden(serverModeWarning)
         .overlay {
             if serverModeWarning {
@@ -357,12 +355,8 @@ private struct OwnerObjectEditorForm: View {
         }
         .sheet(isPresented: $automation) { AutomationEditor(destination: .object(.owned(server: server, objectID: objectID))) }
         .sheet(isPresented: $showingCredentials) { if let credentials { DeviceCredentialsSheet(credentials: credentials, server: server) } }
-        .alert("Entrixy", isPresented: Binding(get: { model.errorMessage != nil }, set: { if !$0 { model.errorMessage = nil } })) {
-            Button(ProductText.string("btn_ok")) { model.errorMessage = nil }
-        } message: { Text(model.errorMessage ?? "") }
-        .alert(ProductText.string("edit_object_no_creds_title"), isPresented: $noCredentials) {
-            Button(ProductText.string("btn_ok"), role: .cancel) {}
-        } message: { Text(ProductText.string("edit_object_no_creds_text")) }
+        .appMessageDialog("Entrixy",message:model.errorMessage ?? "",actionTitle:ProductText.string("btn_ok"),isPresented:Binding(get: { model.errorMessage != nil }, set: { if !$0 { model.errorMessage = nil } }))
+        .appMessageDialog(ProductText.string("edit_object_no_creds_title"),message:ProductText.string("edit_object_no_creds_text"),actionTitle:ProductText.string("btn_ok"),isPresented:$noCredentials)
         .task { if showDeleteOnLaunch { deleting = true } }
         .interactiveDismissDisabled(model.ownerBusy)
         .accessibilityHidden(serverModeWarning || deleting || confirmingMove)

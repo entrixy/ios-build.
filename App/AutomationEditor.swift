@@ -343,6 +343,9 @@ private struct AutomationCodeSetup: View {
                 field(ProductText.string("code_field_repeat"),value:$repeated)
                 Text(ProductText.string("code_forgot_warning")).font(.footnote).foregroundStyle(AppPalette.destructive)
                 if let message { Text(message).font(.footnote).foregroundStyle(AppPalette.destructive) }
+
+            }.disabled(working || !model.canManageGuestAccess)
+        } footer: {
                 HStack(spacing:12) {
                     Button(ProductText.string("btn_cancel"),action:close).buttonStyle(SecondaryActionStyle())
                     Button {
@@ -355,8 +358,7 @@ private struct AutomationCodeSetup: View {
                         }
                     } label: { ActionButtonLabel(title:ProductText.string("btn_save"),busy:working) }
                         .buttonStyle(PrimaryActionStyle()).disabled(code != repeated || !(4...8).contains(code.count))
-                }
-            }.disabled(working || !model.canManageGuestAccess)
+                }.disabled(working || !model.canManageGuestAccess)
         }
         .onDisappear { code = ""; repeated = "" }
         .onChange(of:scenePhase) { if $0 != .active { code = ""; repeated = "" } }

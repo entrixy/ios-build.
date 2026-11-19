@@ -40,8 +40,8 @@ private struct DelegationInboxContent: View {
             }
         }
         .navigationTitle("Ожидаемые ключи").navigationBarTitleDisplayMode(.inline)
-        .confirmationDialog("Удалить данные получателя? Ключи этой передачи могут стать невосстановимыми: потребуется новый доступ от владельца.", isPresented: Binding(get: { removing != nil }, set: { if !$0 { removing = nil } }), titleVisibility: .visible) {
-            Button("Удалить с iPhone", role: .destructive) { if let id = removing { app.removePendingDelegation(id) }; removing = nil }
+        .appConfirmationDialog("Удалить данные получателя?",message:"Ключи этой передачи могут стать невосстановимыми: потребуется новый доступ от владельца.",actionTitle:"Удалить с iPhone",destructive:true,isPresented:Binding(get:{ removing != nil },set:{ if !$0 { removing = nil } })) {
+            if let id = removing { app.removePendingDelegation(id) }; removing = nil
         }
     }
 }

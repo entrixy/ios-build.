@@ -17,11 +17,18 @@ final class AppModel: ObservableObject {
     @Published var networkPrivacyPrompt: PrivacyNetwork?
     @Published var diagnosticConsentPrompt = false
     @Published var keyAcceptance: KeyAcceptance?
+    @Published var incomingMessagePromptID: String?
     lazy var diagnostics = AppDiagnostics(app:self)
-    var hasTaskDialog: Bool {
+    @Published private(set) var localTaskDialogs = Set<UUID>()
+    func setLocalTaskDialog(_ id: UUID, presented: Bool) {
+        guard localTaskDialogs.contains(id) != presented else { return }
+        if presented { localTaskDialogs.insert(id) } else { localTaskDialogs.remove(id) }
+    }
+    var hasTaskDialog: Bool { hasRootDialog || !localTaskDialogs.isEmpty }
+    var hasRootDialog: Bool {
         actionPrompt != nil || bleInformationTarget != nil || objectRemovalTarget != nil || objectAvatarTarget != nil
         || ownerGuestRequestPending || companyRequestID != nil || guestRemovalTarget != nil || codePrompt != nil
-        || backupPromptPending || serverPrompt != nil || networkPrivacyPrompt != nil || diagnosticConsentPrompt || keyAcceptance != nil
+        || backupPromptPending || serverPrompt != nil || networkPrivacyPrompt != nil || diagnosticConsentPrompt || keyAcceptance != nil || incomingMessagePromptID != nil
     }
     let privacyRouter: ServerPrivacyRouter?
     private var unsavedGuestNetworkRestrictions = Set<String>()
@@ -1726,6 +1733,7 @@ final class AppModel: ObservableObject {
 
     func suspend(preserveAutomation: Bool = false) {
         backgroundMonitoring = false; backgroundActionScope = nil
+        incomingMessagePromptID = nil; localTaskDialogs.removeAll()
         diagnosticConsentPrompt = false; diagnostics.pause()
         networkPrivacyPrompt = nil
         bleInformationTarget = nil

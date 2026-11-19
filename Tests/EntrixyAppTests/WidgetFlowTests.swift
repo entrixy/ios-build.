@@ -22,6 +22,24 @@ private final class WidgetAccessMemory: StateStorage {
         app.ownerControl = OwnerControlModel(app:app,dialer:{ _ in XCTFail("Widget must retain the action gate"); return false })
         return (app,storage,WidgetObjectID.forTarget(.owned(server:owner.server,objectID:object.id)))
     }
+    func testLocalTaskDialogsBlockWidgetEntryIndependentlyAndNeverPersistADeferredTap() async throws {
+        let (app,storage,id) = try fixture(); defer { app.suspend() }
+        let inbox = WidgetActionInbox(automaticallyDispatches:false); inbox.bind(app); inbox.setReady(true)
+        let first = UUID(), second = UUID()
+        app.setLocalTaskDialog(first,presented:true); app.setLocalTaskDialog(second,presented:true)
+        XCTAssertTrue(app.hasTaskDialog); XCTAssertFalse(app.hasRootDialog)
+        XCTAssertFalse(inbox.enqueue(id)); await inbox.dispatchPending(); XCTAssertNil(app.actionPrompt)
+        app.setLocalTaskDialog(first,presented:false)
+        XCTAssertTrue(app.hasTaskDialog); XCTAssertFalse(inbox.enqueue(id))
+        app.setLocalTaskDialog(second,presented:false)
+        XCTAssertFalse(app.hasTaskDialog)
+        await inbox.dispatchPending(); XCTAssertNil(app.actionPrompt)
+        // Only a new explicit tap after dismissal can reach the ordinary gate.
+        XCTAssertTrue(inbox.enqueue(id)); await inbox.dispatchPending(); XCTAssertNotNil(app.actionPrompt)
+        XCTAssertTrue(storage.state.journal?.isEmpty ?? true)
+        app.setLocalTaskDialog(first,presented:true); app.suspend()
+        XCTAssertTrue(app.localTaskDialogs.isEmpty); inbox.cancel()
+    }
     func testTapWaitsForAppReadinessAndUsesExistingConfirmationExactlyOnce() async throws {
         let (app,storage,id) = try fixture(); defer { app.suspend() }
         let inbox = WidgetActionInbox(automaticallyDispatches:false), invocation = UUID()

@@ -57,6 +57,9 @@ struct ActionConfirmation: View {
                     Text(ProductText.string("automation_confirm_hint_guest")).font(.body)
                 }
                 if let message { Text(message).font(.footnote).foregroundStyle(AppPalette.destructive) }
+
+            }.disabled(working || !isCurrent)
+        } footer: {
                 HStack(spacing:12) {
                     Button(ProductText.string("btn_cancel")) { close() }.buttonStyle(SecondaryActionStyle())
                     if needsSetup || authentication == nil || allowsPIN {
@@ -65,8 +68,7 @@ struct ActionConfirmation: View {
                         }.buttonStyle(PrimaryActionStyle()).accessibilityIdentifier("action-confirmation-submit")
                             .disabled((needsSetup || allowsPIN) && (!(4...8).contains(code.count) || (needsSetup && code != repeatedCode)))
                     }
-                }
-            }.disabled(working || !isCurrent)
+                }.disabled(working || !isCurrent)
         }
             .task {
                 AppSoundCenter.shared.play(.confirm)

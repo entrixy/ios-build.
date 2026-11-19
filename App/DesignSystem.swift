@@ -142,22 +142,46 @@ private struct DialogContentHeight: PreferenceKey {
 /// One content tree for layout, interaction and accessibility. A tall dialog
 /// scrolls; constructing two copies of its observed controls in ViewThatFits
 /// can leave the accessibility snapshot evaluating both copies indefinitely.
-struct AppDialogSurface<Content: View>: View {
+private struct DialogFooterHeight: PreferenceKey {
+    static var defaultValue: CGFloat = 0
+    static func reduce(value:inout CGFloat,nextValue:()->CGFloat) { value = max(value,nextValue()) }
+}
+
+struct AppDialogSurface<Content:View,Footer:View>: View {
     @ViewBuilder let content: () -> Content
+    @ViewBuilder let footer: () -> Footer
+    private let hasFooter: Bool
     @State private var contentHeight: CGFloat = 0
+    @State private var footerHeight: CGFloat = 0
+    init(@ViewBuilder content:@escaping () -> Content) where Footer == EmptyView {
+        self.content = content; self.footer = { EmptyView() }; hasFooter = false
+    }
+    init(@ViewBuilder content:@escaping () -> Content,@ViewBuilder footer:@escaping () -> Footer) {
+        self.content = content; self.footer = footer; hasFooter = true
+    }
     var body: some View {
         GeometryReader { proxy in
             ZStack {
                 Color.black.opacity(0.35).ignoresSafeArea().contentShape(Rectangle()).onTapGesture { }
                     .accessibilityHidden(true)
-                ScrollView {
-                    content().frame(maxWidth:.infinity,alignment:.leading).fixedSize(horizontal:false,vertical:true)
-                        .background(GeometryReader { size in Color.clear.preference(key:DialogContentHeight.self,value:size.size.height) })
-                }.scrollIndicators(.hidden)
-                    .frame(height:min(contentHeight > 0 ? contentHeight : max(1,proxy.size.height-88),max(1,proxy.size.height-88)))
-                    .onPreferenceChange(DialogContentHeight.self) { height in
-                        if abs(contentHeight-height) > 0.5 { contentHeight = height }
+                VStack(spacing:hasFooter ? 18 : 0) {
+                    let available = max(1,proxy.size.height-88-(hasFooter ? footerHeight+18 : 0))
+                    ScrollView {
+                        content().frame(maxWidth:.infinity,alignment:.leading).fixedSize(horizontal:false,vertical:true)
+                            .background(GeometryReader { size in Color.clear.preference(key:DialogContentHeight.self,value:size.size.height) })
+                    }.scrollIndicators(.hidden)
+                        .frame(height:min(contentHeight > 0 ? contentHeight : available,available))
+                        .onPreferenceChange(DialogContentHeight.self) { height in
+                            if abs(contentHeight-height) > 0.5 { contentHeight = height }
+                        }
+                    if hasFooter {
+                        footer().frame(maxWidth:.infinity).fixedSize(horizontal:false,vertical:true)
+                            .background(GeometryReader { size in Color.clear.preference(key:DialogFooterHeight.self,value:size.size.height) })
+                            .onPreferenceChange(DialogFooterHeight.self) { height in
+                                if abs(footerHeight-height) > 0.5 { footerHeight = height }
+                            }
                     }
+                }
                     .padding(24).frame(width: min(max(0, proxy.size.width - 32), 420))
                     .background(Color(uiColor: .secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 20))
                     .padding(.vertical, 20)
@@ -180,12 +204,63 @@ struct AppConfirmationDialog: View {
             VStack(alignment: .leading, spacing: 18) {
                 Text(title).font(.title3.bold()).accessibilityAddTraits(.isHeader)
                 Text(message).font(.body).fixedSize(horizontal: false, vertical: true)
+
+            }
+        } footer: {
                 HStack(spacing: 12) {
                     Button(ProductText.string("btn_cancel"), action: cancel).buttonStyle(SecondaryActionStyle())
                     Button(role: destructive ? .destructive : nil, action: confirm) { Text(actionTitle) }
                         .buttonStyle(PrimaryActionStyle())
                 }
-            }
         }
     }
+}
+
+
+/// A task-local confirmation shares the root dialog's design while remaining
+/// above its actual sheet/navigation host. It never inherits hidden content's AX.
+private struct TaskDialog<Dialog:View>: ViewModifier {
+    @EnvironmentObject private var model: AppModel
+    @Environment(\.scenePhase) private var phase
+    @State private var barrier = UUID()
+    @Binding var presented: Bool
+    @ViewBuilder let dialog: () -> Dialog
+    func body(content: Content) -> some View {
+        ZStack {
+            content.accessibilityHidden(presented).allowsHitTesting(!presented)
+            if presented {
+                dialog()
+            }
+        }
+        .navigationBarBackButtonHidden(presented)
+        .onAppear { model.setLocalTaskDialog(barrier,presented:presented) }
+        .onChange(of:presented) { model.setLocalTaskDialog(barrier,presented:$0) }
+        .onChange(of:phase) { if $0 == .background { presented = false; model.setLocalTaskDialog(barrier,presented:false) } }
+        .onDisappear { model.setLocalTaskDialog(barrier,presented:false) }
+    }
+}
+
+extension View {
+    func appConfirmationDialog(_ title: String, message: String, actionTitle: String,
+                               destructive: Bool = false, isPresented: Binding<Bool>,
+                               confirm: @escaping () -> Void) -> some View {
+        modifier(TaskDialog(presented:isPresented) {
+            AppConfirmationDialog(title:title,message:message,actionTitle:actionTitle,destructive:destructive,
+                cancel:{ isPresented.wrappedValue = false },confirm:{ confirm(); isPresented.wrappedValue = false })
+        })
+    }
+    func appMessageDialog(_ title: String, message: String, actionTitle: String,
+                          isPresented: Binding<Bool>) -> some View {
+        modifier(TaskDialog(presented:isPresented) {
+            AppDialogSurface {
+                VStack(alignment:.leading,spacing:18) {
+                    Text(title).font(.title3.bold()).accessibilityAddTraits(.isHeader)
+                    Text(message).fixedSize(horizontal:false,vertical:true)
+                }
+            } footer: {
+                Button(actionTitle) { isPresented.wrappedValue = false }.buttonStyle(PrimaryActionStyle())
+            }
+        })
+    }
+
 }

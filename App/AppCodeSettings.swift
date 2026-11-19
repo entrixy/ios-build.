@@ -71,11 +71,13 @@ struct AppCodeDialog: View {
                     field(ProductText.string("code_field_repeat"),text:$repeated)
                 } else { field(ProductText.string("code_current"),text:$current) }
                 if let error { Text(error).font(.footnote).foregroundStyle(AppPalette.destructive) }
+
+            }.disabled(working || !model.canManageGuestAccess)
+        } footer: {
                 HStack(spacing:12) {
                     Button(ProductText.string("btn_cancel")) { model.codePrompt = nil }.buttonStyle(SecondaryActionStyle())
                     Button { submit() } label: { ActionButtonLabel(title:ProductText.string(settingUp ? "btn_save" : "btn_ok"),busy:working) }.buttonStyle(PrimaryActionStyle()).disabled(!ready)
-                }
-            }.disabled(working || !model.canManageGuestAccess)
+                }.disabled(working || !model.canManageGuestAccess)
         }
     }
     private func field(_ title: String,text: Binding<String>) -> some View {

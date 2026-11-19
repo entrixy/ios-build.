@@ -16,6 +16,7 @@ enum StageTwoCapture: String, CaseIterable {
     case diagnostics
     case keyAccepted = "key-accepted"
     case ownerIssued = "owner-issued"
+    case incomingMessage = "incoming-message"
     static var current: Self? {
         let args = ProcessInfo.processInfo.arguments
         guard let i = args.firstIndex(of: "--stage-two"), args.indices.contains(i + 1) else { return nil }
@@ -30,7 +31,7 @@ enum StageTwoCapture: String, CaseIterable {
         }
     }
     var mainTab: AppTab {
-        switch self { case .guestControl, .ownerControl, .ownerConfirmation, .ownerCodeConfirmation, .keyAccepted: return .control; case .ownerGuests, .delegatingGuests, .ownerIssued: return .guests; case .journal: return .journal; default: return .settings }
+        switch self { case .guestControl, .ownerControl, .ownerConfirmation, .ownerCodeConfirmation, .keyAccepted, .incomingMessage: return .control; case .ownerGuests, .delegatingGuests, .ownerIssued: return .guests; case .journal: return .journal; default: return .settings }
     }
     var isOwner: Bool { [.ownerObjects, .ownerGuests, .addServer, .ownerExpanded, .addObject, .objectDelete, .ownerControl, .mixedObjects, .ownerConfirmation, .ownerCodeConfirmation, .ownerBLEObjects, .ownerIssued].contains(self) }
     var isEmpty: Bool { [.empty, .addKey, .deviceClaim].contains(self) }
@@ -57,6 +58,10 @@ struct StageTwoRoot: View {
             guest.incomingDepth = route == .delegatingGuests ? 1 : 0
             if route == .keyAccepted { guest.welcome = "Добро пожаловать! Въезд со стороны двора."; guest.checkedAt = Date() }
             state.guests = [guest]
+            if route == .incomingMessage {
+                var message = SavedMessage(guestID:guest.id,cipher:try! GuestMessageCrypto.seal("Здравствуйте! Въезд со стороны двора. После проезда закройте ворота.",bundleKey:invite.bundleKey),receivedAt:Date())
+                message.deliveryAcknowledged = true; state.incomingMessages = [message]
+            }
         }
         if route.isOwner {
             var owner = try! OwnerAccount(importing: "controller.invalid", masterKey: Data(repeating: 22, count: 32), credentials: OwnerCredentials(deviceID: String(repeating: "a", count: 32), deviceSecret: String(repeating: "b", count: 64)))
@@ -83,6 +88,7 @@ struct StageTwoRoot: View {
         }
         if route == .networkPrivacy { state.networkPrivacy = try! NetworkPrivacyPreferences(own:[PrivacyNetwork(ssid:"Home fixture")]) }
         let app = AppModel(storage:StageTwoStorage(state),privacyRouter:route == .networkPrivacy ? ServerPrivacyRouter() : nil)
+        if route == .incomingMessage { app.messages = MessageManager(app:app,acknowledgements:StageMessageAcknowledgements()) }
         if route == .diagnostics {
             UserDefaults.standard.set(false,forKey:"entrixy.developerMode")
             app.diagnostics = AppDiagnostics(app:app,storage:StageDiagnosticStorage(),api:StageDiagnosticAPI(),usesMetricKit:false)
@@ -116,6 +122,9 @@ private final class StageDiagnosticStorage: DiagnosticStorage {
     private var state = DiagnosticState()
     func load() throws -> DiagnosticState { state }
     func save(_ state: DiagnosticState) throws { try state.validate(); self.state = state }
+}
+private struct StageMessageAcknowledgements: GuestMessageTransport {
+    func acknowledgeMessage(invite:GuestInvite,fingerprint:String,kind:MessageAcknowledgement,hash:String) async throws {}
 }
 private struct StageDiagnosticAPI: DiagnosticTransport {
     func send(_ report: DiagnosticReport) async throws { try report.validate() }

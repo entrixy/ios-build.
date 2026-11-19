@@ -139,3 +139,48 @@ extension MessageManagerTests {
         XCTAssertEqual(target.state?.identity, Data(repeating: 41, count: 32))
     }
 }
+
+
+extension MessageManagerTests {
+    func testUnreadNoticeQueuePreservesOrderAndFailedCloseNeverAcknowledgesRead() async throws {
+        let invite = try invite(), ack = MessageAckStub(), storage = MessageStorage(invite)
+        let model = AppModel(storage:storage), manager = MessageManager(app:model,acknowledgements:ack)
+        let first = try GuestMessageCrypto.seal("Первое",bundleKey:invite.bundleKey)
+        let second = try GuestMessageCrypto.seal("Второе",bundleKey:invite.bundleKey)
+        await manager.receive(first,guestID:invite.id); await manager.receive(second,guestID:invite.id)
+        await manager.receive(first,guestID:invite.id)
+        XCTAssertEqual(model.incomingMessages.count,2)
+        let id = try XCTUnwrap(manager.nextUnreadNotice()?.id)
+        XCTAssertEqual(try manager.text(XCTUnwrap(manager.nextUnreadNotice())),"Первое")
+        let barrier = UUID(); model.setLocalTaskDialog(barrier,presented:true)
+        XCTAssertNil(manager.nextUnreadNotice()); model.setLocalTaskDialog(barrier,presented:false)
+        model.incomingMessagePromptID = id
+        XCTAssertNil(manager.nextUnreadNotice())
+        // Closing the app/temporarily losing presentation does not mark a display read.
+        model.incomingMessagePromptID = nil; XCTAssertEqual(manager.nextUnreadNotice()?.id,id)
+        storage.fail = true; XCTAssertFalse(manager.markRead(id))
+        XCTAssertNil(model.incomingMessages.first(where:{ $0.id == id })?.readAt)
+        XCTAssertFalse(ack.acks.contains { $0.0 == .read }); XCTAssertEqual(manager.nextUnreadNotice()?.id,id)
+        storage.fail = false; XCTAssertTrue(manager.markRead(id))
+        XCTAssertEqual(try manager.text(XCTUnwrap(manager.nextUnreadNotice())),"Второе")
+        await manager.retryAcknowledgements()
+        XCTAssertEqual(ack.acks.filter { $0.0 == .read }.count,1)
+        let restored = AppModel(storage:storage), resumed = MessageManager(app:restored,acknowledgements:ack)
+        XCTAssertEqual(try resumed.text(XCTUnwrap(resumed.nextUnreadNotice())),"Второе")
+        XCTAssertTrue(restored.journal.isEmpty)
+    }
+    func testCorruptNoticeCannotShowOrAcquireReadStatusAndBackgroundCannotRead() async throws {
+        let invite = try invite(), ack = MessageAckStub(), storage = MessageStorage(invite)
+        let model = AppModel(storage:storage), manager = MessageManager(app:model,acknowledgements:ack)
+        let wrong = SavedMessage(guestID:invite.id,cipher:try GuestMessageCrypto.seal("Чужое",bundleKey:Data(repeating:99,count:32)),receivedAt:Date())
+        try model.saveMessages(incoming:[wrong])
+        XCTAssertNil(manager.nextUnreadNotice()); XCTAssertFalse(manager.markRead(wrong.id))
+        XCTAssertTrue(ack.acks.isEmpty); XCTAssertNil(model.incomingMessages.first?.readAt)
+        let cipher = try GuestMessageCrypto.seal("Настоящее",bundleKey:invite.bundleKey)
+        await manager.receive(cipher,guestID:invite.id)
+        let valid = try XCTUnwrap(manager.nextUnreadNotice())
+        model.suspend()
+        XCTAssertNil(manager.nextUnreadNotice()); XCTAssertFalse(manager.markRead(valid.id))
+        XCTAssertFalse(ack.acks.contains { $0.0 == .read }); XCTAssertTrue(model.journal.isEmpty)
+    }
+}

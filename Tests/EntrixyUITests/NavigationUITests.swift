@@ -76,6 +76,20 @@ final class NavigationUITests: XCTestCase {
         XCTAssertTrue(app.staticTexts["Журнал пуст. Здесь будут появляться вызовы."].waitForExistence(timeout: 5))
         reviewCapture("journal")
     }
+    func testIncomingOwnerMessageUsesCompactOverlayUntilCloseAndDoesNotRunAnAction() {
+        let app = XCUIApplication()
+        app.launchArguments = ["--stage-two","incoming-message","-AppleLanguages","(ru)","-AppleLocale","ru_RU"]
+        app.launch(); activeApp = app
+        let title = app.staticTexts["incoming-message-title"]
+        XCTAssertTrue(title.waitForExistence(timeout:20))
+        XCTAssertTrue(app.descendants(matching:.any).matching(identifier:"incoming-message-body").firstMatch.exists)
+        reviewCapture("message-incoming")
+        app.coordinate(withNormalizedOffset:CGVector(dx:0.95,dy:0.15)).tap()
+        XCTAssertTrue(title.exists)
+        app.buttons["incoming-message-close"].tap()
+        XCTAssertTrue(app.buttons["main-tab-control"].waitForExistence(timeout:10))
+        XCTAssertFalse(title.exists); assertBottom(app,["control","settings","journal"])
+    }
     func testAcceptedKeyShowsOwnerWelcomeUntilOKAndKeepsBottomNavigation() {
         let app = XCUIApplication()
         app.launchArguments = ["--stage-two","key-accepted","-AppleLanguages","(ru)","-AppleLocale","ru_RU"]
@@ -276,6 +290,14 @@ final class NavigationUITests: XCTestCase {
         XCTAssertTrue(key.waitForExistence(timeout: 5)); key.tap()
         XCTAssertTrue(app.buttons["Обновить данные"].waitForExistence(timeout: 5))
         reviewCapture("received-key-detail")
+        app.buttons["Удалить ключ с iPhone"].tap()
+        XCTAssertTrue(app.staticTexts["Удалить ключ?"].waitForExistence(timeout:5))
+        let cancel = app.buttons["Отмена"], remove = app.buttons["Удалить ключ"]
+        XCTAssertTrue(cancel.isHittable); XCTAssertTrue(remove.isHittable)
+        XCTAssertEqual(cancel.frame.height,remove.frame.height,accuracy:1)
+        reviewCapture("received-key-delete-confirmation")
+        cancel.tap()
+        XCTAssertTrue(app.buttons["Обновить данные"].waitForExistence(timeout:5))
         assertBottom(app, ["control", "settings", "journal"])
         app.navigationBars.buttons.firstMatch.tap()
         XCTAssertTrue(key.waitForExistence(timeout: 5))
@@ -461,8 +483,11 @@ final class NavigationUITests: XCTestCase {
         XCTAssertTrue(host.waitForExistence(timeout:10)); XCTAssertTrue(host.isEnabled)
         XCTAssertTrue(app.textFields["Почта"].exists); XCTAssertTrue(app.secureTextFields["Пароль"].exists)
         XCTAssertFalse(app.navigationBars.buttons["Отмена"].exists)
+        let cancel = app.buttons["Отмена"]
+        XCTAssertTrue(cancel.isHittable)
+        XCTAssertTrue(app.frame.insetBy(dx:0,dy:1).contains(cancel.frame))
         reviewCapture("server-account")
-        app.buttons["Отмена"].tap()
+        cancel.tap()
         XCTAssertTrue(add.waitForExistence(timeout:10)); assertBottom(app,["settings","journal"])
     }
 

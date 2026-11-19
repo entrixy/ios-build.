@@ -68,6 +68,7 @@ targets:
               public.filename-extension: [ekb]
         CFBundleDisplayName: Entrixy
         CFBundleLocalizations: [en, ru, de, es, fr, pt, zh]
+        NSMotionUsageDescription: Обнаружение зависших координат при движении телефона для настроенных вами геоправил
         NSCameraUsageDescription: Сканирование QR-кода гостевого ключа Entrixy
         NSBluetoothAlwaysUsageDescription: Поиск, привязка и управление вашими контроллерами Entrixy поблизости
         NSFaceIDUsageDescription: Подтверждение действий с объектами Entrixy

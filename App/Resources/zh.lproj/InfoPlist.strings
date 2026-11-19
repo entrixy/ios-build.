@@ -4,3 +4,4 @@
 "NSLocationWhenInUseUsageDescription" = "获取已配置规则所需的对象坐标、接近路线及当前 Wi-Fi 网络";
 "NSLocationAlwaysAndWhenInUseUsageDescription" = "应用在后台时执行您配置的接近规则";
 "NSLocalNetworkUsageDescription" = "连接本地网络中的控制器、Webhook 和摄像头";
+"NSMotionUsageDescription" = "为您配置的位置规则检测手机移动时位置读数是否停滞";

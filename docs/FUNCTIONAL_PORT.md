@@ -1371,3 +1371,117 @@ SOURCE counts; the active earlier20/32 batch is preserved until its result. New
 syntax, four pipeline contract checks and diff checks passed. No new screenshots
 have yet been claimed, visually accepted or published. This remains a current
 feature review, not proof of every device-dependent Android scenario.
+
+
+## Independent motion and frozen-location warning — 19 November 2026, source
+
+Android GeoTracker.locationUnreliable has two branches. The new followup preserves
+its second branch: accurate coordinates that stay within40m of the anchor for
+more than240s warn only with independent linear acceleration >=0.2m/s² in the last
+60s and a live location fix younger than90s. Accurate motion beyond40m resets the
+anchor. GPS speed and repeated coordinates cannot manufacture motion evidence.
+
+AutomationSensors samples CMMotionManager.userAcceleration at2Hz only with active,
+authorized geo tracking. Gravity-free values convert from g to m/s². Samples older
+than2s are discarded by monotonic timestamp; stopped/replaced callbacks cannot
+update a new session. No history is stored, backed up or transmitted. Core Motion
+may suspend in background: missing samples do not imply motion, do not trigger an
+action and do not become a new background entitlement. The existing poor-accuracy
+branch remains functional without motion. Turning geo off/denying location hides
+the diagnostic. Seven localized NSMotionUsageDescription strings were added.
+
+Apple's Core Motion/NSMotionUsageDescription documentation was checked before
+adding the native integration. Local295Core tests pass (three new independent
+frozen/noise/reset cases); full Swift syntax parse passes. Apple SDK compilation,
+real sensor availability/permission and physical warning behavior are pending.
+This followup is not in active publicb575091's292Core/176hosted/24UI/42PNG batch.
+
+## Shared confirmations and error dialogs — 19 November 2026, source followup
+
+A full App/*.swift search found eight remaining native confirmation menus and
+five alert placements outside the approved compact dialog design. Received-key
+removal, pending-recipient removal, BLE renewal, owner/delegated/passed revocation,
+recipient bundle retransmission and BLE pairing now use AppConfirmationDialog.
+General task errors and missing device credentials use its single-action variant.
+The same target-specific mutation functions, pairing warning, selected TTL and
+retry flags remain; no action runs on cancel. There are no remaining .alert or
+.confirmationDialog calls in App sources. System permission/file/contact pickers
+remain native operating-system flows.
+
+TaskDialog places the modal beside its own hidden content tree and above its
+actual sheet host. Ephemeral per-presentation IDs block automation and Widget
+entry; independent dialogs cannot clear another's guard. Root dialogs and local
+barriers are separate so hiding the root cannot hide a child task's controls.
+Local presentations close on background/disappearance and barriers clear on
+suspend; they are not persisted and do not queue physical actions. Root navigation
+is disabled/hidden to accessibility while a local confirmation is open.
+
+One new hosted SOURCE case verifies two concurrent local guards, widget rejection
+without deferred replay, a fresh later tap returning to the ordinary policy gate,
+no journal/physical action, and suspension cleanup. The existing received-key UI
+scenario now inspects equal-height confirmation buttons and cancels without
+removing the key, adding one distinct screenshot. Expected next source totals:
+295Core /177hosted /24UI /43PNG. Swift syntax parse, four pipeline contract checks
+and diff validation pass; Apple compilation/runtime/visual acceptance are pending.
+Active publicb575091 remains the earlier292Core/176hosted/24UI/42PNG snapshot.
+
+
+## Incoming owner message overlay — 19 November 2026, source followup
+
+Android MainActivity.incomingMessage shows an overlay automatically, with owner
+text/linkification and Close. Only dismissal clears that pending message and
+sends read acknowledgement. The prior iOS implementation only had a message list
+and explicit reader; that functional discrepancy was found by reading Android.
+
+IncomingMessagePresenter now presents the same AppDialogSurface over the active
+UIKit task host, using only authenticated, protected unread records. Oldest unread
+comes first; duplicate ciphertext does not create another entry. Presentation is
+blocked behind another task dialog and while app entry/background access is denied.
+Its separate UIKit host avoids inheriting the root's hidden accessibility state
+and can sit above a currently open form, without replacing its navigation/state.
+System permission/alert UI is not interrupted. View disappearance/background,
+key removal or corrupt content dismiss without read; unread records survive restart.
+
+Close authenticates again and durably saves readAt before dismissing; a failed
+write keeps the message unread/visible. Acknowledgement runs after the commit and
+does not hold the Close button behind a network reply. Existing retry logic retains
+the same ciphertext hash after a lost acknowledgement. No message text is logged,
+no backup schema changed, and this is foreground WSS/unread replay, not APNs.
+Links share the bounded plain-text http/https/mailto detector used by key welcome.
+
+Two new hosted SOURCE cases check oldest-first/dedupe, other-dialog deferral,
+presentation-versus-read, failed durable Close, relaunch, corrupt content and
+background rejection. A new UI fixture is encrypted with the software-only guest
+key and uses isolated acknowledgement transport; UI checks one automatic message,
+outside-tap non-dismissal and Close back to the same bottom navigation, with one
+original screenshot from that test. Next source expected:295Core/179hosted/25UI/
+44distinct PNG. Syntax parse and pipeline4 checks pass; Apple SDK/runtime/visual
+acceptance are still pending. Active publicb575091 remains the earlier snapshot.
+
+
+## Actual combined followup result and next dialog fix — 19 November 2026
+
+Nativec7fcaeb/publicb575091, Apple44474873776/job135392870537:292Core,
+Debug/test products, Release including app/widget privacy manifest packaging and
+fixture isolation,176hosted0(10.393s) passed. UI24/23pass/1fail(731.886s): diagnostic
+consent's first accessibility query still times out. The previous root-sibling
+change DID NOT fix it.38/42 unmodified native PNGs exported; four diagnostic states
+missing. Archive14506544001 SHA25699eb9a48e0329cf96a3756de4f81ebe87b963284ff603cec83fc27c4ff4f51ad.
+Not a successful complete review; no new gallery publication.
+
+New source keeps the actual diagnostic dialog/actions/assertions and presents it
+through NativeTaskOverlay, a separate transparent UIKit overFullScreen host with
+modal accessibility. Its content does not inherit the hidden SwiftUI settings List
+AX state. Binding/background/dismantle dismiss it; appearance follows the presenter.
+No diagnostic consent or network submission is fabricated or bypassed.
+
+Visual inspection of the actual b021 server-account frame also found footer buttons
+partly outside the scrolling viewport. AppDialogSurface now has a measured fixed
+footer variant. Long content scrolls above the actions; compact confirmations,
+server configuration, PIN setup, diagnostic consent, key welcome and incoming
+messages use that footer. The existing server UI case now requires Cancel hittable
+and fully inside the app frame before taking its checkpoint. Other scenarios keep
+the same actual assertions. Full Swift syntax/pipeline4/diff checks pass. New
+Apple SDK/runtime and exact pixels require the next combined batch, not a claim
+based on source. Next total295Core/179hosted/25UI/44PNG, including all earlier
+motion/shared-dialog/incoming-message followups; no separate screenshot replay.

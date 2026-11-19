@@ -4,3 +4,4 @@
 "NSLocationWhenInUseUsageDescription" = "Objektkoordinaten, Annäherungsrouten und aktuelles WLAN für Ihre Regeln";
 "NSLocationAlwaysAndWhenInUseUsageDescription" = "Ihre Annäherungsregeln ausführen, während die App im Hintergrund ist";
 "NSLocalNetworkUsageDescription" = "Mit Ihren Controllern, Webhooks und Kameras im lokalen Netzwerk verbinden";
+"NSMotionUsageDescription" = "Erkennen eingefrorener Standortdaten bei Bewegung für Ihre eingerichteten Standortregeln";

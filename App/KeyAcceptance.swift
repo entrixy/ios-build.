@@ -41,13 +41,14 @@ struct KeyAcceptanceDialog: View {
                 if let welcome = guest?.welcome,!welcome.isEmpty {
                     VStack(alignment:.leading,spacing:8) {
                         Text(ProductText.string("owner_says_label")).font(.subheadline.bold())
-                        Text(linkified(welcome)).textSelection(.enabled).privacySensitive()
+                        Text(productLinkified(welcome)).textSelection(.enabled).privacySensitive()
                             .accessibilityIdentifier("key-owner-welcome")
                     }
                 }
+            }.foregroundStyle(Brand.ink)
+        } footer: {
                 Button(ProductText.string("btn_ok")) { model.keyAcceptance = nil }
                     .buttonStyle(PrimaryActionStyle()).accessibilityIdentifier("key-accepted-ok")
-            }.foregroundStyle(Brand.ink)
         }.task { if needsWiFi { sensors.refreshNetwork() } }
     }
     private func check(_ key: String, ready: Bool?) -> some View {
@@ -57,7 +58,9 @@ struct KeyAcceptanceDialog: View {
             Text(ProductText.string(key)).font(.subheadline)
         }
     }
-    private func linkified(_ value: String) -> AttributedString {
+}
+
+func productLinkified(_ value: String) -> AttributedString {
         var result = AttributedString()
         var cursor = value.startIndex
         guard let detector = try? NSDataDetector(types:NSTextCheckingResult.CheckingType.link.rawValue) else { return AttributedString(value) }
@@ -71,4 +74,3 @@ struct KeyAcceptanceDialog: View {
         result += AttributedString(String(value[cursor...]))
         return result
     }
-}

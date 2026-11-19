@@ -13,21 +13,22 @@
 они не ограничивают текущую разрешённую работу. Полный результат ещё не готов.
 Актуальные функциональные границы и проверки — [FUNCTIONAL_PORT.md](FUNCTIONAL_PORT.md).
 
-Последний общий Apple-прогон: native `3d3d578`, public `b021825`,
-[CI44470840973](https://github.com/entrixy/ios-build./actions/runs/44470840973):
-289core, Debug с WidgetKit/test bundles, Release/isolation и173hosted без ошибок.
-В том же simulator pass прошли19 из20 UI-сценариев; диагностика упала на чтении
-accessibility snapshot диалога. Переключатели входа и домашней сети прошли.
-Общий результат — failure. Экспортированы28 оригинальных PNG, четыре состояния
+Последний общий Apple-прогон: native `c7fcaeb`, public `b575091`,
+[CI44474873776](https://github.com/entrixy/ios-build./actions/runs/44474873776):
+292core, Debug с WidgetKit/test bundles, Release/privacy-manifest packaging/isolation
+и176hosted без ошибок. В том же pass прошли23 из24UI; чтение accessibility диалога
+диагностики снова timeout. Root-sibling исправление не устранило эту ошибку.
+Общий результат — failure. Экспортированы38/42 оригинальных PNG; четыре состояния
 диагностики не достигнуты. Этот частичный комплект не опубликован и не принят.
 
-Текущие followups: приветствие из проверенного bundle/подтверждение приёма ключа,
-Android Home GPS/widget hints, required API manifests app/widget, проверка фоновой
-полномочности после durable save перед FIRE/POST, расширение UI маршрутов выданного
-ключа, QR, сообщения, пресетов, компаний, звуков и пароля копии. Диалог вынесен
-в отдельного соседа скрытого navigation tree; исправление AX ещё требует прогона.
-Локальные292core и4 pipeline contract checks прошли. Следующий общий Apple-пакет
-ожидает176hosted/24UI/42PNG — это ещё не результат исполнения.
+Новый общий пакет: отдельный UIKit host диагностики с прежним общим дизайном,
+неподвижный footer общих окон (устраняет обрезание кнопок длинной формы сервера),
+единые оставшиеся confirmation/error окна, независимые task barriers, frozen GPS
+по реальному Core Motion и автоматическая очередь защищённых сообщений владельца
+с durable read-on-Close. Локальные295core и4 pipeline contract checks прошли.
+Следующий источник ожидает179hosted/25UI/44PNG; Apple SDK/runtime/визуальная приёмка
+этих followups ещё не подтверждены. Подготовка галереи отклоняет неполный/упавший
+прогон и проверяет source/hash/размеры/один кадр каждого состояния.
 
 Фоновая автоматика ограничена реальными Core Location/CoreBluetooth событиями,
 коротким разрешением одного target/template и отдельными manual/UI guards.

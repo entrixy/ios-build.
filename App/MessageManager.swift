@@ -36,17 +36,28 @@ final class MessageManager: ObservableObject {
             try await acknowledge(saved.id)
         } catch { message = "Сообщение не удалось проверить или сохранить. Подтверждение чтения не отправлялось." }
     }
-    func read(_ id: String) async {
+    func nextUnreadNotice() -> SavedMessage? {
+        guard app.canManageGuestAccess, !app.hasTaskDialog else { return nil }
+        return app.incomingMessages.reversed().first { $0.readAt == nil && (try? text($0)) != nil }
+    }
+    @discardableResult func markRead(_ id: String) -> Bool {
+        guard app.canManageGuestAccess else { return false }
         do {
-            guard let i = app.incomingMessages.firstIndex(where: { $0.id == id }) else { return }
+            guard let i = app.incomingMessages.firstIndex(where: { $0.id == id }) else { return false }
             _ = try text(app.incomingMessages[i])
             if app.incomingMessages[i].readAt == nil {
-                var updated = app.incomingMessages
-                updated[i].readAt = Date()
-                try app.saveMessages(incoming: updated) // Actual display is durable before read acknowledgement.
+                var updated = app.incomingMessages; updated[i].readAt = Date()
+                try app.saveMessages(incoming:updated)
             }
-            try await acknowledge(id)
-        } catch { message = "Не удалось сохранить подтверждение чтения. Сообщение осталось на этом iPhone." }
+            message = nil; return true
+        } catch {
+            message = "Не удалось сохранить подтверждение чтения. Сообщение осталось на этом iPhone."; return false
+        }
+    }
+    func read(_ id: String) async {
+        guard markRead(id) else { return }
+        do { try await acknowledge(id) }
+        catch { message = "Не удалось сохранить подтверждение чтения. Сообщение осталось на этом iPhone." }
     }
     func retryAcknowledgements() async {
         guard app.canManageGuestAccess else { return }

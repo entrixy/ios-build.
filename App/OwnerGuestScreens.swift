@@ -124,9 +124,7 @@ struct IssueOwnerKeyScreen: View {
                 }
                 .onDisappear { if task == nil, let editingKeyID { model.endEditingGuestKey(editingKeyID) } }
                 .sheet(item: $task, onDismiss: { if let owner { draft.syncSavedSettings(owner: owner) } }) { task in nested(task) }
-                .alert("Entrixy", isPresented: Binding(get: { model.errorMessage != nil }, set: { if !$0 { model.errorMessage = nil } })) {
-                    Button(ProductText.string("btn_ok")) { model.errorMessage = nil }
-                } message: { Text(model.errorMessage ?? "") }
+                .appMessageDialog("Entrixy",message:model.errorMessage ?? "",actionTitle:ProductText.string("btn_ok"),isPresented:Binding(get: { model.errorMessage != nil }, set: { if !$0 { model.errorMessage = nil } }))
         }
     }
     @ViewBuilder private func objectRow(_ entry: CatalogObject) -> some View {
@@ -302,11 +300,11 @@ struct OwnerKeyScreen: View {
         }
         .sheet(isPresented: $editing) { IssueOwnerKeyScreen(serverPreset: server, editingKeyID: keyID, editAccessOnLaunch: reviewingRestoredAccess) }
         .task { if showRevokeOnLaunch { revoking = true } }
-        .confirmationDialog("Продлить Bluetooth-пропуска на выбранный срок?", isPresented: $renewingBLE, titleVisibility: .visible) {
-            Button("Продлить") { Task { await model.renewOwnerBLEKey(server: server, keyID: keyID) } }
+        .appConfirmationDialog("Продлить Bluetooth-пропуска?",message:"Продлить Bluetooth-пропуска на выбранный срок?",actionTitle:"Продлить",isPresented:$renewingBLE) {
+            Task { await model.renewOwnerBLEKey(server: server, keyID: keyID) }
         }
-        .confirmationDialog("Отозвать ключ? Гость и получатели переданного им доступа потеряют доступ.", isPresented: $revoking, titleVisibility: .visible) {
-            Button("Отозвать ключ", role: .destructive) { Task { await model.revokeOwnerKey(server: server, keyID: keyID) } }
+        .appConfirmationDialog("Отозвать ключ?",message:"Гость и получатели переданного им доступа потеряют доступ.",actionTitle:"Отозвать ключ",destructive:true,isPresented:$revoking) {
+            Task { await model.revokeOwnerKey(server: server, keyID: keyID) }
         }
     }
 }

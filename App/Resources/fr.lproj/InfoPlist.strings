@@ -4,3 +4,4 @@
 "NSLocationWhenInUseUsageDescription" = "Coordonnées des objets, trajets d’approche et Wi-Fi actuel pour vos règles";
 "NSLocationAlwaysAndWhenInUseUsageDescription" = "Exécuter vos règles d’approche lorsque l’application est en arrière-plan";
 "NSLocalNetworkUsageDescription" = "Se connecter à vos contrôleurs, webhooks et caméras sur le réseau local";
+"NSMotionUsageDescription" = "Détecter les positions figées lorsque le téléphone bouge pour vos règles de localisation";

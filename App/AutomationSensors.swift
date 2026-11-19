@@ -1,6 +1,7 @@
 import Foundation
 import Combine
 import CoreLocation
+import CoreMotion
 import NetworkExtension
 import EntrixyCore
 
@@ -25,7 +26,32 @@ struct AutomationWiFiNetwork: Equatable {
     private var tracking = false
     private var backgroundTrackingRequested = false
     private var quality = LocationQualityMonitor()
-    func locationUnreliable(at date: Date = Date()) -> Bool { quality.unreliable(at:date) }
+    private let motion = CMMotionManager()
+    private var motionGeneration = UUID()
+    func locationUnreliable(at date: Date = Date()) -> Bool { tracking && (locationAuthorization == .authorizedAlways || locationAuthorization == .authorizedWhenInUse) && quality.unreliable(at:date) }
+
+    private func stopMotionObservation() {
+        motionGeneration = UUID(); motion.stopDeviceMotionUpdates()
+    }
+    private func startMotionObservation() {
+        guard motion.isDeviceMotionAvailable, !motion.isDeviceMotionActive else { return }
+        let generation = UUID(); motionGeneration = generation
+        // Diagnostic only; no activity history, persistence or transmission.
+        // Core Motion may stop in the background: missing samples are not motion.
+        motion.deviceMotionUpdateInterval = 0.5
+        motion.startDeviceMotionUpdates(to:.main) { [weak self] sample,error in
+            guard error == nil, let sample,
+                  ProcessInfo.processInfo.systemUptime >= sample.timestamp,
+                  ProcessInfo.processInfo.systemUptime-sample.timestamp <= 2 else { return }
+            let a = sample.userAcceleration
+            let magnitude = sqrt(a.x*a.x+a.y*a.y+a.z*a.z)*9.80665
+            let received = Date()
+            Task { @MainActor [weak self] in
+                guard let self, self.tracking, self.motionGeneration == generation else { return }
+                self.quality.receiveMotion(at:received,acceleration:magnitude)
+            }
+        }
+    }
 
     override init() {
         super.init()
@@ -69,10 +95,11 @@ struct AutomationWiFiNetwork: Equatable {
         if enabled && !tracking { quality.reset(at:Date()) }
         tracking = enabled
         backgroundTrackingRequested = enabled && background
-        if !enabled { manager.stopUpdatingLocation(); manager.stopMonitoringSignificantLocationChanges(); return }
+        if !enabled { stopMotionObservation(); manager.stopUpdatingLocation(); manager.stopMonitoringSignificantLocationChanges(); return }
         guard manager.authorizationStatus == .authorizedAlways || manager.authorizationStatus == .authorizedWhenInUse else { return }
         manager.allowsBackgroundLocationUpdates = background && manager.authorizationStatus == .authorizedAlways
         manager.pausesLocationUpdatesAutomatically = false
+        startMotionObservation()
         manager.startUpdatingLocation()
         if manager.authorizationStatus == .authorizedAlways { manager.startMonitoringSignificantLocationChanges() }
     }
@@ -90,7 +117,7 @@ struct AutomationWiFiNetwork: Equatable {
             if !requests.isEmpty { manager.requestLocation() }
             if tracking { trackLocation(enabled: true, background: backgroundTrackingRequested) }
             refreshNetwork()
-        case .denied, .restricted: finishLocation(.failure(CLError(.denied)))
+        case .denied, .restricted: stopMotionObservation(); finishLocation(.failure(CLError(.denied)))
         default: break
         }
     }
@@ -102,7 +129,7 @@ struct AutomationWiFiNetwork: Equatable {
         if latest.horizontalAccuracy <= 100 { finishLocation(.success(latest)) }
         // Core Location can deliver a batch after waking the app. Preserve the
         // real route order instead of replacing the corridor with its last fix.
-        for fix in fresh { quality.receive(at:fix.timestamp,accuracy:fix.horizontalAccuracy); onLocation?(fix) }
+        for fix in fresh { quality.receive(at:fix.timestamp,accuracy:fix.horizontalAccuracy,position:AutomationGeoPoint(lat:fix.coordinate.latitude,lon:fix.coordinate.longitude)); onLocation?(fix) }
     }
 
     func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
