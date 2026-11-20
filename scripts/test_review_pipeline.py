@@ -74,6 +74,37 @@ class ReviewPipelineTests(unittest.TestCase):
             with self.assertRaises(subprocess.TimeoutExpired):
                 create_booted_device('tests','iphone','runtime',appearance='light')
 
+    def testRendererStallAlsoRecoversBeforeAnyAppStarts(self):
+        commands = []
+        def execute(*args, **kwargs):
+            commands.append(args)
+            if args[1:3] == ('simctl','create'):
+                return 'first' if sum(c[1:3] == ('simctl','create') for c in commands) == 1 else 'second'
+            return ''
+        def renderer(device):
+            commands.append(('renderer',device))
+            if device == 'first':
+                raise subprocess.TimeoutExpired(('screenshot',device),90)
+        with patch('capture_simulator.run',side_effect=execute),patch.dict('os.environ',{'GITHUB_ACTIONS':'true'}):
+            result = create_booted_device('tests','iphone','runtime',appearance='light',readiness_probe=renderer)
+        self.assertEqual(result,'second')
+        self.assertLess(commands.index(('xcrun','simctl','delete','first')),commands.index(('renderer','second')))
+        self.assertEqual(commands[-1],('renderer','second'))
+        self.assertIn(('killall','-9','com.apple.CoreSimulator.CoreSimulatorService'),commands)
+
+    def testRepeatedRendererFailureStopsAfterTwoDevices(self):
+        commands = []
+        def execute(*args, **kwargs):
+            commands.append(args)
+            return 'device' if args[1:3] == ('simctl','create') else ''
+        def renderer(device):
+            raise subprocess.TimeoutExpired(('screenshot',device),90)
+        with patch('capture_simulator.run',side_effect=execute),patch.dict('os.environ',{'GITHUB_ACTIONS':'false'}):
+            with self.assertRaises(subprocess.TimeoutExpired):
+                create_booted_device('tests','iphone','runtime',appearance='light',readiness_probe=renderer)
+        self.assertEqual(sum(c[1:3] == ('simctl','create') for c in commands),2)
+        self.assertFalse(any(c[0] == 'killall' for c in commands))
+
     def testReviewConfigurationPreservesOriginalProductsAndAddsCaptureOnlyToUITarget(self):
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)

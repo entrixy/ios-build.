@@ -15,6 +15,19 @@ def source_sha():
     return os.environ.get('GITHUB_SHA') or subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip()
 
 
+def capture_health_frame(device, frame):
+    # Renderer readiness belongs to the same bounded cold-boot recovery as the
+    # appearance service. No app has been installed or scenario started yet.
+    frame.unlink(missing_ok=True)
+    run('xcrun','simctl','io',device,'screenshot','--type=png',str(frame),timeout=90)
+    data = frame.read_bytes()
+    if data[:8] != b'\x89PNG\r\n\x1a\n' or len(data) < 29:
+        raise RuntimeError('Simulator UI did not produce a native frame')
+    width,height = struct.unpack('>II',data[16:24])
+    if min(width,height) <= 0:
+        raise RuntimeError('Empty simulator frame')
+
+
 def prepared_device(path, runtime, *, check_ui=True, missing_ok=False):
     report = json.loads(Path(path).read_text())
     if report.get('source_sha') != source_sha() or report.get('runtime') != runtime:
@@ -56,16 +69,12 @@ def main():
         # The disposable runner owns every device here; never do this on a
         # developer's Mac. Finish migrations before compiler memory pressure.
         run('xcrun','simctl','shutdown','all',timeout=30,optional=True)
-    device = create_booted_device('isolated review','com.apple.CoreSimulator.SimDeviceType.iPhone-16',runtime,appearance='light')
+    frame = args.output.parent/'simulator-preflight.png'
+    device = create_booted_device('isolated review','com.apple.CoreSimulator.SimDeviceType.iPhone-16',runtime,appearance='light',
+                                 readiness_probe=lambda device: capture_health_frame(device,frame))
     try:
-        frame = args.output.parent/'simulator-preflight.png'
-        run('xcrun','simctl','io',device,'screenshot','--type=png',str(frame),timeout=30)
         data = frame.read_bytes()
-        if data[:8] != b'\x89PNG\r\n\x1a\n' or len(data) < 29:
-            raise RuntimeError('Simulator UI did not produce a native frame')
         width,height = struct.unpack('>II',data[16:24])
-        if min(width,height) <= 0:
-            raise RuntimeError('Empty simulator frame')
         report = dict(kind='simulator-health-only',source_sha=source_sha(),runtime=runtime,sdk=sdk,
                       architecture=platform.machine(),device=device,width=width,height=height,
                       product_screenshot=False,app_scenarios_started=False)

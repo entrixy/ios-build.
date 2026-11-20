@@ -17,7 +17,7 @@
 
 ## Проверки этого source
 
-Локально: frontend parse App/Widget/hosted/UI, diff check, девять capture-pipeline
+Локально: frontend parse App/Widget/hosted/UI, diff check, одиннадцать capture-pipeline
 контрактов прошли. Ядро не менялось: повторный Linux core-прогон не нужен.
 Следующий общий Apple пакет ожидает312core/197hosted/29UI/58оригинальныхPNG.
 Две новые контрольные точки — меню логотипа и production-диалог запроса гостя
@@ -62,3 +62,14 @@ NavigationStack, чтобы проверять реальное нажатие C
 
 Native List reordering supports long press without an EditButton:
 [Apple list reordering](https://developer.apple.com/documentation/swiftui/making-a-view-into-a-drag-source#Enable-list-reordering).
+
+## Preflight renderer recovery
+
+Publicac720ee/run44783534129:312core прошли; до app compilation системный
+renderer завис на simctl screenshot (30s), хотя appearance уже отвечал. Поэтому
+новых hosted/UI/PNG/archive результатов нет. Проверка самого renderer теперь
+внутри существующего bounded двухпопыточного cold-boot recovery, до установки
+приложения. На diagnostic screenshot отведено90s; реальные UI assertions,
+сценарии и правила оригинальных изображений не изменены. Два regression-контракта
+подтверждают восстановление и остановку после второй неудачи без запуска app.
+Все11 pipeline contracts прошли; требуется новый настоящий Apple runtime.

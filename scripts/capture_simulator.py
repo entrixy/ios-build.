@@ -34,7 +34,7 @@ def cleanup_device(device):
     run('xcrun', 'simctl', 'delete', device, timeout=30, optional=True)
 
 
-def create_booted_device(model, device_type, runtime, *, appearance=None):
+def create_booted_device(model, device_type, runtime, *, appearance=None, readiness_probe=None):
     # Recovery is allowed only before any app scenario or command has started.
     # A stuck CoreSimulator service cannot be repaired by creating another device.
     for attempt in range(2):
@@ -49,6 +49,8 @@ def create_booted_device(model, device_type, runtime, *, appearance=None):
             # scenario, inside the same bounded cold-boot recovery boundary.
             if appearance is not None:
                 run('xcrun', 'simctl', 'ui', device, 'appearance', appearance, timeout=60)
+            if readiness_probe is not None:
+                readiness_probe(device)
             return device
         except (RuntimeError, subprocess.TimeoutExpired):
             if device:
