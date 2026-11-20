@@ -95,3 +95,25 @@ Diagnostic send/message теперь полностью прокручивают
 Каждый DEBUG StageTwo профиль сбрасывает скрытый developer flag, чтобы failed
 предыдущий кейс не менял следующий. Production preferences не сбрасываются.
 Локальные11pipeline и Swift frontend parse прошли, actual новый Applepending.
+
+## Полный runtime979fb93 и три остатка
+
+Run44800924688/native761a49c:312core/197hosted/Debug/Release прошли.
+29UI завершены:26passed/3failed,56из58PNG. CallClose/GEO/maps/WiFi/time/
+developerReport/QR прошли. Набор overallfailed, не опубликован.
+Реальные PNG и запись drag показали распознанный gesture (row opacity), но без
+перестановки: geometry preferences через отдельные List hosts не дают общего
+каталога кадров. Каждая строка теперь сообщает собственный CGRect через
+onGeometryChange (Apple availability iOS16); durable reorder выполняется один
+раз на drop, сохраняя исходные измерения до завершения жеста. Тот же UI drag
+и проверка порядка в обоих разделах сохранены.
+
+Device-claim code и server row находились ниже viewport lazy list. Проверки
+теперь прокручивают конкретное поле в передний список до exists/value/capture,
+не заменяют его искусственным элементом. Screenshot device-claim ждёт сам code.
+Пакет CI сохраняет312/197/29/58 и Release/archive, но UI+artifact теперь ДО
+Release: неудачный runtime виден раньше; Release log сохраняется в отдельном
+iphone-release-evidence вместе с physical archive evidence. Публикация по-прежнему
+требует complete58 и весь CI success. Swift parse/YAML/11pipeline PASS.
+
+[Apple onGeometryChange, iOS16](https://developer.apple.com/documentation/swiftui/view/ongeometrychange(for:of:action:)).

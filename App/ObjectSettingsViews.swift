@@ -92,13 +92,6 @@ struct ObjectSourceLabel: View {
     }
 }
 
-private struct ObjectRowFrames: PreferenceKey {
-    static var defaultValue: [String:CGRect] = [:]
-    static func reduce(value: inout [String:CGRect], nextValue: () -> [String:CGRect]) {
-        value.merge(nextValue(),uniquingKeysWith:{ _,new in new })
-    }
-}
-
 struct ObjectSettingsRows: View {
     @EnvironmentObject private var model: AppModel
     let entries: [CatalogObject]
@@ -175,14 +168,17 @@ struct ObjectSettingsRows: View {
                     }
                 }
             }.padding(.vertical, 8)
-                .background(GeometryReader { geometry in
-                    Color.clear.preference(key:ObjectRowFrames.self,value:[entry.target.id:geometry.frame(in:.global)])
-                }.allowsHitTesting(false))
+                .onGeometryChange(for:CGRect.self) { geometry in
+                    geometry.frame(in:.global)
+                } action: { frame in
+                    // Each List cell owns its geometry callback. Preferences
+                    // collected above the ForEach can be isolated by cell hosts.
+                    rowFrames[entry.target.id] = frame
+                }
                 .opacity(dragging == entry.target ? 0.75 : 1)
                 .listRowSeparator(.hidden)
                 .listRowBackground(Color(uiColor: .secondarySystemGroupedBackground))
         }
-        .onPreferenceChange(ObjectRowFrames.self) { rowFrames = $0 }
         .sheet(item: $task) { task in
             switch task {
             case .edit(let target):
@@ -209,7 +205,7 @@ struct ObjectSettingsRows: View {
             .updating($dragging) { value,state,_ in
                 if case .second(true,_) = value { state = target }
             }
-            .onChanged { value in
+            .onEnded { value in
                 guard model.canManageGuestAccess,
                       case .second(true,let drag?) = value else { return }
                 var targets = model.catalogObjects().map(\.target)
@@ -219,6 +215,7 @@ struct ObjectSettingsRows: View {
                           return drag.location.y >= frame.minY && drag.location.y <= frame.maxY
                       }),source != destination else { return }
                 targets.remove(at:source); targets.insert(target,at:destination)
+                // Persist once on drop, using the unchanged measured row frames.
                 withAnimation(.easeInOut(duration:0.18)) { model.reorderObjects(targets) }
             }
     }

@@ -89,8 +89,9 @@ final class NavigationUITests: XCTestCase {
         return control
     }
     private func bringFullyIntoView(_ element:XCUIElement,in app:XCUIApplication) {
-        let list = app.collectionViews.firstMatch
-        let container = list.exists ? list : app
+        let lists = app.collectionViews
+        let count = lists.count
+        let container = count > 0 ? lists.element(boundBy:count-1) : app
         for _ in 0..<22 {
             let viewport = container.frame.insetBy(dx:0,dy:8)
             let frame = element.exists ? element.frame : .null
@@ -406,10 +407,11 @@ final class NavigationUITests: XCTestCase {
         app.launchArguments = ["--stage-two","device-claim","-AppleLanguages","(ru)","-AppleLocale","ru_RU"]
         app.launch(); activeApp = app
         let code = app.textFields["device-claim-code"]
+        XCTAssertTrue(app.textFields["Название"].waitForExistence(timeout:20))
+        bringFullyIntoView(code,in:app)
         XCTAssertTrue(code.waitForExistence(timeout:20)); XCTAssertEqual(code.value as? String,"A1B2C3D4")
         XCTAssertTrue(app.staticTexts.matching(NSPredicate(format:"label CONTAINS %@","factory.invalid:8443")).firstMatch.exists)
-        XCTAssertTrue(app.textFields["Название"].exists)
-        reviewCapture("device-claim")
+        reviewCapture("device-claim",settledBy:code)
         app.buttons["Отмена"].tap()
         assertBottom(app,["settings","journal"])
         XCTAssertTrue(app.staticTexts["Пока нет объектов"].exists)
@@ -692,9 +694,11 @@ final class NavigationUITests: XCTestCase {
     func testServerRowsAndCompactAccountDialogStayInSystemAndCancelWithoutRegistration() {
         let app = launch("empty")
         app.segmentedControls.buttons["Система"].tap()
-        XCTAssertTrue(app.buttons["server-select-entrixy.com"].waitForExistence(timeout:10))
+        let existing = app.buttons["server-select-entrixy.com"]
+        bringFullyIntoView(existing,in:app)
+        XCTAssertTrue(existing.waitForExistence(timeout:10))
         let add = app.buttons["server-add"]
-        for _ in 0..<6 { if add.isHittable { break }; app.swipeUp() }
+        bringFullyIntoView(add,in:app)
         XCTAssertTrue(add.isHittable)
         add.tap()
         let host = app.textFields["server-host"]
