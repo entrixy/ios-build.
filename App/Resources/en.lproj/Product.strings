@@ -951,3 +951,16 @@
 "ios_call_confirmation_required" = "iOS requires you to confirm a phone call. The app cannot end the call automatically.";
 "ios_call_guest_confirmation_required" = "iOS always asks for system confirmation before a call. Calls cannot start in the background.";
 "ios_call_imported_hangup" = "The Android setting to end calls after %d seconds has been preserved.";
+
+// iOS review: accessible actions and explicit telephone requests.
+"ios_website" = "Website";
+"ios_object_reorder" = "Reorder objects";
+"ios_move_up" = "Move up";
+"ios_move_down" = "Move down";
+"ios_guest_call_explicit" = "Every guest request needs your action. Tap Call, then confirm the call in iOS. Requests are received while Entrixy is open.";
+"ios_guest_call_notification" = "Show a request notification";
+"ios_guest_call_notification_denied" = "Allow Entrixy notifications in iPhone Settings.";
+"ios_guest_call_request_title" = "%@ requests access";
+"ios_guest_call_request_body" = "Object: %@. Open Entrixy to make the call.";
+"ios_guest_call_expired" = "The request has expired";
+"ios_call_now" = "Call";

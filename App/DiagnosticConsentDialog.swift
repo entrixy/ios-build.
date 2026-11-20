@@ -143,6 +143,7 @@ private final class ConsentActionButton: UIButton {
             button.titleLabel?.font = .preferredFont(forTextStyle:.headline)
             button.titleLabel?.adjustsFontForContentSizeCategory = true
             button.titleLabel?.numberOfLines = 0
+            button.titleLabel?.textAlignment = .center
             button.contentEdgeInsets = UIEdgeInsets(top:DesignMetrics.actionVerticalPadding,left:DesignMetrics.actionHorizontalPadding,
                 bottom:DesignMetrics.actionVerticalPadding,right:DesignMetrics.actionHorizontalPadding)
             button.layer.cornerRadius = DesignMetrics.actionRadius; button.clipsToBounds = true
@@ -198,6 +199,13 @@ private final class ConsentActionButton: UIButton {
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         guard scroll.bounds.width > 0 else { return }
+        let rowWidth = max(0,(scroll.bounds.width-DesignMetrics.dialogActionGap)/2)
+        let stacked = [later,allow].contains { button in
+            let font = button.titleLabel?.font ?? UIFont.preferredFont(forTextStyle:.headline)
+            return ((button.title(for:.normal) ?? "") as NSString).size(withAttributes:[.font:font]).width+2*DesignMetrics.actionHorizontalPadding > rowWidth+0.5
+        }
+        let axis: NSLayoutConstraint.Axis = stacked ? .vertical : .horizontal
+        if footer.axis != axis { footer.axis = axis; view.setNeedsLayout() }
         let fitting = CGSize(width:scroll.bounds.width,height:UIView.layoutFittingCompressedSize.height)
         let textHeight = labels.systemLayoutSizeFitting(fitting,withHorizontalFittingPriority:.required,verticalFittingPriority:.fittingSizeLevel).height
         let buttonsHeight = footer.systemLayoutSizeFitting(fitting,withHorizontalFittingPriority:.required,verticalFittingPriority:.fittingSizeLevel).height

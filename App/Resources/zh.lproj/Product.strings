@@ -951,3 +951,16 @@
 "ios_call_confirmation_required" = "iOS 要求确认拨打电话。应用无法自动挂断电话。";
 "ios_call_guest_confirmation_required" = "iOS 始终要求通过系统确认拨号。无法在后台拨打电话。";
 "ios_call_imported_hangup" = "已保留 Android 的 %d 秒后自动挂断设置。";
+
+// iOS review: accessible actions and explicit telephone requests.
+"ios_website" = "网站";
+"ios_object_reorder" = "调整对象顺序";
+"ios_move_up" = "上移";
+"ios_move_down" = "下移";
+"ios_guest_call_explicit" = "每个访客请求都需要您操作。点击“拨打”，然后在 iOS 中确认通话。仅在 Entrixy 打开时接收请求。";
+"ios_guest_call_notification" = "显示请求通知";
+"ios_guest_call_notification_denied" = "请在 iPhone 设置中允许 Entrixy 通知。";
+"ios_guest_call_request_title" = "%@ 请求访问";
+"ios_guest_call_request_body" = "对象：%@。请打开 Entrixy 以拨打电话。";
+"ios_guest_call_expired" = "请求已过期";
+"ios_call_now" = "拨打";

@@ -16,7 +16,7 @@ enum CatalogObject: Identifiable {
     var kind: String {
         switch self { case let .owned(_, object): return object.kind; case let .received(_, object): return object.kind }
     }
-    var sourceLabel: String { switch self { case .owned: return "Свой"; case .received: return "Гостевой" } }
+    var sourceLabel: String { switch self { case .owned: return ProductText.string("source_mine"); case .received: return ProductText.string("action_source_guest") } }
     var originalLabel: String {
         switch self {
         case let .owned(owner, object): return (try? object.metadata(masterKey: owner.masterKey)["label"] as? String) ?? "Название недоступно"

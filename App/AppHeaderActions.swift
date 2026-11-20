@@ -1,23 +1,44 @@
 import SwiftUI
 
+struct AppLogoMenu: View {
+    let help: () -> Void
+    var body: some View {
+        Menu {
+            Menu { AppLanguageChoices() } label: { Label(ProductText.string("ios_language"),systemImage:"globe") }
+                .accessibilityIdentifier("header-language")
+            Button(action:help) { Label(ProductText.string("tab_help"),systemImage:"questionmark.circle") }
+                .accessibilityIdentifier("header-help")
+            Link(destination:URL(string:"https://entrixy.com/")!) { Label(ProductText.string("ios_website"),systemImage:"safari") }
+                .accessibilityIdentifier("header-website")
+        } label: { BrandLogo() }
+            .buttonStyle(.plain).foregroundStyle(Brand.ink)
+            .accessibilityLabel("Entrixy").accessibilityIdentifier("header-menu")
+    }
+}
+
+private struct AppLanguageChoices: View {
+    @AppStorage("entrixy.language") private var language = ""
+    private let choices = [("en","English"),("zh","中文"),("es","Español"),("fr","Français"),("pt","Português"),("ru","Русский"),("de","Deutsch")]
+    var body: some View {
+        ForEach(choices,id:\.0) { choice in
+            Button { language = choice.0 } label: {
+                Label { Text(choice.1) } icon: { Image("flag-" + choice.0) }
+            }.accessibilityAddTraits(ProductText.language == choice.0 ? .isSelected : [])
+        }
+    }
+}
+
 /// MainActivity topBar: help first, then the original language flag/menu.
 struct AppHeaderActions: View {
     @AppStorage("entrixy.language") private var language = ""
     var showHelp = true
-    private let choices = [("en","English"),("zh","中文"),("es","Español"),("fr","Français"),("pt","Português"),("ru","Русский"),("de","Deutsch")]
     var body: some View {
         HStack(spacing:0) {
             if showHelp { NavigationLink { HelpScreen() } label: {
                 Image(systemName:"questionmark.circle").font(.system(size:19)).frame(width:44,height:44)
             }.accessibilityLabel(ProductText.string("tab_help")).accessibilityIdentifier("header-help") }
             Menu {
-                ForEach(choices,id:\.0) { choice in
-                    Button {
-                        language = choice.0
-                    } label: {
-                        Label { Text(choice.1) } icon: { Image("flag-" + choice.0) }
-                    }.accessibilityAddTraits(ProductText.language == choice.0 ? .isSelected : [])
-                }
+                AppLanguageChoices()
             } label: {
                 Image("flag-" + ProductText.language).resizable().interpolation(.high).frame(width:17,height:11).frame(width:44,height:44).contentShape(Rectangle())
             }.accessibilityLabel(ProductText.string("ios_language")).accessibilityIdentifier("header-language")

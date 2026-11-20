@@ -163,7 +163,9 @@ struct IssueOwnerKeyScreen: View {
         }
     }
     private func objectButton(_ symbol: String, label: String, action: @escaping () -> Void) -> some View {
-        Button(action: action) { Image(systemName: symbol).frame(maxWidth: .infinity) }
+        Button(action: action) {
+            Group { if symbol == "arrow.triangle.2.circlepath" { AutomationIcon() } else { Image(systemName:symbol).frame(width:24,height:24) } }.frame(maxWidth:.infinity)
+        }
             .buttonStyle(SecondaryActionStyle()).frame(width: 48).accessibilityLabel(label)
     }
     @ViewBuilder private func nested(_ task: GuestObjectTask) -> some View {

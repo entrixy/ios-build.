@@ -951,3 +951,16 @@
 "ios_call_confirmation_required" = "iOS verlangt eine Bestätigung für Anrufe. Die App kann den Anruf nicht automatisch beenden.";
 "ios_call_guest_confirmation_required" = "iOS verlangt vor jedem Anruf eine Systembestätigung. Anrufe aus dem Hintergrund sind nicht möglich.";
 "ios_call_imported_hangup" = "Die Android-Einstellung zum Auflegen nach %d Sekunden wurde beibehalten.";
+
+// iOS review: accessible actions and explicit telephone requests.
+"ios_website" = "Website";
+"ios_object_reorder" = "Objekte sortieren";
+"ios_move_up" = "Nach oben";
+"ios_move_down" = "Nach unten";
+"ios_guest_call_explicit" = "Jede Gastanfrage erfordert Ihre Aktion. Tippen Sie auf Anrufen und bestätigen Sie den Anruf in iOS. Anfragen werden empfangen, solange Entrixy geöffnet ist.";
+"ios_guest_call_notification" = "Benachrichtigung zur Anfrage anzeigen";
+"ios_guest_call_notification_denied" = "Erlauben Sie Entrixy-Mitteilungen in den iPhone-Einstellungen.";
+"ios_guest_call_request_title" = "%@ bittet um Zugang";
+"ios_guest_call_request_body" = "Objekt: %@. Öffnen Sie Entrixy, um anzurufen.";
+"ios_guest_call_expired" = "Die Anfrage ist abgelaufen";
+"ios_call_now" = "Anrufen";

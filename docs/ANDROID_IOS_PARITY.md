@@ -8,12 +8,13 @@
 ## Основание и границы
 
 - Эталон Android10.90: `56155352b0e9f36ef3685aa071a6aafdb2ef6622`.
-- Функциональный source ротации: `c0b154a`; локально303core без ошибок. Новые182hosted/25UI/44PNG требуют Apple-прогона именно этого source.
-- Последний исполненный набор: native98d4676/public3b806d7, [CI44477923156](https://github.com/entrixy/ios-build./actions/runs/44477923156):295core/179hosted прошли, UI24из25; diagnostic consent AX timeout, общий failure.40из44PNG, без публикации.
-- Следующий nativee2d7b01/publicdc29234, [CI44482890600](https://github.com/entrixy/ios-build./actions/runs/44482890600): Debug/Release/295core и unsigned physical-iPhone Release archive app+widget прошли; симулятор завис ДО hosted/UI. Новый UIKit consent скомпилирован, runtime пока не принят.
-- Publicfc190f0, [CI44486818161](https://github.com/entrixy/ios-build./actions/runs/44486818161): сборки прошли, общий прогон с оригинальными PNG выполняется. Он ещё без блока ротации.
-- На сайте остаются19 прежних кадров069d20b. Они не подтверждают новые функции. Новые PNG публикуются после успешного общего прогона и просмотра исходных кадров.
-- Реальные iPhone/контроллер/камера/cellular, успешный боевой account login, подпись, TestFlight и App Store пока не приняты.
+- Проверенный baseline и точные artifacts — [CURRENT_STATUS.md](CURRENT_STATUS.md).
+  Nativeec2c81f/public487b2f6, CI44521810979:312core/191hosted/27UI и unsigned
+  physical-iPhone archive прошли.56 оригинальных кадров просмотрены/опубликованы.
+- Строки ниже — карта реализации и критериев; исторические количества тестов
+  не заменяют текущий baseline и не означают приёмку всех аппаратных ветвей.
+- Реальные iPhone/контроллер/камера/cellular, успешный боевой account login,
+  подпись, TestFlight и App Store пока не приняты.
 
 ## Как читать карту
 
@@ -79,11 +80,11 @@ P1–P9 — платформенные вопросы ниже. Наличие A
 | 42 | BLE сроки/продление/отзывы; `BleTokenTtlSheet`, `BleFire`, `Vault`, `GuestConn` | **Р** — Выбор BLE TTL (1ч–1мес), renew с прежним DID, signed revocations/carry/receipt; применение настоящим контроллером ещё не принято. | T3 T7; P3 | Проверить все допустимые сроки, expiry без интернета, перенос отзыва на контроллер, подтверждённое применение и повтор доставки. |
 | 43 | Native iOS backup/migration; `Backup`, `ServerRestore`, `FpMove`, `hostClaim/keyMove` | **Р** — App/BackupManager.swift, BackupEnvelope/OwnerBackupMerge: iOS export/inspect/preflight/restore с checkpoint/merge есть; живой перенос не проверен. | T5 T7; P7 | Верный/неверный пароль, конфликт, прерывание owner/guest claim, повторный запуск; исходный доступ и identity не теряются молча. |
 | 44 | Android backup → iOS; `Backup.export/import`, `Prefs/Vault` | **Ч** — BackupManager.inspect реально принимает Android, AndroidOwnerAdapter/KeyRecovery сохраняют PKCS8/signing/epochs/pending rotation; тестовые checkpoints есть, живой перенос не принят. | T5 T7 S; P7 | Реальная копия Android → просмотр состава → preflight → перенос с продолжением после сбоя; совместимость ключей проверяется на сервере/контроллере. |
-| 45 | Foreground/background/restart, push; `HostService`, `BootReceiver`, `FcmService`, `FcmTopics` | **Ч** — Foreground WSS и ограниченные location/Bluetooth OS callbacks, local notifications и отмена просроченных scopes. Нет APNs/Android BootReceiver/бесконечного фонового исполнения. | T1 T2 S; P2 P3 P5 | Раздельно проверить active/background/locked/system termination/force-quit/reboot; свежесть ключей, сообщений и отзывов и политика восстановления. |
+| 45 | Foreground/background/restart, push; `HostService`, `BootReceiver`, `FcmService`, `FcmTopics` | **Ч** — Foreground WSS и ограниченные location/Bluetooth OS callbacks, local notifications и отмена просроченных scopes. AppRemoteNotifications и device-signed pending reads подключены,312core/191hosted прошли; реальные provider/schema/worker/signing/device проверки APNs pending. Android BootReceiver и бесконечное фоновое исполнение в iOS не заявлены. | T1 T2 S; P2 P3 P5 | Раздельно проверить active/background/locked/system termination/force-quit/reboot; свежесть ключей, сообщений и отзывов и политика восстановления. |
 | 46 | Звуки и громкость по событиям; `SoundPlayer`, `BleSound`, `SoundEventCard`, Settings sounds | **Р** — EventSounds: исходные Android профили, upload/preview/volume/mute подключены. Системные режимы/реальный iPhone ещё не приняты. | S; P5 P7 | Загрузить/выбрать/предпрослушать, громкость/mute; разные события и системные режимы, уведомления проверить на iPhone. |
-| 47 | Тема/язык/справка/витрина; `Theme`, `MainActivity.languageList`, `HelpScreen`, `PromoCard` | **Ч** — Theme и7языков с исходными флагами, Help и компании подключены. AppPromotions/PromotionCard cache/display/view/click подключены, новый Apple runtime pending; Android APK self-update не переносится в iOS. | S C; — | Тема/язык сохраняются; все строки/справка/ссылки и бренд корректны; Help сохраняет общую нижнюю навигацию, как Android. |
-| 48 | Диагностика/отправка лога/обновление; `Diagnostics`, `LogSafe`, Settings system, `Api.crashReport/versionCheck` | **Ч** — AppDiagnostics/MetricKit: explicit consent, bounded safe crash queue/manual send в скрытом Developer;179hosted зелёные. Последний diagnostic UI AX timeout, новый UIKit content пока runtime pending. iOS update routing ещё отдельно. | S; — | Собрать/просмотреть/отправить диагностику с удалением секретов; отмена/сбой отправки, информация о версии и штатный переход обновления. |
-| 49 | Виджеты/внешние действия; `KeyWidgetProvider/ConfigActivity/ActionReceiver` | **Ч** — WidgetKit/AppIntent iOS17 target/configuration/catalog,4hosted lifecycle guards прошли. App Group/device provisioning pending; action требует обычного entry/PIN/confirm, без service/URL fire. | S; P9 | Выбрать объект, виджет показывает актуальный доступ; действие соблюдает PIN/права/срок, отзыв и потерю связи; решение API после прототипа. |
+| 47 | Тема/язык/справка/витрина; `Theme`, `MainActivity.languageList`, `HelpScreen`, `PromoCard` | **Ч** — Theme и7языков с исходными флагами, Help и компании подключены. AppPromotions/PromotionCard cache/display/view/click подключены, Apple hosted/UI прошли; Android APK self-update не переносится в iOS. | S C; — | Тема/язык сохраняются; все строки/справка/ссылки и бренд корректны; Help сохраняет общую нижнюю навигацию, как Android. |
+| 48 | Диагностика/отправка лога/обновление; `Diagnostics`, `LogSafe`, Settings system, `Api.crashReport/versionCheck` | **Ч** — AppDiagnostics/MetricKit: explicit consent, bounded safe crash queue/manual send в скрытом Developer; текущие191hosted/27UI прошли, diagnostic согласие/настройки/журнал включены в56кадров. Аппаратная проверка MetricKit остаётся. iOS update routing ещё отдельно. | S; — | Собрать/просмотреть/отправить диагностику с удалением секретов; отмена/сбой отправки, информация о версии и штатный переход обновления. |
+| 49 | Виджеты/внешние действия; `KeyWidgetProvider/ConfigActivity/ActionReceiver` | **Ч** — WidgetKit/AppIntent iOS17 target/configuration/catalog,5hosted lifecycle guards прошли. App Group/device provisioning pending; action требует обычного entry/PIN/confirm, без service/URL fire. | S; P9 | Выбрать объект, виджет показывает актуальный доступ; действие соблюдает PIN/права/срок, отзыв и потерю связи; решение API после прототипа. |
 | 50 | Сеть/локальные ограничения/маршрут; `NetRoute`, `Net`, `WifiChecker`, `net_block` | **Ч** — SSID/BSSID PrivacyNetwork и authenticated opaque CONNECT через cellular-required ServerHTTPSession на iOS17; fail closed на16, без утечки/fallback/retry. Реальная cellular/VPN/DNS проверка не принята. | T7 S; P4 P5 | При Wi-Fi без интернета и доступной сотовой сети не отправлять неавторизованный повтор; сетевые условия проверять до команды, недоступность обозначать явно. |
 
 Статусы отражают подключённые пути, а не процент готовности. Незавершённые платформенные и функциональные ветви указаны в строках; ни одна строка не является выпускной приёмкой.
@@ -159,19 +160,13 @@ P1–P9 — платформенные вопросы ниже. Наличие A
 Аппаратные пробы на этом этапе НЕ выполнялись. Их результат — отдельное доказательство,
 которое нужно получить до обещания соответствующих фоновых/радио сценариев.
 
-## Очерёдность и остановки
+## Текущая очерёдность
 
-1. **Этап 2: рабочая структура — выполнен в описанных границах.** Обычный пользователь без объектов, гость, владелец, делегирующий гость: навигация и состав разделов → настоящие рабочие маршруты. Сначала перенос общих компонентов из каталога в production, затем подключение экранов; не создавать вторую независимую библиотеку стилей. Четыре внутренних раздела настроек; неперенесённые функции остаются в реестре, а не изображают работу. Удалить лишнее «Навигация». На выходе реальная native сборка, компактный набор изменённых экранов и проверка возвратов/видимости панели. Остановиться и доложить.
-2. **Этап 3: управление/объекты.** Пункты 02–12, 25–30, 40: отдельные законченные вертикали device, call, webhook, BLE; не ждать конца проекта, чтобы проверить один настоящий BLE FIRE на iPhone. Ротацию и move не смешивать с rename. Остановка после каждой вертикали.
-3. **Этап 4: права/гости.** 31–39, 42: scope/сроки/auth/native-only/занятость, выдача/пауза/отзыв, A→B→C и сообщения. Зависимые фоновые статусы не объявлять готовыми раньше P5.
-4. **Этап 5: перенос/сервисы.** 19–24, 27–28, 43–44: Android/iOS копии и identity, server/account/company/claim/configurator, move/rotation с checkpoint.
-5. **Этап 6: условия и фон.** 13–17, 41, 45, 50. Платформенные прототипы P1–P6 выполняются до соответствующей вертикали, а не откладываются до App Store. Любая необходимая адаптация с видимым изменением поведения отдельно согласуется.
-6. **Этап 7: остальное.** 29–30, 46–49: avatars/stream, звуки, языки/справка, диагностика, widgets; часть функций может закрываться раньше вместе со своей вертикалью. Дублировать работу не нужно.
-7. **Этап 8: выпуск.** Сквозная Android↔iOS приёмка на сервере/контроллере, устройствах, TestFlight, signing/privacy/review. Сборка симулятора не является сборкой для публикации.
-
-Каждый отчёт: изменённые ID → что реально работает → выполненные проверки и кадры →
-оставшиеся ограничения → следующий ограниченный шаг. Изначальные остановки по этапам отменены последующим запросом пользователя продолжать работу крупными пакетами. Статус не прерывает разрешённую работу. Даты/процент готовности пока
-не оцениваются: физические сценарии и объём адаптаций ещё не измерены.
+Следовать пакетам A–D в [CURRENT_STATUS.md](CURRENT_STATUS.md) и правилам
+[AUTONOMOUS_WORK.md](AUTONOMOUS_WORK.md). Прежние остановки после каждой
+вертикали отменены пользователем. Отчёт не прерывает разрешённую работу.
+Сначала адресно закрыть оставшийся программный объём, затем общий прогон со
+снимками; отдельно — реальная Android/iOS совместимость и выпускная приёмка.
 
 ## Граница завершённого этапа 2
 

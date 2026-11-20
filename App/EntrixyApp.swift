@@ -236,18 +236,16 @@ enum Brand {
 }
 
 struct BrandNavigationHeader: ViewModifier {
+    @State private var showingHelp = false
     func body(content: Content) -> some View {
         content.navigationBarTitleDisplayMode(.large).toolbar {
             if #available(iOS 26.0, *) {
-                ToolbarItem(placement: .navigationBarLeading) { BrandLogo() }
+                ToolbarItem(placement: .navigationBarLeading) { AppLogoMenu { showingHelp = true } }
                     .sharedBackgroundVisibility(.hidden)
             } else {
-                ToolbarItem(placement: .navigationBarLeading) { BrandLogo() }
+                ToolbarItem(placement: .navigationBarLeading) { AppLogoMenu { showingHelp = true } }
             }
-            if #available(iOS 26.0, *) {
-                ToolbarItem(placement:.navigationBarTrailing) { AppHeaderActions() }.sharedBackgroundVisibility(.hidden)
-            } else { ToolbarItem(placement:.navigationBarTrailing) { AppHeaderActions() } }
-        }
+        }.navigationDestination(isPresented:$showingHelp) { HelpScreen() }
     }
 }
 

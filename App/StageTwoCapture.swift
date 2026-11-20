@@ -19,6 +19,7 @@ enum StageTwoCapture: String, CaseIterable {
     case ownerIssued = "owner-issued"
     case incomingMessage = "incoming-message"
     case promotion
+    case ownerPhoneRequest = "owner-phone-request"
     @MainActor static func offlinePromotions(for app:AppModel) -> AppPromotions {
         AppPromotions(app:app,storage:StagePromotionStorage(empty:true),api:StagePromotionAPI())
     }
@@ -36,9 +37,9 @@ enum StageTwoCapture: String, CaseIterable {
         }
     }
     var mainTab: AppTab {
-        switch self { case .guestControl, .ownerControl, .ownerConfirmation, .ownerCodeConfirmation, .keyAccepted, .incomingMessage, .promotion: return .control; case .ownerGuests, .delegatingGuests, .ownerIssued, .ownerCallGuests: return .guests; case .journal: return .journal; default: return .settings }
+        switch self { case .guestControl, .ownerControl, .ownerConfirmation, .ownerCodeConfirmation, .keyAccepted, .incomingMessage, .promotion, .ownerPhoneRequest: return .control; case .ownerGuests, .delegatingGuests, .ownerIssued, .ownerCallGuests: return .guests; case .journal: return .journal; default: return .settings }
     }
-    var isOwner: Bool { [.ownerObjects, .ownerGuests, .addServer, .ownerExpanded, .addObject, .objectDelete, .ownerControl, .mixedObjects, .ownerConfirmation, .ownerCodeConfirmation, .ownerBLEObjects, .ownerIssued, .promotion, .ownerCallGuests, .ownerDeviceObjects].contains(self) }
+    var isOwner: Bool { [.ownerObjects, .ownerGuests, .addServer, .ownerExpanded, .addObject, .objectDelete, .ownerControl, .mixedObjects, .ownerConfirmation, .ownerCodeConfirmation, .ownerBLEObjects, .ownerIssued, .promotion, .ownerCallGuests, .ownerDeviceObjects, .ownerPhoneRequest].contains(self) }
     var isEmpty: Bool { [.empty, .addKey, .deviceClaim].contains(self) }
 }
 private final class StageTwoStorage: StateStorage {
@@ -75,7 +76,7 @@ struct StageTwoRoot: View {
         }
         if route.isOwner {
             var owner = try! OwnerAccount(importing: "controller.invalid", masterKey: Data(repeating: 22, count: 32), credentials: OwnerCredentials(deviceID: String(repeating: "a", count: 32), deviceSecret: String(repeating: "b", count: 64)))
-            let confirmationRoute = route == .ownerConfirmation || route == .ownerCodeConfirmation || route == .ownerCallGuests
+            let confirmationRoute = route == .ownerConfirmation || route == .ownerCodeConfirmation || route == .ownerCallGuests || route == .ownerPhoneRequest
             var object = try! OwnerObject(masterKey: owner.masterKey, label: "Ворота во двор", kind: confirmationRoute ? "call" : "webhook", phone: confirmationRoute ? "+10000000000" : "", url: confirmationRoute ? "" : "https://actuator.invalid/open", secret: confirmationRoute ? "" : "public-capture-secret")
             if route == .ownerBLEObjects {
                 object = try! OwnerObject(importing:object.id,numberID:7,kind:"ble",cipher:object.cipher,wrappedKey:object.wrappedKey,masterKey:owner.masterKey,bleSecret:Data(repeating:9,count:32),bleDeviceID:123)
@@ -97,11 +98,12 @@ struct StageTwoRoot: View {
             if route == .ownerConfirmation { object.localPolicy = Data(#"{"confirm_on":true}"#.utf8) }
             if route == .ownerCodeConfirmation { object.localPolicy = Data(#"{"auth_on":true,"auth":"pin"}"#.utf8) }
             owner.objects = [object]
-            if route == .ownerIssued {
+            if route == .ownerIssued || route == .ownerPhoneRequest {
                 var key = try! OwnerIssuedKey(owner:owner,label:"Анна",numberIDs:[7],welcome:"Добро пожаловать во двор.",nativeOnly:false,confirmation:false)
                 key.keyID = 21; key.effectiveNumberIDs = [7]; key.state = .active; key.pending = nil; key.sent = true
                 owner.issuedKeys = [key]
             }
+            if route == .ownerPhoneRequest { owner.lastSynced = Date() }
             state.owners = [owner]
         }
         if route == .mixedObjects, let owner = state.owners?.first, let object = owner.objects?.first, let guest = state.guests.first {
@@ -117,7 +119,7 @@ struct StageTwoRoot: View {
             UserDefaults.standard.set(false,forKey:"entrixy.developerMode")
             app.diagnostics = AppDiagnostics(app:app,storage:StageDiagnosticStorage(),api:StageDiagnosticAPI(),usesMetricKit:false)
         }
-        if route == .ownerConfirmation || route == .ownerCodeConfirmation || route == .ownerCallGuests {
+        if route == .ownerConfirmation || route == .ownerCodeConfirmation || route == .ownerCallGuests || route == .ownerPhoneRequest {
             // No resume/live factory or actual telephone handoff in these UI routes.
             app.ownerControl = OwnerControlModel(app:app,dialer:{ _ in false })
         }
@@ -131,6 +133,14 @@ struct StageTwoRoot: View {
             .preferredColorScheme(.light)
             .task {
                 // Production RootView and screens; fixture data never calls resume/bind/send.
+                if route == .ownerPhoneRequest,model.ownerControl.phoneRequests.isEmpty,
+                   let owner = model.owners.first,let object = owner.objects?.first,
+                   let key = owner.issuedKeys?.first,let number = object.numberID,
+                   let secrets = try? key.secrets(masterKey:owner.masterKey),
+                   let frame = try? GuestPress.frame(userKey:secrets.userKey,host:owner.server,numberID:number,wireAction:""),
+                   let json = try? JSONSerialization.jsonObject(with:frame) as? [String:Any],let press = json["press"] {
+                    model.ownerControl.capturePhoneRequest(["type":"do_call","call_id":"native-review-request","number_id":number,"user_key_id":21,"press":press],server:owner.server)
+                }
                 if route == .diagnostics { model.diagnostics.activate() }
                 if route == .promotion { model.promotions.activate() }
                 if route == .keyAccepted, let guest = model.guests.first { model.presentKeyAcceptance(guest.id) }

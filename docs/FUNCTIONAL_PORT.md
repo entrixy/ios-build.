@@ -1,35 +1,26 @@
 # Functional Android port — in progress, 16 November 2026
 
-## Latest evidence — 19 November 2026
+## Current evidence — 19 November 2026
 
-Latest completed native94efd48/public506cb4d,
-run44499802532/job135476259632: Apple308core, Debug/Release/privacy/isolation,
-ALL185hosted and unsigned physical-iPhone app/widget archive passed. UI27:
-23passed,4failed;44of56original PNGs. Promotion is now green. Failures: wrong
-Map query type(the identified wrapper is Other; actual Map is its child), avatar
-buttons48vs66.3pt, a detached infinite-origin Window capture anchor, and initial
-diagnostic AX snapshot. Overall failure; no replacement gallery publication.
-Interaction artifact14518884446 SHA256
-7ba391467da71386401e6dfb2afa08daabbc36de37e08a3a890106386e34e464.
-Device evidence14519852648 SHA256
-d3a76eab0872773bfce0c9c899b51406001ee1a9809a8688235980d16e1373bb.
+[CURRENT_STATUS.md](CURRENT_STATUS.md) is the authoritative concise status and
+remaining-work list. Native ec2c81f/public487b2f6,
+[CI44521810979](https://github.com/entrixy/ios-build./actions/runs/44521810979),
+passed Apple312core,191hosted,27UI, Debug/Release/privacy/isolation and unsigned
+physical-iPhone app/widget archive. All56 original same-pass PNGs were reviewed
+and published; source/artifact hashes and device/release limits are in that status.
+The UI fixture lifetime and offscreen screenshot anchors were corrected without
+weakening functional assertions. Native push's six new hosted cases passed.
+Real APNs configuration/delivery, signing, live interoperability, hardware and
+final Store acceptance remain pending. Follow [AUTONOMOUS_WORK.md](AUTONOMOUS_WORK.md).
 
-The next coherent source includes context-only equal-row button filling, actual
-Map-child selection, a finite application capture anchor, and a reversible native
-AX boundary hiding the underlying presenting provider during UIKit dialogs.
-The same consent controller works in ordinary live startup; its Stage System
-underlay still failed in506cb4d. The new boundary is a proposed fix, not proof.
-Original assertions remain; no coordinates replace button queries/consent.
+### Historical failed packages
 
-Also implemented in this remainder package: [native message push](NATIVE_PUSH.md),
-device-signed pending-message reads, protected hint queue/token lifecycle, and
-server APNs outbox/provider/worker. New local312core passed;23pure provider and
-22disposable MariaDB/HTTP contracts passed with zero real sends/production DB writes.
-New six hosted cases await Apple; next312core/191hosted/27UI/56PNG. Four platform
-hints use all seven product languages, and13existing labels reuse Android keys.
-Untranslated legacy strings still require review; no full localization claim.
-Schema/provider credentials/worker install/signing/real delivery remain pending.
-No new full Apple run is started until the coherent remainder is committed.
+Native94efd48/public506cb4d passed308core/185hosted and the unsigned archive,
+but failed4of27UI and exported44of56PNG. Native1d604/public25b37b2 then passed
+312core/191hosted, but the invalid Window capture selector caused22capture failures.
+Native2e66080/public5ef2bc6 passed25of27UI and exported47of56; an offscreen Wi-Fi
+anchor and Stage diagnostic accessibility remained. Those failed/partial sets
+were never published. The full correction passed in487b2f6 above.
 
 ### Earlier completed evidence
 

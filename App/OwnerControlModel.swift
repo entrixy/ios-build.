@@ -11,6 +11,7 @@ struct OwnerPhoneRequest: Identifiable {
     let keyID: UUID
     let press: [String: Any]
     let needsConfirmation: Bool
+    let expiresAt: Date
     var id: String { server + ":" + callID }
 }
 
@@ -26,9 +27,10 @@ final class OwnerControlModel: ObservableObject {
     private let webhook: any PhoneWebhookSending
     private let notices: any OwnerPhoneNoticePosting
     private let phoneBusy: @MainActor () -> Bool
-    private var automaticPhoneRequests = Set<String>()
+    private var phoneHandoffInFlight = false
+    private let clock: @MainActor () -> Date
+    private var requestExpiryTasks: [String:Task<Void,Never>] = [:]
     private var notifyPhoneTasks: [String: Task<Void, Never>] = [:]
-    private var notifyPhoneRequests: [String: OwnerPhoneRequest] = [:]
     private var webhookInFlight = Set<ObjectReference>()
     private var webhookTasks: [ObjectReference: Task<PhoneWebhookReply, Error>] = [:]
     private var webhookPositionTasks: [ObjectReference: Task<Void, Never>] = [:]
@@ -81,21 +83,19 @@ final class OwnerControlModel: ObservableObject {
     }
 
     init(app: AppModel, dialer: (@MainActor (URL) async -> Bool)? = nil, webhook: any PhoneWebhookSending = PhoneWebhookTransport(), notices: (any OwnerPhoneNoticePosting)? = nil,
-         phoneBusy: (@MainActor () -> Bool)? = nil) {
-        self.app = app; self.webhook = webhook
+         phoneBusy: (@MainActor () -> Bool)? = nil, clock: @escaping @MainActor () -> Date = { Date() }) {
+        self.app = app; self.webhook = webhook; self.clock = clock
         self.notices = notices ?? OwnerPhoneNotifications()
         self.phoneBusy = phoneBusy ?? { CXCallObserver().calls.contains { !$0.hasEnded } }
         self.dialer = dialer ?? { url in
             await withCheckedContinuation { continuation in
+                guard UIApplication.shared.canOpenURL(url) else { continuation.resume(returning:false); return }
                 UIApplication.shared.open(url, options: [:]) { continuation.resume(returning: $0) }
             }
         }
         self.notices.cancelled = { [weak self] id in
-            guard let self else { return }
-            self.notifyPhoneTasks.removeValue(forKey: id)?.cancel()
-            self.automaticPhoneRequests.remove(id)
-            self.notices.remove(id: id)
-            if let request = self.notifyPhoneRequests.removeValue(forKey: id) { Task { await self.callStatus(request, status: "declined") } }
+            guard let self,let request = self.phoneRequests.first(where:{ $0.id == id }) else { return }
+            Task { await self.decline(request) }
         }
         ownerChanges = app.$owners.sink { [weak self] _ in
             Task { @MainActor [weak self] in
@@ -118,11 +118,7 @@ final class OwnerControlModel: ObservableObject {
                 webhookPositionGeneration.removeValue(forKey:target)
             }
         }
-        for (id,request) in Array(notifyPhoneRequests) where request.server == server {
-            notifyPhoneTasks.removeValue(forKey:id)?.cancel(); notifyPhoneRequests.removeValue(forKey:id)
-            automaticPhoneRequests.remove(id); notices.remove(id:id)
-        }
-        phoneRequests.removeAll { $0.server == server }
+        for request in phoneRequests.filter({ $0.server == server }) { removePhoneRequest(request.id) }
         positions.removeValue(forKey:server); onlineDevices.removeValue(forKey:server)
         if unavailable { connections[server] = .unavailable } else { connections.removeValue(forKey:server) }
     }
@@ -132,7 +128,9 @@ final class OwnerControlModel: ObservableObject {
         webhookPositionTasks.values.forEach { $0.cancel() }; webhookPositionTasks.removeAll(); webhookPositionGeneration.removeAll()
         acceptedWebhookRequests.removeAll()
         for (id, task) in notifyPhoneTasks { task.cancel(); notices.remove(id: id) }
-        notifyPhoneTasks.removeAll(); notifyPhoneRequests.removeAll(); automaticPhoneRequests.removeAll()
+        notifyPhoneTasks.removeAll()
+        requestExpiryTasks.values.forEach { $0.cancel() }; requestExpiryTasks.removeAll()
+        phoneRequests.forEach { notices.remove(id:$0.id) }
         workers.values.forEach { $0.cancel() }; workers.removeAll(); generations.removeAll()
         for link in links.values {
             if let attempt = link.attempt { messages[attempt.objectID] = "Результат не получен. Автоматического повтора не будет." }
@@ -169,6 +167,7 @@ final class OwnerControlModel: ObservableObject {
                     } catch {}
                     guard self.active, !Task.isCancelled, self.generations[server] == generation else { return }
                     self.connections[server] = .offline
+                    for request in self.phoneRequests.filter({ $0.server == server }) { self.removePhoneRequest(request.id) }
                     if let link = self.links.removeValue(forKey: server) { link.attempt?.timeout?.cancel(); link.live.close() }
                     try? await Task.sleep(nanoseconds: delay * 1_000_000_000)
                     delay = min(delay * 2, 30)
@@ -257,7 +256,7 @@ final class OwnerControlModel: ObservableObject {
             return
         }
         if type == "confirm_expired", let callID = json["call_id"] as? String {
-            phoneRequests.removeAll { $0.server == server && $0.callID == callID }; return
+            for request in phoneRequests.filter({ $0.server == server && $0.callID == callID }) { removePhoneRequest(request.id) }; return
         }
         if type == "do_webhook" {
             if let request = try? verifiedPhoneRequest(json, server: server, webhookOnly: true) {
@@ -358,55 +357,56 @@ final class OwnerControlModel: ObservableObject {
         let nonceScope = key.company == nil ? key.id.uuidString + ":" : ""
         try app.consumeOwnerPress(server + ":" + nonceScope + verified.nonce)
         return OwnerPhoneRequest(server: server, callID: callID, objectID: object.id, keyID: key.id,
-            press: press, needsConfirmation: json["type"] as? String == "confirm_request")
+            press: press, needsConfirmation: json["type"] as? String == "confirm_request",expiresAt:clock().addingTimeInterval(60))
+    }
+    private func removePhoneRequest(_ id:String) {
+        requestExpiryTasks.removeValue(forKey:id)?.cancel()
+        notifyPhoneTasks.removeValue(forKey:id)?.cancel(); notices.remove(id:id)
+        phoneRequests.removeAll { $0.id == id }
     }
     private func prunePhoneRequests() {
-        phoneRequests = phoneRequests.filter { request in
-            guard let owner = app.owners.first(where: { $0.server == request.server && $0.ownershipLost != true }),
+        let invalid = phoneRequests.filter { request in
+            guard request.expiresAt > clock(),let owner = app.owners.first(where: { $0.server == request.server && $0.ownershipLost != true }),
                   let object = owner.objects?.first(where: { $0.id == request.objectID && $0.pending == nil && $0.available != false }),
                   let number = object.numberID,
-                  (try? owner.authorizedGuest(localID: request.keyID, numberID: number)) != nil else { return false }
-            return object.kind == "call" || (object.kind == "webhook" && object.routing["webhook_mode"] == "phone")
+                  (try? owner.authorizedGuest(localID: request.keyID, numberID: number)) != nil else { return true }
+            return !(object.kind == "call" || (object.kind == "webhook" && object.routing["webhook_mode"] == "phone")) || (object.kind == "call" && owner.callPreference(guestID:request.keyID,numberID:number)?.reaction == "off")
         }
+        invalid.forEach { removePhoneRequest($0.id) }
     }
     private func receivePhoneRequest(_ json: [String: Any], server: String) throws {
-        guard phoneRequests.count + automaticPhoneRequests.count < 4,
+        prunePhoneRequests()
+        guard phoneRequests.count < 4,
               let request = try verifiedPhoneRequest(json, server: server),
               let owner = app.owners.first(where: { $0.server == server }),
-              let object = owner.objects?.first(where: { $0.id == request.objectID }), let number = object.numberID else { return }
-        let preference = owner.callPreference(guestID: request.keyID, numberID: number)
-        if object.kind == "call", preference?.reaction == "off" {
-            Task { await decline(request) }; return
+              let object = owner.objects?.first(where: { $0.id == request.objectID }),let number = object.numberID else { return }
+        let preference = owner.callPreference(guestID:request.keyID,numberID:number)
+        if object.kind == "call",preference?.reaction == "off" { Task { await decline(request) }; return }
+        if object.kind == "call",phoneBusy() { Task { await callStatus(request,status:"busy") }; return }
+        // Android's stored auto/notify values never authorize an iOS telephone
+        // handoff. Every call waits for the owner's current, explicit tap.
+        phoneRequests.append(request)
+        AppSoundCenter.shared.play(.incall)
+        requestExpiryTasks[request.id] = Task { [weak self] in
+            do { try await Task.sleep(nanoseconds:60_000_000_000) } catch { return }
+            guard let self,self.phoneRequests.contains(where:{ $0.id == request.id }) else { return }
+            self.requestExpiryTasks[request.id] = nil
+            await self.decline(request,status:"expired")
         }
-        // A migrated key with no explicit local choice retains the earlier
-        // iOS explicit-tap behavior. New form choices follow Android's reaction.
-        if object.kind == "call", preference?.reaction != "notify" { AppSoundCenter.shared.play(.incall) }
-        if object.kind != "call" || request.needsConfirmation || preference == nil || preference?.reaction == "confirm" {
-            phoneRequests.append(request); return
+        Task { [weak self] in
+            guard let self,self.phoneRequests.contains(where:{ $0.id == request.id }) else { return }
+            await self.callStatus(request,status:"awaiting_confirm")
         }
-        if object.kind == "call", phoneBusy(), preference?.serveDuringCall != true {
-            Task { await callStatus(request, status: "busy") }; return
-        }
-        automaticPhoneRequests.insert(request.id)
-        if preference?.reaction == "notify" {
-            notifyPhoneRequests[request.id] = request
-            let label = (try? object.metadata(masterKey: owner.masterKey)["label"] as? String) ?? ""
-            let guest = (try? owner.authorizedGuest(localID: request.keyID, numberID: number))?.label ?? ""
+        if object.kind == "call",preference?.reaction == "notify" {
+            let label = (try? object.metadata(masterKey:owner.masterKey)["label"] as? String) ?? ""
+            let guest = (try? owner.authorizedGuest(localID:request.keyID,numberID:number))?.label ?? ""
             notifyPhoneTasks[request.id] = Task { [weak self] in
                 guard let self else { return }
-                guard await self.notices.show(id: request.id, guest: guest, object: label), self.active,
-                      self.automaticPhoneRequests.contains(request.id) else {
-                    self.automaticPhoneRequests.remove(request.id); self.notifyPhoneTasks.removeValue(forKey: request.id); self.notifyPhoneRequests.removeValue(forKey: request.id)
-                    await self.callStatus(request, status: "error"); return
-                }
-                await self.callStatus(request, status: "scheduled")
-                do { try await Task.sleep(nanoseconds: 5_000_000_000) } catch { return }
-                guard !Task.isCancelled, self.active, self.automaticPhoneRequests.contains(request.id) else { return }
-                self.notices.remove(id: request.id)
-                await self.dial(server: server, objectID: request.objectID, request: request)
-                self.notifyPhoneTasks.removeValue(forKey: request.id); self.notifyPhoneRequests.removeValue(forKey: request.id)
+                _ = await self.notices.show(id:request.id,guest:guest,object:label)
+                if Task.isCancelled || !self.active || !self.phoneRequests.contains(where:{ $0.id == request.id }) { self.notices.remove(id:request.id) }
+                self.notifyPhoneTasks[request.id] = nil
             }
-        } else { Task { [weak self] in await self?.dial(server: server, objectID: request.objectID, request: request) } }
+        }
     }
     private func callStatus(_ request: OwnerPhoneRequest, status: String) async {
         guard active, let link = links[request.server], link.authenticated,
@@ -414,23 +414,24 @@ final class OwnerControlModel: ObservableObject {
         try? await link.live.sendAction(data)
     }
     func approve(_ request: OwnerPhoneRequest) async {
+        prunePhoneRequests()
         guard let object = app.owners.first(where: { $0.server == request.server })?.objects?.first(where: { $0.id == request.objectID }) else { return }
         if object.kind == "webhook" { await phoneWebhook(server: request.server, objectID: request.objectID, request: request) }
+        else if phoneBusy() { await decline(request,status:"busy") }
         else { await dial(server: request.server, objectID: request.objectID, request: request) }
     }
 
-    func decline(_ request: OwnerPhoneRequest) async {
-        phoneRequests.removeAll { $0.id == request.id }
-        automaticPhoneRequests.remove(request.id); notifyPhoneTasks.removeValue(forKey: request.id)?.cancel(); notifyPhoneRequests.removeValue(forKey: request.id); notices.remove(id: request.id)
+    func decline(_ request: OwnerPhoneRequest,status:String = "declined") async {
+        removePhoneRequest(request.id)
         guard let link = links[request.server], link.authenticated else { return }
         let body: [String: Any] = request.needsConfirmation
             ? ["type": "confirm_response", "call_id": request.callID, "accept": false]
-            : ["type": "call_status", "call_id": request.callID, "status": "error"]
+            : ["type": "call_status", "call_id": request.callID, "status": status]
         if let data = try? JSONSerialization.data(withJSONObject: body) { try? await link.live.sendAction(data) }
     }
 
     func dial(server: String, objectID: UUID, request: OwnerPhoneRequest? = nil) async {
-        guard active, app.canManageGuestAccess,
+        guard active, app.canManageGuestAccess,!phoneHandoffInFlight,!phoneBusy(),
               let owner = app.owners.first(where: { $0.server == server }),
               let object = owner.objects?.first(where: { $0.id == objectID && $0.kind == "call" && $0.pending == nil && $0.available != false }),
               let phone = object.localPhone, !phone.isEmpty,
@@ -439,25 +440,33 @@ final class OwnerControlModel: ObservableObject {
         if request == nil, !app.ownerManualActionAllowed(object, server: server, action: .open) { return }
         var who = app.ownerActionWho(server:server,objectID:objectID)
         if let request {
-            let explicit = phoneRequests.contains(where: { $0.id == request.id })
-            let automatic = automaticPhoneRequests.remove(request.id) != nil
-            guard explicit || automatic, let number = object.numberID,
+            guard links[server]?.authenticated == true,phoneRequests.contains(where: { $0.id == request.id }),request.expiresAt > clock(),let number = object.numberID,
                   let key = try? owner.authorizedGuest(localID: request.keyID, numberID: number) else { return }
             let preference = owner.callPreference(guestID: request.keyID, numberID: number)
-            guard preference?.reaction != "off", (!phoneBusy() || preference?.serveDuringCall == true),
-                  !automatic || ["auto", "notify"].contains(preference?.reaction ?? "") else { return }
+            guard preference?.reaction != "off" else { return }
             do {
                 let verified = try key.verifyPress(request.press,server:server,numberID:number,expectedAction:"")
                 who = ProductText.string("journal_who_guest",key.label) + (verified.actor.map { " · " + $0 } ?? "")
             }
             catch { await decline(request); app.errorMessage = "Запрос гостя устарел или больше не разрешён."; return }
-            phoneRequests.removeAll { $0.id == request.id }
+            removePhoneRequest(request.id)
             if request.needsConfirmation {
                 guard let link = links[server], link.authenticated else { return }
                 do { try await link.live.sendAction(JSONSerialization.data(withJSONObject: ["type": "confirm_response", "call_id": request.callID, "accept": true])) }
                 catch { app.errorMessage = "Не удалось подтвердить запрос гостя."; return }
             }
         }
+        // An awaited confirmation reply may have crossed a lock/background or
+        // rights change. Recheck before handing anything to another application.
+        guard active,app.canManageGuestAccess,!phoneHandoffInFlight,!phoneBusy(),
+              let current = app.owners.first(where:{ $0.server == server && $0.ownershipLost != true }),
+              current.objects?.first(where:{ $0.id == objectID }) == object else { return }
+        if let request {
+            guard links[server]?.authenticated == true,request.expiresAt > clock(),let number = object.numberID,
+                  (try? current.authorizedGuest(localID:request.keyID,numberID:number)) != nil,
+                  current.callPreference(guestID:request.keyID,numberID:number)?.reaction != "off" else { return }
+        }
+        phoneHandoffInFlight = true; defer { phoneHandoffInFlight = false }
         let label = (try? object.metadata(masterKey: owner.masterKey)["label"] as? String) ?? "Объект"
         let actionKey = "owner-phone:" + UUID().uuidString
         let entry = JournalEntry(who: who, what: label, actionKey: actionKey, result: "Результат звонка не подтверждён", level: "warning")
@@ -563,3 +572,14 @@ final class OwnerControlModel: ObservableObject {
     }
 
 }
+
+#if DEBUG && targetEnvironment(simulator)
+extension OwnerControlModel {
+    /// Offline signed input enters the production verifier; the stage has no
+    /// live transport and a refusing dialer. Never present in a Release build.
+    func capturePhoneRequest(_ json:[String:Any],server:String) {
+        guard StageTwoCapture.current == .ownerPhoneRequest else { return }
+        try? receivePhoneRequest(json,server:server)
+    }
+}
+#endif

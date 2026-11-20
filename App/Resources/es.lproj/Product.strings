@@ -951,3 +951,16 @@
 "ios_call_confirmation_required" = "iOS exige confirmar las llamadas. La app no puede finalizar la llamada automáticamente.";
 "ios_call_guest_confirmation_required" = "iOS siempre pide confirmación del sistema para llamar. No se puede llamar en segundo plano.";
 "ios_call_imported_hangup" = "Se ha conservado el ajuste de Android para colgar tras %d segundos.";
+
+// iOS review: accessible actions and explicit telephone requests.
+"ios_website" = "Sitio web";
+"ios_object_reorder" = "Ordenar objetos";
+"ios_move_up" = "Subir";
+"ios_move_down" = "Bajar";
+"ios_guest_call_explicit" = "Cada solicitud de un invitado requiere su intervención. Pulse Llamar y confirme la llamada en iOS. Las solicitudes se reciben mientras Entrixy está abierto.";
+"ios_guest_call_notification" = "Mostrar una notificación de solicitud";
+"ios_guest_call_notification_denied" = "Permita las notificaciones de Entrixy en los ajustes del iPhone.";
+"ios_guest_call_request_title" = "%@ solicita acceso";
+"ios_guest_call_request_body" = "Objeto: %@. Abra Entrixy para llamar.";
+"ios_guest_call_expired" = "La solicitud ha caducado";
+"ios_call_now" = "Llamar";

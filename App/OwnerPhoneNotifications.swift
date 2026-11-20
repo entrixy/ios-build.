@@ -27,8 +27,8 @@ import UserNotifications
         categories.insert(UNNotificationCategory(identifier: "entrixy.guest-call", actions: [action], intentIdentifiers: [], options: []))
         center.setNotificationCategories(categories)
         let content = UNMutableNotificationContent()
-        content.title = ProductText.string("notify_call_title", guest)
-        content.body = ProductText.string("notify_call_big", guest, object)
+        content.title = ProductText.string("ios_guest_call_request_title",guest)
+        content.body = ProductText.string("ios_guest_call_request_body",object)
         content.sound = AppSoundCenter.shared.notificationSound(.incall); content.categoryIdentifier = "entrixy.guest-call"
         do { try await center.add(UNNotificationRequest(identifier: id, content: content, trigger: nil)); return true }
         catch { return false }

@@ -958,7 +958,7 @@ extension OwnerAccountTests {
         XCTAssertEqual(api.mutations, 2)
     }
 
-    @MainActor func testExplicitAutoCallChoiceHandsOffOnceAfterPersistingTheAttempt() async throws {
+    @MainActor func testLegacyAutoChoiceRequiresExplicitTapAndCannotRepeatHandoff() async throws {
         let storage = OwnerMemoryStorage(), api = RecordingOwnerAPI()
         let model = AppModel(storage: storage, ownerAPI: api)
         _ = await model.addOwner(server: "owner.invalid", accessCode: "")
@@ -977,7 +977,13 @@ extension OwnerAccountTests {
         defer { control.suspend() }
         control.resume(); try await waitForOwner { control.connections[owner.server] == .connected }
         channel.emit(request); channel.emit(request)
-        try await waitForOwner { dialed == 1 }
+        try await waitForOwner { control.phoneRequests.count == 1 }
+        XCTAssertEqual(dialed,0); XCTAssertTrue(model.journal.isEmpty)
+        let pending = try XCTUnwrap(control.phoneRequests.first)
+        await control.approve(pending)
+        XCTAssertEqual(dialed,1)
+        await control.approve(pending); channel.emit(request)
+        XCTAssertEqual(dialed,1)
         XCTAssertTrue(control.phoneRequests.isEmpty); XCTAssertEqual(model.journal.count,1)
         XCTAssertEqual(model.journal[0].result,"Передано приложению «Телефон»")
     }
@@ -1014,6 +1020,80 @@ extension OwnerAccountTests {
         XCTAssertNil(owner.issuedKeys)
         XCTAssertEqual(owner.objects?.first?.id,first.id)
         XCTAssertEqual(draft.selected,[7])
+    }
+
+    @MainActor private func pendingPhoneFixture(preference:OwnerCallPreference = OwnerCallPreference(),
+        clock:@escaping @MainActor () -> Date = { Date() },busy:@escaping @MainActor () -> Bool = { false },
+        handoff:Bool = true) async throws -> (model:AppModel,control:OwnerControlModel,channel:RecordingOwnerChannel,frame:[String:Any],calls:() -> Int) {
+        let api = RecordingOwnerAPI()
+        let model = AppModel(storage:OwnerMemoryStorage(),ownerAPI:api)
+        _ = await model.addOwner(server:"owner.invalid",accessCode:"")
+        _ = await model.createOwnerObject(server:"owner.invalid",label:"Ворота",kind:"call",phone:"+79990000000",url:"",secret:"",claimCode:"")
+        var config = OwnerKeyConfiguration(); config.calls["7"] = preference
+        _ = await model.createOwnerKey(server:"owner.invalid",label:"Гость",numberIDs:[7],welcome:"",nativeOnly:false,confirmation:false,settings:config)
+        let owner = model.owners[0],secrets = try owner.issuedKeys![0].secrets(masterKey:owner.masterKey)
+        let signed = try GuestPress.frame(userKey:secrets.userKey,host:owner.server,numberID:7,wireAction:"")
+        let press = (try JSONSerialization.jsonObject(with:signed) as! [String:Any])["press"]!
+        let channel = RecordingOwnerChannel(); api.liveChannel = channel
+        var calls = 0
+        let control = OwnerControlModel(app:model,dialer:{ _ in calls += 1; return handoff },notices:RecordingPhoneNotices(),phoneBusy:busy,clock:clock)
+        control.resume(); try await waitForOwner { control.connections[owner.server] == .connected }
+        return (model,control,channel,["type":"do_call","call_id":"explicit-call","number_id":7,"user_key_id":17,"press":press],{ calls })
+    }
+    @MainActor func testExpiredGuestPhoneRequestCannotDialOrCreateHistory() async throws {
+        var instant = Date()
+        let f = try await pendingPhoneFixture(clock:{ instant }); defer { f.control.suspend() }
+        f.channel.emit(f.frame); try await waitForOwner { f.control.phoneRequests.count == 1 }
+        let request = try XCTUnwrap(f.control.phoneRequests.first)
+        instant = instant.addingTimeInterval(61)
+        await f.control.approve(request)
+        XCTAssertEqual(f.calls(),0); XCTAssertTrue(f.model.journal.isEmpty); XCTAssertTrue(f.control.phoneRequests.isEmpty)
+    }
+    @MainActor func testImportedServeDuringCallCannotBypassCurrentPhoneBusyState() async throws {
+        var preference = OwnerCallPreference(); preference.serveDuringCall = true
+        var busy = false
+        let f = try await pendingPhoneFixture(preference:preference,busy:{ busy }); defer { f.control.suspend() }
+        f.channel.emit(f.frame); try await waitForOwner { f.control.phoneRequests.count == 1 }
+        busy = true
+        await f.control.approve(try XCTUnwrap(f.control.phoneRequests.first))
+        XCTAssertEqual(f.calls(),0); XCTAssertTrue(f.model.journal.isEmpty)
+        XCTAssertTrue(f.channel.writes.contains { $0["status"] as? String == "busy" })
+    }
+    @MainActor func testRevokedGuestRequestCannotBeApprovedFromAnOlderDialog() async throws {
+        let f = try await pendingPhoneFixture(); defer { f.control.suspend() }
+        f.channel.emit(f.frame); try await waitForOwner { f.control.phoneRequests.count == 1 }
+        let request = try XCTUnwrap(f.control.phoneRequests.first)
+        f.model.owners[0].issuedKeys![0].state = .revoked
+        await f.control.approve(request)
+        XCTAssertEqual(f.calls(),0); XCTAssertTrue(f.model.journal.isEmpty); XCTAssertTrue(f.control.phoneRequests.isEmpty)
+    }
+    @MainActor func testSuspendingWhileSendingGuestApprovalCannotLaunchPhoneAfterwards() async throws {
+        let f = try await pendingPhoneFixture(); defer { f.control.suspend() }
+        var frame = f.frame; frame["type"] = "confirm_request"
+        f.channel.emit(frame); try await waitForOwner { f.control.phoneRequests.count == 1 }
+        f.channel.onWrite = { json in
+            if json["type"] as? String == "confirm_response",json["accept"] as? Bool == true { f.control.suspend() }
+        }
+        await f.control.approve(try XCTUnwrap(f.control.phoneRequests.first))
+        XCTAssertEqual(f.calls(),0); XCTAssertTrue(f.model.journal.isEmpty); XCTAssertTrue(f.control.phoneRequests.isEmpty)
+    }
+    @MainActor func testFailedExplicitTelephoneHandoffIsAnErrorAndNeverRetries() async throws {
+        let f = try await pendingPhoneFixture(handoff:false); defer { f.control.suspend() }
+        f.channel.emit(f.frame); try await waitForOwner { f.control.phoneRequests.count == 1 }
+        let request = try XCTUnwrap(f.control.phoneRequests.first)
+        await f.control.approve(request); await f.control.approve(request)
+        XCTAssertEqual(f.calls(),1); XCTAssertEqual(f.model.journal.count,1)
+        XCTAssertEqual(f.model.journal.first?.level,"danger")
+        XCTAssertEqual(f.model.journal.first?.result,"Приложение «Телефон» не открылось")
+    }
+
+    @MainActor func testDisconnectedGuestRequestCannotSurviveAsALaterPhoneCommand() async throws {
+        let f = try await pendingPhoneFixture(); defer { f.control.suspend() }
+        f.channel.emit(f.frame); try await waitForOwner { f.control.phoneRequests.count == 1 }
+        let request = try XCTUnwrap(f.control.phoneRequests.first)
+        f.channel.close(); try await waitForOwner { f.control.connections["owner.invalid"] == .offline }
+        await f.control.approve(request)
+        XCTAssertEqual(f.calls(),0); XCTAssertTrue(f.model.journal.isEmpty); XCTAssertTrue(f.control.phoneRequests.isEmpty)
     }
 
 }

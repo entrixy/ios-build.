@@ -188,7 +188,6 @@ struct SettingsScreen: View {
             }.scrollContentBackground(.hidden).compactListSections()
                 .refreshable { if selected == .objects { await model.refreshOwners() }; await model.refresh() }
         }.background(Color(uiColor: .systemGroupedBackground)).navigationTitle(ProductText.string("tab_settings"))
-            .toolbar { if selected == .objects && model.catalogObjects().count > 1 { EditButton().accessibilityLabel("Порядок объектов") } }
             .navigationDestination(isPresented: $showCodeSettings) { AppEntryLockSettings() }
             .navigationDestination(isPresented: $showKey) {
                 if let guest = model.guests.first { KeyDetailScreen(guestID: guest.id) }

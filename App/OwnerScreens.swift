@@ -345,13 +345,19 @@ private struct OwnerObjectEditorForm: View {
                 }
             }
         }
-        .navigationTitle(ProductText.string(object?.kind == "ble" ? "ble_object_default" : "edit_object_title"))
-        .navigationBarTitleDisplayMode(.inline)
-        .toolbar {
-            if object?.kind != "ble" { ToolbarItem(placement: .navigationBarTrailing) {
-                Button { automation = true } label: { Image(systemName: "arrow.triangle.2.circlepath") }
-                    .accessibilityLabel(ProductText.string("owner_automation_desc")).accessibilityIdentifier("owner-object-automation")
-            } }
+        .toolbar(.hidden,for:.navigationBar)
+        .safeAreaInset(edge:.top,spacing:0) {
+            HStack(spacing:12) {
+                Text(ProductText.string(object?.kind == "ble" ? "ble_object_default" : "edit_object_title"))
+                    .font(.title3.weight(.semibold)).frame(maxWidth:.infinity,alignment:.leading)
+                    .accessibilityAddTraits(.isHeader)
+                if object?.kind != "ble" {
+                    Button { automation = true } label: { AutomationIcon() }
+                        .buttonStyle(SquareIconActionStyle())
+                        .accessibilityLabel(ProductText.string("owner_automation_desc")).accessibilityIdentifier("owner-object-automation")
+                }
+            }.padding(.horizontal,DesignMetrics.pageInset).padding(.vertical,12)
+                .background(Color(uiColor:.systemGroupedBackground))
         }
         .sheet(isPresented: $automation) { AutomationEditor(destination: .object(.owned(server: server, objectID: objectID))) }
         .sheet(isPresented: $showingCredentials) { if let credentials { DeviceCredentialsSheet(credentials: credentials, server: server) } }

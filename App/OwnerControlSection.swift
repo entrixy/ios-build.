@@ -17,19 +17,19 @@ struct OwnerPhoneRequestDialog: View {
                     Text(ProductText.string("confirm_text_intro", key.label))
                     Text((try? object.metadata(masterKey: owner.masterKey)["label"] as? String) ?? "Объект").font(.headline)
                     if object.kind == "call" {
-                        Text("iPhone запросит подтверждение телефонного звонка.").font(.footnote).foregroundStyle(Brand.secondaryInk)
+                        Text(ProductText.string("ios_guest_call_explicit")).font(.footnote).foregroundStyle(Brand.secondaryInk)
                     }
 
                 }
             } footer: {
                     EqualActionRow {
                         Button(ProductText.string("confirm_decline"), role: .destructive) { Task { await control.decline(request) } }
-                            .buttonStyle(SecondaryActionStyle())
+                            .buttonStyle(SecondaryActionStyle()).accessibilityIdentifier("owner-phone-decline")
                         Button {
                             approving = true
                             Task { await control.approve(request); approving = false }
-                        } label: { ActionButtonLabel(title: ProductText.string("confirm_allow"), busy: approving) }
-                            .buttonStyle(PrimaryActionStyle())
+                        } label: { ActionButtonLabel(title: ProductText.string(object.kind == "call" ? "ios_call_now" : "confirm_allow"), busy: approving) }
+                            .buttonStyle(PrimaryActionStyle()).accessibilityIdentifier("owner-phone-approve")
                     }.disabled(approving)
         }
         }

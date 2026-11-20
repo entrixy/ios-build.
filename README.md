@@ -6,15 +6,18 @@ This repository is private working source; no new distribution license is assign
 
 ## Current implementation and verification — 19 November 2026
 
-Latest completed public506cb4d/native94efd48: Apple308core, Debug/Release/privacy,
-ALL185hosted and unsigned physical-iPhone archive passed. UI23of27,44of56original
-frames; overall failure. Remaining map/row-size/window-anchor/diagnostic AX issues
-are recorded with exact artifacts in [current evidence](docs/FUNCTIONAL_PORT.md).
-The coherent remainder adds native message push/pending reads and server delivery,
-the actual review fixes, and localized platform hints. Local312core plus23provider/
-22isolated MariaDB/HTTP contracts passed;191hosted/27UI/56PNG await their exact Apple
-package. No real notification, migration, provider setup, signing or device test
-was performed. The live gallery still contains19older frames.
+The current baseline, remaining work and evidence are maintained in
+[CURRENT_STATUS.md](docs/CURRENT_STATUS.md); use it before the historical notes
+below. The autonomous batch workflow is [AUTONOMOUS_WORK.md](docs/AUTONOMOUS_WORK.md).
+
+Native ec2c81f/public487b2f6, [CI44521810979](https://github.com/entrixy/ios-build./actions/runs/44521810979),
+passed Apple312core,191hosted,27UI, Debug/Release/privacy/isolation and unsigned
+physical-iPhone app/widget archive. All56 original screenshots were reviewed and
+published in the [gallery](https://entrixy.com/ios-design.php), replacing19older
+frames. Signing, real device/interoperability acceptance and Store gates remain
+open. Backend APNs source is verified in isolation but unconfigured for real delivery.
+
+The following dated package notes are historical, not the current status.
 
 ### Previous package evidence
 

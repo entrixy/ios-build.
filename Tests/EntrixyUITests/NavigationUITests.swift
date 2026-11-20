@@ -130,6 +130,36 @@ final class NavigationUITests: XCTestCase {
         reviewCapture("automation-time-interval",settledBy:add)
         setAutomationRule("clock",to:false,in:app)
     }
+    func testLogoMenuProvidesLanguageHelpAndWebsiteWithoutOpeningExternalContent() {
+        let app = launch("mixed-objects")
+        app.buttons["header-menu"].tap()
+        let help = app.buttons["header-help"]
+        XCTAssertTrue(help.waitForExistence(timeout:5))
+        XCTAssertTrue(app.buttons["header-website"].exists)
+        XCTAssertTrue(app.buttons["header-language"].exists)
+        reviewCapture("header-menu",settledBy:help)
+        help.tap()
+        XCTAssertTrue(app.staticTexts["Как пользоваться приложением"].waitForExistence(timeout:10))
+        assertBottom(app,["control","settings","guests","journal"])
+        app.navigationBars.buttons.element(boundBy:0).tap()
+        app.buttons["header-menu"].tap(); app.buttons["header-language"].tap(); app.buttons["Deutsch"].tap()
+        XCTAssertTrue(app.buttons["header-menu"].waitForExistence(timeout:10)); app.buttons["header-menu"].tap()
+        XCTAssertEqual(app.buttons["header-help"].label,"Hilfe")
+        app.buttons["header-language"].tap(); app.buttons["Русский"].tap()
+        XCTAssertTrue(app.buttons["main-tab-settings"].waitForExistence(timeout:10))
+    }
+    func testGuestPhoneRequestOffersExplicitCallAndDeclineWithoutTelephoneHandoff() {
+        let app = XCUIApplication()
+        app.launchArguments = ["--stage-two","owner-phone-request","-AppleLanguages","(ru)","-AppleLocale","ru_RU"]
+        app.launch(); activeApp = app
+        let call = app.buttons["owner-phone-approve"], decline = app.buttons["owner-phone-decline"]
+        XCTAssertTrue(call.waitForExistence(timeout:15)); XCTAssertEqual(call.label,"Позвонить")
+        XCTAssertTrue(decline.isHittable)
+        reviewCapture("guest-call-request",settledBy:call)
+        decline.tap()
+        XCTAssertTrue(app.buttons["main-tab-journal"].waitForExistence(timeout:10)); app.buttons["main-tab-journal"].tap()
+        XCTAssertTrue(app.staticTexts["Журнал пуст. Здесь будут появляться вызовы."].waitForExistence(timeout:10))
+    }
     func testEmptyProfileAndModalCancellation() {
         let app = launch("empty")
         assertBottom(app, ["settings", "journal"])
@@ -302,6 +332,7 @@ final class NavigationUITests: XCTestCase {
         XCTAssertEqual(XCTWaiter.wait(for:[enabled],timeout:5),.completed)
         XCTAssertFalse(app.buttons["diagnostics-send"].exists)
         reviewCapture("diagnostic-settings")
+        app.buttons["header-menu"].tap()
         app.buttons["header-help"].tap()
         reviewCapture("help")
         let version = app.descendants(matching:.any).matching(identifier:"help-version").firstMatch
@@ -493,6 +524,15 @@ final class NavigationUITests: XCTestCase {
         XCTAssertLessThan(bleCard.frame.minY, ownCard.frame.minY); XCTAssertLessThan(ownCard.frame.minY, guestCard.frame.minY)
         assertBottom(app, ["control", "settings", "guests", "journal"])
         reviewCapture("control")
+        app.buttons["main-tab-settings"].tap()
+        XCTAssertFalse(app.buttons["Править"].exists)
+        let handles = app.buttons.matching(NSPredicate(format:"identifier BEGINSWITH %@","object-drag-"))
+        XCTAssertEqual(handles.count,3)
+        handles.element(boundBy:0).press(forDuration:1.2,thenDragTo:handles.element(boundBy:2))
+        let reordered = XCTNSPredicateExpectation(predicate:NSPredicate { _,_ in row("Дверь Bluetooth").frame.minY > row("Гостевой въезд").frame.minY },object:app)
+        XCTAssertEqual(XCTWaiter.wait(for:[reordered],timeout:8),.completed)
+        app.buttons["main-tab-control"].tap()
+        XCTAssertLessThan(card("Гостевой въезд").frame.minY,card("Дверь Bluetooth").frame.minY)
     }
     func testObjectCreationUsesAndroidTypeOrderAndDefaultCall() {
         let app = launch("empty")
@@ -544,9 +584,13 @@ final class NavigationUITests: XCTestCase {
         let reaction = app.descendants(matching:.any).matching(identifier:"guest-call-enabled").firstMatch
         XCTAssertTrue(reaction.waitForExistence(timeout:10))
         if nativeSwitch(reaction).value as? String != "1" { nativeSwitch(reaction).tap() }
-        XCTAssertTrue(app.buttons["guest-call-reaction-confirm"].waitForExistence(timeout:10))
-        XCTAssertTrue(app.buttons["guest-call-reaction-auto"].exists)
-        reviewCapture("guest-call-preferences",settledBy:app.buttons["guest-call-reaction-confirm"])
+        let policy = app.staticTexts["guest-call-confirmation-policy"]
+        XCTAssertTrue(policy.waitForExistence(timeout:10))
+        XCTAssertFalse(app.buttons["guest-call-reaction-auto"].exists)
+        XCTAssertFalse(app.buttons["guest-call-reaction-notify"].exists)
+        XCTAssertFalse(app.staticTexts["Во время разговора"].exists)
+        XCTAssertTrue(app.descendants(matching:.any).matching(identifier:"guest-call-notification").firstMatch.exists)
+        reviewCapture("guest-call-preferences",settledBy:policy)
         app.buttons["Закрыть"].tap(); app.buttons["Отмена"].tap()
         XCTAssertFalse(app.buttons.matching(NSPredicate(format:"identifier BEGINSWITH %@","guest-card-")).firstMatch.exists)
 
@@ -574,6 +618,7 @@ final class NavigationUITests: XCTestCase {
         XCTAssertEqual(avatarCancel.frame.height,avatarUpload.frame.height,accuracy:1)
         XCTAssertEqual(avatarCancel.frame.width,avatarUpload.frame.width,accuracy:1)
         XCTAssertGreaterThanOrEqual(avatarUpload.frame.height,48)
+        XCTAssertGreaterThan(avatarUpload.frame.minY,avatarCancel.frame.maxY)
         reviewCapture("object-avatar",settledBy:avatarUpload)
         app.buttons["Отмена"].tap()
         XCTAssertTrue(app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH %@", "object-settings-owner:")).firstMatch.waitForExistence(timeout: 10))

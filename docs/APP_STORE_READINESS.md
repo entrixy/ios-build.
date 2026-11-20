@@ -5,53 +5,23 @@
 каталог с независимыми server/guest/object scope, порядком, раскрытием действий,
 локальным именем/скрытием и добавлением Bluetooth через выбор типа.
 
-## Текущее задание — полный перенос, 17.11.2026
+## Текущий статус — 19.11.2026
 
-Действующее указание пользователя — доделать приложение по рабочему Android,
-затем снять и проверить весь набор нативных экранов и обновить галерею. Прежние
-ограничения «этап 2» и остановки после отдельной вертикали относятся к истории;
-они не ограничивают текущую разрешённую работу. Полный результат ещё не готов.
-Актуальные функциональные границы и проверки — [FUNCTIONAL_PORT.md](FUNCTIONAL_PORT.md).
+Полный перенос остаётся активным заданием. Точная проверенная версия, оставшиеся
+пакеты и ограничения собраны в [CURRENT_STATUS.md](CURRENT_STATUS.md), порядок
+автономной работы — в [AUTONOMOUS_WORK.md](AUTONOMOUS_WORK.md).
 
-Последний общий Apple-прогон: native `98d4676`, public `3b806d7`,
-[CI44477923156](https://github.com/entrixy/ios-build./actions/runs/44477923156):
-295core, Debug с motion/native UIKit hosts/WidgetKit/test bundles,
-Release/privacy/isolation и179hosted без ошибок. UI25:24прошли, включая новую
-очередь сообщений/Close и локальное удаление ключа. Диагностика снова timeout
-accessibility query. Отдельный modal host НЕ устранил ошибку. Общий результат —
-failure.40/44 оригинальных PNG экспортированы, четыре состояния диагностики не
-достигнуты; новая галерея не опубликована/не принята.
+CI44521810979/nativeec2c81f/public487b2f6 прошёл312core/191hosted/27UI,
+Debug/Release/privacy/isolation и unsigned physical-iPhone app/widget archive.
+56 оригинальных кадров просмотрены и опубликованы в галерее вместо19 старых.
+Это не signing/TestFlight/App Store или аппаратная приёмка. TeamID/BundleID
+ранее запрошены, ещё не подтверждены; provisional IDs не использовать как ответ.
+Реальные APNs, BLE/камера/сотовая сеть/фон, account/Android interoperability,
+privacy/Store materials и финальная приёмка остаются в реестре.
 
-Новый результат: native `e2d7b01`, public `dc29234`,
-[CI44482890600](https://github.com/entrixy/ios-build./actions/runs/44482890600):
-295core, Debug/test bundles, Release/privacy/isolation прошли. UIKit содержимое
-согласия с явным AX-порядком скомпилировано, но runtime не начался: cold boot
-симулятора завершился terminal migration failure, затем завис UI service.
-179hosted/25UI/44PNG в этом запуске НЕ выполнялись. Подготовка темы перенесена
-в ограниченный recovery cold boot ДО сценариев; шесть pipeline contracts прошли.
-Фиксация кадра и footer изменений пока требуют живого UI-прогона.
-
-Ограниченная фоновая BLE/свои local webhook, обычные entry/manual guards, UIKit
-очередь сообщений, frozen GPS/Core Motion и четыре widget lifecycle cases имеют
-свою проверочную базу; физическая проверка их поведения остаётся отдельно.
-PIN/confirm BLE ручной; коалесцирование рекламы не означает выход. SIM-call,
-постоянный WSS/APNs в фоне не заявлены реализованными. Полный App Store результат
-ещё не готов.
-
-Для следующего source-пакета добавлен unsigned Release archive с iphoneos SDK
-(приложение + виджет). Проверяются не только arm64, но и физическая iOS platform
-в Mach-O, privacy manifests, fixture isolation и отсутствие provisioning/signatures.
-Архив фактически собран в CI44482890600: SDK26.2, arm64, iphoneos; приложение
-com.entrixy.ios/iOS16, виджет com.entrixy.ios.widget/iOS17. Сам архив/IPA не публикуется;
-сохраняются лог и metadata с upload_ready=false. Подпись, устройство, TestFlight
-и App Store остаются отдельными неподтверждёнными шагами.
-
-App Group `group.com.entrixy.ios` и окончательные Bundle IDs должны быть настроены
-в Apple Developer team перед device signing. Подпись/профили не настроены.
-На сайте остаются19 прежних кадров069; новые рабочие PNG будут взяты из UI-прогона.
-Полная сверка Android, OS/background/BLE/камера на устройстве, реальный account login,
-TestFlight, метаданные и App Store не завершены. Съёмка32 текущих сценариев не равна
-покрытию всех62 Android-узлов; незакрытые узлы отмечены в IOS_STRUCTURE.md.
+Ниже — история прежних этапов; её pending/failure и количества не заменяют
+текущую сводку. Остановки после каждой вертикали отменены позднейшим запросом
+пользователя работать крупными пакетами.
 
 ## Историческая проверка объектов — 16.11.2026
 

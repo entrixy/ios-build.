@@ -951,3 +951,16 @@
 "ios_call_confirmation_required" = "iOS требует подтверждать телефонный звонок. Автоматически завершить звонок приложение не может.";
 "ios_call_guest_confirmation_required" = "iOS всегда запрашивает системное подтверждение звонка. Вызов из фона недоступен.";
 "ios_call_imported_hangup" = "Из Android сохранён авто-сброс через %d с.";
+
+// iOS review: accessible actions and explicit telephone requests.
+"ios_website" = "Сайт";
+"ios_object_reorder" = "Порядок объектов";
+"ios_move_up" = "Переместить выше";
+"ios_move_down" = "Переместить ниже";
+"ios_guest_call_explicit" = "Каждый запрос гостя требует вашего действия. Нажмите «Позвонить», затем подтвердите вызов в iOS. Запросы принимаются, пока Entrixy открыто.";
+"ios_guest_call_notification" = "Показывать уведомление о запросе";
+"ios_guest_call_notification_denied" = "Разрешите уведомления Entrixy в настройках iPhone.";
+"ios_guest_call_request_title" = "%@ просит открыть";
+"ios_guest_call_request_body" = "Объект: %@. Откройте Entrixy, чтобы позвонить.";
+"ios_guest_call_expired" = "Срок запроса истёк";
+"ios_call_now" = "Позвонить";

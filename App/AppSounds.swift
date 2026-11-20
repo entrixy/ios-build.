@@ -223,7 +223,7 @@ struct SoundSettingsRows: View {
                                 .font(.caption).foregroundStyle(Brand.secondaryInk)
                         }.frame(maxWidth:.infinity,alignment:.leading)
                         if !sounds.muted.contains(event) {
-                            Button { importing = event; choosingFile = true } label: { Image(systemName:"square.and.arrow.up").font(.system(size:22)).frame(width:44,height:44) }
+                            Button { importing = event; choosingFile = true } label: { Image("android-upload-file").resizable().scaledToFit().frame(width:24,height:24).frame(width:44,height:44) }
                                 .buttonStyle(.plain).accessibilityLabel(ProductText.string("settings_sound_upload"))
                             if sounds.custom.contains(event) {
                                 Button { sounds.reset(event) } label: { Image(systemName:"arrow.counterclockwise").font(.system(size:21)).frame(width:44,height:44) }

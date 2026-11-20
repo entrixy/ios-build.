@@ -24,7 +24,9 @@ struct ObjectAvatar: View {
             } else { Image("object-\(index + 1)").resizable().scaledToFill() }
         }
         .frame(width: size, height: size)
-        .clipShape(RoundedRectangle(cornerRadius: size * 0.25)).accessibilityHidden(true)
+        .clipShape(RoundedRectangle(cornerRadius: size * 0.25))
+            .overlay(RoundedRectangle(cornerRadius:size * 0.25).strokeBorder(Color(uiColor:.systemGray4),lineWidth:1))
+            .accessibilityHidden(true)
     }
 }
 
@@ -43,6 +45,8 @@ struct OwnerObjectAvatar: View {
                 Image(uiImage: image).resizable().scaledToFill()
             } else { Image("object-\(index + 1)").resizable().scaledToFill() }
         }.frame(width: size, height: size)
-            .clipShape(RoundedRectangle(cornerRadius: size * 0.25)).accessibilityHidden(true)
+            .clipShape(RoundedRectangle(cornerRadius: size * 0.25))
+            .overlay(RoundedRectangle(cornerRadius:size * 0.25).strokeBorder(Color(uiColor:.systemGray4),lineWidth:1))
+            .accessibilityHidden(true)
     }
 }

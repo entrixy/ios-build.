@@ -5,13 +5,12 @@
 
 ## Актуальная сверка — 19.11.2026
 
-Последний завершённый native6625b7e/public91491ea: Apple308core,
-Debug/Release/privacy и unsigned iphoneos app+widget archive прошли.
-Hosted184из185, UI24из26,40из45оригинальныхPNG; общий failure.
-Следующий native94efd48/public506cb4d исправляет старые ожидания отзыва,
-promotion AX identifier и diagnostic presentation; расширяет реальные маршруты
-до27UI/56кадров. Apple runtime пока pending. Актуальное доказательство находится
-в начале [FUNCTIONAL_PORT.md](FUNCTIONAL_PORT.md).
+Текущее доказательство и оставшиеся пакеты: [CURRENT_STATUS.md](CURRENT_STATUS.md).
+Nativeec2c81f/public487b2f6: Apple312core/191hosted/27UI, Debug/Release/privacy/
+isolation и unsigned iphoneos archive — success.56оригинальныхPNG просмотрены
+и опубликованы. Это проверка перечисленных сценариев, не полная приёмка всех
+62узлов Android, реального устройства или App Store. Датированные записи ниже
+сохраняют историю.
 
 ### Предыдущая сверка — 17.11.2026
 

@@ -11,6 +11,8 @@ import re
 import struct
 
 SCREENS = {
+    'header-menu': ('Меню Entrixy', 'Система'),
+    'guest-call-request': ('Запрос гостя на звонок', 'Гости'),
     'control': ('Управление', 'Объекты'),
     'control-promotion': ('Карточка Entrixy в управлении', 'Объекты'),
     'settings-objects': ('Настройки объектов', 'Объекты'),

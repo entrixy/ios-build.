@@ -55,7 +55,7 @@ private final class UnifiedNoticeDelegate: NSObject, UNUserNotificationCenterDel
             if request.trigger is UNPushNotificationTrigger {
                 _ = LiveAppRuntime.model().remoteNotifications.receive(request.content.userInfo)
             } else if response.actionIdentifier == "entrixy.cancel-call" { cancelled(request.identifier) }
-            else if request.content.categoryIdentifier == "entrixy.automation", response.actionIdentifier == UNNotificationDefaultActionIdentifier {
+            else if ["entrixy.automation","entrixy.guest-call"].contains(request.content.categoryIdentifier), response.actionIdentifier == UNNotificationDefaultActionIdentifier {
                 NotificationCenter.default.post(name:.entrixyAutomationFocus,object:nil)
             }
             completionHandler()

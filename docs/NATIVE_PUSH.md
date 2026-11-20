@@ -41,9 +41,11 @@ real notification was sent during implementation. Signed device registration,
 APNs delivery, background/locked/force-quit behavior and migration require actual
 device acceptance. No claim of guaranteed background delivery is made.
 
-The new source adds four core API/payload cases and six hosted flow cases.
-Expected next totals312core/191hosted/27UI/56original checkpoints; exact-source
-Apple verification remains pending. The current506cb4d run predates this block.
+Four core API/payload cases and six hosted flow cases passed in
+[CI44521810979](https://github.com/entrixy/ios-build./actions/runs/44521810979),
+exact nativeec2c81f/public487b2f6:312core/191hosted/27UI and all56original
+checkpoints. This is isolated SDK/runtime verification, not a real APNs send.
+Current baseline and remaining delivery gates: [CURRENT_STATUS.md](CURRENT_STATUS.md).
 
 Primary references:
 

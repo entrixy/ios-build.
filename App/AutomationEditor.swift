@@ -173,14 +173,14 @@ private struct AutomationGeoFields: View {
             if !readOnly {
                 Button {
                     Task { if let point = try? await sensors.currentLocation() { change { $0.geoLat = point.coordinate.latitude; $0.geoLon = point.coordinate.longitude } } }
-                } label: { Label(ProductText.string(sensors.locating ? "action_gps_fetching" : "automation_geo_use_current"), systemImage: "location") }
+                } label: { LeadingActionLabel(title:ProductText.string(sensors.locating ? "action_gps_fetching" : "automation_geo_use_current"), systemImage:"location") }
                     .buttonStyle(SecondaryActionStyle()).disabled(sensors.locating)
             }
             if !readOnly || !geometry.corridors.isEmpty {
                 Button {
                     showingMap = true
                 } label: {
-                    Label(geometry.corridors.isEmpty ? ProductText.string("automation_geo_draw_route") : ProductText.string("automation_geo_route_count",geometry.corridors.count), systemImage: "pencil.tip")
+                    LeadingActionLabel(title:geometry.corridors.isEmpty ? ProductText.string("automation_geo_draw_route") : ProductText.string("automation_geo_route_count",geometry.corridors.count), systemImage:"pencil.tip")
                 }.buttonStyle(SecondaryActionStyle()).accessibilityIdentifier("automation-geo-map")
             }
             if geometry.corridors.isEmpty {

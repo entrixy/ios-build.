@@ -82,8 +82,8 @@ struct CardActionStyle: ButtonStyle {
     }
 }
 
-/// Equal-width actions also share the tallest measured height. Long localized
-/// labels and Dynamic Type may grow a row without squeezing text to its edges.
+/// Keep a row only while every title fits on one line. The same controls move
+/// into a full-width column; no duplicate view tree or font shrinking is needed.
 struct EqualActionRow<Content:View>: View {
     @Environment(\.layoutDirection) private var direction
     @ViewBuilder let content: () -> Content
@@ -94,23 +94,59 @@ private struct EqualActionLayout: Layout {
     let direction: LayoutDirection
     private let gap = DesignMetrics.dialogActionGap
     init(direction:LayoutDirection) { self.direction = direction }
+    private func metrics(_ width:CGFloat, _ subviews:Subviews) -> (stacked:Bool,cellWidth:CGFloat,cellHeight:CGFloat) {
+        let count = CGFloat(subviews.count)
+        let rowWidth = max(0,(width-gap*(count-1))/count)
+        let stacked = subviews.contains { $0.sizeThatFits(.unspecified).width > rowWidth+0.5 }
+        let cellWidth = stacked ? width : rowWidth
+        let cellHeight = max(DesignMetrics.primaryHeight,subviews.map { $0.sizeThatFits(ProposedViewSize(width:cellWidth,height:nil)).height }.max() ?? 0)
+        return (stacked,cellWidth,cellHeight)
+    }
     func sizeThatFits(proposal:ProposedViewSize,subviews:Subviews,cache:inout ()) -> CGSize {
         guard !subviews.isEmpty else { return .zero }
         let count = CGFloat(subviews.count)
         let natural = subviews.map { $0.sizeThatFits(.unspecified).width }.max() ?? 0
         let width = max(0,proposal.width ?? (natural*count+gap*(count-1)))
-        let cellWidth = max(0,(width-gap*(count-1))/count)
-        let height = subviews.map { $0.sizeThatFits(ProposedViewSize(width:cellWidth,height:nil)).height }.max() ?? 0
-        return CGSize(width:width,height:max(DesignMetrics.primaryHeight,height))
+        let measured = metrics(width,subviews)
+        return CGSize(width:width,height:measured.stacked ? measured.cellHeight*count+gap*(count-1) : measured.cellHeight)
     }
     func placeSubviews(in bounds:CGRect,proposal:ProposedViewSize,subviews:Subviews,cache:inout ()) {
         guard !subviews.isEmpty else { return }
-        let cellWidth = max(0,(bounds.width-gap*CGFloat(subviews.count-1))/CGFloat(subviews.count))
+        let measured = metrics(bounds.width,subviews)
         for index in subviews.indices {
             let column = direction == .rightToLeft ? subviews.count-1-index : index
-            subviews[index].place(at:CGPoint(x:bounds.minX+CGFloat(column)*(cellWidth+gap),y:bounds.minY),anchor:.topLeading,
-                proposal:ProposedViewSize(width:cellWidth,height:bounds.height))
+            let x = measured.stacked ? bounds.minX : bounds.minX+CGFloat(column)*(measured.cellWidth+gap)
+            let y = measured.stacked ? bounds.minY+CGFloat(index)*(measured.cellHeight+gap) : bounds.minY
+            subviews[index].place(at:CGPoint(x:x,y:y),anchor:.topLeading,
+                proposal:ProposedViewSize(width:measured.cellWidth,height:measured.cellHeight))
         }
+    }
+}
+
+/// Fixed icon/text columns for groups of wide actions, including wrapped titles.
+struct LeadingActionLabel: View {
+    let title: String
+    let systemImage: String
+    var body: some View {
+        HStack(alignment:.firstTextBaseline,spacing:12) {
+            Image(systemName:systemImage).frame(width:24).accessibilityHidden(true)
+            Text(title).multilineTextAlignment(.leading).frame(maxWidth:.infinity,alignment:.leading)
+        }.frame(maxWidth:.infinity,alignment:.leading)
+    }
+}
+
+struct AutomationIcon: View {
+    var body: some View { Image("android-auto-mode").resizable().scaledToFit().frame(width:26,height:26).accessibilityHidden(true) }
+}
+
+struct SquareIconActionStyle: ButtonStyle {
+    @Environment(\.isEnabled) private var enabled
+    var destructive = false
+    func makeBody(configuration:Configuration) -> some View {
+        configuration.label.frame(width:48,height:48)
+            .foregroundStyle(enabled ? (destructive ? AppPalette.destructive : Brand.ink) : Brand.secondaryInk)
+            .background(enabled ? AppPalette.secondary : Color(uiColor:.systemGray5),in:RoundedRectangle(cornerRadius:12))
+            .opacity(configuration.isPressed ? 0.75 : 1)
     }
 }
 

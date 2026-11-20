@@ -212,12 +212,12 @@ private struct GuestPersonCard: View {
                 Button(ProductText.string("btn_retry"),action:recovery).buttonStyle(SecondaryActionStyle())
             }
             if expanded {
-                ScrollView(.horizontal,showsIndicators:false) {
-                    HStack(spacing:0) {
+                LazyVGrid(columns:[GridItem(.adaptive(minimum:48,maximum:48),spacing:8)],alignment:.leading,spacing:8) {
+                    Group {
                         GuestIconButton("gearshape",label:ProductText.string("guests_edit_desc"),action:edit).disabled(key.pending != nil)
                         GuestIconButton("plus",label:ProductText.string("guests_clone_desc")) { Task { await model.cloneOwnerKey(server:row.server,keyID:key.id) } }.disabled(!model.canCloneOwnerKey(server:row.server,keyID:key.id))
                         GuestIconButton("qrcode",label:"QR",action:qr).disabled(link == nil)
-                        ShareLink(item:shareText) { Image(systemName:"square.and.arrow.up").font(.system(size:22)).frame(width:44,height:48) }.buttonStyle(.plain).disabled(link == nil).accessibilityLabel(ProductText.string("guests_share_chooser"))
+                        ShareLink(item:shareText) { Image(systemName:"square.and.arrow.up").resizable().scaledToFit().frame(width:24,height:24) }.buttonStyle(SquareIconActionStyle()).disabled(link == nil).accessibilityLabel(ProductText.string("guests_share_chooser"))
                         GuestIconButton("envelope",label:ProductText.string("msg_send_icon_desc"),action:message).disabled(key.pending != nil || ![.active,.paused,.restricted].contains(key.state))
                         GuestIconButton(key.state == .paused ? "play.fill" : "pause.fill",label:ProductText.string(key.state == .paused ? "guest_key_resume" : "guest_key_pause")) { Task { await model.setOwnerKeyMode(server:row.server,keyID:key.id,paused:key.state != .paused) } }.disabled(key.pending != nil || ![.active,.paused].contains(key.state))
                         GuestIconButton("trash",label:ProductText.string("btn_delete"),destructive:true,action:remove).disabled(key.keyID == nil)
@@ -236,8 +236,8 @@ struct GuestIconButton: View {
     @Environment(\.isEnabled) private var enabled
     init(_ symbol: String,label: String,destructive: Bool = false,action: @escaping () -> Void) { self.symbol = symbol; self.label = label; self.destructive = destructive; self.action = action }
     var body: some View {
-        Button(action:action) { Image(systemName:symbol).font(.system(size:22)).frame(width:44,height:48).contentShape(Rectangle()) }
-            .buttonStyle(.plain).foregroundStyle(enabled ? (destructive ? AppPalette.destructive : Brand.ink) : Brand.secondaryInk.opacity(0.5)).accessibilityLabel(label)
+        Button(action:action) { Image(systemName:symbol).resizable().scaledToFit().frame(width:24,height:24) }
+            .buttonStyle(SquareIconActionStyle(destructive:destructive)).accessibilityLabel(label)
     }
 }
 struct GuestKeyAvatar: View {

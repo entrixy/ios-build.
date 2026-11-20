@@ -2328,6 +2328,7 @@ extension AppModel {
             else {
                 switch m["status"] as? String {
                 case "declined": text = "Запрос отклонён владельцем"; level = "danger"
+                case "expired": text = ProductText.string("ios_guest_call_expired"); level = "warning"
                 case "busy": text = "Владелец занят"; level = "warning"
                 case "dialing", "accepted", "ok": text = "Набираем…"; level = "success"
                 case "awaiting_confirm", "sent_to_host": text = "Ожидание подтверждения…"

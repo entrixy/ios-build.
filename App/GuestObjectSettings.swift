@@ -76,7 +76,7 @@ struct GuestInvocationEditor: View {
     @Binding var preference: OwnerCallPreference
     @State private var warning = false
     @State private var working = false
-    @State private var rememberedReaction = "auto"
+    @State private var rememberedReaction = "confirm"
     private var owner: OwnerAccount? { model.owners.first { $0.server == server } }
     private var object: OwnerObject? { owner?.objects?.first { $0.id == objectID } }
     private var label: String { guard let owner, let object else { return "" }; return (try? object.metadata(masterKey: owner.masterKey)["label"] as? String) ?? "" }
@@ -91,28 +91,17 @@ struct GuestInvocationEditor: View {
                                 else { rememberedReaction = preference.reaction; preference.reaction = "off" }
                             })).accessibilityIdentifier("guest-call-enabled")
                             if preference.reaction != "off" {
-                                ForEach(["confirm","notify","auto"], id: \.self) { mode in
-                                    Button {
-                                        if mode == "notify" {
-                                            Task {
-                                                if await OwnerPhoneNotifications.authorize() { rememberedReaction = mode; preference.reaction = mode }
-                                                else { model.errorMessage = "Разрешите уведомления Entrixy в настройках iPhone." }
-                                            }
-                                        } else { rememberedReaction = mode; preference.reaction = mode }
-                                    } label: {
-                                        HStack(spacing: 12) {
-                                            Image(systemName: preference.reaction == mode ? "largecircle.fill.circle" : "circle")
-                                            Text(ProductText.string("guest_call_react_" + mode)).frame(maxWidth: .infinity, alignment: .leading)
-                                        }.foregroundStyle(Brand.ink).frame(minHeight: 48).contentShape(Rectangle())
-                                    }.buttonStyle(.plain).accessibilityIdentifier("guest-call-reaction-" + mode)
-                                }
-                                Divider()
-                                Toggle(isOn: $preference.serveDuringCall) {
-                                    VStack(alignment: .leading, spacing: 5) {
-                                        Text(ProductText.string("guest_call_serve_title"))
-                                        Text(ProductText.string("guest_call_serve_hint")).font(.footnote).foregroundStyle(Brand.secondaryInk)
-                                    }
-                                }
+                                Text(ProductText.string("ios_guest_call_explicit"))
+                                    .fixedSize(horizontal:false,vertical:true)
+                                    .accessibilityIdentifier("guest-call-confirmation-policy")
+                                Toggle(ProductText.string("ios_guest_call_notification"),isOn:Binding(get:{ preference.reaction == "notify" },set:{ enabled in
+                                    if enabled {
+                                        Task {
+                                            if await OwnerPhoneNotifications.authorize() { preference.reaction = "notify"; rememberedReaction = "notify" }
+                                            else { model.errorMessage = ProductText.string("ios_guest_call_notification_denied") }
+                                        }
+                                    } else { preference.reaction = "confirm"; rememberedReaction = "confirm" }
+                                })).accessibilityIdentifier("guest-call-notification")
                             }
                         }.padding(16).background(Color(uiColor: .secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 14))
                         Text(ProductText.string("ios_call_guest_confirmation_required")).font(.footnote).foregroundStyle(Brand.secondaryInk)
