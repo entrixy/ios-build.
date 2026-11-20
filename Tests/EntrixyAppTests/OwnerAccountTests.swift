@@ -1024,7 +1024,7 @@ extension OwnerAccountTests {
 
     @MainActor private func pendingPhoneFixture(preference:OwnerCallPreference = OwnerCallPreference(),
         clock:@escaping @MainActor () -> Date = { Date() },busy:@escaping @MainActor () -> Bool = { false },
-        handoff:Bool = true) async throws -> (model:AppModel,control:OwnerControlModel,channel:RecordingOwnerChannel,frame:[String:Any],calls:() -> Int) {
+        handoff:Bool = true) async throws -> (model:AppModel,control:OwnerControlModel,channel:RecordingOwnerChannel,api:RecordingOwnerAPI,frame:[String:Any],calls:() -> Int) {
         let api = RecordingOwnerAPI()
         let model = AppModel(storage:OwnerMemoryStorage(),ownerAPI:api)
         _ = await model.addOwner(server:"owner.invalid",accessCode:"")
@@ -1038,7 +1038,7 @@ extension OwnerAccountTests {
         var calls = 0
         let control = OwnerControlModel(app:model,dialer:{ _ in calls += 1; return handoff },notices:RecordingPhoneNotices(),phoneBusy:busy,clock:clock)
         control.resume(); try await waitForOwner { control.connections[owner.server] == .connected }
-        return (model,control,channel,["type":"do_call","call_id":"explicit-call","number_id":7,"user_key_id":17,"press":press],{ calls })
+        return (model,control,channel,api,["type":"do_call","call_id":"explicit-call","number_id":7,"user_key_id":17,"press":press],{ calls })
     }
     @MainActor func testExpiredGuestPhoneRequestCannotDialOrCreateHistory() async throws {
         var instant = Date()
@@ -1063,7 +1063,8 @@ extension OwnerAccountTests {
         let f = try await pendingPhoneFixture(); defer { f.control.suspend() }
         f.channel.emit(f.frame); try await waitForOwner { f.control.phoneRequests.count == 1 }
         let request = try XCTUnwrap(f.control.phoneRequests.first)
-        f.model.owners[0].issuedKeys![0].state = .revoked
+        f.api.keyRows[0]["enabled"] = 0
+        await f.model.refreshOwners()
         await f.control.approve(request)
         XCTAssertEqual(f.calls(),0); XCTAssertTrue(f.model.journal.isEmpty); XCTAssertTrue(f.control.phoneRequests.isEmpty)
     }
