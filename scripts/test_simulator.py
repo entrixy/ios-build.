@@ -9,6 +9,7 @@ import subprocess
 import struct
 from capture_simulator import create_booted_device, cleanup_device
 from export_ui_review import export_review
+from prepare_review_simulator import prepared_device
 
 
 def device_screen_probe(device):
@@ -61,6 +62,7 @@ def main():
     selection.add_argument("--only-ui", action="store_true", help="Run unchanged UI assertions on a fresh runner without hosted unit tests")
     parser.add_argument("--use-built-tests", action="store_true", help="Run the existing build-for-testing products without rebuilding")
     parser.add_argument('--review-captures', action='store_true', help='Capture named UI checkpoints during the same native/UI test pass')
+    parser.add_argument('--prepared-device',type=Path,help='Use the verified source/runtime-matched device prepared before compilation')
     args = parser.parse_args()
     if args.review_captures and (not args.use_built_tests or args.only_native):
         parser.error('--review-captures requires --use-built-tests and UI tests')
@@ -71,7 +73,7 @@ def main():
     sdk = subprocess.check_output(['xcrun', '--sdk', 'iphonesimulator', '--show-sdk-version'], text=True).strip()
     runtimes = json.loads(subprocess.check_output(['xcrun', 'simctl', 'list', 'runtimes', '--json']))['runtimes']
     runtime = next(r['identifier'] for r in runtimes if r.get('isAvailable') and '.iOS-' in r['identifier'] and (r['version'] == sdk or r['version'].startswith(sdk + '.')))
-    device = create_booted_device('isolated unit tests', 'com.apple.CoreSimulator.SimDeviceType.iPhone-16', runtime, appearance='light')
+    device = prepared_device(args.prepared_device,runtime) if args.prepared_device else create_booted_device('isolated unit tests', 'com.apple.CoreSimulator.SimDeviceType.iPhone-16', runtime, appearance='light')
     result = Path('.local-checks/TestResults/combined-review.xcresult')
     tests_succeeded = False
     try:

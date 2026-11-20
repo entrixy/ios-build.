@@ -25,6 +25,9 @@ jobs:
           xcodebuild -version | tee .local-checks/ci/toolchain.log
       - name: Test protocol core with Apple CryptoKit
         run: swift test 2>&1 | tee .local-checks/ci/core.log
+      - name: Prepare healthy simulator before compiling application products
+        if: github.ref == 'refs/heads/ci/review-batch'
+        run: python3 scripts/prepare_review_simulator.py
       - name: Install project generator
         run: brew install xcodegen
       - name: Generate project
@@ -57,7 +60,7 @@ jobs:
         run: python3 scripts/test_simulator.py --only-ui --use-built-tests 2>&1 | tee .local-checks/ci/ui-tests.log
       - name: Verify native and UI scenarios with original screenshots in the same simulator pass
         if: github.ref == 'refs/heads/ci/review-batch'
-        run: python3 scripts/test_simulator.py --use-built-tests --review-captures 2>&1 | tee .local-checks/ci/combined-review.log
+        run: python3 scripts/test_simulator.py --use-built-tests --review-captures --prepared-device .local-checks/ci/prepared-device.json 2>&1 | tee .local-checks/ci/combined-review.log
       - name: Retain compilation evidence
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
@@ -76,3 +79,6 @@ jobs:
           path: .local-checks/ci/device-release.*
           if-no-files-found: ignore
           retention-days: 3
+      - name: Clean up retained job-owned simulator
+        if: always() && github.ref == 'refs/heads/ci/review-batch'
+        run: python3 scripts/prepare_review_simulator.py --cleanup

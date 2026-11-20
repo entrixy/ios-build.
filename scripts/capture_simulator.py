@@ -44,8 +44,8 @@ def create_booted_device(model, device_type, runtime, *, appearance=None):
             device = created.splitlines()[-1].strip()
             run('xcrun', 'simctl', 'boot', device)
             run('xcrun', 'simctl', 'bootstatus', device, '-b', timeout=300)
-            # bootstatus can exit successfully with a terminal migration failure
-            # (Status=4294967295). Probe the UI service before starting any app
+            # A terminal "Finished" status also occurs in healthy runs and does
+            # not establish UI readiness. Probe the UI service before any app
             # scenario, inside the same bounded cold-boot recovery boundary.
             if appearance is not None:
                 run('xcrun', 'simctl', 'ui', device, 'appearance', appearance, timeout=60)

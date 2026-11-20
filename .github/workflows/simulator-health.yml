@@ -1,0 +1,36 @@
+name: Isolated simulator health
+"on":
+  push:
+    branches: [ci/simulator-health]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  boot:
+    strategy:
+      fail-fast: false
+      matrix:
+        runner: [macos-15, macos-15-intel]
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 15
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.3.app/Contents/Developer
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - name: Show toolchain
+        run: xcodebuild -version
+      - name: Probe simulator without building or running application scenarios
+        run: python3 scripts/prepare_review_simulator.py
+      - name: Clean up job-owned simulator
+        if: always()
+        run: python3 scripts/prepare_review_simulator.py --cleanup
+      - name: Retain health diagnostics, never product screenshots
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: simulator-health-${{ matrix.runner }}
+          path: .local-checks/ci/
+          retention-days: 3

@@ -15,9 +15,40 @@ import zlib
 from export_ui_review import export_review
 from test_simulator import review_test_products
 from capture_simulator import create_booted_device
+from prepare_review_simulator import prepared_device
 
 
 class ReviewPipelineTests(unittest.TestCase):
+    def preparedFixture(self, root):
+        path = Path(root)/'device.json'
+        report = {'source_sha':'a'*40,'runtime':'iOS-runtime','device':'11111111-1111-4111-8111-111111111111'}
+        path.write_text(json.dumps(report))
+        row = {'udid':report['device'],'name':'Entrixy preview tests','state':'Booted','deviceTypeIdentifier':'com.apple.CoreSimulator.SimDeviceType.iPhone-16'}
+        return path,report,row
+
+    def testPreparedDeviceRejectsDifferentSourceBeforeTouchingAnySimulator(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            path,_,_ = self.preparedFixture(temporary)
+            with patch('prepare_review_simulator.source_sha',return_value='b'*40),patch('prepare_review_simulator.subprocess.check_output') as execute:
+                with self.assertRaisesRegex(RuntimeError,'source/runtime'):
+                    prepared_device(path,'iOS-runtime')
+                execute.assert_not_called()
+
+    def testPreparedDeviceRejectsPersonalSimulatorEvenWithMatchingIdentifier(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            path,_,row = self.preparedFixture(temporary); row['name'] = 'Personal iPhone'
+            with patch('prepare_review_simulator.source_sha',return_value='a'*40),patch('prepare_review_simulator.subprocess.check_output',return_value=json.dumps({'devices':{'iOS-runtime':[row]}})),patch('prepare_review_simulator.run') as execute:
+                with self.assertRaisesRegex(RuntimeError,'unowned'):
+                    prepared_device(path,'iOS-runtime')
+                execute.assert_not_called()
+
+    def testPreparedDeviceIsReusedAfterUIHealthCheckWithoutBootingAnotherOne(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            path,report,row = self.preparedFixture(temporary)
+            with patch('prepare_review_simulator.source_sha',return_value='a'*40),patch('prepare_review_simulator.subprocess.check_output',return_value=json.dumps({'devices':{'iOS-runtime':[row]}})),patch('prepare_review_simulator.run') as execute:
+                self.assertEqual(prepared_device(path,'iOS-runtime'),report['device'])
+                execute.assert_called_once_with('xcrun','simctl','ui',report['device'],'appearance','light',timeout=60)
+
     def testUIServiceStallIsRecoveredBeforeAnyTestStarts(self):
         commands = []
         def execute(*args, **kwargs):
