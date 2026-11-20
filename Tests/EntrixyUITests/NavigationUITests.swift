@@ -25,7 +25,9 @@ final class NavigationUITests: XCTestCase {
             if current != previous { previous = current; unchangedSince = Date(); return false }
             return Date().timeIntervalSince(unchangedSince) >= 0.6
         },object:anchor)
-        guard XCTWaiter.wait(for:[settled],timeout:8) == .completed else {
+        // A single hierarchy request took 2–3s on the Intel hosted runner.
+        // Preserve two stable, hittable observations and the 0.6s interval.
+        guard XCTWaiter.wait(for:[settled],timeout:20) == .completed else {
             XCTFail("Native checkpoint did not reach a stable visible layout: " + state); return
         }
         let frame = XCTAttachment(screenshot:XCUIScreen.main.screenshot())
@@ -85,6 +87,19 @@ final class NavigationUITests: XCTestCase {
         let changed = XCTNSPredicateExpectation(predicate:NSPredicate { _,_ in control.value as? String == expected },object:control)
         XCTAssertEqual(XCTWaiter.wait(for:[changed],timeout:5),.completed)
         return control
+    }
+    private func bringFullyIntoView(_ element:XCUIElement,in app:XCUIApplication) {
+        let list = app.collectionViews.firstMatch
+        let container = list.exists ? list : app
+        for _ in 0..<22 {
+            let viewport = container.frame.insetBy(dx:0,dy:8)
+            let frame = element.exists ? element.frame : .null
+            if !frame.isNull,frame.minY >= viewport.minY,frame.maxY <= viewport.maxY { return }
+            let down = !frame.isNull && frame.minY < viewport.minY
+            container.coordinate(withNormalizedOffset:CGVector(dx:0.5,dy:down ? 0.4 : 0.7))
+                .press(forDuration:0.05,thenDragTo:container.coordinate(withNormalizedOffset:CGVector(dx:0.5,dy:down ? 0.7 : 0.4)))
+        }
+        XCTFail("Element never became fully visible: " + element.identifier)
     }
     private func inspectObjectConditions(_ app:XCUIApplication) {
         setAutomationRule("location",to:true,in:app)
@@ -347,8 +362,11 @@ final class NavigationUITests: XCTestCase {
         app.navigationBars.buttons.element(boundBy:0).tap()
         let send = app.buttons["diagnostics-send"]
         for _ in 0..<14 { if send.exists && send.isHittable { break }; app.swipeUp() }
+        bringFullyIntoView(send,in:app)
         XCTAssertTrue(send.isHittable); send.tap()
-        XCTAssertTrue(app.staticTexts["Технический журнал отправлен."].waitForExistence(timeout:10))
+        let sent = app.staticTexts["Технический журнал отправлен."]
+        bringFullyIntoView(sent,in:app)
+        XCTAssertTrue(sent.waitForExistence(timeout:10))
         reviewCapture("developer-report")
         let off = app.buttons["developer-disable"]
         for _ in 0..<4 { if off.isHittable { break }; app.swipeUp() }
@@ -674,9 +692,10 @@ final class NavigationUITests: XCTestCase {
     func testServerRowsAndCompactAccountDialogStayInSystemAndCancelWithoutRegistration() {
         let app = launch("empty")
         app.segmentedControls.buttons["Система"].tap()
+        XCTAssertTrue(app.buttons["server-select-entrixy.com"].waitForExistence(timeout:10))
         let add = app.buttons["server-add"]
         for _ in 0..<6 { if add.isHittable { break }; app.swipeUp() }
-        XCTAssertTrue(add.isHittable); XCTAssertTrue(app.buttons["server-select-entrixy.com"].exists)
+        XCTAssertTrue(add.isHittable)
         add.tap()
         let host = app.textFields["server-host"]
         XCTAssertTrue(host.waitForExistence(timeout:10)); XCTAssertTrue(host.isEnabled)

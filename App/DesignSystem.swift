@@ -167,7 +167,10 @@ private struct SheetDismissFooter: ViewModifier {
     let disabled: Bool
     let action: () -> Void
     func body(content: Content) -> some View {
-        content.safeAreaInset(edge: .bottom, spacing: 0) {
+        // Allocate real layout space beside the content. A safe-area inset on
+        // an outer NavigationStack can be painted over by a nested iOS sheet.
+        VStack(spacing: 0) {
+            content.frame(maxWidth: .infinity, maxHeight: .infinity)
             VStack(spacing: 0) {
                 Divider()
                 Button(title, role: .cancel, action: action)

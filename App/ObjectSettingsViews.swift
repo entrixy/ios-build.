@@ -92,11 +92,20 @@ struct ObjectSourceLabel: View {
     }
 }
 
+private struct ObjectRowFrames: PreferenceKey {
+    static var defaultValue: [String:CGRect] = [:]
+    static func reduce(value: inout [String:CGRect], nextValue: () -> [String:CGRect]) {
+        value.merge(nextValue(),uniquingKeysWith:{ _,new in new })
+    }
+}
+
 struct ObjectSettingsRows: View {
     @EnvironmentObject private var model: AppModel
     let entries: [CatalogObject]
     @State private var expanded = Set<ObjectReference>()
     @State private var task: ObjectSettingsTask?
+    @State private var rowFrames: [String:CGRect] = [:]
+    @GestureState private var dragging: ObjectReference?
 
     var body: some View {
         ForEach(entries) { entry in
@@ -105,6 +114,7 @@ struct ObjectSettingsRows: View {
                     Image(systemName:"line.3.horizontal")
                         .font(.system(size:21)).foregroundStyle(Brand.secondaryInk)
                         .frame(width:44,height:56).contentShape(Rectangle())
+                        .highPriorityGesture(reorderGesture(entry.target))
                         .accessibilityElement(children:.ignore).accessibilityAddTraits(.isButton)
                         .accessibilityLabel(ProductText.string("ios_object_reorder"))
                         .accessibilityIdentifier("object-drag-" + entry.target.id)
@@ -165,14 +175,14 @@ struct ObjectSettingsRows: View {
                     }
                 }
             }.padding(.vertical, 8)
+                .background(GeometryReader { geometry in
+                    Color.clear.preference(key:ObjectRowFrames.self,value:[entry.target.id:geometry.frame(in:.global)])
+                }.allowsHitTesting(false))
+                .opacity(dragging == entry.target ? 0.75 : 1)
                 .listRowSeparator(.hidden)
                 .listRowBackground(Color(uiColor: .secondarySystemGroupedBackground))
-                .moveDisabled(!model.canManageGuestAccess)
-        }.onMove { offsets,destination in
-            var targets = model.catalogObjects().map(\.target)
-            targets.move(fromOffsets:offsets,toOffset:destination)
-            model.reorderObjects(targets)
         }
+        .onPreferenceChange(ObjectRowFrames.self) { rowFrames = $0 }
         .sheet(item: $task) { task in
             switch task {
             case .edit(let target):
@@ -191,6 +201,26 @@ struct ObjectSettingsRows: View {
             }
             #endif
         }
+    }
+
+    private func reorderGesture(_ target:ObjectReference) -> some Gesture {
+        LongPressGesture(minimumDuration:0.35)
+            .sequenced(before:DragGesture(minimumDistance:0,coordinateSpace:.global))
+            .updating($dragging) { value,state,_ in
+                if case .second(true,_) = value { state = target }
+            }
+            .onChanged { value in
+                guard model.canManageGuestAccess,
+                      case .second(true,let drag?) = value else { return }
+                var targets = model.catalogObjects().map(\.target)
+                guard let source = targets.firstIndex(of:target),
+                      let destination = targets.firstIndex(where:{ candidate in
+                          guard let frame = rowFrames[candidate.id] else { return false }
+                          return drag.location.y >= frame.minY && drag.location.y <= frame.maxY
+                      }),source != destination else { return }
+                targets.remove(at:source); targets.insert(target,at:destination)
+                withAnimation(.easeInOut(duration:0.18)) { model.reorderObjects(targets) }
+            }
     }
 
     private func move(_ target:ObjectReference,by offset:Int) {

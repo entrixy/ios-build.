@@ -112,11 +112,13 @@ struct StageTwoRoot: View {
                 .received(guestID: guest.id, objectID: "n:7")])
         }
         if route == .networkPrivacy { state.networkPrivacy = try! NetworkPrivacyPreferences(own:[PrivacyNetwork(ssid:"Home fixture")]) }
+        // Each isolated UI profile starts independently of a preceding test's
+        // hidden seven-tap developer setting. Production preferences are untouched.
+        UserDefaults.standard.set(false,forKey:"entrixy.developerMode")
         let app = AppModel(storage:StageTwoStorage(state),privacyRouter:route == .networkPrivacy ? ServerPrivacyRouter() : nil)
         if route == .promotion { app.promotions = AppPromotions(app:app,storage:StagePromotionStorage(),api:StagePromotionAPI()) }
         if route == .incomingMessage { app.messages = MessageManager(app:app,acknowledgements:StageMessageAcknowledgements()) }
         if route == .diagnostics {
-            UserDefaults.standard.set(false,forKey:"entrixy.developerMode")
             app.diagnostics = AppDiagnostics(app:app,storage:StageDiagnosticStorage(),api:StageDiagnosticAPI(),usesMetricKit:false)
         }
         if route == .ownerConfirmation || route == .ownerCodeConfirmation || route == .ownerCallGuests || route == .ownerPhoneRequest {
