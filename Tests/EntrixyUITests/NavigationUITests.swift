@@ -233,7 +233,11 @@ final class NavigationUITests: XCTestCase {
         app.buttons["Отмена"].tap(); XCTAssertTrue(row.waitForExistence(timeout:10))
         app.buttons["QR"].tap()
         XCTAssertTrue(app.navigationBars["QR"].waitForExistence(timeout:10))
-        XCTAssertTrue(app.buttons["Копировать"].exists); reviewCapture("guest-issued-qr",settledBy:app.buttons["Закрыть"])
+        XCTAssertTrue(app.buttons["Копировать"].exists)
+        let image = app.images["QR-код гостевого ключа"]
+        XCTAssertTrue(image.exists); XCTAssertGreaterThan(image.frame.width,200)
+        XCTAssertTrue(app.buttons["Закрыть"].isHittable)
+        reviewCapture("guest-issued-qr",settledBy:app.buttons["Закрыть"])
         app.buttons["Закрыть"].tap()
         app.buttons["Отправить сообщение"].tap()
         XCTAssertTrue(app.descendants(matching:.any).matching(identifier:"message-text").firstMatch.waitForExistence(timeout:10))
@@ -549,7 +553,8 @@ final class NavigationUITests: XCTestCase {
     func testActualWebhookEditorContainsAndroidFieldsAndAutomationRoute() {
         let app = launch("owner-expanded")
         app.buttons.matching(NSPredicate(format:"identifier BEGINSWITH %@","object-edit-owner:")).firstMatch.tap()
-        XCTAssertTrue(app.navigationBars["Редактировать объект"].waitForExistence(timeout: 10))
+        XCTAssertTrue(app.staticTexts["owner-object-title"].waitForExistence(timeout:10))
+        XCTAssertEqual(app.staticTexts["owner-object-title"].label,"Редактировать объект")
         XCTAssertEqual(app.textFields["Название"].value as? String, "Ворота во двор")
         XCTAssertFalse(app.staticTexts["Значок объекта"].exists)
         XCTAssertFalse(app.buttons["Сохранить защиту"].exists)
@@ -590,7 +595,9 @@ final class NavigationUITests: XCTestCase {
         XCTAssertFalse(app.buttons["guest-call-reaction-notify"].exists)
         XCTAssertFalse(app.staticTexts["Во время разговора"].exists)
         XCTAssertTrue(app.descendants(matching:.any).matching(identifier:"guest-call-notification").firstMatch.exists)
-        reviewCapture("guest-call-preferences",settledBy:policy)
+        XCTAssertTrue(policy.label.hasPrefix("Каждый запрос гостя"))
+        XCTAssertTrue(app.buttons["Закрыть"].isHittable)
+        reviewCapture("guest-call-preferences",settledBy:app.buttons["Закрыть"])
         app.buttons["Закрыть"].tap(); app.buttons["Отмена"].tap()
         XCTAssertFalse(app.buttons.matching(NSPredicate(format:"identifier BEGINSWITH %@","guest-card-")).firstMatch.exists)
 

@@ -11,7 +11,7 @@ concurrency:
 jobs:
   compile:
     runs-on: ${{ (github.ref == 'refs/heads/ci/ui-review-arm' || github.ref == 'refs/heads/ci/native-review-arm') && 'macos-15' || 'macos-15-intel' }}
-    timeout-minutes: 55
+    timeout-minutes: 120
     env:
       DEVELOPER_DIR: /Applications/Xcode_26.3.app/Contents/Developer
     defaults:

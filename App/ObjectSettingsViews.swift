@@ -1,6 +1,5 @@
 import SwiftUI
 import EntrixyCore
-import UniformTypeIdentifiers
 
 /// Product destinations keep the owning server/key in the route. An expanded
 /// card is not a generic object detail page and never performs a physical action.
@@ -98,7 +97,6 @@ struct ObjectSettingsRows: View {
     let entries: [CatalogObject]
     @State private var expanded = Set<ObjectReference>()
     @State private var task: ObjectSettingsTask?
-    @State private var dragging: ObjectReference?
 
     var body: some View {
         ForEach(entries) { entry in
@@ -107,14 +105,6 @@ struct ObjectSettingsRows: View {
                     Image(systemName:"line.3.horizontal")
                         .font(.system(size:21)).foregroundStyle(Brand.secondaryInk)
                         .frame(width:44,height:56).contentShape(Rectangle())
-                        .onDrag {
-                            dragging = entry.target
-                            let provider = NSItemProvider(),payload = Data(entry.target.id.utf8)
-                            provider.registerDataRepresentation(forTypeIdentifier:objectReorderType,visibility:.ownProcess) { completion in
-                                completion(payload,nil); return nil
-                            }
-                            return provider
-                        }
                         .accessibilityElement(children:.ignore).accessibilityAddTraits(.isButton)
                         .accessibilityLabel(ProductText.string("ios_object_reorder"))
                         .accessibilityIdentifier("object-drag-" + entry.target.id)
@@ -177,7 +167,11 @@ struct ObjectSettingsRows: View {
             }.padding(.vertical, 8)
                 .listRowSeparator(.hidden)
                 .listRowBackground(Color(uiColor: .secondarySystemGroupedBackground))
-                .onDrop(of:[objectReorderType],delegate:ObjectReorderDrop(target:entry.target,model:model,dragging:$dragging))
+                .moveDisabled(!model.canManageGuestAccess)
+        }.onMove { offsets,destination in
+            var targets = model.catalogObjects().map(\.target)
+            targets.move(fromOffsets:offsets,toOffset:destination)
+            model.reorderObjects(targets)
         }
         .sheet(item: $task) { task in
             switch task {
@@ -242,22 +236,6 @@ struct BLEInformationDialog: View {
         let flags = fields.filter { value & $0.0 != 0 }.map { ProductText.string("ble_info_flag_" + $0.1) }
         return flags.isEmpty ? ProductText.string("ble_info_state_ok") : flags.joined(separator:", ")
     }
-}
-
-private let objectReorderType = "com.entrixy.object-order"
-@MainActor private struct ObjectReorderDrop: DropDelegate {
-    let target:ObjectReference
-    let model:AppModel
-    @Binding var dragging:ObjectReference?
-    func dropEntered(info:DropInfo) {
-        guard let dragging,dragging != target else { return }
-        var targets = model.catalogObjects().map(\.target)
-        guard let source = targets.firstIndex(of:dragging),let destination = targets.firstIndex(of:target) else { return }
-        targets.move(fromOffsets:IndexSet(integer:source),toOffset:destination > source ? destination+1 : destination)
-        model.reorderObjects(targets)
-    }
-    func dropUpdated(info:DropInfo) -> DropProposal? { DropProposal(operation:.move) }
-    func performDrop(info:DropInfo) -> Bool { let valid = dragging != nil; dragging = nil; return valid }
 }
 
 private extension CatalogObject {

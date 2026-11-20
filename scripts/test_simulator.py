@@ -91,7 +91,7 @@ def main():
             command.append('-only-testing:EntrixyUITests')
         elif args.only_native:
             command.append('-only-testing:EntrixyAppTests')
-        subprocess.run(command, check=True, timeout=1800)
+        subprocess.run(command, check=True, timeout=3600 if args.review_captures else 1800)
         tests_succeeded = True
     except (subprocess.CalledProcessError, subprocess.TimeoutExpired):
         # Retain the exact failed UI frame/hierarchy instead of guessing from a

@@ -291,12 +291,11 @@ struct LinkQRCodeSheet: View {
         NavigationStack {
             ScrollView {
                     VStack(spacing:20) {
-                        InviteQRCode(text:text).onTapGesture { dismiss() }
+                        InviteQRCode(text:text).accessibilityIdentifier("issued-key-qr-image").onTapGesture { dismiss() }
                         Text(ProductText.string("guests_qr_close")).font(.footnote).foregroundStyle(Brand.secondaryInk)
                         Button(ProductText.string("btn_copy")) { UIPasteboard.general.string = text }.buttonStyle(SecondaryActionStyle())
                     }.padding(DesignMetrics.pageInset)
             }.background(Color(uiColor:.systemGroupedBackground)).navigationTitle("QR").navigationBarTitleDisplayMode(.inline)
-                .sheetDismissFooter(ProductText.string("btn_close")) { dismiss() }
-        }
+        }.sheetDismissFooter(ProductText.string("btn_close")) { dismiss() }
     }
 }

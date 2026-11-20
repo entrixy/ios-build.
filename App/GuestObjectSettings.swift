@@ -114,12 +114,12 @@ struct GuestInvocationEditor: View {
                 }.padding(DesignMetrics.pageInset)
             }.background(Color(uiColor: .systemGroupedBackground))
                 .navigationTitle(object?.kind == "call" ? ProductText.string("guest_call_title", label) : label).navigationBarTitleDisplayMode(.inline)
-                .sheetDismissFooter(ProductText.string("btn_close"), disabled: working) { dismiss() }
                 .task { if preference.reaction != "off" { rememberedReaction = preference.reaction } }
-                .accessibilityHidden(warning)
-                .overlay {
-                    if warning { WebhookServerModeConfirmation(cancel: { warning = false }, confirm: { warning = false; Task { await setMode("server") } }) }
-                }
+        }
+        .sheetDismissFooter(ProductText.string("btn_close"),disabled:working) { dismiss() }
+        .accessibilityHidden(warning)
+        .overlay {
+            if warning { WebhookServerModeConfirmation(cancel:{ warning = false },confirm:{ warning = false; Task { await setMode("server") } }) }
         }
     }
     private func setMode(_ mode: String) async {

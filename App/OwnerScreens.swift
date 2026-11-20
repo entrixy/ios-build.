@@ -350,7 +350,7 @@ private struct OwnerObjectEditorForm: View {
             HStack(spacing:12) {
                 Text(ProductText.string(object?.kind == "ble" ? "ble_object_default" : "edit_object_title"))
                     .font(.title3.weight(.semibold)).frame(maxWidth:.infinity,alignment:.leading)
-                    .accessibilityAddTraits(.isHeader)
+                    .accessibilityAddTraits(.isHeader).accessibilityIdentifier("owner-object-title")
                 if object?.kind != "ble" {
                     Button { automation = true } label: { AutomationIcon() }
                         .buttonStyle(SquareIconActionStyle())
