@@ -10,7 +10,7 @@ concurrency:
   cancel-in-progress: true
 jobs:
   compile:
-    runs-on: ${{ (github.ref == 'refs/heads/ci/ui-review-arm' || github.ref == 'refs/heads/ci/native-review-arm' || github.ref == 'refs/heads/ci/review-batch') && 'macos-15' || 'macos-15-intel' }}
+    runs-on: ${{ (github.ref == 'refs/heads/ci/ui-review-arm' || github.ref == 'refs/heads/ci/native-review-arm') && 'macos-15' || 'macos-15-intel' }}
     timeout-minutes: 55
     env:
       DEVELOPER_DIR: /Applications/Xcode_26.3.app/Contents/Developer

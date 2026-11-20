@@ -269,7 +269,7 @@ struct JournalScreen: View {
     }
     var body: some View {
         VStack(spacing: 0) {
-            HStack(spacing: 8) {
+            EqualActionRow {
                 ShareLink(item: text) { JournalToolbarItem(symbol: "square.and.arrow.up", title: "Поделиться") }
                 Button { UIPasteboard.general.string = text; copied = true } label: {
                     JournalToolbarItem(symbol: "doc.on.doc", title: "Копировать")
