@@ -117,3 +117,24 @@ iphone-release-evidence вместе с physical archive evidence. Публик�
 требует complete58 и весь CI success. Swift parse/YAML/11pipeline PASS.
 
 [Apple onGeometryChange, iOS16](https://developer.apple.com/documentation/swiftui/view/ongeometrychange(for:of:action:)).
+
+## Runtime6d331f8: сортировка прошла, четыре новых отказа
+
+Run44814651932/nativefc7fdff:312core/197hosted/DebugPASS;29UI25passed/4failed,
+51из58PNG. Реальное удержание/drag и новый порядок в ОБОИХ корнях прошли,
+deviceClaim originalserver/code/cancel тоже. Release/archive skipped после
+неуспешногоUI, как предусмотрено новым порядком. Никакой partial не опубликован.
+
+Два toggletap не изменили значения после прокрутки/сворачивания; теперь общий
+bringIntoView требует целиком видимый контроль и ДВА стабильных положения
+с hittability ДО единственного нажатия. Никаких повторных tap/ослабленных
+assertions/искусственного state. HomeNetwork использует тот же helper и capture
+anchor — реальный toggle. ServerCancel проверяется после стабилизации диалога,
+включая прежние hittability/frame/tap assertions. Styles явно задают hit shape
+полной окрашенной кнопки, без изменения внешнего вида.
+
+DeviceParameters открылся ПУСТЫМ реальным sheet. Boolean presentation и optional
+payload заменены одним Identifiable sheet item: параметры принадлежат самому
+событию показа и не захватываются nil в первой closure. Функция чтения/проверки
+секрета прежняя; no-creds/error остались прежними. Нет сети/команд/новойidentity.
+Локальные11pipeline/Swiftparse/diffPASS; SDK/runtime новогоsourcepending.

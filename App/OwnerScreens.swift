@@ -267,6 +267,11 @@ struct OwnerObjectEditor: View {
     }
 }
 
+private struct OwnerDeviceCredentialsPrompt: Identifiable {
+    let id = UUID()
+    let credentials: DeviceConfigurationCredentials
+}
+
 private struct OwnerObjectEditorForm: View {
     @EnvironmentObject private var model: AppModel
     @Environment(\.dismiss) private var dismiss
@@ -278,8 +283,7 @@ private struct OwnerObjectEditorForm: View {
     @State private var confirmingMove = false
     @State private var automation = false
     @State private var serverModeWarning = false
-    @State private var credentials: DeviceConfigurationCredentials?
-    @State private var showingCredentials = false
+    @State private var credentialsPrompt: OwnerDeviceCredentialsPrompt?
     @State private var noCredentials = false
     @State private var bindingCode: String?
     @State private var deleting = false
@@ -360,7 +364,9 @@ private struct OwnerObjectEditorForm: View {
                 .background(Color(uiColor:.systemGroupedBackground))
         }
         .sheet(isPresented: $automation) { AutomationEditor(destination: .object(.owned(server: server, objectID: objectID))) }
-        .sheet(isPresented: $showingCredentials) { if let credentials { DeviceCredentialsSheet(credentials: credentials, server: server) } }
+        .sheet(item: $credentialsPrompt) { prompt in
+            DeviceCredentialsSheet(credentials: prompt.credentials, server: server)
+        }
         .appMessageDialog("Entrixy",message:model.errorMessage ?? "",actionTitle:ProductText.string("btn_ok"),isPresented:Binding(get: { model.errorMessage != nil }, set: { if !$0 { model.errorMessage = nil } }))
         .appMessageDialog(ProductText.string("edit_object_no_creds_title"),message:ProductText.string("edit_object_no_creds_text"),actionTitle:ProductText.string("btn_ok"),isPresented:$noCredentials)
         .task { if showDeleteOnLaunch { deleting = true } }
@@ -408,8 +414,9 @@ private struct OwnerObjectEditorForm: View {
             Section {
                 Button {
                     do {
-                        credentials = try model.ownerDeviceCredentials(server: server, objectID: objectID)
-                        if credentials != nil { showingCredentials = true } else { noCredentials = true }
+                        if let credentials = try model.ownerDeviceCredentials(server: server, objectID: objectID) {
+                            credentialsPrompt = OwnerDeviceCredentialsPrompt(credentials: credentials)
+                        } else { noCredentials = true }
                     } catch { model.errorMessage = "Не удалось прочитать сохранённые параметры устройства." }
                 } label: { Label(ProductText.string("edit_object_share_device"), systemImage: "square.and.arrow.up") }
                     .buttonStyle(SecondaryActionStyle()).actionListRow().accessibilityIdentifier("device-share-credentials")

@@ -12,7 +12,13 @@ final class NavigationUITests: XCTestCase {
         guard let app = activeApp else { XCTFail("Missing app for native checkpoint"); return }
         // Check the foreground app's bounds without asking a detached keyboard
         // Window for a hit point. Explicit control anchors must remain hittable.
-        let anchor = reference ?? app
+        guard waitForStable(reference ?? app,in:app,requireHit:reference != nil) else {
+            XCTFail("Native checkpoint did not reach a stable visible layout: " + state); return
+        }
+        let frame = XCTAttachment(screenshot:XCUIScreen.main.screenshot())
+        frame.name = "review-" + state; frame.lifetime = .keepAlways; add(frame)
+    }
+    private func waitForStable(_ anchor:XCUIElement,in app:XCUIApplication,requireHit:Bool = true) -> Bool {
         var previous = CGRect.null
         var unchangedSince = Date()
         let settled = XCTNSPredicateExpectation(predicate:NSPredicate { _,_ in
@@ -20,18 +26,12 @@ final class NavigationUITests: XCTestCase {
             let current = anchor.frame
             guard !current.isEmpty,current.origin.x.isFinite,current.origin.y.isFinite,
                   current.width.isFinite,current.height.isFinite else { unchangedSince = Date(); return false }
-            let visible = reference == nil ? app.state == .runningForeground : anchor.isHittable
+            let visible = requireHit ? anchor.isHittable : app.state == .runningForeground
             guard visible else { unchangedSince = Date(); return false }
             if current != previous { previous = current; unchangedSince = Date(); return false }
             return Date().timeIntervalSince(unchangedSince) >= 0.6
         },object:anchor)
-        // A single hierarchy request took 2–3s on the Intel hosted runner.
-        // Preserve two stable, hittable observations and the 0.6s interval.
-        guard XCTWaiter.wait(for:[settled],timeout:20) == .completed else {
-            XCTFail("Native checkpoint did not reach a stable visible layout: " + state); return
-        }
-        let frame = XCTAttachment(screenshot:XCUIScreen.main.screenshot())
-        frame.name = "review-" + state; frame.lifetime = .keepAlways; add(frame)
+        return XCTWaiter.wait(for:[settled],timeout:20) == .completed
     }
     override func setUp() { continueAfterFailure = false }
     override func tearDown() {
@@ -69,15 +69,8 @@ final class NavigationUITests: XCTestCase {
         return thumb.exists ? thumb : row
     }
     private func bringIntoView(_ row: XCUIElement, in app: XCUIApplication) {
-        let list = app.collectionViews.firstMatch
-        for _ in 0..<22 {
-            if row.exists && nativeSwitch(row).isHittable { return }
-            let view = list.exists ? list : app
-            let down = row.exists && row.frame.maxY < view.frame.minY
-            let start = view.coordinate(withNormalizedOffset:CGVector(dx:0.5,dy:down ? 0.4 : 0.7))
-            let end = view.coordinate(withNormalizedOffset:CGVector(dx:0.5,dy:down ? 0.7 : 0.4))
-            start.press(forDuration:0.05,thenDragTo:end)
-        }
+        bringFullyIntoView(row,in:app)
+        XCTAssertTrue(waitForStable(nativeSwitch(row),in:app),"Control did not settle before interaction")
     }
     @discardableResult private func setAutomationRule(_ symbol:String,to enabled:Bool,in app:XCUIApplication) -> XCUIElement {
         let row = app.descendants(matching:.any).matching(identifier:"automation-rule-"+symbol).firstMatch
@@ -297,22 +290,16 @@ final class NavigationUITests: XCTestCase {
     func testHomeNetworkConsentAndRemovalUseSystemSectionAndPreserveReceivedKeys() {
         let app = launch("network-privacy")
         let row = app.descendants(matching:.any).matching(identifier:"privacy-cellular-consent").firstMatch
-        for _ in 0..<12 {
-            if row.exists {
-                let control = nativeSwitch(row)
-                if control.exists && control.isHittable { break }
-            }
-            app.swipeUp()
-        }
+        bringIntoView(row,in:app)
         XCTAssertTrue(row.waitForExistence(timeout:5))
         let toggle = nativeSwitch(row)
         XCTAssertTrue(toggle.exists); XCTAssertTrue(toggle.isHittable); XCTAssertEqual(toggle.value as? String,"0")
-        reviewCapture("home-network")
+        reviewCapture("home-network",settledBy:toggle)
         toggle.tap()
         let enabled = XCTNSPredicateExpectation(predicate:NSPredicate { _,_ in toggle.value as? String == "1" },object:toggle)
         XCTAssertEqual(XCTWaiter.wait(for:[enabled],timeout:5),.completed)
         let remove = app.buttons.matching(NSPredicate(format:"identifier BEGINSWITH %@","privacy-remove-")).firstMatch
-        for _ in 0..<8 { if remove.exists && remove.isHittable { break }; app.swipeUp() }
+        bringIntoView(remove,in:app)
         XCTAssertTrue(remove.exists); XCTAssertTrue(remove.isHittable); remove.tap()
         let gone = XCTNSPredicateExpectation(predicate:NSPredicate { _,_ in !remove.exists },object:remove)
         XCTAssertEqual(XCTWaiter.wait(for:[gone],timeout:5),.completed)
@@ -706,9 +693,9 @@ final class NavigationUITests: XCTestCase {
         XCTAssertTrue(app.textFields["Почта"].exists); XCTAssertTrue(app.secureTextFields["Пароль"].exists)
         XCTAssertFalse(app.navigationBars.buttons["Отмена"].exists)
         let cancel = app.buttons["Отмена"]
+        reviewCapture("server-account",settledBy:cancel)
         XCTAssertTrue(cancel.isHittable)
         XCTAssertTrue(app.frame.insetBy(dx:0,dy:1).contains(cancel.frame))
-        reviewCapture("server-account",settledBy:cancel)
         cancel.tap()
         XCTAssertTrue(add.waitForExistence(timeout:10)); assertBottom(app,["settings","journal"])
     }

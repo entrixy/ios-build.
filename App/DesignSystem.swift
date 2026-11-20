@@ -54,6 +54,7 @@ struct PrimaryActionStyle: ButtonStyle {
             .frame(maxWidth:.infinity,minHeight:DesignMetrics.primaryHeight,maxHeight:equalRow ? .infinity : nil)
             .background(isEnabled ? (configuration.role == .destructive ? AppPalette.destructive : Brand.ink) : Color(uiColor: .tertiarySystemFill),
                         in: RoundedRectangle(cornerRadius: DesignMetrics.actionRadius))
+            .contentShape(RoundedRectangle(cornerRadius:DesignMetrics.actionRadius))
             .opacity(configuration.isPressed ? 0.86 : 1)
     }
 }
@@ -72,6 +73,7 @@ struct SecondaryActionStyle: ButtonStyle {
             .padding(.horizontal, DesignMetrics.actionHorizontalPadding).padding(.vertical, DesignMetrics.actionVerticalPadding)
             .frame(maxWidth:.infinity,minHeight:DesignMetrics.secondaryHeight,maxHeight:equalRow ? .infinity : nil)
             .background(isEnabled ? (configuration.role == .destructive ? AppPalette.destructive : AppPalette.secondary) : Color(uiColor: .systemGray5), in: RoundedRectangle(cornerRadius: DesignMetrics.actionRadius))
+            .contentShape(RoundedRectangle(cornerRadius:DesignMetrics.actionRadius))
             .opacity(configuration.isPressed ? 0.8 : 1)
     }
 }
