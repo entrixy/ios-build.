@@ -82,9 +82,17 @@ final class NavigationUITests: XCTestCase {
         return control
     }
     private func bringFullyIntoView(_ element:XCUIElement,in app:XCUIApplication) {
-        let lists = app.collectionViews
-        let count = lists.count
-        let container = count > 0 ? lists.element(boundBy:count-1) : app
+        // Preserve accessibility-tree order across List and ScrollView: a sheet
+        // may contain either, while the other type remains behind it. Ignore
+        // small nested horizontal pickers when choosing the vertical viewport.
+        let scrollTypes = NSPredicate(format:"elementType == %d OR elementType == %d",
+            XCUIElement.ElementType.collectionView.rawValue,XCUIElement.ElementType.scrollView.rawValue)
+        let containers = app.descendants(matching:.any).matching(scrollTypes).allElementsBoundByIndex
+        let window = app.frame
+        let container = containers.last { view in
+            let frame = view.frame
+            return frame.width >= window.width*0.75 && frame.height >= window.height*0.30
+        } ?? app
         for _ in 0..<22 {
             let viewport = container.frame.insetBy(dx:0,dy:8)
             let frame = element.exists ? element.frame : .null
