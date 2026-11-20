@@ -10,6 +10,7 @@ import struct
 from capture_simulator import create_booted_device, cleanup_device
 from export_ui_review import export_review
 from prepare_review_simulator import prepared_device
+from run_xctest import run_xctest
 
 
 def device_screen_probe(device):
@@ -91,7 +92,8 @@ def main():
             command.append('-only-testing:EntrixyUITests')
         elif args.only_native:
             command.append('-only-testing:EntrixyAppTests')
-        subprocess.run(command, check=True, timeout=3600 if args.review_captures else 1800)
+        run_xctest(command,timeout=3600 if args.review_captures else 1800,
+                   report_path=Path('.local-checks/ci/xctest-progress.json'))
         tests_succeeded = True
     except (subprocess.CalledProcessError, subprocess.TimeoutExpired):
         # Retain the exact failed UI frame/hierarchy instead of guessing from a

@@ -138,3 +138,20 @@ payload заменены одним Identifiable sheet item: параметры 
 событию показа и не захватываются nil в первой closure. Функция чтения/проверки
 секрета прежняя; no-creds/error остались прежними. Нет сети/команд/новойidentity.
 Локальные11pipeline/Swiftparse/diffPASS; SDK/runtime новогоsourcepending.
+
+## Runtime766b274: тесты не стартовали
+
+Run44824072020/nativeaed641e прошёл312core/preflight/Debug. В combined step
+xcodebuild завис ДО первого Test Suite/Test Case и спустя3600s был остановлен.
+Hosted/UI не начинались, review.json/PNG приложения нет. Диагностический
+renderer после тайм-аута полностью чёрный; preflight показывал SpringBoard.
+Не приписывать этому source прежние197/29/58 или новую аппаратную приёмку.
+
+Новый streaming runner отделяет launch startup (300s без первого Test Suite)
+от прежнего3600s runtime начавшихся тестов, пишет phase/last test/elapsed в
+xctest-progress.json и heartbeat30s. При тайм-ауте завершает только собственную
+process group, без повторного запуска/повторения сценариев. Actual failure
+exit сохраняется; exit0 без теста не объявляется успехом. Пять настоящих
+локальных subprocess regressions (включая остановку дочернего процесса перед
+записью маркера) и11pipeline contracts прошли. App/UI assertions не менялись.
+Следующий настоящий Apple runtime/58/Release/archive всё ещё нужен.
