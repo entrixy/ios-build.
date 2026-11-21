@@ -37,7 +37,11 @@ aps-environment, associated domains и вложенные profiles в насто
 ## Тексты и скриншоты
 
 `release/metadata/ru.json` и `en-US.json`: название, подзаголовок, описание,
-promotional text и keywords в пределах длины полей. Перед загрузкой указать
+promotional text в пределах символьных лимитов. Keywords проверяются по UTF-8:
+RU94байта, EN55байт при лимите100. Support URL ведёт прямо к iOS-разделу
+руководства с настоящим contact email; marketing/privacy URLs также подготовлены.
+Руководство на всех7языках уточняет Keychain/reset и ограничения iOS.
+Перед загрузкой указать
 фактические версию/build, категорию, владельца/copyright, возрастной рейтинг,
 страны и контакт App Review. Не обещать автоматический звонок/отбой в iOS.
 
@@ -112,4 +116,5 @@ background/locked доставка, отозванный ключ, invalid token
 [privacy manifests](https://developer.apple.com/documentation/technotes/tn3184-adding-data-collection-details-to-your-privacy-manifest),
 [App Attest](https://developer.apple.com/documentation/devicecheck/establishing-your-app-s-integrity),
 [App Review](https://developer.apple.com/app-store/review/guidelines/),
-[screenshots](https://developer.apple.com/help/app-store-connect/reference/app-information/screenshot-specifications).
+[screenshots](https://developer.apple.com/help/app-store-connect/reference/app-information/screenshot-specifications),
+[metadata limits and Support URL](https://developer.apple.com/help/app-store-connect/reference/app-information/platform-version-information).

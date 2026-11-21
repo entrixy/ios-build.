@@ -119,6 +119,10 @@ struct SettingsScreen: View {
     @State private var selected: SettingsTab = .objects
     @State private var showKey = false
     @State private var showCodeSettings = false
+    @State private var showingLocalReset = false
+    #if DEBUG && targetEnvironment(simulator)
+    @State private var captureConfigured = false
+    #endif
     @State private var addingKey = false
     @State private var addingObject = false
     @State private var createdDevice: ObjectReference?
@@ -174,7 +178,7 @@ struct SettingsScreen: View {
                             }.buttonStyle(.plain).accessibilityIdentifier("theme-"+choice).accessibilityAddTraits(appearance == choice ? .isSelected : [])
                         }
                     } header: { Text(ProductText.string("theme_section")) }
-                    AppCodeSettingsSection()
+                    AppCodeSettingsSection(showReset:{ showingLocalReset = true })
                     BackupSettingsSection(flow:model.backupPresentation)
                     ServerSettingsSection()
                     if model.privacyRouter != nil { NetworkPrivacySettingsSection(sensors:model.automationSensors) }
@@ -194,6 +198,7 @@ struct SettingsScreen: View {
                 if let guest = model.guests.first { KeyDetailScreen(guestID: guest.id) }
             }
             .sheet(isPresented: $addingKey) { KeyImportScreen(input: $keyInput) }
+            .sheet(isPresented: $showingLocalReset) { LocalResetScreen() }
             .sheet(isPresented: $addingObject, onDismiss: {
                 if case let .owned(server, id) = createdDevice,
                    (try? model.ownerDeviceCredentials(server: server, objectID: id)) != nil { showingCreatedDevice = true }
@@ -207,6 +212,8 @@ struct SettingsScreen: View {
             .task {
                 if let requested = model.settingsRequest { selected = requested; model.settingsRequest = nil }
                 #if DEBUG && targetEnvironment(simulator)
+                if !captureConfigured {
+                captureConfigured = true
                 if let scenario = ActionCaptureScenario.current, [ActionCaptureScenario.appCodeSetup, .appCodeSettings].contains(scenario) { selected = .system; showCodeSettings = true }
                 if let route = StageTwoCapture.current {
                     selected = route.settingsTab
@@ -214,6 +221,7 @@ struct SettingsScreen: View {
                     showCodeSettings = route == .codeSettings
                     if route == .addServer { model.serverPrompt = ServerSettingsPrompt(action:.configure(nil,initial:"entrixy.com")) }
                     addingObject = route == .addObject
+                }
                 }
                 #endif
                 if PreviewRouting.keyDetail && !model.guests.isEmpty { selected = .keys; showKey = true }

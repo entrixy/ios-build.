@@ -58,9 +58,11 @@ struct AppEntryLockScreen: View {
 
 struct AppEntryLockSettings: View {
     @EnvironmentObject private var model: AppModel
+    @State private var showingLocalReset = false
     var body: some View {
-        List { AppCodeSettingsSection() }.compactListSections()
+        List { AppCodeSettingsSection(showReset:{ showingLocalReset = true }) }.compactListSections()
             .navigationTitle(ProductText.string("code_title")).navigationBarTitleDisplayMode(.inline)
+            .sheet(isPresented:$showingLocalReset) { LocalResetScreen() }
             .task {
                 #if DEBUG && targetEnvironment(simulator)
                 if ActionCaptureScenario.current == .appCodeSetup, !model.hasActionCode { model.codePrompt = AppCodePrompt(action:.setup(enableLock:false)) }

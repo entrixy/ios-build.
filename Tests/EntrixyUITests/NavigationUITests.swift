@@ -281,6 +281,7 @@ final class NavigationUITests: XCTestCase {
         XCTAssertTrue(app.staticTexts["No messages yet"].waitForExistence(timeout:10))
         XCTAssertTrue(app.staticTexts["Incoming"].exists)
         app.navigationBars.buttons.element(boundBy:0).tap()
+        XCTAssertTrue(app.segmentedControls.buttons["System"].isSelected)
         let privacy = app.descendants(matching:.any).matching(identifier:"privacy-policy").firstMatch
         bringFullyIntoView(privacy,in:app)
         XCTAssertTrue(privacy.isHittable); XCTAssertTrue(privacy.label.contains("Privacy policy"))

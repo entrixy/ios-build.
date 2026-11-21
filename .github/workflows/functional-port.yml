@@ -14,9 +14,9 @@ jobs:
     timeout-minutes: 180
     env:
       DEVELOPER_DIR: /Applications/Xcode_26.3.app/Contents/Developer
-      # Narrow stress cases must pass before the full batch, using this build.
+      # Reproduce the actual reset/settings regressions before the full batch.
       # '1' is diagnosis only; 'preflight' continues into complete acceptance.
-      ENTRIXY_FOCUSED_SWITCHES: 'preflight'
+      ENTRIXY_REVIEW_PREFLIGHT: 'preflight'
     defaults:
       run:
         shell: bash
@@ -27,7 +27,7 @@ jobs:
           mkdir -p .local-checks/ci
           xcodebuild -version | tee .local-checks/ci/toolchain.log
       - name: Test protocol core with Apple CryptoKit
-        if: env.ENTRIXY_FOCUSED_SWITCHES != '1'
+        if: env.ENTRIXY_REVIEW_PREFLIGHT != '1'
         run: swift test 2>&1 | tee .local-checks/ci/core.log
       - name: Prepare healthy simulator before compiling application products
         id: simulator_prepare
@@ -56,30 +56,22 @@ jobs:
       - name: Verify native UI routes without taking a product screenshot batch
         if: startsWith(github.ref, 'refs/heads/ci/ui-review')
         run: python3 scripts/test_simulator.py --only-ui --use-built-tests 2>&1 | tee .local-checks/ci/ui-tests.log
-      - name: Diagnose the two failing native switch scenarios without a gallery export
-        if: github.ref == 'refs/heads/ci/review-batch' && env.ENTRIXY_FOCUSED_SWITCHES != '' && steps.simulator_prepare.outcome == 'success'
-        run: |
-          python3 scripts/test_simulator.py --only-ui --use-built-tests --prepared-device .local-checks/ci/prepared-device.json --keep-prepared-device --iterations 3 \
-            --test EntrixyUITests/NavigationUITests/testCrashConsentAndSevenTapDeveloperLogUseNativeSettingsAndPreserveNavigation \
-            --test EntrixyUITests/NavigationUITests/testHomeNetworkConsentAndRemovalUseSystemSectionAndPreserveReceivedKeys \
-            2>&1 | tee .local-checks/ci/focused-switches.log
-      - name: Verify backup entry, delegation bounds and camera scrolling before full review
-        if: github.ref == 'refs/heads/ci/review-batch' && env.ENTRIXY_FOCUSED_SWITCHES == 'preflight' && steps.simulator_prepare.outcome == 'success'
+      - name: Verify local reset and English return navigation before full review
+        if: github.ref == 'refs/heads/ci/review-batch' && env.ENTRIXY_REVIEW_PREFLIGHT != '' && steps.simulator_prepare.outcome == 'success'
         run: |
           python3 scripts/test_simulator.py --only-ui --use-built-tests --prepared-device .local-checks/ci/prepared-device.json --keep-prepared-device \
-            --test EntrixyUITests/NavigationUITests/testSoundSettingsAndBackupPasswordFormUseRealControlsWithoutExporting \
-            --test EntrixyUITests/NavigationUITests/testDelegatedAccessShowsSeveralLevelsAndPoolWithoutCreatingKey \
-            --test EntrixyUITests/NavigationUITests/testObjectCameraSettingsStayInsideEditorWhileScrolling \
-            2>&1 | tee .local-checks/ci/focused-review.log
+            --test EntrixyUITests/NavigationUITests/testLocalResetRequiresTypedConfirmationAndDoesNotExposeOldAccess \
+            --test EntrixyUITests/NavigationUITests/testEnglishKeyImportMessagesAndPrivacyUseSelectedLanguageWithoutOpeningExternalContent \
+            2>&1 | tee .local-checks/ci/review-preflight.log
       - name: Retain focused diagnosis before the complete acceptance pass
-        if: always() && github.ref == 'refs/heads/ci/review-batch' && env.ENTRIXY_FOCUSED_SWITCHES != ''
+        if: always() && github.ref == 'refs/heads/ci/review-batch' && env.ENTRIXY_REVIEW_PREFLIGHT != ''
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
-          name: focused-switch-evidence
+          name: review-preflight-evidence
           path: .local-checks/ci/
           retention-days: 3
       - name: Verify native and UI scenarios with original screenshots in the same simulator pass
-        if: github.ref == 'refs/heads/ci/review-batch' && env.ENTRIXY_FOCUSED_SWITCHES != '1' && steps.simulator_prepare.outcome == 'success'
+        if: github.ref == 'refs/heads/ci/review-batch' && env.ENTRIXY_REVIEW_PREFLIGHT != '1' && steps.simulator_prepare.outcome == 'success'
         run: python3 scripts/test_simulator.py --use-built-tests --review-captures --prepared-device .local-checks/ci/prepared-device.json --keep-prepared-device 2>&1 | tee .local-checks/ci/combined-review.log
       - name: Retain compilation evidence
         # Store candidates use the native renderer after the complete UI pass.
@@ -91,7 +83,7 @@ jobs:
           path: .local-checks/ci/
           retention-days: 3
       - name: Capture original Store-format JPEG candidates without modifying images
-        if: github.ref == 'refs/heads/ci/review-batch' && env.ENTRIXY_FOCUSED_SWITCHES != '1' && steps.simulator_prepare.outcome == 'success'
+        if: github.ref == 'refs/heads/ci/review-batch' && env.ENTRIXY_REVIEW_PREFLIGHT != '1' && steps.simulator_prepare.outcome == 'success'
         run: python3 scripts/capture_store_assets.py --prepared-device .local-checks/ci/prepared-device.json 2>&1 | tee .local-checks/ci/store-assets.log
       - name: Retain original Store-format screenshot candidates
         if: always()
@@ -106,7 +98,7 @@ jobs:
       - name: Compile Release and verify fixture isolation
         id: release_build
         timeout-minutes: 25
-        if: ${{ always() && steps.debug_build.outcome == 'success' && !startsWith(github.ref, 'refs/heads/ci/ui-review') && env.ENTRIXY_FOCUSED_SWITCHES != '1' }}
+        if: ${{ always() && steps.debug_build.outcome == 'success' && !startsWith(github.ref, 'refs/heads/ci/ui-review') && env.ENTRIXY_REVIEW_PREFLIGHT != '1' }}
         run: |
           xcodebuild -project Entrixy.xcodeproj -scheme Entrixy \
             -configuration Release -sdk iphonesimulator \

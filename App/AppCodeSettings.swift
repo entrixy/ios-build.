@@ -10,8 +10,8 @@ struct AppCodePrompt: Identifiable {
 /// Android. Protected transitions ask for the current code in a compact dialog.
 struct AppCodeSettingsSection: View {
     @EnvironmentObject private var model: AppModel
+    let showReset: () -> Void
     @State private var working = false
-    @State private var resetting = false
     var body: some View {
         Group {
             Section { Text(ProductText.string("code_settings_hint")).font(.footnote).foregroundStyle(Brand.secondaryInk) }
@@ -35,11 +35,10 @@ struct AppCodeSettingsSection: View {
             Text(ProductText.string(ActionBiometrics.available || model.appEntryBiometricEnabled ? "ios_entry_bio_hint" : "ios_entry_bio_unavailable")).font(.footnote).foregroundStyle(Brand.secondaryInk)
             }
             Section {
-                Button(ProductText.string("ios_reset_title"),role:.destructive) { resetting = true }
+                Button(ProductText.string("ios_reset_title"),role:.destructive,action:showReset)
                     .buttonStyle(SecondaryActionStyle()).actionListRow().accessibilityIdentifier("local-reset-open")
             }
         }.disabled(working || !model.canManageGuestAccess)
-            .sheet(isPresented:$resetting) { LocalResetScreen() }
     }
     private func apply(enabled: Bool,biometric: Bool) {
         guard !working else { return }; working = true

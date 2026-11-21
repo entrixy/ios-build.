@@ -5,43 +5,52 @@
 `56155352b0e9f36ef3685aa071a6aafdb2ef6622`, с утверждённым дизайном, затем App Store.
 Порядок работы: [AUTONOMOUS_WORK.md](AUTONOMOUS_WORK.md).
 
-## Новый пакет без физического iPhone — ожидает Apple SDK/runtime
+## Новый пакет без физического iPhone — два UI исправления ожидают проверки
 
-Первый source `cc5f616` / public `dd51a32`, run44924160939 завершился
-неуспешно21.11 в16:37UTC: Apple core прошёл, но два холодных запуска Intel
-симулятора остановились на timeout UI appearance service. Сборка приложения,
-hosted/UI, Release и новые снимки в этом run не запускались. Это инфраструктурный
-сбой, а не подтверждённая ошибка приложения. GitHub connector показывал устаревший
-статус; актуальное завершение проверено через REST без кэша.
+Source `de3e44d` / public `dbd5e1d`, run44931604741: Apple313core, Debug app/widget/
+test bundles,212hosted и9focused прошли. Общий UI:31из33 прошли; два новых сценария
+не прошли. Получены62из64PNG, complete=false/tests_succeeded=false; не опубликованы.
+Store capture после ошибки пропущен; независимые Release/archive ещё проверяются.
 
-Следующий цельный source включает:
-- Явный local reset/PIN recovery: атомарный пустой state с durable cleanup marker,
-  отказ старым моделям в записи и повторной очистке новых данных,9 hosted contracts.
-- Остановка отклонённого native-only hello без удаления ключей и BLE grants;
-  причина переводится при отображении. Сам контракт аттестации ещё не решён.
-- Параметризуемые App/Widget IDs и App Group, проверка собранной конфигурации,
-  безопасный генератор release inputs, фактические privacy declarations.
-- Общий privacy link в System/Help;1423 Product keys во всех7 языках. Переведены
-  активные UI literals и известные системные результаты при отображении, сохраняя
-  исходные значения для протокола/логики и пользовательский текст без изменения.
-  Даты следуют выбранному языку. Добавлен английский UI-сценарий.
-- Центрирование «Нарисовать маршрут», два новых native reset checkpoints.
-- Четыре оригинальных Store JPEG после полного native/UI прохода на том же
-  проверенном симуляторе; независимые Debug/Release/archive при сбое UI service.
-  Ошибка подготовки всё равно делает общий review неуспешным.
+Причины и следующий цельный fix:
+- Reset sheet был прикреплён к Group из нескольких List Sections и не открывался.
+  Владение sheet перенесено в стабильный SettingsScreen/AppEntryLockSettings;
+  Section вызывает переданный callback. Та же форма/дизайн/защита сброса сохранены.
+- DEBUG SettingsScreen.task повторно применял начальный capture route при возврате
+  из Messages и переключал System на Objects. Настройка fixture теперь выполняется
+  один раз на экземпляр; обычный settingsRequest обрабатывается по-прежнему.
+  Английский тест дополнительно проверяет сохранение выбранной System.
+- В следующем Apple batch сначала исполняются именно эти2 регрессии, затем весь
+  набор212hosted/33UI/64PNG. Прежние9 focused уже прошли; соответствующие сценарии
+  остаются в общем наборе, без отдельного повторения. Assertions не ослаблены.
 
-Локально: Swift syntax parse PASS (не SDK typecheck); Linux Foundation исполнил
-ProductText с реальными1423×7 resources; структура ключей/placeholder одинакова.
-11 pipeline /6 process /4 release-preparation checks прошли в подготовке.
-Ожидаемый Apple набор:313core/212hosted/33UI +9focused,64nativePNG +4originalJPEG.
-Это ожидаемые количества, новые runtime assertions ещё не приняты.
+Состав пакета: явный атомарный local reset/PIN recovery с durable cleanup marker,
+запрет старых записей/очистки новых данных;9 reset contracts прошли. Native-only
+refusal прекращает одинаковый reconnect и сохраняет ключи/BLE; истинный контракт
+аттестации ещё не решён.1423 Product keys во всех7 языках, активный UI и известные
+системные результаты переводятся при отображении; raw protocol и пользовательские
+данные сохраняются. Три localization hosted cases прошли; английские import/messages
+положительные проверки прошли до описанной ошибки возврата в fixture.
+Есть прямой privacy link System/Help и даты выбранного языка.
+
+App/Widget IDs/App Group параметризованы, генератор release inputs не принимает
+неподтверждённые значения. Privacy flow inventory/manifests, RU/EN metadata и
+review handoff подготовлены. RU keywords исправлены до94 UTF8bytes/EN55; Support/
+marketing/privacy URLs добавлены отдельным metadata/docs-only `9d86cef` (в bundle
+не входят). Публичный guide на всех7языках уточняет recovery/Keychain/ограничения
+и содержит contact email; политика дополнена фактическими iOS flows/retention.
+Production APNs schema создана пустой, provider отключён.
+
+Первый `cc5f616` / public `dd51a32`, run44924160939 остановился на simulator UI
+service до Debug. Новый fresh host эту ошибку не воспроизвёл. Это отдельный
+инфраструктурный сбой, не причина двух UI failures выше.
+
+Локально для исправлений: Swift syntax parse PASS (не SDK typecheck),11 pipeline
+contracts/YAML/diff PASS. Новый Apple runtime ещё не исполнен. Ожидаемый итог:
+313core/212hosted/33UI +2focused,64nativePNG +4originalJPEG на том же симуляторе.
 До complete CI и просмотра всех новых кадров галерея сохраняет62 d4915bb.
-
 Материалы: [RELEASE_HANDOFF.md](RELEASE_HANDOFF.md),
 [PRIVACY_DATA_FLOWS.md](PRIVACY_DATA_FLOWS.md), `release/metadata/`.
-Публичная privacy policy дополнена фактическими iOS flows/retention/reset;
-все7 языковых destinations отвечают HTTPS200. Production APNs schema создана
-пустой, provider отключён. Реальная доставка и signing остаются внешними gates.
 
 ## Выполненный пакет замечаний — 21.11.2026
 
