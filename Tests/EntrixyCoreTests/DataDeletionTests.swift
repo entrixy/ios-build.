@@ -10,7 +10,20 @@ private final class DeletionHTTPFixture: URLProtocol {
     override class func canInit(with request: URLRequest) -> Bool { request.url?.host == "deletion.invalid" }
     override class func canonicalRequest(for request: URLRequest) -> URLRequest { request }
     override func startLoading() {
-        Self.requests.append(request)
+        // Darwin URLSession hands URLProtocol a body stream; Linux may keep
+        // httpBody. Record the actual bytes in either representation.
+        var recorded = request
+        if recorded.httpBody == nil, let stream = recorded.httpBodyStream {
+            stream.open(); defer { stream.close() }
+            var body = Data(), buffer = [UInt8](repeating:0,count:4096)
+            while true {
+                let count = stream.read(&buffer,maxLength:buffer.count)
+                guard count >= 0, body.count + count <= 65536 else { client?.urlProtocol(self,didFailWithError:URLError(.cannotDecodeRawData)); return }
+                if count == 0 { break }; body.append(contentsOf:buffer.prefix(count))
+            }
+            recorded.httpBody = body
+        }
+        Self.requests.append(recorded)
         guard let result = Self.result else { client?.urlProtocol(self,didFailWithError:URLError(.badServerResponse)); return }
         let response = HTTPURLResponse(url:request.url!,statusCode:200,httpVersion:"HTTP/1.1",headerFields:["Content-Type":"application/json"])!
         client?.urlProtocol(self,didReceive:response,cacheStoragePolicy:.notAllowed)
@@ -49,9 +62,9 @@ final class DataDeletionTests: XCTestCase {
         _ = try await api.dataDeletion(server:"deletion.invalid",credentials:credentials,receipt:receipt,accountToken:"temporary-account-token",submit:true)
         _ = try await api.dataDeletion(server:"deletion.invalid",credentials:credentials,receipt:receipt,accountToken:"must-not-send",submit:false)
         XCTAssertEqual(DeletionHTTPFixture.requests.count,2)
-        let first = try XCTUnwrap(JSONSerialization.jsonObject(with:DeletionHTTPFixture.requests[0].httpBody!) as? [String:Any])
+        let first = try XCTUnwrap(JSONSerialization.jsonObject(with:XCTUnwrap(DeletionHTTPFixture.requests[0].httpBody)) as? [String:Any])
         XCTAssertEqual(first["device_secret"] as? String,credentials.deviceSecret); XCTAssertEqual(first["confirmation"] as? String,"DELETE")
-        let second = try XCTUnwrap(JSONSerialization.jsonObject(with:DeletionHTTPFixture.requests[1].httpBody!) as? [String:Any])
+        let second = try XCTUnwrap(JSONSerialization.jsonObject(with:XCTUnwrap(DeletionHTTPFixture.requests[1].httpBody)) as? [String:Any])
         XCTAssertEqual(Set(second.keys),Set(["operation","request_id","receipt"]))
         XCTAssertEqual(DeletionHTTPFixture.requests[1].url?.path,"/api/data_deletion.php")
     }
