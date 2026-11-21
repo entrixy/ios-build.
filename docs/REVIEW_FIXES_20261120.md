@@ -188,3 +188,23 @@ Switch stable check; Diagnostic/HomeNetwork/EntryLock tap по центру ши
 isHittable у ненажимаемогоAXwrapper больше не подменяет проверку реального
 касания и результата. Все обычные кнопки/footers сохраняют hittability guards.
 Appsource не менялся. UITestparse/diffPASS; новый runtime ещё нужен.
+
+## Runtimeee4fa08: жесты прошли, ожидание и ввод
+
+Run44850583836/native3a9e59d:312core/197hosted/DebugPASS;29UI26pass3fail,
+48из58PNG. HomeNetwork/Diagnostic Switch gestures и остальные прежние пути
+прошли; два случая остановились в geometry waiter до tap, один получил
+частично удалённое имя. XCTest predicate-object diagnostics собирали большие
+AX descriptions уже после первой обязательной false-пробы, отнимая весь20s
+бюджет до второй. Waiter теперь напрямую опрашивает те же bounds/foreground/
+buttonhittability в том же20s окне, с двумя наблюдениями>=0.6s и допуском0.5pt
+на округление. На отказе сохраняет реальные samples без дополнительных AX
+запросов. Switch single-touch/value guards прежние.
+
+ReceivedObjectNameScreen больше не присваивает себе ТО ЖЕ значение на каждом
+введённом символе: нормализованный текст записывается только при изменении.
+Это сохраняет фильтр newline/64characters, избегая лишних binding updates.
+Тест отдельно физически удаляет старый текст, ждёт empty/AXplaceholder, вводит
+Yard, проверяет его до и после Done; нет повторного ввода/инъекции state.
+Softwarekeyboard не сделана обязательной при подключённой hardware keyboard.
+Swift frontend parse/diffPASS; новый полный Apple пакет pending.

@@ -288,7 +288,10 @@ private struct ReceivedObjectNameScreen: View {
                     AppField("Название") {
                         TextField(ProductText.string("add_object_name"),text:$label).autocorrectionDisabled().focused($editing).submitLabel(.done)
                             .onSubmit { editing = false }
-                            .onChange(of:label) { label = String($0.replacingOccurrences(of:"\n",with:"").replacingOccurrences(of:"\r",with:"").prefix(64)) }
+                            .onChange(of:label) { value in
+                                let normalized = String(value.replacingOccurrences(of:"\n",with:"").replacingOccurrences(of:"\r",with:"").prefix(64))
+                                if normalized != value { label = normalized }
+                            }
                     }
                 } footer: { Text("Название изменится только на этом iPhone.") }
                 Section {

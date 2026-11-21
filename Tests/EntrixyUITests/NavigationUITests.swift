@@ -23,17 +23,26 @@ final class NavigationUITests: XCTestCase {
     private func waitForStable(_ anchor:XCUIElement,in app:XCUIApplication,requireHit:Bool = true) -> Bool {
         var previous = CGRect.null
         var unchangedSince = Date()
-        let settled = XCTNSPredicateExpectation(predicate:NSPredicate { _,_ in
-            guard anchor.exists else { unchangedSince = Date(); return false }
-            let current = anchor.frame
-            guard !current.isEmpty,current.origin.x.isFinite,current.origin.y.isFinite,
-                  current.width.isFinite,current.height.isFinite else { unchangedSince = Date(); return false }
-            let visible = requireHit ? anchor.isHittable : app.state == .runningForeground
-            guard visible else { unchangedSince = Date(); return false }
-            if current != previous { previous = current; unchangedSince = Date(); return false }
-            return Date().timeIntervalSince(unchangedSince) >= 0.6
-        },object:anchor)
-        return XCTWaiter.wait(for:[settled],timeout:20) == .completed
+        let deadline = Date().addingTimeInterval(20)
+        var samples: [String] = []
+        // XCTest's expectation-object descriptions can consume the entire
+        // deadline collecting a hierarchy before the second observation.
+        while Date() < deadline {
+            if anchor.exists {
+                let current = anchor.frame
+                let valid = !current.isEmpty && current.origin.x.isFinite && current.origin.y.isFinite && current.width.isFinite && current.height.isFinite
+                let visible = requireHit ? anchor.isHittable : app.state == .runningForeground
+                samples.append("rect=\(current), valid=\(valid), visible=\(visible)")
+                if valid && visible {
+                    let same = !previous.isNull && abs(current.minX-previous.minX) <= 0.5 && abs(current.minY-previous.minY) <= 0.5 && abs(current.width-previous.width) <= 0.5 && abs(current.height-previous.height) <= 0.5
+                    if same && Date().timeIntervalSince(unchangedSince) >= 0.6 { return true }
+                    if !same { previous = current; unchangedSince = Date() }
+                } else { unchangedSince = Date() }
+            } else { samples.append("missing"); unchangedSince = Date() }
+            RunLoop.current.run(until:Date().addingTimeInterval(0.2))
+        }
+        print("STABILITY_FAILURE requireHit=\(requireHit): " + samples.joined(separator:"; "))
+        return false
     }
     override func setUp() { continueAfterFailure = false }
     override func tearDown() {
@@ -510,8 +519,19 @@ final class NavigationUITests: XCTestCase {
         app.buttons["Название"].tap()
         let field = app.textFields["Название"]
         XCTAssertTrue(field.waitForExistence(timeout: 10)); field.tap()
+        XCTAssertTrue(waitForStable(field,in:app))
         let old = field.value as? String ?? ""
-        field.typeText(String(repeating: XCUIKeyboardKey.delete.rawValue, count: old.count) + "Yard\n")
+        let placeholder = field.placeholderValue ?? ""
+        field.typeText(String(repeating: XCUIKeyboardKey.delete.rawValue, count: old.count))
+        let cleared = XCTNSPredicateExpectation(predicate:NSPredicate { _,_ in
+            let value = field.value as? String
+            return value == "" || value == placeholder
+        },object:nil)
+        XCTAssertEqual(XCTWaiter.wait(for:[cleared],timeout:5),.completed)
+        field.typeText("Yard")
+        let entered = XCTNSPredicateExpectation(predicate:NSPredicate { _,_ in field.value as? String == "Yard" },object:nil)
+        XCTAssertEqual(XCTWaiter.wait(for:[entered],timeout:5),.completed)
+        field.typeText("\n")
         XCTAssertEqual(field.value as? String,"Yard")
         reviewCapture("object-rename")
         app.buttons["Сохранить"].tap()
