@@ -7,6 +7,7 @@ import plistlib
 from pathlib import Path
 import subprocess
 import struct
+import shutil
 from capture_simulator import create_booted_device, cleanup_device
 from export_ui_review import export_review
 from prepare_review_simulator import prepared_device
@@ -54,6 +55,20 @@ def review_test_products(products):
     destination = source.with_name(source.stem + '-review.xctestrun')
     destination.write_bytes(plistlib.dumps(data))
     return destination
+
+
+def retain_fixture_input_trace(device, *, review):
+    """Read only the fixed non-personal trace from this owned simulator fixture."""
+    try:
+        container = Path(subprocess.check_output(['xcrun','simctl','get_app_container',device,'com.entrixy.ios','data'],text=True,timeout=15).strip())
+        trace = container/'Library/Caches/stage-two-input.jsonl'
+        if trace.is_file() and trace.stat().st_size <= 1_048_576:
+            destination = Path('.local-checks/ci')/('review-native-input.jsonl' if review else 'focused-native-input.jsonl')
+            destination.parent.mkdir(parents=True,exist_ok=True)
+            shutil.copyfile(trace,destination)
+            print('Retained isolated native input trace:',destination,flush=True)
+    except (OSError,subprocess.SubprocessError) as error:
+        print('Could not retain isolated native input trace:',type(error).__name__,flush=True)
 
 
 def main():
@@ -126,6 +141,8 @@ def main():
         raise
     finally:
         try:
+            if args.test or args.review_captures:
+                retain_fixture_input_trace(device,review=args.review_captures)
             if args.review_captures:
                 try: device_screen_probe(device)
                 except (OSError,RuntimeError,subprocess.SubprocessError) as error:

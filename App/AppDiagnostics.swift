@@ -101,6 +101,9 @@ private final class DiagnosticSubscriber: NSObject, MXMetricManagerSubscriber {
         do { try storage.save(draft); state = draft } catch { message = "ios_diag_storage_failed" }
     }
     @discardableResult func setConsent(_ value: Bool) -> Bool {
+        #if DEBUG && targetEnvironment(simulator)
+        StageTwoInputTrace.record("diagnostic-consent-request",["requested":value,"ready":ready,"canManage":app.canManageGuestAccess,"enabledBefore":enabled])
+        #endif
         guard ready,app.canManageGuestAccess else { return false }
         if !value { autoPaused = true; cancelUpload(); removeSubscriber() }
         var draft = state; draft.consent.asked = true; draft.consent.enabled = value
@@ -109,6 +112,9 @@ private final class DiagnosticSubscriber: NSObject, MXMetricManagerSubscriber {
         } else { draft.consent.acceptedAt = nil; draft.reports = [] }
         do {
             try storage.save(draft); state = draft; enabled = value; autoPaused = false; message = nil
+            #if DEBUG && targetEnvironment(simulator)
+            StageTwoInputTrace.record("diagnostic-consent-saved",["enabled":enabled])
+            #endif
             app.diagnosticConsentPrompt = false
             configureSubscriber(); flush(); return true
         } catch {

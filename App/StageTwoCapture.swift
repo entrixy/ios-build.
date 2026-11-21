@@ -133,6 +133,7 @@ struct StageTwoRoot: View {
                  pendingURL:.constant(route == .deviceClaim ? URL(string:"https://factory.invalid:8443/claim?c=a1b2-c3d4") : nil))
             .environmentObject(model)
             .preferredColorScheme(.light)
+            .background(StageTwoInputProbe().frame(width:0,height:0))
             .task {
                 // Production RootView and screens; fixture data never calls resume/bind/send.
                 if route == .ownerPhoneRequest,model.ownerControl.phoneRequests.isEmpty,
