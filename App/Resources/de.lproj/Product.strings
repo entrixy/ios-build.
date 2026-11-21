@@ -1002,7 +1002,7 @@
 "ios_entry_rejected" = "Der Code wurde nicht akzeptiert oder die Eingabe ist vorübergehend gesperrt. Warte nach mehreren Fehlversuchen.";
 "ios_entry_failed" = "Die Anmeldung konnte nicht bestätigt werden. Code und Zugänge bleiben unverändert.";
 
-"ios_native_attestation_required" = "Der Server verlangt für diesen Schlüssel einen Echtheitsnachweis der App. Diese Version unterstützt ihn noch nicht. Dein Schlüssel bleibt erhalten; wiederholte Verbindungsversuche wurden gestoppt. Wende dich an den Zugangsinhaber.";
+"ios_native_app_refused" = "Der Server hat den App-Zugriff für diesen Schlüssel abgelehnt. Der Schlüssel bleibt gespeichert; weitere Verbindungen wurden gestoppt. Aktualisieren Sie den Schlüssel oder wenden Sie sich an den Zugangsinhaber.";
 
 "ios_ble_pair" = "Koppeln";
 
@@ -1451,3 +1451,23 @@
 "ios_system_core_controller_pass_missing" = "Kein geschützter Controllerzugang empfangen.";
 "ios_system_core_joint_rules_unavailable" = "Die gemeinsame Prüfung der Objektbedingungen ist derzeit nicht verfügbar.";
 "ios_system_restored_pending_keys_fmt" = "Bindungen übertragen. Schlüssel, die auf ein geschütztes Besitzerpaket warten: %1$d. Sie sind unter Schlüssel gespeichert.";
+
+// Server deletion initiation and receipt status
+"ios_deletion_title" = "Serverdaten löschen";
+"ios_deletion_hint" = "Löschung auf dem ausgewählten Server anfordern. Dies ist vom lokalen Zurücksetzen getrennt. Sichern Sie vorher benötigte Daten.";
+"ios_deletion_device" = "Nur dieses Gerät";
+"ios_deletion_device_hint" = "Registrierung dieses Geräts und zugehörige Daten auf diesem Server löschen. Das E-Mail-Konto und andere Geräte bleiben erhalten.";
+"ios_deletion_account" = "Gesamtes Konto";
+"ios_deletion_account_hint" = "Das gesamte Konto und zugehörige personenbezogene Daten auf diesem Server löschen, einschließlich Geräteregistrierungen und Zugängen. Dies betrifft auch Ihre anderen Geräte.";
+"ios_deletion_confirmation" = "Zur Bestätigung DELETE eingeben";
+"ios_deletion_submit" = "Löschung anfordern";
+"ios_deletion_pending" = "Der Server hat die Anfrage angenommen. Die Daten sind noch nicht als gelöscht bestätigt.";
+"ios_deletion_complete" = "Der Server hat die Löschung bestätigt. Lokale Kopien und Daten auf anderen Servern werden nicht automatisch gelöscht.";
+"ios_deletion_due" = "Bearbeitungsfrist: %@";
+"ios_deletion_prepared" = "Die Serverbestätigung steht aus. Prüfen Sie den Status oder bestätigen Sie dieselbe Anfrage erneut.";
+"ios_deletion_check" = "Status prüfen";
+"ios_deletion_unavailable" = "Dieser Server nimmt noch keine Löschanfragen an. Die Löschung ist nicht bestätigt.";
+"ios_deletion_auth" = "Geben Sie das aktuelle Passwort des verknüpften Kontos ein.";
+"ios_deletion_error" = "Keine Serverbestätigung erhalten. Die Anfrage bleibt auf diesem Telefon gespeichert; prüfen Sie ihren Status.";
+"ios_deletion_not_found" = "Der Server hat diese Anfrage nicht gefunden. Sie können sie mit derselben Kennung bestätigen und senden.";
+"ios_deletion_no_servers" = "Keine Eigentümerregistrierungen. Empfangene Schlüssel unter Einstellungen → Schlüssel entfernen.";

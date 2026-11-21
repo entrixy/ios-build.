@@ -14,7 +14,7 @@ jobs:
     timeout-minutes: 180
     env:
       DEVELOPER_DIR: /Applications/Xcode_26.3.app/Contents/Developer
-      # Reproduce the actual reset/settings regressions before the full batch.
+      # Reproduce the actual raw-value slider failure and new decoder/deletion paths.
       # '1' is diagnosis only; 'preflight' continues into complete acceptance.
       ENTRIXY_REVIEW_PREFLIGHT: 'preflight'
     defaults:
@@ -67,12 +67,14 @@ jobs:
       - name: Verify native UI routes without taking a product screenshot batch
         if: startsWith(github.ref, 'refs/heads/ci/ui-review')
         run: python3 scripts/test_simulator.py --only-ui --use-built-tests 2>&1 | tee .local-checks/ci/ui-tests.log
-      - name: Verify local reset and English return navigation before full review
+      - name: Verify rendered slider input and new decoder and deletion paths before full review
         if: github.ref == 'refs/heads/ci/review-batch' && env.ENTRIXY_REVIEW_PREFLIGHT != '' && steps.simulator_prepare.outcome == 'success'
         run: |
-          python3 scripts/test_simulator.py --only-ui --use-built-tests --prepared-device .local-checks/ci/prepared-device.json --keep-prepared-device \
-            --test EntrixyUITests/NavigationUITests/testLocalResetRequiresTypedConfirmationAndDoesNotExposeOldAccess \
-            --test EntrixyUITests/NavigationUITests/testEnglishKeyImportMessagesAndPrivacyUseSelectedLanguageWithoutOpeningExternalContent \
+          python3 scripts/test_simulator.py --use-built-tests --prepared-device .local-checks/ci/prepared-device.json --keep-prepared-device \
+            --test EntrixyUITests/NavigationUITests/testOwnedBLEInformationUsesSeparateActionAndDoesNotInventUnobservedReadings \
+            --test EntrixyUITests/NavigationUITests/testServerDeletionRequiresConfirmationAndReportsPendingWithoutClaimingErasure \
+            --test EntrixyAppTests/CameraVideoProxyTests/testActualWebMDecoderDisplaysFramesThroughAuthenticatedHTTPBridge \
+            --test EntrixyAppTests/CameraVideoProxyTests/testActualDASHDecoderDisplaysFramesFromProtectedManifestAndSegments \
             2>&1 | tee .local-checks/ci/review-preflight.log
       - name: Retain focused diagnosis before the complete acceptance pass
         if: always() && github.ref == 'refs/heads/ci/review-batch' && env.ENTRIXY_REVIEW_PREFLIGHT != ''

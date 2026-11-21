@@ -23,7 +23,7 @@ import EntrixyCore
     var failed: ((Error) -> Void)?
 
     init(camera: CameraRequest,configuration: URLSessionConfiguration = .ephemeral) throws {
-        guard camera.media == .nativeVideo, ["https","http"].contains(camera.url.scheme?.lowercased() ?? "") else { throw CameraStreamFailure.format }
+        guard [.nativeVideo, .otherVideo].contains(camera.media), ["https","http"].contains(camera.url.scheme?.lowercased() ?? "") else { throw CameraStreamFailure.format }
         self.camera = camera
         let parameters = NWParameters.tcp
         parameters.requiredLocalEndpoint = .hostPort(host:NWEndpoint.Host("127.0.0.1"),port:.any)
@@ -70,7 +70,7 @@ import EntrixyCore
         guard active, camera.allowsRedirect(to:url), let origin else { throw CameraStreamFailure.format }
         if let name = names[url] { return origin.appendingPathComponent(name) }
         let suffix = url.pathExtension.lowercased()
-        let ext = ["m3u8","mp4","mov","m4v","ts","m4s","aac","vtt","key"].contains(suffix) ? "." + suffix : ""
+        let ext = ["m3u8","mpd","webm","mkv","mp4","mov","m4v","ts","m4s","aac","vtt","key"].contains(suffix) ? "." + suffix : ""
         guard url.absoluteString.utf8.count <= 8192 else { throw CameraStreamFailure.format }
         let sealed = try GuestCrypto.encrypt(key:resourceKey,plaintext:Data(url.absoluteString.utf8))
         let name = capability + "/" + GuestCrypto.base64URL(Data(sealed.utf8)) + ext
@@ -81,6 +81,17 @@ import EntrixyCore
         return origin.appendingPathComponent(name)
     }
     private func resource(_ path: String) throws -> URL {
+        let dashPrefix = "/" + capability + "/dash/"
+        if path.hasPrefix(dashPrefix) {
+            let pieces = path.dropFirst(dashPrefix.count).split(separator: "/", omittingEmptySubsequences: false)
+            guard let token = pieces.first, !token.isEmpty,
+                  let envelope = String(data: try GuestCrypto.decodeBase64URL(String(token)), encoding: .utf8) else { throw CameraStreamFailure.format }
+            let clear = try GuestCrypto.decrypt(key: resourceKey, envelope: envelope)
+            guard clear.count <= 16384 else { throw CameraStreamFailure.format }
+            let template = try JSONDecoder().decode(CameraDASHTemplate.self, from: clear)
+            let address = try template.expanded(pieces.dropFirst().map(String.init))
+            guard camera.allowsRedirect(to: address) else { throw CameraStreamFailure.format }; return address
+        }
         let prefix = "/" + capability + "/"
         guard path.hasPrefix(prefix) else { throw CameraStreamFailure.format }
         guard let token = path.dropFirst(prefix.count).split(separator:".",maxSplits:1).first, !token.isEmpty else { throw CameraStreamFailure.format }
@@ -88,6 +99,16 @@ import EntrixyCore
         let clear = try GuestCrypto.decrypt(key:resourceKey,envelope:envelope)
         guard clear.count <= 8192, let text = String(data:clear,encoding:.utf8), let url = URL(string:text), camera.allowsRedirect(to:url) else { throw CameraStreamFailure.format }
         return url
+    }
+    private func registerDASH(_ value: String, base: URL) throws -> String {
+        let template = try CameraDASHTemplate(value, base: base)
+        let sample = try template.expanded(template.fields.map { _ in "0" })
+        guard camera.allowsRedirect(to: sample), let origin else { throw CameraStreamFailure.format }
+        if template.fields.isEmpty { return try register(sample).absoluteString }
+        let clear = try JSONEncoder().encode(template)
+        let envelope = try GuestCrypto.encrypt(key: resourceKey, plaintext: clear)
+        let token = GuestCrypto.base64URL(Data(envelope.utf8))
+        return origin.absoluteString + "/" + capability + "/dash/" + token + "/" + template.fields.joined(separator: "/")
     }
     private func accept(_ connection: NWConnection) {
         guard active, Self.isLoopback(connection.endpoint), connections.count < 8 else { connection.cancel(); return }
@@ -122,7 +143,7 @@ import EntrixyCore
             guard let origin, let port = origin.port, local.host == "127.0.0.1:\(port)", local.path.hasPrefix("/" + capability + "/"),
                   let remote = try? resource(local.path) else { try await Self.failure(404,on:connection); return }
             legitimate = true
-            let playlistURL = remote.pathExtension.lowercased() == "m3u8"
+            let playlistURL = ["m3u8", "mpd"].contains(remote.pathExtension.lowercased())
             var request = URLRequest(url:remote,cachePolicy:.reloadIgnoringLocalCacheData,timeoutInterval:15)
             request.httpMethod = playlistURL ? "GET" : local.method
             for (name,value) in camera.headers { request.setValue(value,forHTTPHeaderField:name) }
@@ -134,12 +155,14 @@ import EntrixyCore
             guard (200..<300).contains(http.statusCode) else { throw CameraStreamFailure.http(http.statusCode) }
             let mime = http.mimeType?.lowercased() ?? "application/octet-stream"
             guard mime.range(of:#"^[A-Za-z0-9!#$&^_.+-]+/[A-Za-z0-9!#$&^_.+-]+$"#,options:.regularExpression) != nil else { throw CameraStreamFailure.format }
-            let playlist = playlistURL || mime.contains("mpegurl")
+            let dash = remote.pathExtension.lowercased() == "mpd" || mime == "application/dash+xml"
+            let playlist = playlistURL || mime.contains("mpegurl") || dash
             if playlist {
                 var data = Data()
                 for try await byte in bytes { try Task.checkCancellation(); guard data.count < 1_048_576 else { throw CameraStreamFailure.format }; data.append(byte) }
-                let rewritten = try CameraHLSPlaylist.rewriting(data,base:finalURL,resource:{ try self.register($0) })
-                try await Self.send(Self.response(200,headers:["Content-Type":"application/vnd.apple.mpegurl","Content-Length":String(rewritten.count)]),on:connection); sentHeaders = true
+                let rewritten = try dash ? CameraDASHManifest.rewriting(data, base: finalURL, resource: { try self.registerDASH($0, base: $1) })
+                    : CameraHLSPlaylist.rewriting(data,base:finalURL,resource:{ try self.register($0) })
+                try await Self.send(Self.response(200,headers:["Content-Type":dash ? "application/dash+xml" : "application/vnd.apple.mpegurl","Content-Length":String(rewritten.count)]),on:connection); sentHeaders = true
                 if local.method != "HEAD" { try await Self.send(rewritten,on:connection) }
             } else {
                 var headers: [String:String] = ["Content-Type":mime]

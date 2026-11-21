@@ -321,7 +321,11 @@ final class AppModel: ObservableObject {
                 needs.bluetooth = needs.bluetooth || context.isBLE
             }
         }
-        needs.notifications = owners.contains { owner in
+        // Guest message/share alerts need permission even when there are no
+        // owner call requests or automation rules. APNs token registration alone
+        // does not authorize visible notifications.
+        needs.notifications = guests.contains { $0.invite.server == "entrixy.com" }
+        needs.notifications = needs.notifications || owners.contains { owner in
             owner.ownershipLost != true && (owner.issuedKeys ?? []).contains { key in
                 key.state != .revoked && key.state != .paused && (key.callPreferences ?? [:]).values.contains { $0.reaction == "notify" }
             }
@@ -1773,7 +1777,7 @@ final class AppModel: ObservableObject {
             } catch {
                 let code = (error as? GuestAPI.Failure)?.code ?? (error is KeychainStore.Failure ? "storage_error" : "connection_failed")
                 syncFailure = safeDiagnosticCode(code)
-                if stopForNativeAttestation(guestID:entry.id,reason:code) { continue }
+                if stopForNativePolicyRefusal(guestID:entry.id,reason:code) { continue }
                 // A temporary read-connection failure uses the inline connection state.
                 // Reconnection must be able to recover without a stale blocking alert.
                 if GuestEvent.terminalReasons.contains(code) || ["network_policy_unsupported", "paused", "storage_error"].contains(code) {
@@ -2076,7 +2080,7 @@ final class AppModel: ObservableObject {
                     guard !Task.isCancelled, self.foreground, self.generations[entry.id] == generation else { return }
                     let code = (error as? GuestAPI.Failure)?.code ?? (error is KeychainStore.Failure ? "storage_error" : "connection_failed")
                     self.syncFailure = self.safeDiagnosticCode(code)
-                    if self.stopForNativeAttestation(guestID:entry.id,reason:code) { return }
+                    if self.stopForNativePolicyRefusal(guestID:entry.id,reason:code) { return }
                     if code == "storage_error" {
                         self.errorMessage = self.readable(code)
                         self.connections[entry.id] = .offline
@@ -2138,12 +2142,12 @@ final class AppModel: ObservableObject {
         return allowed.contains(code) ? code : "unknown_error"
     }
 
-    /// A platform proof failure is not revocation. Keep encrypted keys and BLE
+    /// A server app-policy refusal is not revocation. Keep encrypted keys and BLE
     /// grants intact, but do not hammer the same rejected hello in a retry loop.
-    @discardableResult func stopForNativeAttestation(guestID:String,reason:String) -> Bool {
+    @discardableResult func stopForNativePolicyRefusal(guestID:String,reason:String) -> Bool {
         guard reason == "native_only",guests.contains(where:{ $0.id == guestID }) else { return false }
         stopActions(guestID); connections[guestID] = .offline
-        guestConnectionProblems[guestID] = "ios_native_attestation_required"
+        guestConnectionProblems[guestID] = "ios_native_app_refused"
         return true
     }
 
@@ -3022,6 +3026,58 @@ extension AppModel {
         if armed { bleAutomationDisarmed.remove(target.id) } else { bleAutomationDisarmed.insert(target.id) }
         guard bleAutomationDisarmed != prior else { return }
         do { try save(guests) } catch { bleAutomationDisarmed = prior; throw error }
+    }
+}
+
+extension AppModel {
+    func submitDataDeletion(server: String, scope: DataDeletionScope, password: String, confirmation: String) async -> Bool {
+        guard confirmation == "DELETE", canManageGuestAccess, !ownerBusy, !busy,
+              let owner = owners.first(where: { $0.server == server }), let credentials = owner.credentials else { return false }
+        let receipt = owner.serverSettings?.deletionReceipt ?? DataDeletionReceipt(scope: scope)
+        guard receipt.scope == scope, receipt.result == nil else { return false }
+        if scope == .account && (owner.serverSettings?.accountEmail == nil || password.isEmpty || password.utf8.count > 8192) {
+            errorMessage = ProductText.string("ios_deletion_auth"); return false
+        }
+        ownerBusy = true; defer { ownerBusy = false }
+        do {
+            // Preserve the id/bearer BEFORE authentication/network. Reopening or
+            // losing a response cannot create a second request identity.
+            try storeDataDeletionReceipt(receipt, server: server)
+            let token: String?
+            if scope == .account, let email = owner.serverSettings?.accountEmail {
+                token = try await ownerAPI.accountLogin(server: server, email: email, password: password)
+            } else { token = nil }
+            guard canManageGuestAccess, owners.first(where: { $0.server == server })?.credentials == credentials else { return false }
+            let result = try await ownerAPI.dataDeletion(server: server, credentials: credentials, receipt: receipt, accountToken: token, submit: true)
+            guard canManageGuestAccess, owners.first(where: { $0.server == server })?.credentials == credentials,
+                  owners.first(where: { $0.server == server })?.serverSettings?.deletionReceipt?.id == receipt.id else { return false }
+            var saved = receipt; saved.result = result; try storeDataDeletionReceipt(saved, server: server); return true
+        } catch { errorMessage = dataDeletionError(error); return false }
+    }
+    func refreshDataDeletion(server: String) async -> Bool {
+        guard canManageGuestAccess, !ownerBusy, !busy,
+              let receipt = owners.first(where: { $0.server == server })?.serverSettings?.deletionReceipt else { return false }
+        ownerBusy = true; defer { ownerBusy = false }
+        do {
+            let result = try await ownerAPI.dataDeletion(server: server, credentials: nil, receipt: receipt, accountToken: nil, submit: false)
+            guard canManageGuestAccess, owners.first(where: { $0.server == server })?.serverSettings?.deletionReceipt?.id == receipt.id else { return false }
+            var saved = receipt; saved.result = result; try storeDataDeletionReceipt(saved, server: server); return true
+        } catch { errorMessage = dataDeletionError(error); return false }
+    }
+    private func storeDataDeletionReceipt(_ receipt: DataDeletionReceipt, server: String) throws {
+        try receipt.validate()
+        guard canManageGuestAccess, let index = owners.firstIndex(where: { $0.server == server }) else { throw GuestCrypto.Failure.invalidEnvelope }
+        var updated = owners, settings = updated[index].serverSettings ?? OwnerServerSettings()
+        settings.deletionReceipt = receipt; updated[index].serverSettings = settings
+        try saveOwners(updated)
+    }
+    private func dataDeletionError(_ error: Error) -> String {
+        switch (error as? OwnerAPI.Failure)?.code {
+        case "deletion_unavailable": return ProductText.string("ios_deletion_unavailable")
+        case "not_found": return ProductText.string("ios_deletion_not_found")
+        case "account_auth", "bad_credentials", "unconfirmed": return ProductText.string("ios_deletion_auth")
+        default: return ProductText.string("ios_deletion_error")
+        }
     }
 }
 

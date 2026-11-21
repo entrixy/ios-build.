@@ -1002,7 +1002,7 @@
 "ios_entry_rejected" = "O código não foi aceite ou a entrada está temporariamente bloqueada. Após vários erros, aguarde antes de tentar de novo.";
 "ios_entry_failed" = "Não foi possível verificar a entrada. O código e os acessos não foram alterados.";
 
-"ios_native_attestation_required" = "O servidor exige uma prova de autenticidade da app para esta chave. Esta versão ainda não a suporta. A chave foi mantida e as tentativas repetidas de ligação foram interrompidas. Contacte o proprietário do acesso.";
+"ios_native_app_refused" = "O servidor recusou o acesso da aplicação com esta chave. A chave foi mantida; as reconexões foram interrompidas. Atualize a chave ou contacte o proprietário do acesso.";
 
 "ios_ble_pair" = "Emparelhar";
 
@@ -1451,3 +1451,23 @@
 "ios_system_core_controller_pass_missing" = "Não foi recebido um passe protegido do controlador.";
 "ios_system_core_joint_rules_unavailable" = "A verificação conjunta das condições deste objeto está indisponível agora.";
 "ios_system_restored_pending_keys_fmt" = "Associações transferidas. Chaves a aguardar um pacote protegido do proprietário: %1$d. Estão guardadas em Chaves.";
+
+// Server deletion initiation and receipt status
+"ios_deletion_title" = "Eliminar dados do servidor";
+"ios_deletion_hint" = "Inicie a eliminação no servidor selecionado. Esta operação é separada da reposição local. Guarde as cópias de segurança necessárias antes de continuar.";
+"ios_deletion_device" = "Apenas este dispositivo";
+"ios_deletion_device_hint" = "Eliminar o registo deste dispositivo e os dados associados neste servidor. A conta de e-mail e os outros dispositivos são mantidos.";
+"ios_deletion_account" = "Conta inteira";
+"ios_deletion_account_hint" = "Eliminar toda a conta e os dados pessoais associados neste servidor, incluindo registos de dispositivos e acessos. Também afeta os seus outros dispositivos.";
+"ios_deletion_confirmation" = "Escreva DELETE para confirmar";
+"ios_deletion_submit" = "Pedir eliminação";
+"ios_deletion_pending" = "O servidor aceitou o pedido. A eliminação dos dados ainda não foi confirmada.";
+"ios_deletion_complete" = "O servidor confirmou a eliminação. As cópias locais e os dados noutros servidores não são eliminados automaticamente.";
+"ios_deletion_due" = "Prazo de processamento: %@";
+"ios_deletion_prepared" = "Não foi recebida confirmação do servidor. Consulte o estado ou confirme novamente este mesmo pedido.";
+"ios_deletion_check" = "Consultar estado";
+"ios_deletion_unavailable" = "Este servidor ainda não aceita pedidos de eliminação. A eliminação não está confirmada.";
+"ios_deletion_auth" = "Introduza a palavra-passe atual da conta associada.";
+"ios_deletion_error" = "Não foi possível obter confirmação do servidor. O pedido permanece neste telefone; consulte o estado.";
+"ios_deletion_not_found" = "O servidor não encontrou este pedido. Pode confirmá-lo e enviá-lo com o mesmo identificador.";
+"ios_deletion_no_servers" = "Não há registos de proprietário. Remova as chaves recebidas em Definições → Chaves.";

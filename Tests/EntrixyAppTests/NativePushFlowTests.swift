@@ -47,6 +47,17 @@ private final class PushInboxMemory: NativePushInboxStorage {
     private func payload(_ invite:GuestInvite,type:String = "message") -> [AnyHashable:Any] {
         ["entrixy":["type":type,"server":invite.server,"hash":GuestCrypto.hash(Data(invite.userKey.utf8))]]
     }
+    func testMessageOnlyGuestRequiresAlertPermissionWithoutLocationOrBluetooth() throws {
+        let (app,_,_,_,_,_) = try fixture(); defer { app.suspend() }
+        let needs = app.phoneRequirements()
+        XCTAssertTrue(needs.notifications)
+        XCTAssertFalse(needs.location)
+        XCTAssertFalse(needs.bluetooth)
+    }
+    func testCustomServerWithoutNativePushDoesNotRequestAlertPermissionForAnEmptyKey() throws {
+        let (app,_,_,_,_,_) = try fixture(server:"private.invalid"); defer { app.suspend() }
+        XCTAssertFalse(app.phoneRequirements().notifications)
+    }
     private func wait(_ condition:() -> Bool) async throws {
         for _ in 0..<100 { if condition() { return }; try await Task.sleep(nanoseconds:10_000_000) }
         XCTFail("Push transaction did not finish")

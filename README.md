@@ -4,7 +4,7 @@ Native iOS port of the full Android client, not an expansion of Entrixy Open.
 The existing full client defines expected behavior and the server wire formats.
 This repository is private working source; no new distribution license is assigned.
 
-## Current implementation and verification — 21 November 2026
+## Current implementation and verification — 22 November 2026
 
 The current baseline, remaining work and evidence are maintained in
 [CURRENT_STATUS.md](docs/CURRENT_STATUS.md); use it before the historical notes
@@ -15,12 +15,14 @@ The accepted baseline is nativeb18d37f/publicd4915bb,
 Apple312core,198hosted,31UI +9focused, Debug/Release/privacy/isolation and an
 unsigned physical-iPhone app/widget archive passed. All62 original native frames
 were inspected and published in the [gallery](https://entrixy.com/ios-design.php).
-The next no-iPhone package adds safe explicit local reset, seven-language UI and
-system-result presentation, release identity/privacy preparation and original
-Store screenshot capture. Its new Apple SDK/runtime verification is pending;
-see CURRENT_STATUS.md for exact evidence and external release gates.
-
-The following dated package notes are historical, not the current status.
+Full no-iPhone scope remains active. The current source audit and remaining
+activation/device boundaries are in [NO_IPHONE_AUDIT.md](docs/NO_IPHONE_AUDIT.md).
+Camera RTSP/DASH/software playback, message alert permission and protected
+server-data deletion initiation join the reset/localization/release preparations.
+Linux321 core and14 pipeline checks pass; the changed Apple SDK/runtime/gallery
+batch is still pending. The deletion service is disabled until a real processing
+operator, deadline and retention inventory are approved. Do not claim submission
+readiness from source presence or from the preceding accepted gallery.
 
 ### Previous package evidence
 

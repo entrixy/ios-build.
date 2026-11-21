@@ -23,6 +23,9 @@ settings:
 packages:
   EntrixyCore:
     path: .
+  VLCKit:
+    url: https://github.com/videolan/vlckit.git
+    revision: 7f98c70f9f0c11fbdf828220890bd6280361ae99
 targets:
   Entrixy:
     type: application
@@ -38,6 +41,8 @@ targets:
     dependencies:
       - package: EntrixyCore
         product: EntrixyCore
+      - package: VLCKit
+        product: VLCKit
       - target: EntrixyWidget
     settings:
       base:

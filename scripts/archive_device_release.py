@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Build/inspect an unsigned iPhone Release archive; never export or upload an IPA."""
 import json
+import hashlib
 import os
 from pathlib import Path
 import plistlib
@@ -59,6 +60,21 @@ def main():
     app = archive / 'Products/Applications/Entrixy.app'
     widget = app / 'PlugIns/EntrixyWidget.appex'
     records = dict(app=bundle_record(app), widget=bundle_record(widget))
+    camera_framework = app / 'Frameworks/VLCKit.framework'
+    camera_info = plistlib.loads((camera_framework / 'Info.plist').read_bytes())
+    camera_binary = (camera_framework / camera_info['CFBundleExecutable']).read_bytes()
+    verify_device_image(camera_binary)
+    if struct.unpack('<I', camera_binary[12:16])[0] != 6:
+        raise ValueError('Camera library must remain a dynamically linked framework')
+    if not (app / 'VLCKit-LICENSE.txt').is_file():
+        raise ValueError('Camera library license/source-access notice is missing')
+    if (widget / 'Frameworks/VLCKit.framework').exists():
+        raise ValueError('The camera decoder must not be embedded in the widget')
+    if any(path.name.startswith(('camera-decoder.', 'dash-init-', 'dash-seg-')) for path in app.rglob('*')):
+        raise ValueError('Unit-test camera media must not be packaged in the Release app')
+    camera = dict(bundle_id=camera_info['CFBundleIdentifier'], platform='iphoneos',
+                  architectures=['arm64'], dynamically_linked=True,
+                  sha256=hashlib.sha256(camera_binary).hexdigest(), license_packaged=True)
     if not records['widget']['bundle_id'].startswith(records['app']['bundle_id'] + '.'):
         raise ValueError('Widget bundle identifier does not belong to the archived application')
     subprocess.run([
@@ -70,7 +86,7 @@ def main():
     source = os.environ.get('GITHUB_SHA') or subprocess.check_output(['git', 'rev-parse', 'HEAD'], text=True).strip()
     report = dict(kind='unsigned-iphone-release-archive', source_sha=source,
                   sdk=subprocess.check_output(['xcrun', '--sdk', 'iphoneos', '--show-sdk-version'], text=True).strip(),
-                  bundles=records, fixture_isolation='passed', privacy_manifest_packaging='passed',
+                  bundles=records, camera_framework=camera, fixture_isolation='passed', privacy_manifest_packaging='passed',
                   upload_ready=False, signing_and_provisioning='pending', physical_device_tested=False)
     output.write_text(json.dumps(report, indent=2) + '\n')
     print('Built/verified unsigned iPhone Release app and widget. Signing, device testing and App Store upload remain pending.', flush=True)

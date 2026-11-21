@@ -21,6 +21,7 @@ enum StageTwoCapture: String, CaseIterable {
     case incomingMessage = "incoming-message"
     case promotion
     case ownerPhoneRequest = "owner-phone-request"
+    case dataDeletion = "data-deletion"
     @MainActor static func offlinePromotions(for app:AppModel) -> AppPromotions {
         AppPromotions(app:app,storage:StagePromotionStorage(empty:true),api:StagePromotionAPI())
     }
@@ -32,7 +33,7 @@ enum StageTwoCapture: String, CaseIterable {
     var settingsTab: SettingsTab {
         switch self {
         case .guestKeys, .keyDetail, .addKey: return .keys
-        case .system, .codeSettings, .addServer, .networkPrivacy, .diagnostics: return .system
+        case .system, .codeSettings, .addServer, .networkPrivacy, .diagnostics, .dataDeletion: return .system
         case .sounds: return .sounds
         default: return .objects
         }
@@ -40,7 +41,7 @@ enum StageTwoCapture: String, CaseIterable {
     var mainTab: AppTab {
         switch self { case .guestControl, .ownerControl, .ownerConfirmation, .ownerCodeConfirmation, .keyAccepted, .incomingMessage, .promotion, .ownerPhoneRequest: return .control; case .ownerGuests, .delegatingGuests, .delegatingGuestsDeep, .ownerIssued, .ownerCallGuests: return .guests; case .journal: return .journal; default: return .settings }
     }
-    var isOwner: Bool { [.ownerObjects, .ownerGuests, .addServer, .ownerExpanded, .addObject, .objectDelete, .ownerControl, .mixedObjects, .ownerConfirmation, .ownerCodeConfirmation, .ownerBLEObjects, .ownerIssued, .promotion, .ownerCallGuests, .ownerDeviceObjects, .ownerPhoneRequest].contains(self) }
+    var isOwner: Bool { [.ownerObjects, .ownerGuests, .addServer, .ownerExpanded, .addObject, .objectDelete, .ownerControl, .mixedObjects, .ownerConfirmation, .ownerCodeConfirmation, .ownerBLEObjects, .ownerIssued, .promotion, .ownerCallGuests, .ownerDeviceObjects, .ownerPhoneRequest, .dataDeletion].contains(self) }
     var isEmpty: Bool { [.empty, .addKey, .deviceClaim].contains(self) }
 }
 private final class StageTwoStorage: StateStorage {
@@ -105,6 +106,9 @@ struct StageTwoRoot: View {
                 owner.issuedKeys = [key]
             }
             if route == .ownerPhoneRequest { owner.lastSynced = Date() }
+            if route == .dataDeletion {
+                var settings = OwnerServerSettings(); settings.accountEmail = "owner@example.test"; owner.serverSettings = settings
+            }
             state.owners = [owner]
         }
         if route == .mixedObjects, let owner = state.owners?.first, let object = owner.objects?.first, let guest = state.guests.first {
@@ -116,7 +120,8 @@ struct StageTwoRoot: View {
         // Each isolated UI profile starts independently of a preceding test's
         // hidden seven-tap developer setting. Production preferences are untouched.
         UserDefaults.standard.set(false,forKey:"entrixy.developerMode")
-        let app = AppModel(storage:StageTwoStorage(state),privacyRouter:route == .networkPrivacy ? ServerPrivacyRouter() : nil)
+        let ownerAPI: OwnerTransport = route == .dataDeletion ? StageDeletionAPI() : OwnerAPI()
+        let app = AppModel(storage:StageTwoStorage(state),ownerAPI:ownerAPI,privacyRouter:route == .networkPrivacy ? ServerPrivacyRouter() : nil)
         if route == .promotion { app.promotions = AppPromotions(app:app,storage:StagePromotionStorage(),api:StagePromotionAPI()) }
         if route == .incomingMessage { app.messages = MessageManager(app:app,acknowledgements:StageMessageAcknowledgements()) }
         if route == .diagnostics {
@@ -198,5 +203,19 @@ private struct StageTwoDelegationAPI: DelegationTransport {
     func delegationInfo(server: String,group: String) async throws -> Data { throw GuestCrypto.Failure.invalidEnvelope }
     func redeemDelegation(_ pending: DelegationRedemption,fingerprint: String) async throws -> Data { throw GuestCrypto.Failure.invalidEnvelope }
     func resolveDelegation(_ pending: DelegationRedemption,part: DelegationRedemption.Part,fingerprint: String) async throws -> GuestInvite? { throw GuestCrypto.Failure.invalidEnvelope }
+}
+private struct StageDeletionAPI: OwnerTransport {
+    func register(server:String,accessCode:String) async throws -> OwnerCredentials { throw GuestCrypto.Failure.invalidEnvelope }
+    func sync(server:String,credentials:OwnerCredentials,fingerprint:String) async throws -> Data { throw GuestCrypto.Failure.invalidEnvelope }
+    func mutate(server:String,credentials:OwnerCredentials,fingerprint:String,operation:OwnerOperation,body:Data) async throws -> Data { throw GuestCrypto.Failure.invalidEnvelope }
+    func accountLogin(server:String,email:String,password:String) async throws -> String {
+        guard server == "controller.invalid", email == "owner@example.test", password == "review-only-password" else { throw GuestCrypto.Failure.invalidEnvelope }
+        return "review-only-auth"
+    }
+    func dataDeletion(server:String,credentials:OwnerCredentials?,receipt:DataDeletionReceipt,accountToken:String?,submit:Bool) async throws -> DataDeletionResult {
+        guard server == "controller.invalid", !submit || (credentials != nil && accountToken == "review-only-auth") else { throw GuestCrypto.Failure.invalidEnvelope }
+        let now = Int64(Date().timeIntervalSince1970)
+        return DataDeletionResult(requestID:receipt.id,scope:receipt.scope,status:.pending,requestedAt:now,expectedBy:now+30*86400)
+    }
 }
 #endif

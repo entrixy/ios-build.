@@ -1002,7 +1002,7 @@
 "ios_entry_rejected" = "The code was not accepted or entry is temporarily locked. After several errors, wait before trying again.";
 "ios_entry_failed" = "Could not verify sign-in. Your code and access remain unchanged.";
 
-"ios_native_attestation_required" = "The server requires proof of app authenticity for this key. This version does not support it yet. Your key is kept; repeated connections have stopped. Contact the access owner.";
+"ios_native_app_refused" = "The server rejected app access for this key. Your key is kept; repeated connections have stopped. Refresh the key or contact the access owner.";
 
 "ios_ble_pair" = "Pair";
 
@@ -1451,3 +1451,23 @@
 "ios_system_core_controller_pass_missing" = "A protected controller pass has not been received.";
 "ios_system_core_joint_rules_unavailable" = "Combined checking of this object's conditions is currently unavailable.";
 "ios_system_restored_pending_keys_fmt" = "Bindings transferred. Keys awaiting a protected owner bundle: %1$d. They are saved under Keys.";
+
+// Server deletion initiation and receipt status
+"ios_deletion_title" = "Delete server data";
+"ios_deletion_hint" = "Initiate deletion on the selected server. This is separate from a local reset. Save any backups you need before deletion.";
+"ios_deletion_device" = "This device only";
+"ios_deletion_device_hint" = "Delete this device registration and its associated data on this server. The email account and other devices remain.";
+"ios_deletion_account" = "Entire account";
+"ios_deletion_account_hint" = "Delete the entire account and its associated personal data on this server, including device registrations and access. This affects your other devices too.";
+"ios_deletion_confirmation" = "Type DELETE to confirm";
+"ios_deletion_submit" = "Request deletion";
+"ios_deletion_pending" = "The server accepted your request. Data has not yet been reported as deleted.";
+"ios_deletion_complete" = "The server confirmed deletion is complete. Local copies and data on other servers are not automatically erased.";
+"ios_deletion_due" = "Processing deadline: %@";
+"ios_deletion_prepared" = "Server confirmation has not been received. Check the status or confirm this same request again.";
+"ios_deletion_check" = "Check status";
+"ios_deletion_unavailable" = "This server is not accepting deletion requests yet. Deletion is not confirmed.";
+"ios_deletion_auth" = "Enter the current password of the linked account.";
+"ios_deletion_error" = "Could not obtain server confirmation. Your request is kept on this phone; check its status.";
+"ios_deletion_not_found" = "The server did not find this request. You can confirm and send it using the same request ID.";
+"ios_deletion_no_servers" = "No owner registrations. Remove received keys in Settings → Keys.";

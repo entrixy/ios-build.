@@ -11,6 +11,8 @@ import re
 import struct
 
 SCREENS = {
+    'server-deletion-confirmation': ('Подтверждение удаления данных на сервере', 'Система'),
+    'server-deletion-pending': ('Заявка на удаление: ожидает обработки', 'Система'),
     'header-menu': ('Меню Entrixy', 'Система'),
     'guest-call-request': ('Запрос гостя на звонок', 'Гости'),
     'control': ('Управление', 'Объекты'),

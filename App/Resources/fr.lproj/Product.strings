@@ -1002,7 +1002,7 @@
 "ios_entry_rejected" = "Le code a été refusé ou la saisie est temporairement bloquée. Après plusieurs erreurs, patientez avant de réessayer.";
 "ios_entry_failed" = "La connexion n’a pas pu être vérifiée. Votre code et vos accès restent inchangés.";
 
-"ios_native_attestation_required" = "Le serveur exige une preuve d’authenticité de l’app pour cette clé. Cette version ne la prend pas encore en charge. Votre clé est conservée et les tentatives de connexion répétées sont arrêtées. Contactez le propriétaire de l’accès.";
+"ios_native_app_refused" = "Le serveur a refusé l’accès de l’application avec cette clé. La clé est conservée ; les reconnexions sont arrêtées. Actualisez la clé ou contactez le propriétaire de l’accès.";
 
 "ios_ble_pair" = "Associer";
 
@@ -1451,3 +1451,23 @@
 "ios_system_core_controller_pass_missing" = "Aucun pass protégé du contrôleur reçu.";
 "ios_system_core_joint_rules_unavailable" = "La vérification combinée des conditions de cet objet est actuellement indisponible.";
 "ios_system_restored_pending_keys_fmt" = "Associations transférées. Clés en attente d’un paquet protégé du propriétaire : %1$d. Elles sont enregistrées dans Clés.";
+
+// Server deletion initiation and receipt status
+"ios_deletion_title" = "Supprimer les données du serveur";
+"ios_deletion_hint" = "Demandez la suppression sur le serveur choisi. Cette opération est distincte de la réinitialisation locale. Conservez les sauvegardes nécessaires avant de continuer.";
+"ios_deletion_device" = "Cet appareil uniquement";
+"ios_deletion_device_hint" = "Supprimer l’enregistrement de cet appareil et ses données associées sur ce serveur. Le compte e-mail et les autres appareils sont conservés.";
+"ios_deletion_account" = "Compte entier";
+"ios_deletion_account_hint" = "Supprimer le compte entier et ses données personnelles sur ce serveur, y compris les appareils enregistrés et les accès. Vos autres appareils seront également concernés.";
+"ios_deletion_confirmation" = "Saisissez DELETE pour confirmer";
+"ios_deletion_submit" = "Demander la suppression";
+"ios_deletion_pending" = "Le serveur a accepté la demande. La suppression des données n’est pas encore confirmée.";
+"ios_deletion_complete" = "Le serveur a confirmé la suppression. Les copies locales et les données des autres serveurs ne sont pas effacées automatiquement.";
+"ios_deletion_due" = "Date limite de traitement : %@";
+"ios_deletion_prepared" = "Aucune confirmation du serveur reçue. Vérifiez l’état ou confirmez à nouveau cette même demande.";
+"ios_deletion_check" = "Vérifier l’état";
+"ios_deletion_unavailable" = "Ce serveur n’accepte pas encore les demandes de suppression. La suppression n’est pas confirmée.";
+"ios_deletion_auth" = "Saisissez le mot de passe actuel du compte associé.";
+"ios_deletion_error" = "Impossible d’obtenir la confirmation du serveur. La demande reste sur ce téléphone ; vérifiez son état.";
+"ios_deletion_not_found" = "Le serveur n’a pas trouvé cette demande. Vous pouvez la confirmer et l’envoyer avec le même identifiant.";
+"ios_deletion_no_servers" = "Aucun appareil propriétaire enregistré. Supprimez les clés reçues dans Réglages → Clés.";

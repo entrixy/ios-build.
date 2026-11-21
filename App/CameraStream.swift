@@ -66,6 +66,7 @@ enum CameraStreamFailure: Error { case http(Int), format }
 @MainActor final class CameraStreamModel: ObservableObject {
     @Published private(set) var image: UIImage?
     @Published private(set) var player: AVPlayer?
+    @Published private(set) var softwareVideo: CameraSoftwareVideo?
     @Published private(set) var message: String?
     @Published private(set) var loading = true
     private var worker: Task<Void,Never>?
@@ -74,10 +75,13 @@ enum CameraStreamFailure: Error { case http(Int), format }
     private var generation = UUID()
     private let transport: CameraHTTPFrames
     private var videoProxy: CameraVideoProxy?
+    private var rtspProxy: CameraRTSPProxy?
     init(transport: CameraHTTPFrames = CameraHTTPFrames()) { self.transport = transport }
     func stop() {
         generation = UUID(); worker?.cancel(); worker = nil; timeout?.cancel(); timeout = nil
         observation = nil; player?.pause(); player = nil
+        softwareVideo?.stop(); softwareVideo = nil
+        rtspProxy?.stop(); rtspProxy = nil
         videoProxy?.stop(); videoProxy = nil
     }
     func start(_ context: ObjectCameraContext) {
@@ -89,7 +93,25 @@ enum CameraStreamFailure: Error { case http(Int), format }
             do {
                 let request = try CameraRequest(configuration:context.configuration,guestUserKey:context.guestUserKey,localKeyID:context.localKeyID)
                 switch request.media {
-                case .otherVideo: throw CameraStreamFailure.format
+                case .otherVideo:
+                    let address: URL
+                    if request.url.scheme?.lowercased() == "rtsp" {
+                        let bridge = try CameraRTSPProxy(camera: request); self.rtspProxy = bridge
+                        bridge.failed = { [weak self] error in guard let self, self.generation == current else { return }; self.fail(Self.error(error)) }
+                        address = try await bridge.start()
+                    } else {
+                        let bridge = try CameraVideoProxy(camera: request, configuration: self.transport.configuration); self.videoProxy = bridge
+                        bridge.failed = { [weak self] error in guard let self, self.generation == current else { return }; self.fail(Self.error(error)) }
+                        address = try await bridge.start()
+                    }
+                    guard self.generation == current, !Task.isCancelled else { return }
+                    let video = try CameraSoftwareVideo(url: address)
+                    video.changed = { [weak self] playing in
+                        guard let self, self.generation == current else { return }
+                        if playing { self.loading = false; self.timeout?.cancel() }
+                        else { self.fail(ProductText.string("stream_err_connect")) }
+                    }
+                    self.softwareVideo = video
                 case .nativeVideo:
                     var address = request.url
                     if request.authenticated {
@@ -137,10 +159,10 @@ enum CameraStreamFailure: Error { case http(Int), format }
         timeout = Task { [weak self] in
             do { try await Task.sleep(nanoseconds:15_000_000_000) } catch { return }
             guard let self, self.generation == current, self.loading else { return }
-            self.fail(ProductText.string("stream_timeout")); self.worker?.cancel(); self.player?.pause()
+            self.fail(ProductText.string("stream_timeout")); self.worker?.cancel()
         }
     }
-    private func fail(_ text: String) { loading = false; message = text; timeout?.cancel(); videoProxy?.stop(); videoProxy = nil; player?.pause() }
+    private func fail(_ text: String) { loading = false; message = text; timeout?.cancel(); videoProxy?.stop(); videoProxy = nil; rtspProxy?.stop(); rtspProxy = nil; softwareVideo?.stop(); softwareVideo = nil; player?.pause() }
     private static func error(_ error: Error?) -> String {
         guard let error else { return ProductText.string("stream_err_unknown") }
         if case CameraStreamFailure.http(let code) = error {
@@ -165,6 +187,7 @@ struct ObjectCameraStream: View {
         ZStack {
             Color(uiColor:.secondarySystemGroupedBackground)
             if let player = model.player { VideoPlayer(player:player).allowsHitTesting(false) }
+            else if let video = model.softwareVideo { CameraSoftwareSurface(video: video).allowsHitTesting(false) }
             else if let image = model.image { Image(uiImage:image).resizable().scaledToFit() }
             if model.loading { ProgressView().accessibilityLabel("Загрузка") }
             if let message = model.message {

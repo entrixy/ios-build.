@@ -4,6 +4,7 @@ import FoundationNetworking
 #endif
 
 public protocol OwnerTransport {
+    func dataDeletion(server: String, credentials: OwnerCredentials?, receipt: DataDeletionReceipt, accountToken: String?, submit: Bool) async throws -> DataDeletionResult
     func supportsOwnerSuite(server: String) async throws -> Bool
     func accountLogin(server: String, email: String, password: String) async throws -> String
     func linkAccount(server: String, credentials: OwnerCredentials, token: String?) async throws -> String?
@@ -17,6 +18,7 @@ public protocol OwnerTransport {
 }
 
 public extension OwnerTransport {
+    func dataDeletion(server: String, credentials: OwnerCredentials?, receipt: DataDeletionReceipt, accountToken: String?, submit: Bool) async throws -> DataDeletionResult { throw GuestCrypto.Failure.invalidEnvelope }
     func supportsOwnerSuite(server: String) async throws -> Bool { true }
     func accountLogin(server: String, email: String, password: String) async throws -> String { throw GuestCrypto.Failure.invalidEnvelope }
     func linkAccount(server: String, credentials: OwnerCredentials, token: String?) async throws -> String? { throw GuestCrypto.Failure.invalidEnvelope }
@@ -140,6 +142,20 @@ public final class OwnerAPI: OwnerTransport {
         try credentials.validate()
         guard CompanyInvite.validCode(code) else { throw GuestCrypto.Failure.invalidEnvelope }
         _ = try await post(server:server,endpoint:"company",body:["code":code,"device_id":credentials.deviceID,"device_secret":credentials.deviceSecret],query:"a=claim")
+    }
+    public func dataDeletion(server: String, credentials: OwnerCredentials?, receipt: DataDeletionReceipt, accountToken: String? = nil, submit: Bool) async throws -> DataDeletionResult {
+        try receipt.validate()
+        var body: [String: Any] = ["operation": submit ? "request" : "status", "request_id": receipt.id, "receipt": receipt.token]
+        if submit {
+            guard let credentials else { throw GuestCrypto.Failure.invalidEnvelope }; try credentials.validate()
+            body["device_id"] = credentials.deviceID; body["device_secret"] = credentials.deviceSecret
+            body["scope"] = receipt.scope.rawValue; body["confirmation"] = "DELETE"
+            if let accountToken { guard !accountToken.isEmpty, accountToken.utf8.count <= 32768 else { throw GuestCrypto.Failure.invalidEnvelope }; body["account_token"] = accountToken }
+        }
+        let data = try await post(server: server, endpoint: "data_deletion", body: body)
+        let result = try JSONDecoder().decode(DataDeletionResult.self, from: data); try result.validate()
+        guard result.requestID == receipt.id, result.scope == receipt.scope else { throw GuestCrypto.Failure.invalidEnvelope }
+        return result
     }
     private func post(server: String, endpoint: String, body: [String: Any], query: String? = nil) async throws -> Data {
         let host = try GuestInvite.normalizeServer(server)

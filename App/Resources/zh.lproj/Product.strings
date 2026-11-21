@@ -1002,7 +1002,7 @@
 "ios_entry_rejected" = "验证码未被接受，或输入已暂时锁定。多次输错后，请稍候再试。";
 "ios_entry_failed" = "无法验证登录。您的验证码和访问权限未更改。";
 
-"ios_native_attestation_required" = "服务器要求验证此密钥所用应用的真实性。此版本尚未接入该验证。密钥已保留，重复连接已停止。请联系访问权限所有者。";
+"ios_native_app_refused" = "服务器拒绝此钥匙的应用访问。钥匙已保留，重复连接已停止。请刷新钥匙或联系权限所有者。";
 
 "ios_ble_pair" = "配对";
 
@@ -1451,3 +1451,23 @@
 "ios_system_core_controller_pass_missing" = "尚未收到受保护的控制器通行证。";
 "ios_system_core_joint_rules_unavailable" = "当前无法对此对象的条件进行联合检查。";
 "ios_system_restored_pending_keys_fmt" = "绑定已转移。正在等待所有者提供受保护密钥包的密钥数量：%1$d。它们已保存在“密钥”分区。";
+
+// Server deletion initiation and receipt status
+"ios_deletion_title" = "删除服务器数据";
+"ios_deletion_hint" = "在所选服务器上发起删除请求。此操作与本地重置相互独立。删除前请保存所需备份。";
+"ios_deletion_device" = "仅此设备";
+"ios_deletion_device_hint" = "删除此设备在该服务器上的注册及相关数据。邮箱账户和其他设备将保留。";
+"ios_deletion_account" = "整个账户";
+"ios_deletion_account_hint" = "删除该服务器上的整个账户及相关个人数据，包括设备注册和访问权限。您的其他设备也会受到影响。";
+"ios_deletion_confirmation" = "输入 DELETE 以确认";
+"ios_deletion_submit" = "请求删除";
+"ios_deletion_pending" = "服务器已接受请求，但尚未确认数据已删除。";
+"ios_deletion_complete" = "服务器已确认删除完成。本地副本和其他服务器上的数据不会自动清除。";
+"ios_deletion_due" = "处理截止日期：%@";
+"ios_deletion_prepared" = "尚未收到服务器确认。请查看状态，或再次确认同一请求。";
+"ios_deletion_check" = "查看状态";
+"ios_deletion_unavailable" = "此服务器尚不接受删除请求。删除尚未确认。";
+"ios_deletion_auth" = "请输入关联账户的当前密码。";
+"ios_deletion_error" = "无法取得服务器确认。请求已保存在此手机上，请查看其状态。";
+"ios_deletion_not_found" = "服务器未找到此请求。您可以使用同一请求编号确认并发送。";
+"ios_deletion_no_servers" = "没有所有者注册。请在设置 → 钥匙中删除收到的钥匙。";

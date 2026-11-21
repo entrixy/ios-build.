@@ -187,7 +187,11 @@ struct SettingsScreen: View {
                         NavigationLink(ProductText.string("ios_licenses")) { LicenseScreen() }
                         KeyValueRow(title: ProductText.string("ios_version"), value: Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "—")
                     }
-                    Section { AppPrivacyPolicyLink().actionListRow() }
+                    Section {
+                        AppPrivacyPolicyLink().actionListRow()
+                        NavigationLink(ProductText.string("ios_deletion_title")) { DataDeletionServersScreen() }
+                            .accessibilityIdentifier("data-deletion-settings")
+                    }
                     DeveloperSettingsSection(service:model.diagnostics)
                 }
             }.scrollContentBackground(.hidden).compactListSections()
@@ -373,9 +377,9 @@ struct LicenseScreen: View {
             .navigationTitle(ProductText.string("ios_licenses")).navigationBarTitleDisplayMode(.inline)
     }
     private var license: String {
-        guard let url = Bundle.main.url(forResource: "MaterialIcons-LICENSE", withExtension: "txt"),
-              let text = try? String(contentsOf: url, encoding: .utf8) else { return "Material Design icons · Google · Apache 2.0" }
-        return text
+        ["MaterialIcons-LICENSE", "VLCKit-LICENSE"].compactMap { name in
+            Bundle.main.url(forResource: name, withExtension: "txt").flatMap { try? String(contentsOf: $0, encoding: .utf8) }
+        }.joined(separator: "\n\n")
     }
 }
 

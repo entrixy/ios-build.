@@ -13,8 +13,10 @@ public struct OwnerServerSettings: Codable, Equatable {
     public var accessCode = ""
     public var accountEmail: String?
     public var pendingAccount: OwnerAccountLinkIntent?
+    public var deletionReceipt: DataDeletionReceipt?
     public init() {}
     public func validate() throws {
+        try deletionReceipt?.validate()
         guard accessCode.utf8.count <= 8192,
               [accountEmail,pendingAccount?.email].compactMap({ $0 }).allSatisfy({ !$0.isEmpty && $0.utf8.count <= 512 && !$0.contains("\r") && !$0.contains("\n") }) else { throw GuestCrypto.Failure.invalidEnvelope }
     }

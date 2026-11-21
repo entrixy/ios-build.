@@ -1,3 +1,14 @@
+# Уточнение полного объёма —22.11.2026
+
+Актуальны [CURRENT_STATUS.md](CURRENT_STATUS.md) и [NO_IPHONE_AUDIT.md](NO_IPHONE_AUDIT.md).
+Код камер, уведомлений и server deletion initiation дополняет полный перенос;
+новый целый Apple SDK/runtime/gallery batch ещё не принят. Deletion processing
+по умолчанию выключен до согласования срока/оператора/retention; manual initiation
+не равна автоматическому удалению. Signing, реальные IDs/APNs/AASA, устройство,
+финальные privacy/export/reviewer ответы и Store остаются отдельными границами.
+
+Ниже сохранена история.
+
 # Entrixy: путь к App Store
 
 После ревью настроек объектов извлечена [структура Android](ANDROID_STRUCTURE.md)

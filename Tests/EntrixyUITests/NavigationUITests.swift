@@ -576,9 +576,25 @@ final class NavigationUITests: XCTestCase {
         app.buttons.matching(NSPredicate(format:"identifier BEGINSWITH %@","guest-object-invocation-")).firstMatch.tap()
         let lifetime = app.sliders["guest-ble-lifetime"], value = app.staticTexts["guest-ble-lifetime-value"]
         XCTAssertTrue(lifetime.waitForExistence(timeout:10)); let previous = value.label
-        lifetime.adjust(toNormalizedSliderPosition:0)
+        XCTAssertTrue(waitForStable(lifetime,in:app))
+        // iOS26 SwiftUI exposes this discrete slider as raw 0...10 ("5"),
+        // rather than a percentage. XCTest's normalized adjust synthesized a
+        // gesture without moving the actual thumb in the failed source916 run.
+        // Drag the visible thumb from its reported value; keep the value-change
+        // assertion and require the real one-hour setting afterwards.
+        let raw = lifetime.value as? String ?? ""
+        let number = Double(raw.replacingOccurrences(of:"%",with:"")) ?? .nan
+        let normalized = raw.contains("%") ? number/100 : number/10
+        XCTAssertTrue(normalized.isFinite && (0...1).contains(normalized))
+        let frame = lifetime.frame.intersection(app.frame), inset = frame.height/2
+        XCTAssertTrue(frame.width > 2*inset && frame.height > 0)
+        let origin = app.coordinate(withNormalizedOffset:.zero)
+        let start = origin.withOffset(CGVector(dx:frame.minX+inset+(frame.width-2*inset)*CGFloat(normalized)-app.frame.minX,dy:frame.midY-app.frame.minY))
+        let end = origin.withOffset(CGVector(dx:frame.minX+inset-app.frame.minX,dy:frame.midY-app.frame.minY))
+        start.press(forDuration:0.4,thenDragTo:end,withVelocity:.slow,thenHoldForDuration:0.2)
         let changed = XCTNSPredicateExpectation(predicate:NSPredicate { _,_ in value.label != previous },object:value)
         XCTAssertEqual(XCTWaiter.wait(for:[changed],timeout:5),.completed)
+        XCTAssertEqual(value.label,"1 час")
         reviewCapture("guest-ble-lifetime",settledBy:lifetime)
         app.buttons["Закрыть"].tap(); app.buttons["Отмена"].tap()
         XCTAssertFalse(app.buttons.matching(NSPredicate(format:"identifier BEGINSWITH %@","guest-card-")).firstMatch.exists)
@@ -928,6 +944,26 @@ final class NavigationUITests: XCTestCase {
         XCTAssertTrue(restart.isEnabled)
         XCTAssertFalse(confirmation.exists); XCTAssertFalse(app.buttons["Отмена"].exists)
         reviewCapture("local-reset-complete",settledBy:restart)
+    }
+
+    func testServerDeletionRequiresConfirmationAndReportsPendingWithoutClaimingErasure() {
+        let app = launch("data-deletion")
+        let open = app.buttons["data-deletion-settings"]
+        bringFullyIntoView(open,in:app); XCTAssertTrue(open.isHittable); open.tap()
+        let server = app.buttons["data-deletion-server-controller.invalid"]
+        XCTAssertTrue(server.waitForExistence(timeout:10)); server.tap()
+        let field = app.textFields["data-deletion-confirmation"], submit = app.buttons["data-deletion-submit"]
+        XCTAssertTrue(field.waitForExistence(timeout:10)); XCTAssertFalse(submit.isEnabled)
+        reviewCapture("server-deletion-confirmation",settledBy:app.buttons["Отмена"])
+        let password = app.secureTextFields["data-deletion-password"]
+        bringFullyIntoView(password,in:app); password.tap(); password.typeText("review-only-password")
+        field.tap(); field.typeText("DELETE\n")
+        bringFullyIntoView(submit,in:app); XCTAssertTrue(submit.isEnabled); submit.tap()
+        let status = app.staticTexts["data-deletion-status"]
+        XCTAssertTrue(status.waitForExistence(timeout:15)); XCTAssertTrue(status.label.contains("ещё"))
+        reviewCapture("server-deletion-pending",settledBy:app.buttons["Закрыть"])
+        app.buttons["Закрыть"].tap(); XCTAssertTrue(server.waitForExistence(timeout:10))
+        assertBottom(app,["control","settings","guests","journal"])
     }
 
     func testEntryLockSettingsUseCompactCodeDialogsAndWrongCodeCannotDisableLock() {
