@@ -20,7 +20,7 @@ struct ObjectAvatarPicker: View {
                             Image("object-\(index + 1)").resizable().scaledToFit()
                                 .frame(maxWidth: .infinity).aspectRatio(1, contentMode: .fit)
                                 .clipShape(RoundedRectangle(cornerRadius: 14))
-                                .overlay(RoundedRectangle(cornerRadius: 14).strokeBorder(model.avatarPreset(target) == index ? Brand.ink : .clear, lineWidth: 3))
+                                .overlay(RoundedRectangle(cornerRadius: 14).strokeBorder(model.avatarPreset(target) == index ? AppPalette.selected : .clear, lineWidth: 3))
                         }.buttonStyle(.plain).accessibilityLabel("Иконка \(index + 1)")
                             .accessibilityAddTraits(model.avatarPreset(target) == index ? .isSelected : [])
                     }

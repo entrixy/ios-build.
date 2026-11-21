@@ -533,7 +533,7 @@
 "hangup_inactive" = "Don't hang up";
 "hangup_title" = "Auto hang-up";
 "help_c_auto" = "Any object can open by itself — by place, Wi-Fi, time, or, for Bluetooth controllers, proximity. It keeps working with the app minimized while the Control tab is open.";
-"help_c_control" = "The Control tab is one list of your objects and those shared with you. A tap opens; the dot by the icon shows the connection — green ready, yellow connecting, red none.";
+"help_c_control" = "The Control tab is one list of your objects and those shared with you. A tap opens; the dot by the icon shows the connection — green ready, blue connecting, red none.";
 "help_c_guests" = "Share access with one button — a QR code and a link. You choose which objects a guest sees and what a tap does (confirm, open, or require identity); any guest can be switched off in one tap.";
 "help_c_objects" = "Add objects in Settings. Four types: Call dials a number; Webhook sends a command over the internet (Home Assistant, Shelly, Tasmota, Raspberry Pi); Device is your own controller on our server; Bluetooth opens nearby without internet or a SIM.";
 "help_c_perm" = "Two permissions the app cannot switch on for you: Location → Allow all the time and Battery → Unrestricted. Without them background automation stops. On Xiaomi, Huawei, Oppo, Vivo and Realme, don't swipe the app away from recent apps — just minimize it.";

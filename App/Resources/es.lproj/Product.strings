@@ -533,7 +533,7 @@
 "hangup_inactive" = "No colgar";
 "hangup_title" = "Colgado automático de la llamada";
 "help_c_auto" = "Cualquier objeto puede abrirse solo: por lugar, Wi-Fi, tiempo y, en los controladores Bluetooth, por proximidad. Sigue funcionando con la app minimizada mientras la pestaña «Control» esté abierta.";
-"help_c_control" = "La pestaña «Control» es una única lista de tus objetos y los que te han compartido. Un toque abre; el punto junto al icono muestra la conexión: verde listo, amarillo conectando, rojo sin conexión.";
+"help_c_control" = "La pestaña «Control» es una única lista de tus objetos y los que te han compartido. Un toque abre; el punto junto al icono muestra la conexión: verde listo, azul conectando, rojo sin conexión.";
 "help_c_guests" = "El acceso se comparte con un botón: un código QR y un enlace. Eliges qué objetos ve el invitado y qué hace un toque (confirmar, abrir o pedir identidad); cualquier invitado se puede apagar con un toque.";
 "help_c_objects" = "Los objetos se añaden en Ajustes. Cuatro tipos: «Llamada» marca un número; «Webhook» envía un comando por internet (Home Assistant, Shelly, Tasmota, Raspberry Pi); «Dispositivo» es tu propio controlador en nuestro servidor; «Bluetooth» abre de cerca sin internet ni SIM.";
 "help_c_perm" = "Dos permisos que la app no puede activar por ti: «Ubicación → Permitir siempre» y «Batería → Sin restricciones». Sin ellos, la automatización en segundo plano se detiene. En Xiaomi, Huawei, Oppo, Vivo y Realme no deslices la app fuera de recientes: solo minimízala.";

@@ -82,6 +82,7 @@ struct ComposeMessageScreen: View {
                     }
                 }
                 Section {
+                    Text("Сообщение получателю").font(.subheadline).foregroundStyle(Brand.secondaryInk)
                     AppField("Текст сообщения") {
                         TextField("Текст сообщения", text: $text, axis: .vertical).lineLimit(3...6)
                             .accessibilityIdentifier("message-text")
@@ -99,7 +100,7 @@ struct ComposeMessageScreen: View {
                         .buttonStyle(PrimaryActionStyle())
                         .disabled(text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || text.count > 500 || text.utf8.count > 2048)
                         .accessibilityIdentifier("message-send")
-                } header: { Text("Сообщение получателю") } footer: { Text("Отправка на сервер ещё не подтверждает доставку или чтение получателем.") }
+                } footer: { Text("Отправка на сервер ещё не подтверждает доставку или чтение получателем.") }
             }.disabled(manager.busy)
             .taskSheetTitle("Написать сообщение",form:true)
             .sheetDismissFooter(sentID == nil ? "Отмена" : "Закрыть", disabled: manager.busy) { dismiss() }

@@ -65,7 +65,7 @@ struct ObjectRadioChoice: View {
                     .foregroundStyle(selected ? AppPalette.selected : Brand.secondaryInk)
                 Text(title).font(.subheadline).frame(maxWidth: .infinity, alignment: .leading)
             }.foregroundStyle(Brand.ink).frame(minHeight: DesignMetrics.secondaryHeight).contentShape(Rectangle())
-        }.buttonStyle(.plain).accessibilityAddTraits(selected ? .isSelected : [])
+        }.buttonStyle(.plain).accessibilityLabel(title).accessibilityAddTraits(selected ? .isSelected : [])
     }
 }
 
@@ -111,9 +111,10 @@ struct ObjectCameraFields: View {
                 Text(ProductText.string("snap_interval",camera.intervalSec))
                 Slider(value:Binding(get:{ Double(camera.intervalSec) },set:{ camera.intervalSec=Int($0) }),in:0...30,step:1).tint(AppPalette.selected)
             }
-            Picker(ProductText.string("snap_show_when_title"),selection:$camera.showWhen) {
-                ForEach(["always","call","nearby"],id:\.self) { value in Text(ProductText.string("snap_when_"+value)).tag(value) }
-            }.pickerStyle(.inline).tint(AppPalette.selected)
+            Text(ProductText.string("snap_show_when_title")).font(.subheadline)
+            ForEach(["always","call","nearby"],id:\.self) { value in
+                ObjectRadioChoice(title:ProductText.string("snap_when_"+value),selected:camera.showWhen == value) { camera.showWhen=value }
+            }
         }
     }
 }

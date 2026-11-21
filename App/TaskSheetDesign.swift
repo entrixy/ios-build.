@@ -1,6 +1,14 @@
 import SwiftUI
 import UIKit
 
+/// Apply the functional tint at the switch itself: presentation hosts and
+/// navigation tint must not turn an enabled option back into a navy switch.
+struct SelectedSwitchStyle: ToggleStyle {
+    func makeBody(configuration:Configuration) -> some View {
+        Toggle(configuration).toggleStyle(.switch).tint(AppPalette.selected)
+    }
+}
+
 /// The same heading and first-content inset for every application task sheet.
 /// Native photo/file/camera pickers and ordinary pushed pages keep their own bars.
 struct TaskSheetHeader<Trailing:View>: View {

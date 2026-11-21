@@ -112,6 +112,15 @@ final class NavigationUITests: XCTestCase {
         }
         XCTAssertEqual(counter.value as? String,String(wanted))
     }
+    private func assertDelegationMaximum(_ id:String,value:Int,in app:XCUIApplication) {
+        let counter=delegationCounter(id,in:app),plus=counterButton(counter,increase:true)
+        // SwiftUI's native Stepper renders its upper-bound button disabled on
+        // iOS26 but still reports isEnabled=true through AX. Verify the actual
+        // user action cannot exceed the bound, rather than trusting that flag.
+        XCTAssertEqual(counter.value as? String,String(value))
+        if plus.isEnabled { plus.tap() }
+        XCTAssertEqual(counter.value as? String,String(value))
+    }
     private func tapSwitchControl(_ control:XCUIElement,in app:XCUIApplication) {
         XCTAssertEqual(control.elementType,.switch)
         XCTAssertTrue(control.isEnabled)
@@ -385,10 +394,14 @@ final class NavigationUITests: XCTestCase {
         XCTAssertGreaterThanOrEqual(cancel.frame.minY,send.frame.maxY)
         reviewCapture("backup-password",settledBy:cancel)
         let password=app.secureTextFields["Пароль копии"],repeated=app.secureTextFields["Повторите пароль"]
-        password.tap();password.typeText("native-review-only");password.typeText("\n")
+        password.tap();password.typeText("native-review-only")
+        XCTAssertEqual((password.value as? String)?.count,17)
+        password.typeText("\n")
         XCTAssertFalse(save.isEnabled)
         XCTAssertTrue(waitForStable(repeated,in:app));repeated.tap()
-        repeated.typeText("native-review-only");repeated.typeText("\n")
+        repeated.typeText("native-review-only")
+        XCTAssertEqual((repeated.value as? String)?.count,17)
+        repeated.typeText("\n")
         XCTAssertTrue(waitForStable(cancel,in:app))
         XCTAssertTrue(save.isEnabled);XCTAssertTrue(send.isEnabled);XCTAssertTrue(cancel.isEnabled)
         reviewCapture("backup-password-ready",settledBy:cancel)
@@ -825,9 +838,9 @@ final class NavigationUITests: XCTestCase {
         tapSwitchControl(nativeSwitch(enabled),in:app)
         // Incoming depth4/pool12 permits at most3 further levels and11 child keys.
         setDelegationCount("delegation-depth",to:3,in:app)
-        XCTAssertFalse(counterButton(delegationCounter("delegation-depth",in:app),increase:true).isEnabled)
+        assertDelegationMaximum("delegation-depth",value:3,in:app)
         setDelegationCount("delegation-pool",to:11,in:app)
-        XCTAssertFalse(counterButton(delegationCounter("delegation-pool",in:app),increase:true).isEnabled)
+        assertDelegationMaximum("delegation-pool",value:11,in:app)
         setDelegationCount("delegation-pool",to:7,in:app)
         reviewCapture("passed-access-delegation-limits")
         let ok=app.buttons["ОК"].firstMatch;bringIntoView(ok,in:app);ok.tap()

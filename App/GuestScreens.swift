@@ -92,12 +92,11 @@ struct ConnectionLabel: View {
         }.font(.subheadline).foregroundStyle(Brand.secondaryInk)
     }
     private var color: Color {
-        if model.connection(for: guestID) == .unavailable { return .red }
-        if paused { return .orange }
+        if model.connection(for: guestID) == .unavailable || paused { return AppPalette.statusOffline }
         switch model.connection(for: guestID) {
-        case .connected: return Color(red: 149.0/255, green: 193.0/255, blue: 31.0/255)
-        case .connecting: return .orange
-        case .offline, .unavailable: return .secondary
+        case .connected: return AppPalette.statusReady
+        case .connecting: return AppPalette.statusBlue
+        case .offline, .unavailable: return AppPalette.statusOffline
         }
     }
 }

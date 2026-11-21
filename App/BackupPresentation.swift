@@ -188,6 +188,8 @@ struct BackupFlowHost: View {
     private func password(_ title: String,value: Binding<String>) -> some View {
         AppField(ProductText.string(title)) {
             SecureField(ProductText.string(title),text:value).padding(14).background(Color(uiColor:.tertiarySystemFill),in:RoundedRectangle(cornerRadius:12))
+                .keyboardType(.asciiCapable).textInputAutocapitalization(.never).autocorrectionDisabled()
+                .textContentType(flow.prompt == .export ? .newPassword : .password)
                 .focused($focusedPassword,equals:title).submitLabel(.done).onSubmit { focusedPassword=nil }
         }
     }

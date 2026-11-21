@@ -145,10 +145,9 @@ struct AddOwnerObjectScreen: View {
                 } else if kind == "ble" {
                     Text(ProductText.string("ble_pair_hint")).font(.footnote).foregroundStyle(Brand.secondaryInk)
                 } else {
-                    Picker(ProductText.string("add_object_type_device"), selection: $claimMode) {
-                        Text(ProductText.string("add_object_device_new")).tag(false)
-                        Text(ProductText.string("add_object_device_claim")).tag(true)
-                    }.pickerStyle(.inline).tint(AppPalette.selected)
+                    Text(ProductText.string("add_object_type_device")).font(.subheadline)
+                    ObjectRadioChoice(title:ProductText.string("add_object_device_new"),selected:!claimMode) { claimMode=false }
+                    ObjectRadioChoice(title:ProductText.string("add_object_device_claim"),selected:claimMode) { claimMode=true }
                     if claimMode {
                         AppField(ProductText.string("add_object_device_claim_code")) {
                             TextField("A1B2C3D4", text: $claimCode).textInputAutocapitalization(.characters).autocorrectionDisabled()

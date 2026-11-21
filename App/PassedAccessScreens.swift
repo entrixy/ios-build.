@@ -234,7 +234,7 @@ struct EditPassedObjects: View {
                         Button {
                             if selected.contains(object.numberID) { selected.remove(object.numberID) } else { selected.insert(object.numberID) }
                         } label: {
-                            HStack { Text(object.label); Spacer(); Image(systemName: selected.contains(object.numberID) ? "checkmark.circle.fill" : "circle") }.foregroundStyle(Brand.ink)
+                            HStack { Text(object.label); Spacer(); Image(systemName: selected.contains(object.numberID) ? "checkmark.circle.fill" : "circle").foregroundStyle(selected.contains(object.numberID) ? AppPalette.selected : Brand.secondaryInk) }.foregroundStyle(Brand.ink)
                         }.disabled(!selected.contains(object.numberID) && !canAdd)
                     }
                     if guest == nil { Text("Исходный ключ удалён с этого iPhone").foregroundStyle(Brand.secondaryInk) }

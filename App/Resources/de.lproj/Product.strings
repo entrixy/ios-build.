@@ -533,7 +533,7 @@
 "hangup_inactive" = "Nicht beenden";
 "hangup_title" = "Anruf automatisch beenden";
 "help_c_auto" = "Jedes Objekt kann sich selbst öffnen — nach Ort, WLAN, Zeit und bei Bluetooth-Controllern nach Nähe. Es läuft bei minimierter App, solange der Tab „Steuerung“ geöffnet ist.";
-"help_c_control" = "Der Tab „Steuerung“ ist eine Liste Ihrer Objekte und der freigegebenen. Ein Tippen öffnet; der Punkt am Symbol zeigt die Verbindung — grün bereit, gelb verbindet, rot keine.";
+"help_c_control" = "Der Tab „Steuerung“ ist eine Liste Ihrer Objekte und der freigegebenen. Ein Tippen öffnet; der Punkt am Symbol zeigt die Verbindung — grün bereit, blau verbindet, rot keine.";
 "help_c_guests" = "Zugang wird mit einer Taste geteilt — ein QR-Code und ein Link. Sie wählen, welche Objekte ein Gast sieht und was ein Tippen bewirkt (bestätigen, öffnen, Identität verlangen); jeder Gast lässt sich mit einem Tippen abschalten.";
 "help_c_objects" = "Objekte werden in den Einstellungen hinzugefügt. Vier Typen: „Anruf“ wählt eine Nummer; „Webhook“ sendet einen Befehl über das Internet (Home Assistant, Shelly, Tasmota, Raspberry Pi); „Gerät“ ist Ihr eigener Controller auf unserem Server; „Bluetooth“ öffnet aus der Nähe ohne Internet und SIM.";
 "help_c_perm" = "Zwei Berechtigungen kann die App nicht für Sie einschalten: „Standort → Immer zulassen“ und „Akku → Ohne Einschränkung“. Ohne sie stoppt die Hintergrund-Automatik. Bei Xiaomi, Huawei, Oppo, Vivo und Realme die App nicht aus den letzten Apps wischen — nur minimieren.";

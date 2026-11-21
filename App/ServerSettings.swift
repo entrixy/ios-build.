@@ -20,6 +20,7 @@ struct ServerSettingsSection: View {
                         Button { model.selectOwnerServer(host) } label: {
                             HStack(spacing:12) {
                                 Image(systemName:model.selectedOwnerServer == host ? "largecircle.fill.circle" : "circle")
+                                    .foregroundStyle(model.selectedOwnerServer == host ? AppPalette.selected : Brand.secondaryInk)
                                 VStack(alignment:.leading,spacing:4) {
                                     Text(host).font(.body.weight(.semibold))
                                     if let mail = model.owners.first(where:{ $0.server == host })?.serverSettings?.accountEmail { Text(mail).font(.caption).foregroundStyle(Brand.secondaryInk) }

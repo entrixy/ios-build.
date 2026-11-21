@@ -533,7 +533,7 @@
 "hangup_inactive" = "Ne pas raccrocher";
 "hangup_title" = "Raccrochage auto de l'appel";
 "help_c_auto" = "Tout objet peut s’ouvrir seul — par lieu, Wi-Fi, heure et, pour les contrôleurs Bluetooth, par proximité. Cela continue avec l’application réduite tant que l’onglet « Contrôle » est ouvert.";
-"help_c_control" = "L’onglet « Contrôle » est une liste unique de vos objets et de ceux qu’on vous a partagés. Une pression ouvre ; le point près de l’icône indique la connexion — vert prêt, jaune connexion, rouge aucune.";
+"help_c_control" = "L’onglet « Contrôle » est une liste unique de vos objets et de ceux qu’on vous a partagés. Une pression ouvre ; le point près de l’icône indique la connexion — vert prêt, bleu connexion, rouge aucune.";
 "help_c_guests" = "L’accès se partage d’un bouton — un QR code et un lien. Vous choisissez les objets que voit l’invité et ce que fait une pression (confirmer, ouvrir ou demander l’identité) ; tout invité se coupe d’une pression.";
 "help_c_objects" = "Les objets s’ajoutent dans les Réglages. Quatre types : « Appel » compose un numéro ; « Webhook » envoie une commande par internet (Home Assistant, Shelly, Tasmota, Raspberry Pi) ; « Appareil » est votre propre contrôleur sur notre serveur ; « Bluetooth » ouvre de près sans internet ni SIM.";
 "help_c_perm" = "Deux autorisations que l’application ne peut pas activer à votre place : « Localisation → Toujours autoriser » et « Batterie → Sans restriction ». Sans elles, l’automatisation en arrière-plan s’arrête. Sur Xiaomi, Huawei, Oppo, Vivo et Realme, ne balayez pas l’application hors des récentes — réduisez-la simplement.";
