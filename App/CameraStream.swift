@@ -67,11 +67,13 @@ enum CameraStreamFailure: Error { case http(Int), format }
     @Published private(set) var image: UIImage?
     @Published private(set) var player: AVPlayer?
     @Published private(set) var softwareVideo: CameraSoftwareVideo?
+    @Published private(set) var videoAspect: CGFloat = 16/9
     @Published private(set) var message: String?
     @Published private(set) var loading = true
     private var worker: Task<Void,Never>?
     private var timeout: Task<Void,Never>?
     private var observation: NSKeyValueObservation?
+    private var sizeObservation: NSKeyValueObservation?
     private var generation = UUID()
     private let transport: CameraHTTPFrames
     private var videoProxy: CameraVideoProxy?
@@ -79,13 +81,13 @@ enum CameraStreamFailure: Error { case http(Int), format }
     init(transport: CameraHTTPFrames = CameraHTTPFrames()) { self.transport = transport }
     func stop() {
         generation = UUID(); worker?.cancel(); worker = nil; timeout?.cancel(); timeout = nil
-        observation = nil; player?.pause(); player = nil
+        observation = nil; sizeObservation = nil; player?.pause(); player = nil
         softwareVideo?.stop(); softwareVideo = nil
         rtspProxy?.stop(); rtspProxy = nil
         videoProxy?.stop(); videoProxy = nil
     }
     func start(_ context: ObjectCameraContext) {
-        stop(); loading = true; message = nil; image = nil
+        stop(); loading = true; message = nil; image = nil; videoAspect = 16/9
         let current = generation
         armTimeout(current)
         worker = Task { [weak self] in
@@ -106,6 +108,7 @@ enum CameraStreamFailure: Error { case http(Int), format }
                     }
                     guard self.generation == current, !Task.isCancelled else { return }
                     let video = try CameraSoftwareVideo(url: address)
+                    video.resized = { [weak self] size in guard let self, self.generation == current else { return }; self.updateAspect(size) }
                     video.changed = { [weak self] playing in
                         guard let self, self.generation == current else { return }
                         if playing { self.loading = false; self.timeout?.cancel() }
@@ -122,6 +125,9 @@ enum CameraStreamFailure: Error { case http(Int), format }
                     }
                     guard self.generation == current, !Task.isCancelled else { return }
                     let item = AVPlayerItem(url:address)
+                    self.sizeObservation = item.observe(\.presentationSize, options: [.initial, .new]) { [weak self] item, _ in
+                        Task { @MainActor in guard let self, self.generation == current else { return }; self.updateAspect(item.presentationSize) }
+                    }
                     self.observation = item.observe(\.status,options:[.initial,.new]) { [weak self] item,_ in
                         Task { @MainActor in
                             guard let self, self.generation == current else { return }
@@ -161,6 +167,11 @@ enum CameraStreamFailure: Error { case http(Int), format }
             guard let self, self.generation == current, self.loading else { return }
             self.fail(ProductText.string("stream_timeout")); self.worker?.cancel()
         }
+    }
+    private func updateAspect(_ size: CGSize) {
+        guard size.width.isFinite, size.height.isFinite, size.width > 0, size.height > 0 else { return }
+        let aspect = size.width/size.height
+        if abs(videoAspect-aspect) > 0.001 { videoAspect = aspect }
     }
     private func fail(_ text: String) { loading = false; message = text; timeout?.cancel(); videoProxy?.stop(); videoProxy = nil; rtspProxy?.stop(); rtspProxy = nil; softwareVideo?.stop(); softwareVideo = nil; player?.pause() }
     private static func error(_ error: Error?) -> String {
@@ -203,7 +214,7 @@ struct ObjectCameraStream: View {
         .onChange(of:phase) { value in if value == .active { model.start(context) } else { model.stop() } }
         .onDisappear { model.stop() }
     }
-    private var aspect: CGFloat { model.image.map { $0.size.width/max(1,$0.size.height) } ?? 16/9 }
+    private var aspect: CGFloat { model.image.map { $0.size.width/max(1,$0.size.height) } ?? model.videoAspect }
 }
 
 extension AppModel {

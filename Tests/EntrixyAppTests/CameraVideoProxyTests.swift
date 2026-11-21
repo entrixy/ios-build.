@@ -143,6 +143,8 @@ private final class CameraVideoProtocol: URLProtocol {
         defer { player.view.removeFromSuperview(); window.isHidden = true; previous?.makeKey() }
         for _ in 0..<250 where !player.hasDecodedVideo && model.message == nil { try await Task.sleep(nanoseconds:50_000_000) }
         XCTAssertTrue(player.hasDecodedVideo,"The extended decoder did not produce actual video output")
+        for _ in 0..<100 where abs(model.videoAspect-4/3) > 0.01 && model.message == nil { try await Task.sleep(nanoseconds:20_000_000) }
+        XCTAssertEqual(model.videoAspect,4/3,accuracy:0.01,"The camera container must use actual video proportions, as Android does")
         XCTAssertNil(model.message); XCTAssertFalse(model.loading); XCTAssertFalse(CameraVideoProtocol.recorded().isEmpty)
         model.stop(); XCTAssertNil(model.softwareVideo)
     }
