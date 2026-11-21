@@ -170,3 +170,21 @@ Run44836415970/native0e28ff8:312core/197hosted/DebugPASS;29UI26passed/3failed,
 Остались прежние fully-visible/two-stable/hittability/single tap/value guards;
 проверки не пропущены. Product source не менялся; только selector helper.
 UITest frontend parse/diffPASS; новый полный Apple runtime нужен.
+
+## Runtime8aafde4: реальная область тумблера
+
+Run44845312878/nativea500fda:312core/197hosted/DebugPASS,29UI25pass4fail,
+51из58PNG. GEO/routeMap/WiFi и оба camera/device пути работали до следующего
+Switch stable check; Diagnostic/HomeNetwork/EntryLock tap по центру широкого
+родительскогоAXSwitch попадал в ПОДПИСЬ. Старый комментарий EntryLock прямо
+описывал эту разницу; selector-only исправление было недостаточным.
+
+Теперь значения/доступность читаются у именованного SwiftUI Toggle, а одно
+настоящее касание вычисляется по пересечению CGRect его вложенного63x28
+тумблера с родителем/экраном (у labelsHidden — собственной61x28рамки).
+Нет фиксированных экранных координат, accessibilityActivate, state injection,
+повторного tap или пропуска результата. Сохраняются enabled/fullviewport/
+две стабильные геометрии и прежние value/dialog assertions. Switch-only
+isHittable у ненажимаемогоAXwrapper больше не подменяет проверку реального
+касания и результата. Все обычные кнопки/footers сохраняют hittability guards.
+Appsource не менялся. UITestparse/diffPASS; новый runtime ещё нужен.

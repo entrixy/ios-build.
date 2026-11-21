@@ -11,8 +11,10 @@ final class NavigationUITests: XCTestCase {
         // geometric stability; the animated brand itself remains enabled.
         guard let app = activeApp else { XCTFail("Missing app for native checkpoint"); return }
         // Check the foreground app's bounds without asking a detached keyboard
-        // Window for a hit point. Explicit control anchors must remain hittable.
-        guard waitForStable(reference ?? app,in:app,requireHit:reference != nil) else {
+        // Window for a hit point. Buttons retain their hittability check;
+        // SwiftUI switches are exercised at their actual rendered thumb bounds.
+        let requireHit = reference.map { $0.elementType != .switch } ?? false
+        guard waitForStable(reference ?? app,in:app,requireHit:requireHit) else {
             XCTFail("Native checkpoint did not reach a stable visible layout: " + state); return
         }
         let frame = XCTAttachment(screenshot:XCUIScreen.main.screenshot())
@@ -73,13 +75,30 @@ final class NavigationUITests: XCTestCase {
     }
     private func bringIntoView(_ row: XCUIElement, in app: XCUIApplication) {
         bringFullyIntoView(row,in:app)
-        XCTAssertTrue(waitForStable(nativeSwitch(row),in:app),"Control did not settle before interaction")
+        let control = nativeSwitch(row)
+        XCTAssertTrue(waitForStable(control,in:app,requireHit:control.elementType != .switch),"Control did not settle before interaction")
+        XCTAssertTrue(control.isEnabled)
+    }
+    private func tapSwitchControl(_ control:XCUIElement,in app:XCUIApplication) {
+        XCTAssertEqual(control.elementType,.switch)
+        XCTAssertTrue(control.isEnabled)
+        let implementation = control.switches.firstMatch
+        let rendered = implementation.exists ? implementation : control
+        let frame = rendered.frame.intersection(control.frame).intersection(app.frame)
+        // No guessed screen point and no direct model/accessibility activation.
+        // SwiftUI's whole labelled row is a Switch, but its centre is the label.
+        guard !frame.isEmpty,frame.width <= 100,frame.height <= 60 else {
+            XCTFail("The rendered switch thumb is not visible");return
+        }
+        let window = app.frame
+        app.coordinate(withNormalizedOffset:.zero)
+            .withOffset(CGVector(dx:frame.midX-window.minX,dy:frame.midY-window.minY)).tap()
     }
     @discardableResult private func setAutomationRule(_ symbol:String,to enabled:Bool,in app:XCUIApplication) -> XCUIElement {
         let row = app.descendants(matching:.any).matching(identifier:"automation-rule-"+symbol).firstMatch
         XCTAssertTrue(row.waitForExistence(timeout:10)); bringIntoView(row,in:app)
         let control = nativeSwitch(row), expected = enabled ? "1" : "0"
-        if control.value as? String != expected { control.tap() }
+        if control.value as? String != expected { tapSwitchControl(control,in:app) }
         let changed = XCTNSPredicateExpectation(predicate:NSPredicate { _,_ in control.value as? String == expected },object:control)
         XCTAssertEqual(XCTWaiter.wait(for:[changed],timeout:5),.completed)
         return control
@@ -304,9 +323,9 @@ final class NavigationUITests: XCTestCase {
         bringIntoView(row,in:app)
         XCTAssertTrue(row.waitForExistence(timeout:5))
         let toggle = nativeSwitch(row)
-        XCTAssertTrue(toggle.exists); XCTAssertTrue(toggle.isHittable); XCTAssertEqual(toggle.value as? String,"0")
+        XCTAssertTrue(toggle.exists); XCTAssertTrue(toggle.isEnabled); XCTAssertEqual(toggle.value as? String,"0")
         reviewCapture("home-network",settledBy:toggle)
-        toggle.tap()
+        tapSwitchControl(toggle,in:app)
         let enabled = XCTNSPredicateExpectation(predicate:NSPredicate { _,_ in toggle.value as? String == "1" },object:toggle)
         XCTAssertEqual(XCTWaiter.wait(for:[enabled],timeout:5),.completed)
         let remove = app.buttons.matching(NSPredicate(format:"identifier BEGINSWITH %@","privacy-remove-")).firstMatch
@@ -345,7 +364,8 @@ final class NavigationUITests: XCTestCase {
         let row = app.descendants(matching:.any).matching(identifier:"diagnostics-consent-switch").firstMatch
         XCTAssertTrue(row.waitForExistence(timeout:10))
         let control = nativeSwitch(row)
-        XCTAssertEqual(control.value as? String,"0"); control.tap()
+        bringIntoView(row,in:app)
+        XCTAssertEqual(control.value as? String,"0"); tapSwitchControl(control,in:app)
         let enabled = XCTNSPredicateExpectation(predicate:NSPredicate { _,_ in control.value as? String == "1" },object:control)
         XCTAssertEqual(XCTWaiter.wait(for:[enabled],timeout:5),.completed)
         XCTAssertFalse(app.buttons["diagnostics-send"].exists)
@@ -587,7 +607,7 @@ final class NavigationUITests: XCTestCase {
         app.buttons["Закрыть"].tap()
         XCTAssertTrue(app.buttons["owner-object-automation"].waitForExistence(timeout: 10))
         let camera = app.descendants(matching:.any).matching(identifier:"object-camera-enabled").firstMatch
-        bringIntoView(camera,in:app); nativeSwitch(camera).tap()
+        bringIntoView(camera,in:app); tapSwitchControl(nativeSwitch(camera),in:app)
         let address = app.textFields["object-camera-url"]
         XCTAssertTrue(address.waitForExistence(timeout:10)); bringIntoView(address,in:app)
         for _ in 0..<5 {
@@ -606,7 +626,8 @@ final class NavigationUITests: XCTestCase {
         app.buttons.matching(NSPredicate(format:"identifier BEGINSWITH %@","guest-object-invocation-")).firstMatch.tap()
         let reaction = app.descendants(matching:.any).matching(identifier:"guest-call-enabled").firstMatch
         XCTAssertTrue(reaction.waitForExistence(timeout:10))
-        if nativeSwitch(reaction).value as? String != "1" { nativeSwitch(reaction).tap() }
+        bringIntoView(reaction,in:app)
+        if nativeSwitch(reaction).value as? String != "1" { tapSwitchControl(nativeSwitch(reaction),in:app) }
         let policy = app.staticTexts["guest-call-confirmation-policy"]
         XCTAssertTrue(policy.waitForExistence(timeout:10))
         XCTAssertFalse(app.buttons["guest-call-reaction-auto"].exists)
@@ -721,7 +742,7 @@ final class NavigationUITests: XCTestCase {
         func tapLock() {
             bringIntoView(lock,in:app)
             let thumb = nativeSwitch(lock)
-            XCTAssertTrue(thumb.isHittable); thumb.tap()
+            tapSwitchControl(thumb,in:app)
         }
         tapLock()
         let code = app.secureTextFields["Код Entrixy"], repeated = app.secureTextFields["Повторите код"]
