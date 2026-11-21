@@ -159,7 +159,7 @@ struct IssueOwnerKeyScreen: View {
                 }
                 if !forCompany, selected, object.kind != "ble", let camera = object.localConfiguration?.camera, camera.enabled, !camera.url.isEmpty {
                     Toggle(ProductText.string("guests_grant_video"), isOn: Binding(get: { draft.streams[number] ?? true }, set: { draft.streams[number] = $0 }))
-                        .font(.subheadline).padding(.leading, 30)
+                        .tint(AppPalette.selected).font(.subheadline).padding(.leading, 30)
                 }
             }
         }

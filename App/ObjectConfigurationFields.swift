@@ -81,7 +81,7 @@ struct ObjectCameraFields: View {
                 Text(ProductText.string("snap_title"))
                 Text(ProductText.string("snap_hint")).font(.footnote).foregroundStyle(Brand.secondaryInk)
             }
-        }.accessibilityIdentifier("object-camera-enabled")
+        }.tint(AppPalette.selected).accessibilityIdentifier("object-camera-enabled")
         if camera.enabled {
             AppField(ProductText.string("snap_url_label")) {
                 TextField("https://cam.example.com/snap.jpg",text:$camera.url)

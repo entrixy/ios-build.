@@ -90,7 +90,7 @@ struct GuestInvocationEditor: View {
                             Toggle(ProductText.string("guest_call_react_title"), isOn: Binding(get: { preference.reaction != "off" }, set: { enabled in
                                 if enabled { preference.reaction = rememberedReaction }
                                 else { rememberedReaction = preference.reaction; preference.reaction = "off" }
-                            })).accessibilityIdentifier("guest-call-enabled")
+                            })).tint(AppPalette.selected).accessibilityIdentifier("guest-call-enabled")
                             if preference.reaction != "off" {
                                 Text(ProductText.string("ios_guest_call_explicit"))
                                     .fixedSize(horizontal:false,vertical:true)
@@ -102,14 +102,14 @@ struct GuestInvocationEditor: View {
                                             else { model.errorMessage = ProductText.string("ios_guest_call_notification_denied") }
                                         }
                                     } else { preference.reaction = "confirm"; rememberedReaction = "confirm" }
-                                })).accessibilityIdentifier("guest-call-notification")
+                                })).tint(AppPalette.selected).accessibilityIdentifier("guest-call-notification")
                             }
                         }.padding(16).background(Color(uiColor: .secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 14))
                         Text(ProductText.string("ios_call_guest_confirmation_required")).font(.footnote).foregroundStyle(Brand.secondaryInk)
                     } else if object?.kind == "webhook" {
                         Toggle(ProductText.string("webhook_server_mode_title"), isOn: Binding(get: { object?.routing["webhook_mode"] == "server" }, set: { toServer in
                             if toServer { warning = true } else { Task { await setMode("phone") } }
-                        })).padding(16).background(Color(uiColor: .secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 14))
+                        })).tint(AppPalette.selected).padding(16).background(Color(uiColor: .secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 14))
                             .disabled(working || model.ownerBusy || object?.pending != nil)
                     }
                 }.padding(DesignMetrics.pageInset)
@@ -150,7 +150,7 @@ struct GuestAccessFields: View {
                         Text(ProductText.string("guests_native_only"))
                         Text(ProductText.string("guests_native_only_hint")).font(.footnote).foregroundStyle(Brand.secondaryInk)
                     }
-                }
+                }.tint(AppPalette.selected)
             }
             if maxDepth < 1 { Text(ProductText.string("delegate_stops_here")).foregroundStyle(Brand.secondaryInk) }
             else {
@@ -159,13 +159,14 @@ struct GuestAccessFields: View {
                         Text(ProductText.string("guests_allow_delegate"))
                         Text(ProductText.string("guests_allow_delegate_hint")).font(.footnote).foregroundStyle(Brand.secondaryInk)
                     }
-                }.accessibilityIdentifier("delegation-enabled")
+                }.tint(AppPalette.selected).accessibilityIdentifier("delegation-enabled")
                 if value.depth > 0 {
                     Stepper(value:Binding(get:{ value.depth },set:{ change(depth:$0) }),in:1...maxDepth) {
-                        HStack {
-                            Text(ProductText.string("ios_delegation_depth"))
-                            Spacer()
-                            Text(String(value.depth)).bold().foregroundStyle(AppPalette.selected)
+                        HStack(spacing:12) {
+                            Text(ProductText.string("ios_delegation_depth")).fixedSize(horizontal:false,vertical:true)
+                            Spacer(minLength:8)
+                            Text(String(value.depth)).bold().monospacedDigit().foregroundStyle(AppPalette.selected)
+                                .frame(minWidth:20,alignment:.trailing)
                                 .accessibilityIdentifier("delegation-depth-value")
                         }
                     }.tint(AppPalette.selected).accessibilityLabel(ProductText.string("ios_delegation_depth"))
@@ -176,10 +177,11 @@ struct GuestAccessFields: View {
                             Text(ProductText.string("guests_pass_pool_hint")).font(.footnote).foregroundStyle(Brand.secondaryInk)
                         }
                         Stepper(value:Binding(get:{ value.pool },set:{ change(pool:$0) }),in:1...maxPool) {
-                            HStack {
-                                Text(ProductText.string("ios_delegation_key_count"))
-                                Spacer()
-                                Text(String(value.pool)).bold().foregroundStyle(AppPalette.selected)
+                            HStack(spacing:12) {
+                                Text(ProductText.string("ios_delegation_key_count")).fixedSize(horizontal:false,vertical:true)
+                                Spacer(minLength:8)
+                                Text(String(value.pool)).bold().monospacedDigit().foregroundStyle(AppPalette.selected)
+                                    .frame(minWidth:20,alignment:.trailing)
                                     .accessibilityIdentifier("delegation-pool-value")
                             }
                         }.tint(AppPalette.selected).accessibilityLabel(ProductText.string("ios_delegation_key_count"))
