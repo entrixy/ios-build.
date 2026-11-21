@@ -7,6 +7,15 @@
 
 ## Новый пакет без физического iPhone — два UI исправления ожидают проверки
 
+Следующий source00573f0/publicfa6f665, run44941648937 собрал Debug, однако
+preflight/full UI были пропущены: artifact не содержит prepared-device.json или
+simulator runtime metadata. REST показывает подготовку как success, но шаг имеет
+continue-on-error, поэтому по одному conclusion готовность не подтверждается.
+Точный вывод ожидает job log; это НЕ результат двух UI-исправлений. Независимый
+Release/archive выполняется. Вместо слепого полного повтора запускается отдельный
+simulator-health на Intel/ARM, с сохранением полного preparation log в artifact.
+
+
 Source `de3e44d` / public `dbd5e1d`, run44931604741: Apple313core, Debug app/widget/
 test bundles,212hosted и9focused прошли. Общий UI:31из33 прошли; два новых сценария
 не прошли. Получены62из64PNG, complete=false/tests_succeeded=false; не опубликованы.

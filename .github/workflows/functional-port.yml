@@ -36,7 +36,7 @@ jobs:
         # The explicit acceptance gate below still fails the overall review.
         continue-on-error: true
         if: github.ref == 'refs/heads/ci/review-batch'
-        run: python3 scripts/prepare_review_simulator.py
+        run: python3 scripts/prepare_review_simulator.py 2>&1 | tee .local-checks/ci/simulator-prepare.log
       - name: Install project generator
         run: brew install xcodegen
       - name: Generate project

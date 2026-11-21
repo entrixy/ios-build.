@@ -21,9 +21,12 @@ jobs:
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
       - name: Show toolchain
-        run: xcodebuild -version
+        run: |
+          mkdir -p .local-checks/ci
+          xcodebuild -version | tee .local-checks/ci/toolchain.log
+          uname -m | tee .local-checks/ci/architecture.log
       - name: Probe simulator without building or running application scenarios
-        run: python3 scripts/prepare_review_simulator.py
+        run: python3 scripts/prepare_review_simulator.py 2>&1 | tee .local-checks/ci/simulator-prepare.log
       - name: Clean up job-owned simulator
         if: always()
         run: python3 scripts/prepare_review_simulator.py --cleanup
