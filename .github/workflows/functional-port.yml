@@ -16,7 +16,7 @@ jobs:
       DEVELOPER_DIR: /Applications/Xcode_26.3.app/Contents/Developer
       # Temporary narrow diagnosis after repeated switch interaction failures.
       # Must be empty for the complete review/publication run.
-      ENTRIXY_FOCUSED_SWITCHES: '1'
+      ENTRIXY_FOCUSED_SWITCHES: ''
     defaults:
       run:
         shell: bash

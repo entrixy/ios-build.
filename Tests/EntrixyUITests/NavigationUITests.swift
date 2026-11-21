@@ -112,6 +112,9 @@ final class NavigationUITests: XCTestCase {
         XCTAssertTrue(row.waitForExistence(timeout:10)); bringIntoView(row,in:app)
         let control = nativeSwitch(row), expected = enabled ? "1" : "0"
         if control.value as? String != expected { tapSwitchControl(control,in:app) }
+        // Collapsing an expanded rule rebuilds its AX node and clamps the
+        // scroll offset. Read the saved value only after that real reflow.
+        XCTAssertTrue(waitForStable(control,in:app,requireHit:false),"Rule did not settle after its content changed")
         let changed = XCTNSPredicateExpectation(predicate:NSPredicate { _,_ in control.value as? String == expected },object:nil)
         XCTAssertEqual(XCTWaiter.wait(for:[changed],timeout:5),.completed)
         return control
