@@ -7,9 +7,10 @@ import EntrixyCore
 /// rewrites SDP/control addresses and allows only TCP-interleaved camera reads.
 @MainActor final class CameraRTSPProxy {
     private final class Peer {
+        struct Pending { var message: CameraRTSPMessage; let localSequence: String; var retried: Bool }
         let local: NWConnection, remote: NWConnection
-        var pending: [String: CameraRTSPMessage] = [:]
-        var retried = Set<String>()
+        var pending: [String: Pending] = [:]
+        var sequence: UInt32 = 0
         var digest: CameraRTSPDigest?
         var nonceCount: UInt32 = 0
         var tasks: [Task<Void, Never>] = []
@@ -103,6 +104,10 @@ import EntrixyCore
             message.headers["authorization"] = try digest.authorization(basic: basic, method: request.method, uri: request.uri, count: peer.nonceCount, cnonce: GuestCrypto.hash(GuestCrypto.randomBytes(count: 16)))
         }
     }
+    private func nextSequence(_ peer: Peer) throws -> String {
+        guard peer.sequence < UInt32.max else { throw CameraStreamFailure.format }
+        peer.sequence += 1; return String(peer.sequence)
+    }
     private func pumpClient(_ id: UUID) async {
         guard let peer = peers[id] else { return }; var parser = CameraRTSPFramer()
         defer { close(id) }
@@ -113,7 +118,8 @@ import EntrixyCore
                     switch frame {
                     case .packet(let bytes): try await CameraSocket.send(bytes, on: peer.remote)
                     case .message(var message):
-                        guard let request = message.request, message.body.isEmpty, let cseq = message.headers["cseq"], peer.pending[cseq] == nil, peer.pending.count < 32 else { throw CameraStreamFailure.format }
+                        guard let request = message.request, message.body.isEmpty, let cseq = message.headers["cseq"],
+                              !peer.pending.values.contains(where: { $0.localSequence == cseq }), peer.pending.count < 32 else { throw CameraStreamFailure.format }
                         let remote = try target(request.uri)
                         if request.method == "SETUP" {
                             let transport = message.headers["transport"]?.lowercased() ?? ""
@@ -124,7 +130,8 @@ import EntrixyCore
                         // supplied credentials and proxy/cookie side channels.
                         message.headers.removeValue(forKey: "authorization"); message.headers.removeValue(forKey: "proxy-authorization")
                         message.headers.removeValue(forKey: "cookie"); message.headers.removeValue(forKey: "referer")
-                        peer.pending[cseq] = message
+                        let sequence = try nextSequence(peer); message.headers["cseq"] = sequence
+                        peer.pending[sequence] = Peer.Pending(message: message, localSequence: cseq, retried: false)
                         try authorize(&message, peer: peer)
                         try await CameraSocket.send(message.encoded, on: peer.remote)
                     }
@@ -142,15 +149,20 @@ import EntrixyCore
                     switch frame {
                     case .packet(let bytes): try await CameraSocket.send(bytes, on: peer.local)
                     case .message(var message):
-                        guard let status = message.status, let cseq = message.headers["cseq"], var pending = peer.pending[cseq], let request = pending.request,
+                        guard let status = message.status, let cseq = message.headers["cseq"], var pending = peer.pending[cseq], let request = pending.message.request,
                               let requestURL = URL(string: request.uri) else { throw CameraStreamFailure.format }
                         if status == 401 {
-                            guard !peer.retried.contains(cseq), let challenge = message.headers["www-authenticate"] else { throw URLError(.userAuthenticationRequired) }
-                            peer.digest = try CameraRTSPDigest(challenge: challenge); peer.retried.insert(cseq)
-                            try authorize(&pending, peer: peer); try await CameraSocket.send(pending.encoded, on: peer.remote); continue
+                            guard !pending.retried, let challenge = message.headers["www-authenticate"] else { throw URLError(.userAuthenticationRequired) }
+                            peer.digest = try CameraRTSPDigest(challenge: challenge)
+                            peer.pending.removeValue(forKey: cseq)
+                            let sequence = try nextSequence(peer); pending.message.headers["cseq"] = sequence; pending.retried = true
+                            peer.pending[sequence] = pending
+                            var authenticated = pending.message; try authorize(&authenticated, peer: peer)
+                            try await CameraSocket.send(authenticated.encoded, on: peer.remote); continue
                         }
+                        if status < 200 { continue }
                         guard status < 300 else { throw CameraStreamFailure.http(status) }
-                        peer.pending.removeValue(forKey: cseq); peer.retried.remove(cseq)
+                        peer.pending.removeValue(forKey: cseq); message.headers["cseq"] = pending.localSequence
                         var base = requestURL
                         for header in ["content-base", "content-location"] {
                             if let value = message.headers[header] {

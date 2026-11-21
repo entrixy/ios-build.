@@ -61,7 +61,7 @@ This document records the source audit; it does not declare the app ready to sub
 ## Remaining acceptance and activation
 
 The new source has not yet passed its complete Apple SDK/runtime/gallery batch.
-Expected:321core,223hosted,34UI,66 native PNGs plus4 original Store JPEG candidates;
+Expected:322core,223hosted,34UI,66 native PNGs plus4 original Store JPEG candidates;
 counts are coverage targets, not product-completion percentages. See CURRENT_STATUS
 for the actual final-source result. Do not publish partial or older-source images.
 

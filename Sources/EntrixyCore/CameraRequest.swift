@@ -27,7 +27,7 @@ public struct CameraRequest: Equatable {
             }
         }
         if let user = parts.user {
-            if headers["Authorization"] == nil { headers["Authorization"] = "Basic " + Data((user + ":" + (parts.password ?? "")).utf8).base64EncodedString() }
+            if !headers.keys.contains(where: { $0.lowercased() == "authorization" }) { headers["Authorization"] = "Basic " + Data((user + ":" + (parts.password ?? "")).utf8).base64EncodedString() }
             parts.user = nil; parts.password = nil
         }
         guard let address = parts.url else { throw GuestCrypto.Failure.invalidEnvelope }; self.url = address

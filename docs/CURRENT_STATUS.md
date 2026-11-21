@@ -10,7 +10,7 @@ permission для гостя с сообщениями; настоящий Go na
 текст отказа; инициирование удаления серверных данных с защищённой квитанцией,
 подтверждением DELETE и новым входом для всего аккаунта. По всем7языкам1441ключ.
 
-Локально321core PASS, включая3 новых deletion и5 camera/contract;14проверок
+Локально322core PASS, включая3 новых deletion и6 camera/contract;14проверок
 pipeline PASS; Swift syntax (НЕ SDK), YAML/Python и7-language parity PASS.
 План общего набора:223hosted/34UI/66оригинальныхPNG +4StoreJPEG, Debug/Release/
 privacy/isolation и unsigned physical-iPhone archive с динамической camera library.

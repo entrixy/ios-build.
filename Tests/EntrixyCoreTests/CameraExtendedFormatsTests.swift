@@ -2,6 +2,14 @@ import XCTest
 @testable import EntrixyCore
 
 final class CameraExtendedFormatsTests: XCTestCase {
+    func testExplicitAuthorizationWinsCaseInsensitivelyOverURLUserInfo() throws {
+        var configuration = ObjectCameraConfiguration(); configuration.enabled = true
+        configuration.url = "rtsp://old-user:old-password@camera.invalid/live"
+        configuration.authType = "header"; configuration.authHeader = "authorization"; configuration.authValue = "Bearer explicit-test-value"
+        let camera = try CameraRequest(configuration:configuration)
+        XCTAssertNil(camera.url.user); XCTAssertNil(camera.url.password)
+        XCTAssertEqual(camera.headers.count,1); XCTAssertEqual(camera.headers["authorization"],"Bearer explicit-test-value")
+    }
     func testDASHRewritesNestedBasesTemplatesSegmentsAndClockWithoutLeakingCredentials() throws {
         let xml = #"<MPD xmlns="urn:mpeg:dash:schema:mpd:2011"><BaseURL>media/</BaseURL><UTCTiming schemeIdUri="urn:mpeg:dash:utc:http-iso:2014" value="clock"/><Period><AdaptationSet bitstreamSwitching="true"><Representation id="one"><SegmentTemplate initialization="init-$RepresentationID$.m4s?token=secret" media="$RepresentationID$/seg-$Number%05d$.m4s?token=secret"/></Representation></AdaptationSet></Period></MPD>"#
         let base = URL(string: "https://camera.invalid/live/index.mpd")!

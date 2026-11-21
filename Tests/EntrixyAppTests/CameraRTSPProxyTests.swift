@@ -71,10 +71,12 @@ import EntrixyCore
             XCTAssertEqual(message.request?.uri, remote.absoluteString)
             let cseq = try XCTUnwrap(message.headers["cseq"])
             if fixture.requests.count == 1 {
+                XCTAssertEqual(cseq,"1")
                 XCTAssertTrue(message.headers["authorization"]?.hasPrefix("Basic ") == true)
                 return Data("RTSP/1.0 401 Unauthorized\r\nCSeq: \(cseq)\r\nWWW-Authenticate: Digest realm=\"camera\", nonce=\"test-nonce\", qop=\"auth\"\r\nContent-Length: 0\r\n\r\n".utf8)
             }
             let auth = try XCTUnwrap(message.headers["authorization"])
+            XCTAssertEqual(cseq,"2","Authentication is a new upstream request, not a duplicate sequence")
             XCTAssertTrue(auth.hasPrefix("Digest ")); XCTAssertTrue(auth.contains("uri=\"" + remote.absoluteString + "\""))
             XCTAssertFalse(auth.contains("test-camera-password"))
             let sdp = "v=0\r\na=control:*\r\nm=video 0 RTP/AVP 96\r\na=control:trackID=1\r\n"
@@ -85,7 +87,7 @@ import EntrixyCore
         XCTAssertFalse(local.absoluteString.contains("private")); XCTAssertFalse(local.absoluteString.contains("password"))
         try await CameraSocket.send(Data("DESCRIBE \(local.absoluteString) RTSP/1.0\r\nCSeq: 1\r\nAccept: application/sdp\r\n\r\n".utf8), on: connection)
         let response = try await readMessage(connection)
-        XCTAssertEqual(response.status,200); XCTAssertEqual(fixture.requests.count,2)
+        XCTAssertEqual(response.status,200); XCTAssertEqual(response.headers["cseq"],"1"); XCTAssertEqual(fixture.requests.count,2)
         let sdp = String(decoding:response.body,as:UTF8.self)
         XCTAssertFalse(sdp.contains("trackID")); XCTAssertFalse(sdp.contains("private")); XCTAssertTrue(sdp.contains("a=control:rtsp://127.0.0.1:"))
         XCTAssertNil(response.headers["www-authenticate"])

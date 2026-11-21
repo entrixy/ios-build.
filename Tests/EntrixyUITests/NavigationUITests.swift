@@ -957,7 +957,7 @@ final class NavigationUITests: XCTestCase {
         reviewCapture("server-deletion-confirmation",settledBy:app.buttons["Отмена"])
         let password = app.secureTextFields["data-deletion-password"]
         bringFullyIntoView(password,in:app); password.tap(); password.typeText("review-only-password")
-        field.tap(); field.typeText("DELETE\n")
+        bringFullyIntoView(field,in:app); field.tap(); field.typeText("DELETE\n")
         bringFullyIntoView(submit,in:app); XCTAssertTrue(submit.isEnabled); submit.tap()
         let status = app.staticTexts["data-deletion-status"]
         XCTAssertTrue(status.waitForExistence(timeout:15)); XCTAssertTrue(status.label.contains("ещё"))

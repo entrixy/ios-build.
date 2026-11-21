@@ -52,3 +52,21 @@ report с manifests и ответы Store с фактически включён
 
 Основание классификации: [Apple privacy details](https://developer.apple.com/app-store/app-privacy-details/)
 и [формат manifest](https://developer.apple.com/documentation/technotes/tn3184-adding-data-collection-details-to-your-privacy-manifest).
+
+## Дополнительный исходный код22.11 — активация отдельно
+
+VLCKit декодирует только loopback camera capabilities. HTTP/RTSP-мосты приложения
+держат авторизацию на выбранном camera origin; remote URL, password/token не
+передаются проигрывателю. Это third-party decoder, не analytics/advertising SDK;
+license/source-access notice включён. Реальная камера/сетевая приёмка pending.
+
+Server deletion initiation добавляет подтверждённый запрос scope=device/account,
+request ID, host/user ID, время и статус; вDB только hash случайной квитанции.
+Пароль/JWT используются временно для нового входа, не пишутся в state/queue.
+Локальная квитанция защищена вместе с owner state и может попасть в выбранный
+пользователем зашифрованный backup; после local RESET она пропадает, серверная
+заявка не отменяется. Receipt-status API не возвращает email, host ID или bearer.
+Это app functionality, не tracking. Service disabled: оператор/срок/retention ещё
+не утверждены, migration не применялась, реальных заявок/удалений нет. Перед
+активацией сверить фактический retention с install/DATA_DELETION.md сайта; нельзя
+считать pending удалением или заменить удаление shared account локальным RESET.

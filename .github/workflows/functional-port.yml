@@ -7,7 +7,8 @@ permissions:
   contents: read
 concurrency:
   group: functional-port-${{ github.ref }}
-  cancel-in-progress: true
+  # Preserve useful SDK/archive evidence; the next coherent source waits in queue.
+  cancel-in-progress: false
 jobs:
   compile:
     runs-on: ${{ (github.ref == 'refs/heads/ci/ui-review-arm' || github.ref == 'refs/heads/ci/native-review-arm') && 'macos-15' || 'macos-15-intel' }}

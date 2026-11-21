@@ -118,3 +118,17 @@ background/locked доставка, отозванный ключ, invalid token
 [App Review](https://developer.apple.com/app-store/review/guidelines/),
 [screenshots](https://developer.apple.com/help/app-store-connect/reference/app-information/screenshot-specifications),
 [metadata limits and Support URL](https://developer.apple.com/help/app-store-connect/reference/app-information/platform-version-information).
+
+## Дополнение22.11: камеры и инициирование удаления
+
+Текущий source включает pinned official VLCKit и dynamic-framework/license/device
+archive checks, но до нового полного Apple batch не имеет SDK/runtime acceptance.
+Синтетические WebM/DASH fixture-media принадлежат только тестовому bundle; Release
+проверка запрещает их упаковку в приложение. Физическая камера остаётся отдельной.
+
+Серверный deletion endpoint подготовлен, но реально отвечает503deletion_unavailable.
+До включения ENTRIXY_DELETION_DAYS согласовать ответственного оператора, реальную
+инвентаризацию удаления/законного хранения и срок. install/DATA_DELETION.md сайта
+содержит конкретный manual-processing runbook/CLI. Данные не удалялись, заявку
+от имени пользователя агент не подавал; активный сервис не обещан. Эта активация
+и финальные Store/privacy ответы требуют решения владельца сервиса, а не iPhone.

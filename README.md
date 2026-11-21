@@ -19,7 +19,7 @@ Full no-iPhone scope remains active. The current source audit and remaining
 activation/device boundaries are in [NO_IPHONE_AUDIT.md](docs/NO_IPHONE_AUDIT.md).
 Camera RTSP/DASH/software playback, message alert permission and protected
 server-data deletion initiation join the reset/localization/release preparations.
-Linux321 core and14 pipeline checks pass; the changed Apple SDK/runtime/gallery
+Linux322 core and14 pipeline checks pass; the changed Apple SDK/runtime/gallery
 batch is still pending. The deletion service is disabled until a real processing
 operator, deadline and retention inventory are approved. Do not claim submission
 readiness from source presence or from the preceding accepted gallery.

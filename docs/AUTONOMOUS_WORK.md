@@ -1,3 +1,7 @@
+Следующий цельный source можно поставить в очередь того жеci/review-batch:
+workflow cancel-in-progress=false сохраняет полезный текущий SDK/archive прогон.
+Нельзя отправлять микрокоммиты, отменять текущую работу или плодить новые ветки.
+
 ## Текущий preflight —22ноября
 
 Source916:313core/212hosted/32из33UI, единственный сбой — normalized XCTest
