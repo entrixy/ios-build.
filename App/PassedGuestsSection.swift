@@ -25,7 +25,7 @@ private struct PassedGuestsContent: View {
             ForEach(visible) { record in
                 PassedGuestCard(record:record,edit:{ editing = record },message:{ messaging = record },remove:{ app.guestRemovalTarget = .passed(record) })
             }
-            if let message = manager.message { Text(message).font(.footnote).foregroundStyle(Brand.secondaryInk) }
+            if let message = manager.message { Text(ProductText.systemMessage(message)).font(.footnote).foregroundStyle(Brand.secondaryInk) }
             if canPass {
                 Button { adding = true } label: { Label(ProductText.string("delegate_create"),systemImage:"plus") }.buttonStyle(PrimaryActionStyle()).disabled(manager.busy || app.ownerBusy || app.busy)
                     .accessibilityIdentifier("pass-received-access")

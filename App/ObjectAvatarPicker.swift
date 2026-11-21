@@ -21,12 +21,12 @@ struct ObjectAvatarPicker: View {
                                 .frame(maxWidth: .infinity).aspectRatio(1, contentMode: .fit)
                                 .clipShape(RoundedRectangle(cornerRadius: 14))
                                 .overlay(RoundedRectangle(cornerRadius: 14).strokeBorder(model.avatarPreset(target) == index ? AppPalette.selected : .clear, lineWidth: 3))
-                        }.buttonStyle(.plain).accessibilityLabel("Иконка \(index + 1)")
+                        }.buttonStyle(.plain).accessibilityLabel(ProductText.string("ios_icon_number_fmt",index + 1))
                             .accessibilityAddTraits(model.avatarPreset(target) == index ? .isSelected : [])
                     }
                 }.disabled(saving || model.ownerBusy)
                 if saving { ProgressView().frame(maxWidth: .infinity) }
-                if let message { Text(message).foregroundStyle(.red) }
+                if let message { Text(ProductText.systemMessage(message)).foregroundStyle(.red) }
 
             }
             .onChange(of: photo) { value in

@@ -97,7 +97,7 @@ struct OwnerGuestsScreen: View {
                 QRScannerScreen { raw in
                     scanning = false
                     do { let invite = try CompanyInvite.parse(raw); Task { await model.receiveCompanyInvite(invite) } }
-                    catch { model.errorMessage = "В QR-коде не найден запрос компании Entrixy." }
+                    catch { model.errorMessage = ProductText.string("ios_company_qr_not_found") }
                 }
             }
             .onChange(of:model.companyGrantRequest) { id in
@@ -155,9 +155,9 @@ struct OwnerGuestsScreen: View {
     @ViewBuilder private var guestRecovery: some View {
         ForEach(model.owners.filter { !($0.androidKeys ?? []).isEmpty }) { owner in
             VStack(alignment:.leading,spacing:8) {
-                Text("Сохранённые ключи Android: \(owner.androidKeys?.count ?? 0)").font(.headline)
-                Text("Для восстановления нужно подтвердить связку и правила передачи. Секреты сохранены.").font(.footnote).foregroundStyle(Brand.secondaryInk)
-                Button("Проверить данные сервера") { Task { await model.refreshOwners() } }.buttonStyle(SecondaryActionStyle()).disabled(model.ownerBusy)
+                Text(ProductText.string("ios_android_saved_keys_fmt",owner.androidKeys?.count ?? 0)).font(.headline)
+                Text(ProductText.string("ios_restore_bundle_rules_hint")).font(.footnote).foregroundStyle(Brand.secondaryInk)
+                Button(ProductText.string("ios_server_data_check")) { Task { await model.refreshOwners() } }.buttonStyle(SecondaryActionStyle()).disabled(model.ownerBusy)
             }.padding(.top,12)
         }
     }

@@ -14,9 +14,9 @@ struct OwnerDelegatedKeyScreen: View {
             if let key {
                 Section {
                     Text(key.label).font(.headline)
-                    if let message = app.ownerMessages[server] { Text(message).font(.subheadline).foregroundStyle(Brand.secondaryInk) }
+                    if let message = app.ownerMessages[server] { Text(ProductText.systemMessage(message)).font(.subheadline).foregroundStyle(Brand.secondaryInk) }
                     Text(ownerDelegatedStatus(key)).foregroundStyle(Brand.secondaryInk)
-                    if let message = app.ownerDelegationMessages[keyID] { Text(message).font(.subheadline).foregroundStyle(Brand.secondaryInk) }
+                    if let message = app.ownerDelegationMessages[keyID] { Text(ProductText.systemMessage(message)).font(.subheadline).foregroundStyle(Brand.secondaryInk) }
                     KeyValueRow(title: ProductText.string("ble_server_label"), value: server)
                 }
                 Section(ProductText.string("settings_tab_objects")) {
@@ -25,39 +25,39 @@ struct OwnerDelegatedKeyScreen: View {
                     }
                 }
                 Section {
-                    Button("Обновить данные") { Task { await app.refreshOwners() } }.buttonStyle(SecondaryActionStyle()).disabled(app.ownerBusy)
+                    Button(ProductText.string("ios_refresh_data")) { Task { await app.refreshOwners() } }.buttonStyle(SecondaryActionStyle()).disabled(app.ownerBusy)
                     if key.state == .awaiting && key.revocationPending != true {
                         if key.sent {
-                            Button("Повторить передачу связки") { retrying = true }.buttonStyle(PrimaryActionStyle()).disabled(app.ownerBusy)
+                            Button(ProductText.string("ios_bundle_retry")) { retrying = true }.buttonStyle(PrimaryActionStyle()).disabled(app.ownerBusy)
                         } else {
-                            Button("Подтвердить переданный доступ") { Task { await app.approveDelegatedKey(server: server, keyID: keyID) } }.buttonStyle(PrimaryActionStyle()).disabled(app.ownerBusy)
+                            Button(ProductText.string("ios_delegated_access_confirm")) { Task { await app.approveDelegatedKey(server: server, keyID: keyID) } }.buttonStyle(PrimaryActionStyle()).disabled(app.ownerBusy)
                         }
                     }
                     if key.state != .revoked && key.revocationSent != true {
-                        Button("Отозвать доступ", role: .destructive) { revoking = true }.buttonStyle(SecondaryActionStyle()).disabled(app.ownerBusy)
+                        Button(ProductText.string("ios_access_revoke"), role: .destructive) { revoking = true }.buttonStyle(SecondaryActionStyle()).disabled(app.ownerBusy)
                     }
-                } footer: { Text("Получатель использует собственный ключ. Связка выдаётся только после проверки поручительства и прав передавшего. Передача связки сама по себе не открывает объект.") }
-            } else { Text("Переданный ключ недоступен").foregroundStyle(Brand.secondaryInk) }
+                } footer: { Text(ProductText.string("ios_bundle_vouch_hint")) }
+            } else { Text(ProductText.string("ios_delegated_key_unavailable")).foregroundStyle(Brand.secondaryInk) }
         }
-        .navigationTitle("Переданный доступ").navigationBarTitleDisplayMode(.inline)
-        .appConfirmationDialog("Отозвать доступ?",message:"Отозвать доступ у этого получателя и всей цепочки ниже него?",actionTitle:"Отозвать доступ",destructive:true,isPresented:$revoking) {
+        .navigationTitle(ProductText.string("ios_delegated_access")).navigationBarTitleDisplayMode(.inline)
+        .appConfirmationDialog(ProductText.string("ios_access_revoke_title"),message:ProductText.string("ios_access_revoke_recipient_chain"),actionTitle:ProductText.string("ios_access_revoke"),destructive:true,isPresented:$revoking) {
             Task { await app.revokeDelegatedKey(server: server, keyID: keyID) }
         }
-        .appConfirmationDialog("Передать связку?",message:"Передать ту же сохранённую связку повторно? Команда открытия не отправляется.",actionTitle:"Передать связку",isPresented:$retrying) {
+        .appConfirmationDialog(ProductText.string("ios_bundle_transfer_title"),message:ProductText.string("ios_bundle_same_retry_hint"),actionTitle:ProductText.string("ios_bundle_transfer"),isPresented:$retrying) {
             Task { await app.approveDelegatedKey(server: server, keyID: keyID, retry: true) }
         }
     }
     private func objectLabel(_ id: Int) -> String {
-        guard let owner, let object = owner.objects?.first(where: { $0.numberID == id }) else { return "Объект \(id)" }
-        return (try? object.metadata(masterKey: owner.masterKey)["label"] as? String) ?? "Объект \(id)"
+        guard let owner, let object = owner.objects?.first(where: { $0.numberID == id }) else { return ProductText.string("ios_obj_number_fmt",id) }
+        return (try? object.metadata(masterKey: owner.masterKey)["label"] as? String) ?? ProductText.string("ios_obj_number_fmt",id)
     }
 }
 func ownerDelegatedStatus(_ key: OwnerDelegatedKey) -> String {
-    if key.revocationPending == true { return "Отзыв ожидает подтверждения сервера" }
+    if key.revocationPending == true { return ProductText.string("ios_revoke_server_pending") }
     switch key.state {
-    case .awaiting: return key.sent ? "Связка ожидает подтверждения сервера" : "Поручительство проверено, требуется связка"
-    case .ready: return "Доступ действует"
-    case .unavailable: return "Доступ не подтверждён или цепочка приостановлена"
-    case .revoked: return "Доступ отозван"
+    case .awaiting: return key.sent ? ProductText.string("ios_bundle_server_pending") : ProductText.string("ios_vouch_verified_bundle_required")
+    case .ready: return ProductText.string("ios_access_active")
+    case .unavailable: return ProductText.string("ios_access_unconfirmed_or_paused")
+    case .revoked: return ProductText.string("ios_access_revoked")
     }
 }

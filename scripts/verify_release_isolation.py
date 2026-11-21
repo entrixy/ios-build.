@@ -48,6 +48,28 @@ def main():
         'NSPrivacyAccessedAPICategoryFileTimestamp':['C617.1','3B52.1']})
     required_reasons(args.release_app / 'PlugIns/EntrixyWidget.appex', {
         'NSPrivacyAccessedAPICategoryFileTimestamp':['C617.1']})
+    app_manifest = plistlib.loads((args.release_app / 'PrivacyInfo.xcprivacy').read_bytes())
+    widget_manifest = plistlib.loads((args.release_app / 'PlugIns/EntrixyWidget.appex/PrivacyInfo.xcprivacy').read_bytes())
+    if app_manifest.get('NSPrivacyTracking') is not False or widget_manifest.get('NSPrivacyTracking') is not False:
+        raise RuntimeError('Built privacy manifests do not match the audited no-tracking behavior')
+    expected_types = {'EmailAddress','UserID','DeviceID','ProductInteraction','AdvertisingData',
+                      'OtherUserContent','EmailsOrTextMessages','CrashData','OtherDiagnosticData'}
+    rows = app_manifest.get('NSPrivacyCollectedDataTypes', [])
+    declared_types = {row.get('NSPrivacyCollectedDataType') for row in rows}
+    if len(rows) != len(expected_types) or declared_types != {'NSPrivacyCollectedDataType'+value for value in expected_types}:
+        raise RuntimeError('Built app is missing audited data-flow declarations')
+    allowed_purposes = {'NSPrivacyCollectedDataTypePurposeAppFunctionality',
+                        'NSPrivacyCollectedDataTypePurposeDeveloperAdvertising',
+                        'NSPrivacyCollectedDataTypePurposeAnalytics'}
+    for row in rows:
+        if (type(row.get('NSPrivacyCollectedDataTypeLinked')) is not bool
+                or row.get('NSPrivacyCollectedDataTypeTracking') is not False
+                or not row.get('NSPrivacyCollectedDataTypePurposes')
+                or not set(row['NSPrivacyCollectedDataTypePurposes']).issubset(allowed_purposes)):
+            raise RuntimeError('Built app has an incomplete audited data-flow declaration')
+    if widget_manifest.get('NSPrivacyCollectedDataTypes') != []:
+        raise RuntimeError('Widget must not declare a nonexistent server data collection path')
+    print('Audited app data-flow declarations and on-device-only widget manifest are packaged')
     print('Required API manifests verified in the actual Release app and widget bundles')
     print('Release fixture/bootstrap isolation verified in built executable')
 

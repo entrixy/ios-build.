@@ -175,7 +175,7 @@ struct ActionButtonLabel: View {
     var body: some View {
         HStack(spacing: 10) {
             if busy { ProgressView().controlSize(.small).tint(isEnabled ? Color(uiColor: .systemBackground) : AppPalette.statusBlue) }
-            Text(title).multilineTextAlignment(.center)
+            Text(ProductText.systemMessage(title)).multilineTextAlignment(.center)
         }.accessibilityValue(busy ? ProductText.string("ios_action_working") : "")
     }
 }
@@ -315,7 +315,7 @@ struct AppConfirmationDialog: View {
         AppDialogSurface {
             VStack(alignment: .leading, spacing: 18) {
                 Text(title).font(.title3.bold()).accessibilityAddTraits(.isHeader)
-                Text(message).font(.body).fixedSize(horizontal: false, vertical: true)
+                Text(ProductText.systemMessage(message)).font(.body).fixedSize(horizontal: false, vertical: true)
 
             }
         } footer: {
@@ -367,7 +367,7 @@ extension View {
             AppDialogSurface {
                 VStack(alignment:.leading,spacing:18) {
                     Text(title).font(.title3.bold()).accessibilityAddTraits(.isHeader)
-                    Text(message).fixedSize(horizontal:false,vertical:true)
+                    Text(ProductText.systemMessage(message)).fixedSize(horizontal:false,vertical:true)
                 }
             } footer: {
                 Button(actionTitle) { isPresented.wrappedValue = false }.buttonStyle(PrimaryActionStyle())

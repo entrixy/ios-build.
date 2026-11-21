@@ -87,16 +87,16 @@ def main():
         parser.error('--test requires --only-ui and exact UI methods, without --review-captures')
     if not 1 <= args.iterations <= 3 or (args.iterations != 1 and not args.test):
         parser.error('--iterations 2 or 3 requires explicit diagnostic --test selection')
-    if args.keep_prepared_device and (not args.prepared_device or not args.test):
-        parser.error('--keep-prepared-device requires a prepared device and explicit diagnostic tests')
+    if args.keep_prepared_device and (not args.prepared_device or not (args.test or args.review_captures)):
+        parser.error('--keep-prepared-device requires a prepared device and an explicit diagnostic or complete review pass')
     if args.review_captures and (not args.use_built_tests or args.only_native):
         parser.error('--review-captures requires --use-built-tests and UI tests')
     if args.use_built_tests:
         products = Path('.local-checks/DerivedData/Build/Products')
         if not list(products.glob('*.xctestrun')):
             parser.error('--use-built-tests requires build-for-testing products in .local-checks/DerivedData')
-    sdk = subprocess.check_output(['xcrun', '--sdk', 'iphonesimulator', '--show-sdk-version'], text=True).strip()
-    runtimes = json.loads(subprocess.check_output(['xcrun', 'simctl', 'list', 'runtimes', '--json']))['runtimes']
+    sdk = subprocess.check_output(['xcrun', '--sdk', 'iphonesimulator', '--show-sdk-version'], text=True, timeout=60).strip()
+    runtimes = json.loads(subprocess.check_output(['xcrun', 'simctl', 'list', 'runtimes', '--json'], timeout=60))['runtimes']
     runtime = next(r['identifier'] for r in runtimes if r.get('isAvailable') and '.iOS-' in r['identifier'] and (r['version'] == sdk or r['version'].startswith(sdk + '.')))
     device = prepared_device(args.prepared_device,runtime) if args.prepared_device else create_booted_device('isolated unit tests', 'com.apple.CoreSimulator.SimDeviceType.iPhone-16', runtime, appearance='light')
     result = Path('.local-checks/TestResults/combined-review.xcresult')

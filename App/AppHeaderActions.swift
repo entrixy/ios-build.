@@ -1,5 +1,17 @@
 import SwiftUI
 
+struct AppPrivacyPolicyLink: View {
+    private var destination: URL {
+        let language = ProductText.language
+        return URL(string:"https://entrixy.com" + (language == "en" ? "" : "/" + language) + "/privacy")!
+    }
+    var body: some View {
+        Link(destination:destination) {
+            Label(ProductText.string("ios_privacy_policy"),systemImage:"hand.raised")
+        }.buttonStyle(SecondaryActionStyle()).accessibilityIdentifier("privacy-policy")
+    }
+}
+
 struct AppLogoMenu: View {
     let help: () -> Void
     var body: some View {
@@ -66,7 +78,8 @@ struct HelpScreen: View {
                         Text(ProductText.string(section.1)).font(.body).lineSpacing(3)
                     }.frame(maxWidth:.infinity,alignment:.leading).padding(16).background(Color(uiColor:.secondarySystemGroupedBackground),in:RoundedRectangle(cornerRadius:16))
                 }
-                Link(destination:guide) { Label(ProductText.string("help_full_guide"),systemImage:"arrow.up.right.square").frame(maxWidth:.infinity,minHeight:48) }.buttonStyle(PrimaryActionStyle())
+                Link(destination:guide) { Label(ProductText.string("help_full_guide"),systemImage:"arrow.up.right.square") }.buttonStyle(PrimaryActionStyle())
+                AppPrivacyPolicyLink()
                 if let developerFeedback { Text(developerFeedback).font(.footnote).foregroundStyle(Brand.secondaryInk) }
                 Text("v" + (Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "—")).font(.footnote).foregroundStyle(Brand.secondaryInk).frame(maxWidth:.infinity,alignment:.trailing).padding(.top,12)
                     .contentShape(Rectangle()).accessibilityIdentifier("help-version").onTapGesture {

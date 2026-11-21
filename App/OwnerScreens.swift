@@ -25,7 +25,7 @@ struct OwnerObjectsScreen: View {
     let server: String
     var body: some View {
         List { OwnerObjectRows(server: server) }.compactListSections()
-            .navigationTitle("Мои объекты").navigationBarTitleDisplayMode(.inline)
+            .navigationTitle(ProductText.string("ios_obj_own")).navigationBarTitleDisplayMode(.inline)
             .refreshable { await model.refreshOwners() }
     }
 }
@@ -42,7 +42,7 @@ struct OwnerObjectRows: View {
                         if case let .owned(account, _) = $0 { return account.server == server }
                         return false
                     })
-                    if (owner.objects ?? []).isEmpty { Text("Пока нет добавленных объектов").foregroundStyle(Brand.secondaryInk) }
+                    if (owner.objects ?? []).isEmpty { Text(ProductText.string("ios_obj_added_empty")).foregroundStyle(Brand.secondaryInk) }
                 }
                 Section {
                     Button { adding = true } label: { Label(ProductText.string("settings_add_object"), systemImage: "plus") }
@@ -55,16 +55,16 @@ struct OwnerObjectRows: View {
                         ForEach(owner.bleArchivedObjects ?? []) { object in
                             if let did = object.bleDeviceID {
                                 NavigationLink { BLEPermissionsScreen(server: server, deviceID: did) } label: {
-                                    Text((try? object.metadata(masterKey: owner.masterKey)["label"] as? String) ?? "Bluetooth-контроллер")
+                                    Text((try? object.metadata(masterKey: owner.masterKey)["label"] as? String) ?? ProductText.string("ios_ble_controller"))
                                 }
                             }
                         }
-                    } header: { Text("Bluetooth после удаления объекта") } footer: {
-                        Text("Секрет привязки сохранён, чтобы доставить контроллеру изменения доступа.")
+                    } header: { Text(ProductText.string("ios_ble_after_object_removal")) } footer: {
+                        Text(ProductText.string("ios_ble_retained_secret_hint"))
                     }
                 }
                 if let snapshot = model.ownerSnapshots[server], snapshot.objectCount > (owner.objects ?? []).filter({ $0.numberID != nil }).count {
-                    Section { Text("На сервере есть объекты, ключи которых отсутствуют на этом iPhone. Для их настройки нужна резервная копия владельца.").foregroundStyle(Brand.secondaryInk) }
+                    Section { Text(ProductText.string("ios_owner_missing_object_keys")).foregroundStyle(Brand.secondaryInk) }
                 }
             }
         }
@@ -168,7 +168,7 @@ struct AddOwnerObjectScreen: View {
             }
             if let owner = model.owners.first(where: { $0.server == destinationServer }), owner.registrationPending {
                 Section {
-                    Text(model.ownerMessages[server] ?? "Доступ владельца ещё не подтверждён.").foregroundStyle(Brand.secondaryInk)
+                    Text(model.ownerMessages[server] ?? ProductText.string("ios_owner_access_unconfirmed")).foregroundStyle(Brand.secondaryInk)
                     Button(ProductText.string("server_edit")) {
                         finish(nil)
                         model.settingsRequest = .system
@@ -186,7 +186,7 @@ struct AddOwnerObjectScreen: View {
         .taskSheetTitle(ProductText.string("add_object_title"),form:true)
         .task {
             #if DEBUG && targetEnvironment(simulator)
-            if StageTwoCapture.current == .addObject { kind = "ble"; label = "Новый BLE-объект" }
+            if StageTwoCapture.current == .addObject { kind = "ble"; label = ProductText.string("ios_ble_object_new") }
             #endif
         }
         .navigationDestination(isPresented: $pairing) {
@@ -217,7 +217,7 @@ struct AddOwnerObjectScreen: View {
             guard await model.addOwner(server: server, accessCode: "") else { return }
         }
         guard model.owners.first(where: { $0.server == server })?.credentials != nil else {
-            model.errorMessage = "Сначала завершите сохранённую регистрацию владельца. Повторная регистрация не отправлялась."
+            model.errorMessage = ProductText.string("ios_owner_finish_registration")
             return
         }
         if kind == "ble" { pairing = true; return }
@@ -263,7 +263,7 @@ struct OwnerObjectEditor: View {
                let draft = try? OwnerObjectEdit(object: object, masterKey: owner.masterKey) {
                 OwnerObjectEditorForm(server: server, objectID: objectID, initialDraft: draft,
                     showDeleteOnLaunch: showDeleteOnLaunch)
-            } else { Text("Объект недоступен").foregroundStyle(Brand.secondaryInk) }
+            } else { Text(ProductText.string("ios_obj_unavailable")).foregroundStyle(Brand.secondaryInk) }
         }
     }
 }
@@ -336,7 +336,7 @@ private struct OwnerObjectEditorForm: View {
                     recoveryFields(object)
                 }
                 if let message = model.ownerObjectMessages[objectID] {
-                    Section { Text(message).font(.subheadline).foregroundStyle(Brand.secondaryInk) }
+                    Section { Text(ProductText.systemMessage(message)).font(.subheadline).foregroundStyle(Brand.secondaryInk) }
                 }
                 if move == nil {
                     Section {
@@ -375,8 +375,8 @@ private struct OwnerObjectEditorForm: View {
             } else if serverModeWarning {
                 WebhookServerModeConfirmation(cancel: { serverModeWarning = false }, confirm: { draft.webhookMode = "server"; serverModeWarning = false })
             } else if deleting {
-                AppConfirmationDialog(title: ProductText.string("confirm_delete_object_title"), message: "Гости потеряют доступ к этому объекту.",
-                    actionTitle: "Удалить объект", destructive: true, cancel: { deleting = false }, confirm: {
+                AppConfirmationDialog(title: ProductText.string("confirm_delete_object_title"), message: ProductText.string("ios_obj_delete_guests_hint"),
+                    actionTitle: ProductText.string("ios_obj_delete"), destructive: true, cancel: { deleting = false }, confirm: {
                         deleting = false
                         Task { await model.deleteOwnerObject(server: server, objectID: objectID); if object == nil { dismiss() } }
                     })
@@ -395,10 +395,10 @@ private struct OwnerObjectEditorForm: View {
                 .disabled(model.ownerBusy || move != nil)
         }
         if let move {
-            Section { Text("Перенос ожидает подтверждения: " + move.destination).foregroundStyle(Brand.secondaryInk) }
+            Section { Text(ProductText.string("ios_obj_transfer_pending_prefix") + move.destination).foregroundStyle(Brand.secondaryInk) }
             Section {
                 Button { Task { if await model.moveBLEObject(server: server, objectID: objectID, to: move.destination) { dismiss() } } } label: {
-                    ActionButtonLabel(title: "Проверить результат", busy: model.ownerBusy)
+                    ActionButtonLabel(title: ProductText.string("ios_check_result"), busy: model.ownerBusy)
                 }.buttonStyle(PrimaryActionStyle()).actionListRow().disabled(model.ownerBusy)
             }
         }
@@ -411,7 +411,7 @@ private struct OwnerObjectEditorForm: View {
                         if let credentials = try model.ownerDeviceCredentials(server: server, objectID: objectID) {
                             credentialsPrompt = OwnerDeviceCredentialsPrompt(credentials: credentials)
                         } else { noCredentials = true }
-                    } catch { model.errorMessage = "Не удалось прочитать сохранённые параметры устройства." }
+                    } catch { model.errorMessage = ProductText.string("ios_device_read_saved_failed") }
                 } label: { Label(ProductText.string("edit_object_share_device"), systemImage: "square.and.arrow.up") }
                     .buttonStyle(SecondaryActionStyle()).actionListRow().accessibilityIdentifier("device-share-credentials")
             }
@@ -419,7 +419,7 @@ private struct OwnerObjectEditorForm: View {
                 Button {
                     if bindingCode != nil { bindingCode = nil; return }
                     do { bindingCode = try model.ownerSocketBindingCode(server: server, objectID: objectID) }
-                    catch { model.errorMessage = "Не удалось сохранить привязку к приложению. Новый код не создавался." }
+                    catch { model.errorMessage = ProductText.string("ios_device_app_binding_failed") }
                 } label: { Label(ProductText.string("edit_object_bind_app"), systemImage: "lock") }
                     .buttonStyle(SecondaryActionStyle()).actionListRow()
                     .disabled(model.ownerBusy || object?.pending != nil || object?.available == false)
@@ -440,33 +440,33 @@ private struct OwnerObjectEditorForm: View {
     @ViewBuilder private func recoveryFields(_ object: OwnerObject) -> some View {
         Section {
             if object.available == false {
-                Text("Объект недоступен. Обновите данные сервера, прежде чем изменять его.").foregroundStyle(Brand.secondaryInk)
+                Text(ProductText.string("ios_obj_refresh_unavailable")).foregroundStyle(Brand.secondaryInk)
             }
             if object.pending != nil {
-                Text(object.sent ? "Результат запроса не подтверждён. Обновление проверит его без повторной отправки." : "Изменение ещё не применено.")
+                Text(object.sent ? ProductText.string("ios_request_check_without_resend") : ProductText.string("ios_change_not_applied_yet"))
                     .foregroundStyle(Brand.secondaryInk)
             } else if object.revision == nil {
-                Text("Для безопасного изменения сначала обновите данные. Сервер должен поддерживать проверку версии объекта.")
+                Text(ProductText.string("ios_obj_revision_required"))
                     .font(.footnote).foregroundStyle(Brand.secondaryInk)
             }
         }
         Section {
-            Button("Проверить результат") { Task { await model.refreshOwners() } }
+            Button(ProductText.string("ios_check_result")) { Task { await model.refreshOwners() } }
                 .buttonStyle(SecondaryActionStyle()).actionListRow().disabled(model.ownerBusy)
         }
         if model.canSaveOwnerObjectResult(objectID) {
             Section {
-                Button("Сохранить результат") { Task { await model.retrySavingOwnerObjectResult(server: server, objectID: objectID) } }
+                Button(ProductText.string("ios_save_result")) { Task { await model.retrySavingOwnerObjectResult(server: server, objectID: objectID) } }
                     .buttonStyle(PrimaryActionStyle()).actionListRow().disabled(model.ownerBusy)
             }
         } else if !object.sent && object.pending == .create && object.routing["device_id_ref"] != nil {
             Section {
-                Button("Повторить создание объекта") { Task { await model.retryPreparedOwnerObject(server: server, objectID: objectID) } }
+                Button(ProductText.string("ios_obj_retry_creation")) { Task { await model.retryPreparedOwnerObject(server: server, objectID: objectID) } }
                     .buttonStyle(PrimaryActionStyle()).actionListRow().disabled(model.ownerBusy)
             }
         } else if object.pending != nil && !object.sent {
             Section {
-                Button("Отменить изменение", role: .destructive) {
+                Button(ProductText.string("ios_change_cancel"), role: .destructive) {
                     model.cancelOwnerObjectChange(server: server, objectID: objectID)
                     if let owner = model.owners.first(where: { $0.server == server }), let object = self.object,
                        let restored = try? OwnerObjectEdit(object: object, masterKey: owner.masterKey) { draft = restored }

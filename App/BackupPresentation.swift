@@ -144,7 +144,7 @@ struct BackupFlowHost: View {
                         case .export: exportFields
                         case .password: importFields
                         case .review: review
-                        case .result: Text(flow.feedback ?? "")
+                        case .result: Text(ProductText.systemMessage(flow.feedback ?? ""))
                         }
                     }
                 } footer: { promptActions(prompt) }
@@ -201,19 +201,19 @@ struct BackupFlowHost: View {
             password("backup_pass_repeat",value:$flow.repeated)
             if !flow.password.isEmpty, flow.password.count < 8 { Text(ProductText.string("backup_pass_short",8)).font(.footnote).foregroundStyle(AppPalette.destructive) }
             if !flow.repeated.isEmpty, flow.password != flow.repeated { Text(ProductText.string("backup_pass_mismatch")).font(.footnote).foregroundStyle(AppPalette.destructive) }
-            if let feedback = flow.feedback { Text(feedback).font(.footnote).foregroundStyle(AppPalette.destructive) }
+            if let feedback = flow.feedback { Text(ProductText.systemMessage(feedback)).font(.footnote).foregroundStyle(AppPalette.destructive) }
         }
     }
     private var importFields: some View {
         VStack(alignment:.leading,spacing:14) {
             Text(ProductText.string("ios_backup_transfer_hint")).font(.footnote).foregroundStyle(Brand.secondaryInk)
             password("backup_pass_label",value:$flow.password)
-            if let feedback = flow.feedback { Text(feedback).font(.footnote).foregroundStyle(AppPalette.destructive) }
+            if let feedback = flow.feedback { Text(ProductText.systemMessage(feedback)).font(.footnote).foregroundStyle(AppPalette.destructive) }
         }
     }
     @ViewBuilder private var review: some View {
         if let preview = manager.preview {
-            Text(preview.created.formatted(date:.abbreviated,time:.shortened)).font(.footnote).foregroundStyle(Brand.secondaryInk)
+            Text(ProductText.date(preview.created)).font(.footnote).foregroundStyle(Brand.secondaryInk)
             Text(ProductText.string("ios_backup_contents",preview.owners.count,preview.guests.count + (preview.androidGuests ?? []).count))
             Text(ProductText.string("ios_backup_transfer_hint")).font(.footnote).foregroundStyle(Brand.secondaryInk)
             if let sounds = preview.eventSounds, !sounds.unavailableSamples.isEmpty {

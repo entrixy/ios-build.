@@ -108,7 +108,7 @@ private struct IncomingMessageDialog: View {
                     Text(productLinkified(text)).textSelection(.enabled).privacySensitive()
                         .accessibilityIdentifier("incoming-message-body")
                 }
-                if let error = manager.message { Text(error).font(.footnote).foregroundStyle(AppPalette.destructive) }
+                if let error = manager.message { Text(ProductText.systemMessage(error)).font(.footnote).foregroundStyle(AppPalette.destructive) }
             }.foregroundStyle(Brand.ink)
         } footer: {
                 Button(ProductText.string("btn_close"),action:close).buttonStyle(PrimaryActionStyle())

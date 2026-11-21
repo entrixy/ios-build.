@@ -3,14 +3,14 @@ import CoreImage.CIFilterBuiltins
 import EntrixyCore
 
 func ownerKeyStatus(_ key: OwnerIssuedKey) -> String {
-    if key.pending != nil { return key.sent ? "Ожидает подтверждения сервера" : "Запрос ещё не применён" }
+    if key.pending != nil { return key.sent ? ProductText.string("ios_server_confirmation_pending") : ProductText.string("ios_request_not_applied_yet") }
     switch key.state {
-    case .active: return "Доступ действует"
-    case .paused: return "Доступ приостановлен"
-    case .revoked: return "Ключ отозван"
-    case .draft: return "Подготовка ключа"
-    case .unavailable: return "Ключ недоступен на сервере"
-    case .restricted: return "Нужна обработка запроса владельцем"
+    case .active: return ProductText.string("ios_access_active")
+    case .paused: return ProductText.string("ios_access_paused")
+    case .revoked: return ProductText.string("ios_key_revoked")
+    case .draft: return ProductText.string("ios_key_preparing")
+    case .unavailable: return ProductText.string("ios_key_server_unavailable")
+    case .restricted: return ProductText.string("ios_owner_processing_required")
     }
 }
 
@@ -98,7 +98,7 @@ struct IssueOwnerKeyScreen: View {
                 }
                 Section {
                     ForEach(rows) { entry in objectRow(entry) }
-                    if rows.isEmpty { Text("Сначала добавьте объект в настройках").foregroundStyle(Brand.secondaryInk) }
+                    if rows.isEmpty { Text(ProductText.string("ios_add_object_first")).foregroundStyle(Brand.secondaryInk) }
                 } header: { Text(ProductText.string("guests_objects_allowed")) }
                 Section {
                     Button { Task { await save() } } label: {
@@ -115,7 +115,7 @@ struct IssueOwnerKeyScreen: View {
                             try draft.load(owner: owner, key: key)
                             label = key.label; welcome = try key.bundle(masterKey: owner.masterKey)["welcome"] as? String ?? ""
                             if let grant = key.company { companyID = model.companies.first(where:{ $0.server == owner.server && $0.companyID == grant.companyID })?.id ?? ""; welcome = "" }
-                        } catch { model.errorMessage = "Не удалось прочитать настройки ключа." }
+                        } catch { model.errorMessage = ProductText.string("ios_key_settings_read_failed") }
                     } else if companySelection {
                         if companyID.isEmpty, model.companies.count == 1 { companyID = model.companies[0].id }
                         server = company?.server ?? ""; label = company?.name ?? ""
@@ -223,7 +223,7 @@ struct IssueOwnerKeyScreen: View {
                 if let editingKeyID { model.endEditingGuestKey(editingKeyID) }
                 dismiss()
             }
-        } catch { model.errorMessage = "Не удалось сохранить настройки доступа." }
+        } catch { model.errorMessage = ProductText.string("ios_access_settings_save_failed") }
     }
 }
 
@@ -248,53 +248,53 @@ struct OwnerKeyScreen: View {
                     Text(key.label).font(.title3.bold())
                     Text(ownerKeyStatus(key)).foregroundStyle(Brand.secondaryInk)
                     KeyValueRow(title: ProductText.string("ble_server_label"), value: server)
-                    KeyValueRow(title: "Объектов", value: String((key.effectiveNumberIDs ?? key.numberIDs).count))
-                    if let message = model.ownerKeyMessages[keyID] { Text(message).foregroundStyle(Brand.secondaryInk) }
+                    KeyValueRow(title: ProductText.string("ios_object_count"), value: String((key.effectiveNumberIDs ?? key.numberIDs).count))
+                    if let message = model.ownerKeyMessages[keyID] { Text(ProductText.systemMessage(message)).foregroundStyle(Brand.secondaryInk) }
                     if let owner, let bundle = try? key.bundle(masterKey: owner.masterKey), let rows = bundle["ble"] as? [[String: Any]], !rows.isEmpty {
                         ForEach(rows.compactMap { try? BLEGuestGrant(row: $0) }, id: \.objectID) { grant in
-                            KeyValueRow(title: "Bluetooth-пропуск", value: Date(timeIntervalSince1970: Double(grant.validUntil)).formatted(date: .abbreviated, time: .shortened))
+                            KeyValueRow(title: ProductText.string("ios_ble_pass"), value: ProductText.date(Date(timeIntervalSince1970: Double(grant.validUntil))))
                         }
-                        Text("Bluetooth-отзыв нужно доставить контроллеру. До этого офлайн-пропуск может действовать до указанного срока.").font(.footnote).foregroundStyle(Brand.secondaryInk)
+                        Text(ProductText.string("ios_ble_revoke_delivery_hint")).font(.footnote).foregroundStyle(Brand.secondaryInk)
                     }
                 }
                 if let link {
                     Section {
                         InviteQRCode(text: link.absoluteString).frame(maxWidth: .infinity).padding(.vertical, 12)
-                        ShareLink(item: link) { Label("Передать ссылку гостю", systemImage: "square.and.arrow.up") }.buttonStyle(PrimaryActionStyle())
+                        ShareLink(item: link) { Label(ProductText.string("ios_share_guest_link"), systemImage: "square.and.arrow.up") }.buttonStyle(PrimaryActionStyle())
                         Text(link.absoluteString).font(.caption.monospaced()).textSelection(.enabled).privacySensitive()
-                    } footer: { Text("Ключ предназначен одному получателю. При первом добавлении сервер привяжет его к устройству гостя.") }
+                    } footer: { Text(ProductText.string("ios_key_single_recipient_hint")) }
                 }
                 Section {
                     if key.accessNeedsReview == true {
-                        Text("Ключ восстановлен. Проверьте правила передачи доступа перед новой выдачей по цепочке.").font(.footnote).foregroundStyle(Brand.secondaryInk)
-                        Button("Проверить правила передачи") { reviewingRestoredAccess = true; editing = true }.buttonStyle(SecondaryActionStyle())
+                        Text(ProductText.string("ios_key_recovered_rules_hint")).font(.footnote).foregroundStyle(Brand.secondaryInk)
+                        Button(ProductText.string("ios_check_delegation_rules")) { reviewingRestoredAccess = true; editing = true }.buttonStyle(SecondaryActionStyle())
                             .disabled(key.pending != nil)
                     }
                     if key.pending != nil {
-                        Button("Проверить результат") { Task { await model.refreshOwners() } }.buttonStyle(SecondaryActionStyle())
+                        Button(ProductText.string("ios_check_result")) { Task { await model.refreshOwners() } }.buttonStyle(SecondaryActionStyle())
                         if model.canSaveOwnerKeyResult(keyID) {
-                            Button("Сохранить результат") { Task { await model.retrySavingOwnerKeyResult(server: server, keyID: keyID) } }.buttonStyle(PrimaryActionStyle())
+                            Button(ProductText.string("ios_save_result")) { Task { await model.retrySavingOwnerKeyResult(server: server, keyID: keyID) } }.buttonStyle(PrimaryActionStyle())
                         } else if !key.sent {
-                            Button("Повторить запрос") { Task { await model.retryPreparedOwnerKey(server: server, keyID: keyID) } }.buttonStyle(PrimaryActionStyle())
+                            Button(ProductText.string("ios_request_retry")) { Task { await model.retryPreparedOwnerKey(server: server, keyID: keyID) } }.buttonStyle(PrimaryActionStyle())
                             if key.keyID == nil {
-                                Button("Отменить выдачу", role: .destructive) { model.discardUnsentOwnerKey(server: server, keyID: keyID); if self.key == nil { dismiss() } }.buttonStyle(SecondaryActionStyle())
+                                Button(ProductText.string("ios_issue_cancel"), role: .destructive) { model.discardUnsentOwnerKey(server: server, keyID: keyID); if self.key == nil { dismiss() } }.buttonStyle(SecondaryActionStyle())
                             }
                         }
                     } else if key.state == .active || key.state == .paused {
-                        Button(key.state == .paused ? "Возобновить доступ" : "Приостановить доступ") { Task { await model.setOwnerKeyMode(server: server, keyID: keyID, paused: key.state != .paused) } }.buttonStyle(SecondaryActionStyle())
+                        Button(key.state == .paused ? ProductText.string("ios_access_resume") : ProductText.string("ios_access_pause")) { Task { await model.setOwnerKeyMode(server: server, keyID: keyID, paused: key.state != .paused) } }.buttonStyle(SecondaryActionStyle())
                     }
                     if key.pending == nil, key.state == .active, let owner,
                        let bundle = try? key.bundle(masterKey: owner.masterKey), let rows = bundle["ble"] as? [[String: Any]], !rows.isEmpty {
-                        Button("Продлить Bluetooth-пропуска") { renewingBLE = true }.buttonStyle(SecondaryActionStyle())
+                        Button(ProductText.string("ios_ble_passes_renew")) { renewingBLE = true }.buttonStyle(SecondaryActionStyle())
                     }
                     if key.pending == nil && [.active, .paused, .restricted].contains(key.state) {
-                        Button("Написать сообщение") { composing = true }.buttonStyle(SecondaryActionStyle())
+                        Button(ProductText.string("ios_message_compose")) { composing = true }.buttonStyle(SecondaryActionStyle())
                     }
-                    if key.keyID != nil && key.state != .revoked { Button("Отозвать ключ", role: .destructive) { revoking = true }.buttonStyle(SecondaryActionStyle()) }
+                    if key.keyID != nil && key.state != .revoked { Button(ProductText.string("ios_key_revoke"), role: .destructive) { revoking = true }.buttonStyle(SecondaryActionStyle()) }
                 }.disabled(model.ownerBusy)
             }
         }
-        .navigationTitle("Выданный ключ").navigationBarTitleDisplayMode(.inline)
+        .navigationTitle(ProductText.string("ios_key_issued")).navigationBarTitleDisplayMode(.inline)
         .sheet(isPresented: $composing) { ComposeMessageScreen(manager: model.messages, target: .owner(server: server, keyID: keyID)) }
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
@@ -305,10 +305,10 @@ struct OwnerKeyScreen: View {
         }
         .sheet(isPresented: $editing) { IssueOwnerKeyScreen(serverPreset: server, editingKeyID: keyID, editAccessOnLaunch: reviewingRestoredAccess) }
         .task { if showRevokeOnLaunch { revoking = true } }
-        .appConfirmationDialog("Продлить Bluetooth-пропуска?",message:"Продлить Bluetooth-пропуска на выбранный срок?",actionTitle:"Продлить",isPresented:$renewingBLE) {
+        .appConfirmationDialog(ProductText.string("ios_ble_passes_renew_title"),message:ProductText.string("ios_ble_passes_renew_body"),actionTitle:ProductText.string("ios_renew"),isPresented:$renewingBLE) {
             Task { await model.renewOwnerBLEKey(server: server, keyID: keyID) }
         }
-        .appConfirmationDialog("Отозвать ключ?",message:"Гость и получатели переданного им доступа потеряют доступ.",actionTitle:"Отозвать ключ",destructive:true,isPresented:$revoking) {
+        .appConfirmationDialog(ProductText.string("ios_key_revoke_title"),message:ProductText.string("ios_key_revoke_chain_hint"),actionTitle:ProductText.string("ios_key_revoke"),destructive:true,isPresented:$revoking) {
             Task { await model.revokeOwnerKey(server: server, keyID: keyID) }
         }
     }
@@ -318,7 +318,7 @@ struct InviteQRCode: View {
     let text: String
     var body: some View {
         if let image {
-            Image(uiImage: image).interpolation(.none).resizable().scaledToFit().frame(maxWidth: 260).padding(12).background(.white, in: RoundedRectangle(cornerRadius: 12)).accessibilityLabel("QR-код гостевого ключа")
+            Image(uiImage: image).interpolation(.none).resizable().scaledToFit().frame(maxWidth: 260).padding(12).background(.white, in: RoundedRectangle(cornerRadius: 12)).accessibilityLabel(ProductText.string("ios_guest_key_qr"))
         }
     }
     private var image: UIImage? {

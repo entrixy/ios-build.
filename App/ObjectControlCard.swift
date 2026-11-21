@@ -36,7 +36,7 @@ struct ObjectControlCard<MainLabel: View>: View {
                     if accepted, camera?.configuration.showWhen == "call" { cameraOpen = true }
                 } label: { mainLabel().frame(maxWidth:.infinity,alignment:.leading).contentShape(Rectangle()) }
                     .buttonStyle(CardActionStyle()).accessibilityLabel(accessibilityText)
-                    .accessibilityHint("Выполнить действие с объектом")
+                    .accessibilityHint(ProductText.string("ios_object_action_accessibility"))
                 if camera != nil {
                     Button { withAnimation(.easeInOut(duration:0.18)) { cameraOpen.toggle() } } label: {
                         Image(systemName:"video").font(.system(size:24)).foregroundStyle(Brand.ink)

@@ -130,8 +130,13 @@ struct StageTwoRoot: View {
         return app
     }
     var body: some View {
+        Group {
+        if model.localDataErased { LocalResetCompleteScreen() }
+        else {
         RootView(initialTab: route.mainTab, showAddKey: route == .addKey,
                  pendingURL:.constant(route == .deviceClaim ? URL(string:"https://factory.invalid:8443/claim?c=a1b2-c3d4") : nil))
+        }
+        }
             .environmentObject(model)
             .preferredColorScheme(.light)
             .background(StageTwoInputProbe().frame(width:0,height:0))

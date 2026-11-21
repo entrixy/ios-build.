@@ -12,7 +12,7 @@ private struct PassedAccessContent: View {
     @State private var adding = false
     var body: some View {
         List {
-            if let message = manager.message { Section { Text(message).foregroundStyle(Brand.secondaryInk) } }
+            if let message = manager.message { Section { Text(ProductText.systemMessage(message)).foregroundStyle(Brand.secondaryInk) } }
             ForEach(app.passedAccess) { record in
                 NavigationLink { PassedAccessDetail(manager: manager, accessID: record.id) } label: {
                     VStack(alignment: .leading, spacing: 6) {
@@ -21,10 +21,10 @@ private struct PassedAccessContent: View {
                     }.padding(.vertical, 5)
                 }
             }
-            if app.passedAccess.isEmpty { Text("Переданных ключей пока нет").foregroundStyle(Brand.secondaryInk) }
+            if app.passedAccess.isEmpty { Text(ProductText.string("ios_passed_keys_empty")).foregroundStyle(Brand.secondaryInk) }
         }
-        .navigationTitle("Переданный доступ").navigationBarTitleDisplayMode(.inline)
-        .toolbar { ToolbarItem(placement: .primaryAction) { Button { adding = true } label: { Image(systemName: "plus").accessibilityLabel("Передать доступ") }.disabled(manager.busy || app.guests.isEmpty || app.busy || app.ownerBusy) } }
+        .navigationTitle(ProductText.string("ios_delegated_access")).navigationBarTitleDisplayMode(.inline)
+        .toolbar { ToolbarItem(placement: .primaryAction) { Button { adding = true } label: { Image(systemName: "plus").accessibilityLabel(ProductText.string("ios_access_pass")) }.disabled(manager.busy || app.guests.isEmpty || app.busy || app.ownerBusy) } }
         .refreshable { await manager.reload() }
         .task { await manager.reload() }
         .sheet(isPresented: $adding) { PassAccessForm(manager: manager) }
@@ -92,9 +92,9 @@ struct PassAccessForm: View {
                         ForEach(options.filter { $0.source.invite.server == host }) { option in row(option) }
                     } header: { if hosts.count > 1 { Text(host) } }
                 }
-                if let message = manager.message { Section { Text(message).font(.footnote).foregroundStyle(Brand.secondaryInk) } }
+                if let message = manager.message { Section { Text(ProductText.systemMessage(message)).font(.footnote).foregroundStyle(Brand.secondaryInk) } }
                 if let record, record.parts.contains(where:{ $0.state == .draft }) {
-                    Section { Button("Продолжить передачу") { Task { await manager.continueCreating(record.id) } }.buttonStyle(SecondaryActionStyle()).actionListRow() }
+                    Section { Button(ProductText.string("ios_transfer_continue")) { Task { await manager.continueCreating(record.id) } }.buttonStyle(SecondaryActionStyle()).actionListRow() }
                 }
                 Section {
                     Button { Task { await save() } } label: { ActionButtonLabel(title:ProductText.string(accessID == nil ? "delegate_create" : "btn_save"),busy:saving || manager.busy) }
@@ -141,7 +141,7 @@ struct PassAccessForm: View {
             }
             guard var latest = app.passedAccess.first(where:{ $0.id == initial.id }) else { return }
             latest.label = name.isEmpty ? ProductText.string("guests_default_name") : name
-            do { try app.savePassedAccess(latest) } catch { app.errorMessage = "Не удалось сохранить имя гостя."; return }
+            do { try app.savePassedAccess(latest) } catch { app.errorMessage = ProductText.string("ios_guest_name_save_failed"); return }
             dismiss()
         } else if await manager.create(label:name.isEmpty ? ProductText.string("guests_default_name") : name,welcome:welcome.trimmingCharacters(in:.whitespacesAndNewlines),objects:selected) != nil { dismiss() }
     }
@@ -161,32 +161,32 @@ struct PassedAccessDetail: View {
                     Text(record.label).font(.headline)
                     Text(passedAccessStatus(record)).foregroundStyle(Brand.secondaryInk)
                     KeyValueRow(title: ProductText.string("ble_server_label"), value: record.server)
-                    KeyValueRow(title: "Исходных ключей", value: String(record.parts.count))
-                    if let message = manager.message { Text(message).font(.subheadline).foregroundStyle(Brand.secondaryInk) }
+                    KeyValueRow(title: ProductText.string("ios_source_keys"), value: String(record.parts.count))
+                    if let message = manager.message { Text(ProductText.systemMessage(message)).font(.subheadline).foregroundStyle(Brand.secondaryInk) }
                 }
                 if let link = record.link, let url = URL(string: link.url) {
                     Section {
                         InviteQRCode(text: link.url).frame(maxWidth: .infinity).padding(.vertical, 12)
-                        ShareLink(item: url) { Label("Передать ссылку", systemImage: "square.and.arrow.up") }.buttonStyle(PrimaryActionStyle())
+                        ShareLink(item: url) { Label(ProductText.string("ios_link_share"), systemImage: "square.and.arrow.up") }.buttonStyle(PrimaryActionStyle())
                         Text(link.url).font(.caption.monospaced()).textSelection(.enabled).privacySensitive()
-                    } footer: { Text("Передавайте ссылку одному получателю. Секрет после # подтверждает, кому вы передаёте доступ.") }
+                    } footer: { Text(ProductText.string("ios_pass_single_recipient_hint")) }
                 }
                 Section {
-                    Button("Обновить данные") { Task { await manager.reload() } }.buttonStyle(SecondaryActionStyle())
+                    Button(ProductText.string("ios_refresh_data")) { Task { await manager.reload() } }.buttonStyle(SecondaryActionStyle())
                     if record.parts.contains(where: { $0.state == .draft }) {
-                        Button("Продолжить передачу") { Task { await manager.continueCreating(record.id) } }.buttonStyle(PrimaryActionStyle())
+                        Button(ProductText.string("ios_transfer_continue")) { Task { await manager.continueCreating(record.id) } }.buttonStyle(PrimaryActionStyle())
                     }
                     if record.parts.contains(where: { $0.childID != nil }) && record.link != nil {
-                        Button("Написать сообщение") { composing = true }.buttonStyle(SecondaryActionStyle())
+                        Button(ProductText.string("ios_message_compose")) { composing = true }.buttonStyle(SecondaryActionStyle())
                     }
                     ForEach(record.parts.indices, id: \.self) { index in
                         let part = record.parts[index]
                         if ![PassedAccess.State.draft, .revoking, .revoked].contains(part.state) {
-                            Button("Изменить объекты · часть \(index + 1)") { editingSource = part.sourceID }.buttonStyle(SecondaryActionStyle()).disabled(part.pendingEdit != nil)
+                            Button(ProductText.string("ios_edit_objects_part_fmt",index + 1)) { editingSource = part.sourceID }.buttonStyle(SecondaryActionStyle()).disabled(part.pendingEdit != nil)
                         }
                     }
                     if !record.parts.allSatisfy({ $0.state == .revoked }) {
-                        Button(record.parts.contains(where: { $0.state == .revoking }) ? "Повторить отзыв" : "Отозвать переданный доступ", role: .destructive) { revoking = true }.buttonStyle(SecondaryActionStyle())
+                        Button(record.parts.contains(where: { $0.state == .revoking }) ? ProductText.string("ios_revoke_retry") : ProductText.string("ios_passed_access_revoke"), role: .destructive) { revoking = true }.buttonStyle(SecondaryActionStyle())
                     }
                 }.disabled(manager.busy || app.busy || app.ownerBusy)
             }
@@ -196,20 +196,20 @@ struct PassedAccessDetail: View {
         .sheet(isPresented: Binding(get: { editingSource != nil }, set: { if !$0 { editingSource = nil } })) {
             if let source = editingSource { EditPassedObjects(manager: manager, accessID: accessID, sourceID: source) }
         }
-        .appConfirmationDialog("Отозвать доступ?",message:"Отозвать весь доступ по этой ссылке и цепочке ниже неё?",actionTitle:"Отозвать доступ",destructive:true,isPresented:$revoking) {
+        .appConfirmationDialog(ProductText.string("ios_access_revoke_title"),message:ProductText.string("ios_link_revoke_chain_hint"),actionTitle:ProductText.string("ios_access_revoke"),destructive:true,isPresented:$revoking) {
             Task { await manager.revoke(accessID, retry: true) }
         }
     }
 }
 func passedAccessStatus(_ record: PassedAccess) -> String {
-    if record.parts.allSatisfy({ $0.state == .revoked }) { return "Доступ отозван" }
-    if record.parts.contains(where: { $0.state == .revoking }) { return "Отзыв не завершён" }
-    if record.parts.contains(where: { $0.pendingEdit != nil }) { return "Изменение объектов не подтверждено" }
-    if record.parts.contains(where: { $0.state == .draft }) { return "Выдача ссылки не подтверждена" }
-    if record.parts.contains(where: { $0.state == .unavailable }) { return "Переданный доступ не подтверждён" }
-    if record.parts.contains(where: { $0.state == .awaitingOwner }) { return "Ожидает подтверждения владельцев" }
-    if record.parts.allSatisfy({ $0.state == .active }) { return "Доступ действует" }
-    return "Ожидает принятия получателем"
+    if record.parts.allSatisfy({ $0.state == .revoked }) { return ProductText.string("ios_access_revoked") }
+    if record.parts.contains(where: { $0.state == .revoking }) { return ProductText.string("ios_revoke_incomplete") }
+    if record.parts.contains(where: { $0.pendingEdit != nil }) { return ProductText.string("ios_object_changes_unconfirmed") }
+    if record.parts.contains(where: { $0.state == .draft }) { return ProductText.string("ios_link_issuance_unconfirmed") }
+    if record.parts.contains(where: { $0.state == .unavailable }) { return ProductText.string("ios_delegated_access_unconfirmed") }
+    if record.parts.contains(where: { $0.state == .awaitingOwner }) { return ProductText.string("ios_owners_confirmation_pending") }
+    if record.parts.allSatisfy({ $0.state == .active }) { return ProductText.string("ios_access_active") }
+    return ProductText.string("ios_recipient_acceptance_pending")
 }
 
 struct EditPassedObjects: View {
@@ -226,7 +226,7 @@ struct EditPassedObjects: View {
     var body: some View {
         NavigationStack {
             Form {
-                Section("Объекты получателя") {
+                Section(ProductText.string("ios_recipient_objects")) {
                     ForEach(guest?.objects ?? []) { object in
                         let allow = manager.snapshots[sourceID]?.allowance[object.numberID]
                         let existing = part?.objects[String(object.numberID)] != nil
@@ -237,14 +237,14 @@ struct EditPassedObjects: View {
                             HStack { Text(object.label); Spacer(); Image(systemName: selected.contains(object.numberID) ? "checkmark.circle.fill" : "circle").foregroundStyle(selected.contains(object.numberID) ? AppPalette.selected : Brand.secondaryInk) }.foregroundStyle(Brand.ink)
                         }.disabled(!selected.contains(object.numberID) && !canAdd)
                     }
-                    if guest == nil { Text("Исходный ключ удалён с этого iPhone").foregroundStyle(Brand.secondaryInk) }
+                    if guest == nil { Text(ProductText.string("ios_source_key_removed")).foregroundStyle(Brand.secondaryInk) }
                 }
                 Section {
-                    if let message = manager.message { Text(message).foregroundStyle(Brand.secondaryInk) }
-                    Button("Сохранить объекты") { Task { if await manager.editObjects(accessID, sourceID: sourceID, numberIDs: selected) { dismiss() } } }.buttonStyle(PrimaryActionStyle()).disabled(guest == nil)
-                } footer: { Text("Удаление объекта заберёт его и у тех, кому получатель передал ключ дальше. Пустой набор отзывает эту часть доступа. Добавленные объекты потребуют подтверждения владельца.") }
+                    if let message = manager.message { Text(ProductText.systemMessage(message)).foregroundStyle(Brand.secondaryInk) }
+                    Button(ProductText.string("ios_objects_save")) { Task { if await manager.editObjects(accessID, sourceID: sourceID, numberIDs: selected) { dismiss() } } }.buttonStyle(PrimaryActionStyle()).disabled(guest == nil)
+                } footer: { Text(ProductText.string("ios_pass_object_changes_hint")) }
             }.disabled(manager.busy || app.busy || app.ownerBusy || part?.pendingEdit != nil)
-            .taskSheetTitle("Объекты получателя",form:true)
+            .taskSheetTitle(ProductText.string("ios_recipient_objects"),form:true)
             .sheetDismissFooter(disabled: manager.busy || app.busy || app.ownerBusy) { dismiss() }
 
             .task { if !loaded { loaded = true; selected = Set(part?.objects.keys.compactMap(Int.init) ?? []) }; await manager.reload(sourceID: sourceID) }

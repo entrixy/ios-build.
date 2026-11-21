@@ -51,7 +51,7 @@ struct OwnerCatalogControlCard: View {
     let object: OwnerObject
     private var entry: CatalogObject { .owned(owner, object) }
     var body: some View {
-        ObjectControlCard(automation:app.automation,entry:entry,accessibilityText:app.objectLabel(entry)+". Управлять",action:{
+        ObjectControlCard(automation:app.automation,entry:entry,accessibilityText:app.objectLabel(entry)+ProductText.string("ios_control_accessibility_suffix"),action:{
             guard let intent = app.ownerActionIntent(server: owner.server, objectID: object.id) else { return false }
             if intent.policy.confirmation || intent.policy.authentication != nil { app.actionPrompt = .owner(intent) }
             else { Task { await app.execute(intent) } }
@@ -63,10 +63,10 @@ struct OwnerCatalogControlCard: View {
                     Text(app.objectLabel(entry)).font(.headline).foregroundStyle(.primary)
                     ObjectSourceLabel(entry: entry)
                     if let rejection = app.ownerActionRejections[object.id] {
-                        Text(rejection.message).font(.subheadline).foregroundStyle(.red)
+                        Text(ProductText.systemMessage(rejection.message)).font(.subheadline).foregroundStyle(.red)
                     }
-                    if let message = ble.messages[object.id] { Text(message).font(.subheadline).foregroundStyle(Brand.secondaryInk) }
-                    if let message = control.messages[object.id] { Text(message).font(.subheadline).foregroundStyle(Brand.secondaryInk) }
+                    if let message = ble.messages[object.id] { Text(ProductText.systemMessage(message)).font(.subheadline).foregroundStyle(Brand.secondaryInk) }
+                    if let message = control.messages[object.id] { Text(ProductText.systemMessage(message)).font(.subheadline).foregroundStyle(Brand.secondaryInk) }
                 }.frame(maxWidth: .infinity, alignment: .leading)
             }
         }

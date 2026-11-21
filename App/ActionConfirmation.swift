@@ -21,7 +21,7 @@ struct ActionConfirmation: View {
     private var guestIntent: ActionIntent? { if case .guest(let value) = request { return value }; return nil }
     private var ownerIntent: OwnerActionIntent? { if case .owner(let value) = request { return value }; return nil }
     private var authentication: String? { guestIntent?.policy.authentication ?? ownerIntent?.policy.authentication }
-    private var title: String { guestIntent?.title ?? ownerIntent?.title ?? "Подтвердить" }
+    private var title: String { guestIntent?.title ?? ownerIntent?.title ?? ProductText.string("ios_action_confirm") }
     private var objectLabel: String {
         if let intent = guestIntent, let entry = model.catalogObject(.received(guestID:intent.guestID,objectID:intent.object.id)) { return model.objectLabel(entry) }
         return guestIntent?.object.label ?? ownerIntent?.label ?? ProductText.string("journal_who_limit")
@@ -64,7 +64,7 @@ struct ActionConfirmation: View {
                             .font(.body).frame(maxWidth:.infinity,alignment:.leading)
                     }
                 }
-                if let message { Text(message).font(.footnote).foregroundStyle(AppPalette.destructive) }
+                if let message { Text(ProductText.systemMessage(message)).font(.footnote).foregroundStyle(AppPalette.destructive) }
 
             }.disabled(working || !isCurrent)
         } footer: {
@@ -133,7 +133,7 @@ struct ActionConfirmation: View {
         Task {
             defer { working = false; code = ""; repeatedCode = "" }
             do { try await model.setActionCode(code); configured = true }
-            catch { message = "Не удалось сохранить код. Введите от 4 до 8 цифр." }
+            catch { message = ProductText.string("ios_code_invalid_save") }
         }
     }
     private func authenticatePIN() {
@@ -143,7 +143,7 @@ struct ActionConfirmation: View {
             do {
                 if try await authorizeCode() { await perform(); close() }
                 else { message = ProductText.string("ios_entry_rejected") }
-            } catch { message = "Не удалось проверить код в защищённом хранилище." }
+            } catch { message = ProductText.string("ios_code_store_check_failed") }
         }
     }
     private func authenticateBio() {
@@ -151,7 +151,7 @@ struct ActionConfirmation: View {
         Task {
             defer { working = false }
             do { try await authorizeBiometric(); await perform(); close() }
-            catch { message = "Биометрия недоступна или подтверждение отменено. Действие не отправлено." }
+            catch { message = ProductText.string("ios_biometry_action_not_sent") }
         }
     }
 }

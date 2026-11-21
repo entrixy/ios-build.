@@ -238,13 +238,13 @@ struct SoundSettingsRows: View {
                     }.foregroundStyle(Brand.ink).padding(.vertical,4)
                 }
             }
-            if let message { Section { Text(message).foregroundStyle(.red) } }
+            if let message { Section { Text(ProductText.systemMessage(message)).foregroundStyle(.red) } }
         }
         .fileImporter(isPresented:$choosingFile,allowedContentTypes:[.audio]) { result in
             guard let importing else { return }
             do { try sounds.importSound(result.get(),event:importing); message = nil }
             catch {
-                if (error as? CocoaError)?.code != .userCancelled { message = "Не удалось загрузить звук. Выберите доступный аудиофайл, который поддерживает iPhone." }
+                if (error as? CocoaError)?.code != .userCancelled { message = ProductText.string("ios_sound_import_failed") }
             }
             self.importing = nil
         }

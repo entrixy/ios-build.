@@ -74,7 +74,7 @@ enum ActionBiometrics {
         var item = query
         item[kSecReturnData as String] = true
         item[kSecUseAuthenticationContext as String] = context
-        item[kSecUseOperationPrompt as String] = "Подтвердите действие в Entrixy"
+        item[kSecUseOperationPrompt as String] = ProductText.string("ios_system_authentication_prompt")
         let status = SecItemCopyMatching(item as CFDictionary, nil)
         guard status == errSecSuccess else { throw KeychainStore.Failure(status: status) }
     }

@@ -33,7 +33,7 @@ def prepared_device(path, runtime, *, check_ui=True, missing_ok=False):
     if report.get('source_sha') != source_sha() or report.get('runtime') != runtime:
         raise RuntimeError('Prepared simulator does not belong to this source/runtime')
     device = report['device']; uuid.UUID(device)
-    devices = json.loads(subprocess.check_output(['xcrun','simctl','list','devices','--json'],text=True))['devices']
+    devices = json.loads(subprocess.check_output(['xcrun','simctl','list','devices','--json'],text=True,timeout=60))['devices']
     owned = next((row for row in devices.get(runtime,[]) if row['udid'] == device),None)
     if owned is None and missing_ok:
         return None
@@ -61,8 +61,9 @@ def main():
     if args.output.exists():
         raise RuntimeError('Do not overwrite or mix prepared simulator evidence')
     args.output.parent.mkdir(parents=True,exist_ok=True)
-    sdk = subprocess.check_output(['xcrun','--sdk','iphonesimulator','--show-sdk-version'],text=True).strip()
-    runtimes = json.loads(subprocess.check_output(['xcrun','simctl','list','runtimes','--json'],text=True))
+    print('Reading installed iOS SDK/runtime metadata with a bounded deadline',flush=True)
+    sdk = subprocess.check_output(['xcrun','--sdk','iphonesimulator','--show-sdk-version'],text=True,timeout=60).strip()
+    runtimes = json.loads(subprocess.check_output(['xcrun','simctl','list','runtimes','--json'],text=True,timeout=60))
     (args.output.parent/'simulator-runtimes.json').write_text(json.dumps(runtimes,indent=2)+'\n')
     runtime = next(r['identifier'] for r in runtimes['runtimes'] if r.get('isAvailable') and '.iOS-' in r['identifier'] and (r['version'] == sdk or r['version'].startswith(sdk+'.')))
     if os.environ.get('GITHUB_ACTIONS') == 'true':

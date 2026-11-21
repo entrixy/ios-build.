@@ -6,6 +6,7 @@ import EntrixyCore
 struct EntrixyApp: App {
     @UIApplicationDelegateAdaptor(EntrixyLifecycleDelegate.self) private var lifecycle
     @AppStorage("entrixy.appearance") private var appearance = "system"
+    @AppStorage("entrixy.language") private var language = ""
     @State private var localGeneration = UUID()
     var body: some Scene {
         WindowGroup {
@@ -30,6 +31,7 @@ struct EntrixyApp: App {
             .id(localGeneration)
             .onReceive(NotificationCenter.default.publisher(for:.entrixyLocalResetCompleted)) { _ in localGeneration = UUID() }
             .toggleStyle(SelectedSwitchStyle())
+            .environment(\.locale,Locale(identifier:language.isEmpty ? ProductText.language : language))
             .preferredColorScheme(appearance == "light" ? .light : appearance == "dark" ? .dark : nil)
         }
     }

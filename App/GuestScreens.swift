@@ -11,7 +11,7 @@ struct ControlScreen: View {
     var body: some View {
         Group {
             if model.controlObjects.isEmpty {
-                EmptyScreen(image: "icon-key", title: ProductText.string("help_section_objects"), detail: "Добавьте свой объект в настройках или ключ, полученный от владельца.")
+                EmptyScreen(image: "icon-key", title: ProductText.string("help_section_objects"), detail: ProductText.string("ios_control_empty_hint"))
             } else {
                 ScrollView {
                     LazyVStack(alignment: .leading, spacing: 16) {
@@ -27,7 +27,7 @@ struct ControlScreen: View {
                             }
                         }
                         if !query.isEmpty && entries.isEmpty {
-                            Text("Ничего не найдено").foregroundStyle(.secondary).frame(maxWidth: .infinity).padding(32)
+                            Text(ProductText.string("ios_search_empty")).foregroundStyle(.secondary).frame(maxWidth: .infinity).padding(32)
                         }
                     }.padding(20).measureControlContent()
                 }.background(Color(uiColor: .systemGroupedBackground))
@@ -35,7 +35,7 @@ struct ControlScreen: View {
                     .modifier(HomeWidgetHint())
             }
         }
-        .searchable(text: $query, placement: .navigationBarDrawer(displayMode: .automatic), prompt: "Найти объект")
+        .searchable(text: $query, placement: .navigationBarDrawer(displayMode: .automatic), prompt: ProductText.string("ios_search_objects"))
         .navigationTitle(ProductText.string("tab_actions"))
         .onAppear { model.automation.setWorking(true) }
         .onDisappear { model.automation.setWorking(false) }
@@ -66,13 +66,13 @@ private struct GuestCatalogControlCard: View {
                 VStack(alignment: .leading, spacing: 6) {
                     Text(model.objectLabel(entry)).font(.headline).foregroundStyle(.primary)
                     ObjectSourceLabel(entry: entry)
-                    if guest.paused { Text("Доступ приостановлен").font(.subheadline).foregroundStyle(Brand.secondaryInk) }
+                    if guest.paused { Text(ProductText.string("ios_access_paused")).font(.subheadline).foregroundStyle(Brand.secondaryInk) }
                     if let rejection = model.actionRejections[guest.id + "|" + object.id] {
-                        Text(rejection.message).font(.subheadline).foregroundStyle(.red).fixedSize(horizontal: false, vertical: true)
+                        Text(ProductText.systemMessage(rejection.message)).font(.subheadline).foregroundStyle(.red).fixedSize(horizontal: false, vertical: true)
                     }
                     BLEGuestActionMessage(model: model.bleGuestControl, actionKey: guest.id + "|" + object.id)
                     if let text = model.actionMessages[guest.id + "|" + object.id] {
-                        Text(text).font(.subheadline).foregroundStyle(Brand.secondaryInk).fixedSize(horizontal: false, vertical: true)
+                        Text(ProductText.systemMessage(text)).font(.subheadline).foregroundStyle(Brand.secondaryInk).fixedSize(horizontal: false, vertical: true)
                     }
                 }.frame(maxWidth: .infinity, alignment: .leading)
             }
@@ -88,7 +88,7 @@ struct ConnectionLabel: View {
     var body: some View {
         HStack(spacing: 5) {
             Circle().fill(color).frame(width: 6, height: 6)
-            Text(model.connection(for: guestID) == .unavailable ? "Ключ недоступен" : (paused ? "Доступ приостановлен" : model.connection(for: guestID).title))
+            Text(model.connection(for: guestID) == .unavailable ? ProductText.string("ios_key_unavailable") : (paused ? ProductText.string("ios_access_paused") : model.connection(for: guestID).title))
         }.font(.subheadline).foregroundStyle(Brand.secondaryInk)
     }
     private var color: Color {
@@ -127,21 +127,21 @@ struct SettingsScreen: View {
     var body: some View {
         VStack(spacing: 0) {
             PhoneReadinessCard(service:model.phoneReadiness,sensors:model.automationSensors)
-            Picker("Раздел настроек", selection: $selected) {
+            Picker(ProductText.string("ios_settings_sections"), selection: $selected) {
                 ForEach(SettingsTab.allCases, id: \.self) { Text($0.title).tag($0) }
             }.pickerStyle(.segmented).padding(.horizontal, 20).padding(.vertical, 12)
                 .accessibilityIdentifier("settings-sections")
             List {
                 switch selected {
                 case .objects:
-                    if model.catalogObjects().isEmpty { Text("Пока нет объектов").foregroundStyle(Brand.secondaryInk) }
+                    if model.catalogObjects().isEmpty { Text(ProductText.string("ios_objects_empty")).foregroundStyle(Brand.secondaryInk) }
                     ObjectSettingsRows(entries: model.catalogObjects())
                     Section {
                         Button(ProductText.string("settings_add_object")) { addingObject = true }.buttonStyle(SecondaryActionStyle()).actionListRow()
                             .disabled(!model.storageReady || model.ownerBusy)
                     }
                 case .keys:
-                    if model.guests.isEmpty && model.androidPendingGuests.isEmpty { Text("Пока нет полученных ключей").foregroundStyle(Brand.secondaryInk) }
+                    if model.guests.isEmpty && model.androidPendingGuests.isEmpty { Text(ProductText.string("ios_keys_empty")).foregroundStyle(Brand.secondaryInk) }
                     ForEach(model.androidPendingGuests) { source in
                         ImportedGuestKeyRow(source:source,manager:model.backups)
                     }
@@ -149,7 +149,7 @@ struct SettingsScreen: View {
                         NavigationLink { KeyDetailScreen(guestID: guest.id) } label: {
                             VStack(alignment: .leading, spacing: 7) {
                                 Text(guest.invite.server).font(.headline)
-                                Text("Объектов: \(guest.objects.count)").font(.subheadline).foregroundStyle(Brand.secondaryInk)
+                                Text(ProductText.string("ios_object_count_fmt",guest.objects.count)).font(.subheadline).foregroundStyle(Brand.secondaryInk)
                                 ConnectionLabel(guestID: guest.id, paused: guest.paused)
                             }.padding(.vertical, 4)
                         }.accessibilityIdentifier("received-key-" + guest.id)
@@ -158,7 +158,7 @@ struct SettingsScreen: View {
                         Button(ProductText.string("settings_add_key")) { keyInput = ""; addingKey = true }.buttonStyle(PrimaryActionStyle())
                             .actionListRow()
                     }
-                    Section { NavigationLink("Ожидаемые ключи") { DelegationInboxScreen() } }
+                    Section { NavigationLink(ProductText.string("ios_pending_keys")) { DelegationInboxScreen() } }
                 case .sounds:
                     SoundSettingsRows()
                 case .system:
@@ -179,10 +179,11 @@ struct SettingsScreen: View {
                     ServerSettingsSection()
                     if model.privacyRouter != nil { NetworkPrivacySettingsSection(sensors:model.automationSensors) }
                     Section {
-                        NavigationLink("Сообщения") { MessagesScreen() }
-                        NavigationLink("Лицензии") { LicenseScreen() }
-                        KeyValueRow(title: "Версия", value: Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "—")
+                        NavigationLink(ProductText.string("ios_messages")) { MessagesScreen() }
+                        NavigationLink(ProductText.string("ios_licenses")) { LicenseScreen() }
+                        KeyValueRow(title: ProductText.string("ios_version"), value: Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "—")
                     }
+                    Section { AppPrivacyPolicyLink().actionListRow() }
                     DeveloperSettingsSection(service:model.diagnostics)
                 }
             }.scrollContentBackground(.hidden).compactListSections()
@@ -234,28 +235,28 @@ struct KeyDetailScreen: View {
                     VStack(alignment: .leading, spacing: 12) {
                         KeyValueRow(title: ProductText.string("ble_server_label"), value: guest.invite.server)
                         Divider()
-                        KeyValueRow(title: "Объектов", value: String(guest.objects.count))
+                        KeyValueRow(title: ProductText.string("ios_object_count"), value: String(guest.objects.count))
                         Divider()
                         ConnectionLabel(guestID: guest.id, paused: guest.paused)
                         if let date = guest.checkedAt {
                             Divider()
-                            KeyValueRow(title: "Обновлено", value: date.formatted(date: .abbreviated, time: .shortened))
+                            KeyValueRow(title: ProductText.string("ios_updated"), value: ProductText.date(date))
                         }
                     }.padding(16).background(Color(uiColor: .secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 16))
                         if let problem = model.guestConnectionProblems[guestID] {
-                            Text(problem).font(.subheadline).foregroundStyle(AppPalette.destructive).fixedSize(horizontal:false,vertical:true)
+                            Text(ProductText.string(problem)).font(.subheadline).foregroundStyle(AppPalette.destructive).fixedSize(horizontal:false,vertical:true)
                         }
                         Button { Task { await model.refresh() } } label: {
-                            Label("Обновить данные", systemImage: "arrow.clockwise")
+                            Label(ProductText.string("ios_refresh_data"), systemImage: "arrow.clockwise")
                         }.buttonStyle(SecondaryActionStyle()).disabled(model.busy)
-                        Button("Удалить ключ с iPhone", role: .destructive) { removing = true }.buttonStyle(SecondaryActionStyle()).disabled(model.busy)
-                        Text("Удаление уберёт ключ и его объекты из этого приложения. Повторно добавить ключ можно по исходной ссылке.").font(.footnote).foregroundStyle(Brand.secondaryInk)
+                        Button(ProductText.string("ios_key_remove_local"), role: .destructive) { removing = true }.buttonStyle(SecondaryActionStyle()).disabled(model.busy)
+                        Text(ProductText.string("ios_key_remove_hint")).font(.footnote).foregroundStyle(Brand.secondaryInk)
                     }.padding(DesignMetrics.pageInset)
                 }.background(Color(uiColor: .systemGroupedBackground))
-            } else { EmptyScreen(image: "icon-key", title: "Ключ удалён", detail: "Вы можете добавить его снова по ссылке владельца.") }
+            } else { EmptyScreen(image: "icon-key", title: ProductText.string("ios_key_removed"), detail: ProductText.string("ios_key_readd_hint")) }
         }
-        .navigationTitle("Полученный ключ").navigationBarTitleDisplayMode(.inline)
-        .appConfirmationDialog(ProductText.string("guest_delete_title"),message:"Удалить ключ и его объекты с этого iPhone?",actionTitle:"Удалить ключ",destructive:true,isPresented:$removing) {
+        .navigationTitle(ProductText.string("ios_key_received_title")).navigationBarTitleDisplayMode(.inline)
+        .appConfirmationDialog(ProductText.string("guest_delete_title"),message:ProductText.string("ios_key_remove_body"),actionTitle:ProductText.string("ios_key_remove_action"),destructive:true,isPresented:$removing) {
             model.removeKey(guestID); if !model.guests.contains(where: { $0.id == guestID }) { dismiss() }
         }
     }
@@ -266,7 +267,7 @@ struct JournalScreen: View {
     @State private var copied = false
     private var text: String {
         model.journal.reversed().map { entry in
-            let date = entry.date.formatted(date: .numeric, time: .standard)
+            let date = ProductText.date(entry.date,dateStyle:.numeric,timeStyle:.standard)
             return "\(date)  \(entry.who) → \(model.journalLabel(entry))" + (entry.result.isEmpty ? "" : " · " + entry.result)
         }.joined(separator: "\n")
     }
@@ -302,7 +303,7 @@ struct JournalScreen: View {
                             Text(model.journalLabel(entry)).font(.body.weight(.medium)).foregroundStyle(Brand.ink)
                         }
                         if !entry.result.isEmpty {
-                            Text(entry.result).font(.subheadline)
+                            Text(ProductText.systemMessage(entry.result)).font(.subheadline)
                                 .foregroundStyle(entry.level == "danger" ? Color(uiColor: .systemRed) : Brand.secondaryInk)
                                 .padding(.leading, 86)
                         }
@@ -315,7 +316,7 @@ struct JournalScreen: View {
         .background(Color(uiColor: .systemGroupedBackground)).navigationTitle(ProductText.string("tab_journal"))
         .overlay(alignment: .bottom) {
             if copied {
-                Text("Журнал скопирован").font(.subheadline)
+                Text(ProductText.string("ios_journal_copied")).font(.subheadline)
                     .padding(.horizontal, 16).padding(.vertical, 10)
                     .background(.regularMaterial, in: Capsule()).padding(.bottom, 16)
                     .allowsHitTesting(false).accessibilityAddTraits(.updatesFrequently)
@@ -361,7 +362,7 @@ struct KeyValueRow: View {
 struct LicenseScreen: View {
     var body: some View {
         ScrollView { Text(license).font(.footnote).padding(20) }
-            .navigationTitle("Лицензии").navigationBarTitleDisplayMode(.inline)
+            .navigationTitle(ProductText.string("ios_licenses")).navigationBarTitleDisplayMode(.inline)
     }
     private var license: String {
         guard let url = Bundle.main.url(forResource: "MaterialIcons-LICENSE", withExtension: "txt"),
@@ -375,7 +376,7 @@ private struct BLEGuestActionMessage: View {
     let actionKey: String
     var body: some View {
         if let text = model.messages[actionKey] {
-            Text(text).font(.subheadline).foregroundStyle(Brand.secondaryInk).fixedSize(horizontal: false, vertical: true)
+            Text(ProductText.systemMessage(text)).font(.subheadline).foregroundStyle(Brand.secondaryInk).fixedSize(horizontal: false, vertical: true)
         }
     }
 }

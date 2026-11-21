@@ -39,10 +39,10 @@ enum GuestConnection: Equatable {
     case connecting, connected, offline, unavailable
     var title: String {
         switch self {
-        case .connecting: return "Подключение…"
-        case .connected: return "Сервер на связи"
-        case .offline: return "Нет соединения"
-        case .unavailable: return "Ключ недоступен"
+        case .connecting: return ProductText.string("ios_connecting")
+        case .connected: return ProductText.string("ios_server_connected")
+        case .offline: return ProductText.string("ios_no_connection")
+        case .unavailable: return ProductText.string("ios_key_unavailable")
         }
     }
 }

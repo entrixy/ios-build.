@@ -129,7 +129,7 @@ struct GuestInvocationEditor: View {
         do {
             var draft = try OwnerObjectEdit(object: object, masterKey: owner.masterKey); draft.webhookMode = mode
             _ = await model.updateOwnerObject(server: server, objectID: objectID, draft: draft)
-        } catch { model.errorMessage = "Не удалось изменить режим отправки." }
+        } catch { model.errorMessage = ProductText.string("ios_sending_mode_change_failed") }
     }
 }
 

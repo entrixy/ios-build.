@@ -16,20 +16,20 @@ struct QRScannerScreen: View {
         NavigationStack {
             Group {
                 if !DataScannerViewController.isSupported {
-                    EmptyScreen(image: "icon-key", title: "Камера недоступна", detail: "Вставьте ссылку или выберите фотографию QR-кода.")
+                    EmptyScreen(image: "icon-key", title: ProductText.string("ios_qr_unavailable"), detail: ProductText.string("ios_qr_fallback"))
                 } else if permission == .authorized && DataScannerViewController.isAvailable {
                     ScannerView(onResult: onResult, onError: { problem = $0 })
                         .overlay(alignment: .bottom) {
-                            Text(problem ?? "Наведите камеру на QR-код гостевого ключа")
+                            Text(problem ?? ProductText.string("ios_qr_instruction"))
                                 .font(.subheadline).padding(16).background(.regularMaterial, in: RoundedRectangle(cornerRadius: 16)).padding()
                         }
                 } else if permission == .authorized {
-                    EmptyScreen(image: "icon-key", title: "Камера временно недоступна", detail: "Выберите фотографию QR-кода или вставьте ссылку.")
+                    EmptyScreen(image: "icon-key", title: ProductText.string("ios_qr_temporary"), detail: ProductText.string("ios_qr_choose_photo"))
                 } else if permission == .notDetermined {
-                    ProgressView("Запрашиваем доступ к камере")
+                    ProgressView(ProductText.string("ios_qr_requesting"))
                 } else {
                     VStack(spacing: 20) {
-                        Text("Разрешите доступ к камере в настройках iPhone или выберите фотографию QR-кода.")
+                        Text(ProductText.string("ios_qr_permission"))
                             .multilineTextAlignment(.center)
                         Button(ProductText.string("btn_open_settings")) {
                             if let url = URL(string: UIApplication.openSettingsURLString) { UIApplication.shared.open(url) }
@@ -66,7 +66,7 @@ private struct ScannerView: UIViewControllerRepresentable {
         scanner.delegate = context.coordinator
         DispatchQueue.main.async {
             do { try scanner.startScanning() }
-            catch { onError("Не удалось запустить камеру. Выберите фотографию QR-кода.") }
+            catch { onError(ProductText.string("ios_qr_start_failure")) }
         }
         return scanner
     }
@@ -92,7 +92,7 @@ private struct ScannerView: UIViewControllerRepresentable {
             for item in items {
                 guard case .barcode(let barcode) = item, let value = barcode.payloadStringValue else { continue }
                 guard let text = try? AccessLink.incomingText(value) else {
-                    onError("Этот QR-код не содержит поддерживаемый гостевой ключ Entrixy.")
+                    onError(ProductText.string("ios_qr_invalid"))
                     continue
                 }
                 delivered = true

@@ -49,7 +49,7 @@ frames only after both dimensions and visible content pass review.
 Primary source checked19November2026:
 [Apple screenshot specifications](https://developer.apple.com/help/app-store-connect/reference/app-information/screenshot-specifications).
 
-Only choose Store images after all56 checkpoints from the final source are
+Only choose Store images after all checkpoints (62 accepted baseline;64 in the next package) from the final source are
 complete and visually reviewed. A partial/failed review and DEBUG fixture
 isolation are recorded separately; screenshots cannot establish hardware readiness.
 
@@ -58,12 +58,13 @@ isolation are recorded separately; screenshots cannot establish hardware readine
 - Protected access material and encrypted server bundles; account email only
   when the user links an account. Object/camera/webhook secrets have scoped paths.
 - On-device location/Wi-Fi/Bluetooth conditions, optional camera/Photos access,
-  Face ID and independent motion for configured geo warnings. No contacts read.
+  Face ID and independent motion for configured geo warnings. A system contact
+  picker returns only the name/number explicitly selected for a guest; no bulk read.
 - Explicit-consent MetricKit crashes; manual technical reports only on request.
 - Optional native notifications: APNs token registered only with entrixy.com,
   bound guest-key hash and environment. Apple sees generic delivery hints rather
   than message text/ciphertext. The separate worker expires inactive tokens after
-  thirty days when configured/running. Schema/provider/signing/device acceptance
+  thirty days when configured/running. The empty production schema is prepared; provider/signing/device acceptance
   is pending; no real APNs delivery has been performed.
 - Trusted promotion catalogue: per-install UUID, version/language, coarse usage
   tags/installation age and counted views; go.php processes clicks. Access-server
@@ -72,9 +73,10 @@ isolation are recorded separately; screenshots cannot establish hardware readine
   Network-service IP/log handling and retention still require the actual server
   inventory; a No Data Collected declaration has not been made.
 
-The current public privacy page describes Android and does not yet describe the
-new iOS diagnostic/catalogue processing. Its URL must not be presented as an
-approved final iOS privacy policy. Prepare the factual iOS update from this data
-inventory and the server's retention settings before submission. App Store privacy
-answers, export compliance, age rating, reviewer access and real-device evidence
-remain explicit release gates, not inferred successes from an unsigned archive.
+The public privacy page was updated21November2026 with actual iOS diagnostics,
+promotion identifiers, selected contacts, APNs preparation, retention and explicit
+local reset/Keychain behavior. All seven language destinations return HTTPS200.
+This is source-backed disclosure, not approval of final App Store answers.
+See PRIVACY_DATA_FLOWS.md and RELEASE_HANDOFF.md. App Store privacy answers,
+export compliance, age rating, account/deletion classification, reviewer access
+and real-device evidence remain release gates.

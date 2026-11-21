@@ -2143,7 +2143,7 @@ final class AppModel: ObservableObject {
     @discardableResult func stopForNativeAttestation(guestID:String,reason:String) -> Bool {
         guard reason == "native_only",guests.contains(where:{ $0.id == guestID }) else { return false }
         stopActions(guestID); connections[guestID] = .offline
-        guestConnectionProblems[guestID] = ProductText.string("ios_native_attestation_required")
+        guestConnectionProblems[guestID] = "ios_native_attestation_required"
         return true
     }
 
@@ -2667,8 +2667,10 @@ extension AppModel {
     @discardableResult func finishLocalResetCleanup() -> Bool {
         guard localDataErased,localResetCleanupPending else { return localDataErased }
         do {
-            try resetCleanup(biometricService)
-            try storage.finishCleanup()
+            if try storage.cleanupNeeded() {
+                try resetCleanup(biometricService)
+                try storage.finishCleanup()
+            }
             localResetCleanupPending = false;errorMessage = nil
             return true
         } catch { errorMessage = ProductText.string("ios_reset_cleanup_failed");return false }

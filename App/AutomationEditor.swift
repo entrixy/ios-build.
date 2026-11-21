@@ -45,7 +45,7 @@ struct AutomationEditor: View {
                         rule(c, title: text("automation_rule_confirm"), symbol: "hand.tap", enabled: \.confirmEnabled, level: \.confirmLevel) {
                             Text(text(c.incoming ? "automation_confirm_hint_guest" : "automation_confirm_hint")).foregroundStyle(Brand.secondaryInk)
                         }
-                        if let message { Text(message).foregroundStyle(.red) }
+                        if let message { Text(ProductText.systemMessage(message)).foregroundStyle(.red) }
                     }.padding(DesignMetrics.pageInset).disabled(!c.canEdit)
                 } else { Text(text("object_unavailable")).padding(DesignMetrics.pageInset) }
             }.background(Color(uiColor: .systemGroupedBackground))
@@ -129,7 +129,7 @@ struct AutomationEditor: View {
     private func change(_ update: (inout AutomationTemplate) -> Void) {
         guard let current = context else { return }
         var copy = current.template; update(&copy)
-        message = (saveOverride?(copy) ?? model.saveAutomation(current, template: copy)) ? nil : "Не удалось сохранить изменение. Прежние настройки сохранены."
+        message = (saveOverride?(copy) ?? model.saveAutomation(current, template: copy)) ? nil : ProductText.string("ios_change_save_preserved")
     }
     private func finishCodeSetup() {
         guard !model.hasActionCode, let c = context, !(c.incoming && c.template.authLevel == .force) else { return }
@@ -193,7 +193,7 @@ private struct AutomationGeoFields: View {
                         .disabled(maximum == 10)
                 }
             }
-            if let message = sensors.message { Text(message).font(.footnote).foregroundStyle(Brand.secondaryInk) }
+            if let message = sensors.message { Text(ProductText.systemMessage(message)).font(.footnote).foregroundStyle(Brand.secondaryInk) }
         }.fullScreenCover(isPresented: $showingMap) {
             AutomationRouteMap(sensors: sensors,
                 gate: geometry.geoLat.flatMap { lat in geometry.geoLon.map { AutomationGeoPoint(lat: lat,lon: $0) } },
@@ -346,7 +346,7 @@ private struct AutomationCodeSetup: View {
                 field(ProductText.string("code_field"),value:$code)
                 field(ProductText.string("code_field_repeat"),value:$repeated)
                 Text(ProductText.string("code_forgot_warning")).font(.footnote).foregroundStyle(AppPalette.destructive)
-                if let message { Text(message).font(.footnote).foregroundStyle(AppPalette.destructive) }
+                if let message { Text(ProductText.systemMessage(message)).font(.footnote).foregroundStyle(AppPalette.destructive) }
 
             }.disabled(working || !model.canManageGuestAccess)
         } footer: {
@@ -358,7 +358,7 @@ private struct AutomationCodeSetup: View {
                         Task {
                             defer { working = false; code = ""; repeated = "" }
                             do { try await model.setActionCode(code); close() }
-                            catch { message = "Не удалось сохранить код. Прежние данные сохранены." }
+                            catch { message = ProductText.string("ios_code_save_preserved") }
                         }
                     } label: { ActionButtonLabel(title:ProductText.string("btn_save"),busy:working) }
                         .buttonStyle(PrimaryActionStyle()).disabled(code != repeated || !(4...8).contains(code.count))

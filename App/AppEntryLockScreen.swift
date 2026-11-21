@@ -26,8 +26,8 @@ struct AppEntryLockScreen: View {
                 }
                 Button(ProductText.string("ios_code_forgot")) { reset = true }
                     .buttonStyle(SecondaryActionStyle()).disabled(working || !model.storageReady)
-                if let message { Text(message).foregroundStyle(.red).fixedSize(horizontal: false, vertical: true) }
-                if !model.storageReady, let error = model.errorMessage { Text(error).foregroundStyle(.red) }
+                if let message { Text(ProductText.systemMessage(message)).foregroundStyle(.red).fixedSize(horizontal: false, vertical: true) }
+                if !model.storageReady, let error = model.errorMessage { Text(ProductText.systemMessage(error)).foregroundStyle(.red) }
             }.frame(maxWidth: .infinity, alignment: .leading).padding(DesignMetrics.pageInset)
             }
                 .scrollDismissesKeyboard(.interactively)

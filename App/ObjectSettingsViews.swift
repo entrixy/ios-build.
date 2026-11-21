@@ -50,11 +50,11 @@ struct CatalogStatusAvatar: View {
     }
     private func description(_ status: CatalogAvailability) -> String {
         switch status {
-        case .ready: return "Объект доступен"
-        case .offline: return "Объект недоступен"
+        case .ready: return ProductText.string("ios_obj_available")
+        case .offline: return ProductText.string("ios_obj_unavailable")
         case .connecting: return ProductText.string("pair_connecting")
-        case .neutral: return "HTTPS-запрос"
-        case .unknown: return "Доступность ещё не проверена"
+        case .neutral: return ProductText.string("ios_https_request")
+        case .unknown: return ProductText.string("ios_availability_unchecked")
         }
     }
 }
@@ -129,7 +129,7 @@ struct ObjectSettingsRows: View {
                             Text(model.objectLabel(entry)).font(.headline).foregroundStyle(Brand.ink)
                             ObjectSourceLabel(entry: entry)
                             if case let .owned(_, object) = entry, object.pending != nil {
-                                Text(object.sent ? "Ожидает подтверждения сервера" : "Изменение не применено")
+                                Text(object.sent ? ProductText.string("ios_server_confirmation_pending") : ProductText.string("ios_change_not_applied"))
                                     .font(.caption).foregroundStyle(Brand.secondaryInk)
                             }
                         }.frame(maxWidth: .infinity, alignment: .leading)
@@ -138,7 +138,7 @@ struct ObjectSettingsRows: View {
                     }.contentShape(Rectangle())
                 }.buttonStyle(.plain)
                     .accessibilityIdentifier("object-settings-" + entry.target.id)
-                    .accessibilityValue(expanded.contains(entry.target) ? "Развёрнут" : "Свёрнут")
+                    .accessibilityValue(expanded.contains(entry.target) ? ProductText.string("ios_expanded") : ProductText.string("ios_collapsed"))
                 }
                 if expanded.contains(entry.target) {
                     Divider()
@@ -164,7 +164,7 @@ struct ObjectSettingsRows: View {
                             .disabled(model.ownerBusy || model.busy || entry.deletionPending)
                     }
                     if case let .owned(_, object) = entry, let message = model.ownerObjectMessages[object.id] {
-                        Text(message).font(.subheadline).foregroundStyle(Brand.secondaryInk)
+                        Text(ProductText.systemMessage(message)).font(.subheadline).foregroundStyle(Brand.secondaryInk)
                     }
                 }
             }.padding(.vertical, 8)
@@ -293,12 +293,12 @@ private struct ReceivedObjectNameScreen: View {
                                 if normalized != value { label = normalized }
                             }
                     }
-                } footer: { Text("Название изменится только на этом iPhone.") }
+                } footer: { Text(ProductText.string("ios_obj_local_name_hint")) }
                 Section {
                     Button(ProductText.string("btn_save")) { let name = label; editing = false; if model.renameReceivedObject(target,label:name) { dismiss() } }
                         .buttonStyle(PrimaryActionStyle()).actionListRow().disabled(model.busy || model.catalogObject(target) == nil)
                 }
-            }.taskSheetTitle("Название объекта",form:true)
+            }.taskSheetTitle(ProductText.string("ios_obj_name"),form:true)
                 .sheetDismissFooter(disabled: model.busy) { dismiss() }
                 .task {
                     guard !initialized else { return }; initialized = true
@@ -324,8 +324,8 @@ struct ObjectRemovalConfirmation: View {
     let target: ObjectReference
     private var received: Bool { if case .received = target { return true }; return false }
     var body: some View {
-        AppConfirmationDialog(title: received ? "Скрыть объект?" : ProductText.string("confirm_delete_object_title"),
-            message: message, actionTitle: received ? "Скрыть объект" : "Удалить объект", destructive: true,
+        AppConfirmationDialog(title: received ? ProductText.string("ios_obj_hide_title") : ProductText.string("confirm_delete_object_title"),
+            message: message, actionTitle: received ? ProductText.string("ios_obj_hide") : ProductText.string("ios_obj_delete"), destructive: true,
             cancel: { model.objectRemovalTarget = nil }, confirm: {
                 guard model.canManageGuestAccess, model.catalogObject(target) != nil else { model.objectRemovalTarget = nil; return }
                 switch target {
@@ -339,6 +339,6 @@ struct ObjectRemovalConfirmation: View {
     }
     private var message: String {
         let label = model.catalogObject(target).map { "«" + model.objectLabel($0) + "». " } ?? ""
-        return label + (received ? "Ключ и остальные объекты останутся. Повторное добавление исходного ключа вернёт скрытый объект." : "Гости потеряют доступ к этому объекту.")
+        return label + (received ? ProductText.string("ios_obj_hide_hint") : ProductText.string("ios_obj_delete_guests_hint"))
     }
 }

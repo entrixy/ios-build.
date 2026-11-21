@@ -44,6 +44,16 @@ final class LocalStateSession: StateStorage {
         try underlying.save(empty)
         replacement = empty.identity; retired = true
     }
+    func cleanupNeeded() throws -> Bool {
+        lock.lock(); defer { lock.unlock() }
+        guard let current = try underlying.load(), current.identity == (replacement ?? identity) else {
+            throw KeychainStore.Failure(status:errSecInteractionNotAllowed)
+        }
+        try Self.validateResetMarker(current)
+        // Another fresh model may have completed cleanup and started using its
+        // new state. A retired screen must not erase that model's new files.
+        return current.pendingLocalReset == true
+    }
     func finishCleanup() throws {
         lock.lock(); defer { lock.unlock() }
         guard var current = try underlying.load(), current.identity == (replacement ?? identity),

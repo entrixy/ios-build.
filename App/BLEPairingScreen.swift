@@ -24,12 +24,12 @@ private struct BLEPairingContent: View {
     var body: some View {
         Form {
             Section {
-                AppField("Название объекта") {
-                    TextField("Название объекта", text: $label)
+                AppField(ProductText.string("ios_obj_name")) {
+                    TextField(ProductText.string("ios_obj_name"), text: $label)
                 }
-                Text("Включите режим привязки на своём контроллере и держите iPhone рядом. Привязка меняет ключ владельца контроллера.")
+                Text(ProductText.string("ios_ble_pairing_hint"))
                     .font(.footnote).foregroundStyle(Brand.secondaryInk)
-                Button("Найти контроллеры") { Task { await model.scan() } }.buttonStyle(PrimaryActionStyle()).disabled(model.busy)
+                Button(ProductText.string("ios_ble_find_controllers")) { Task { await model.scan() } }.buttonStyle(PrimaryActionStyle()).disabled(model.busy)
                 ForEach(model.discoveries) { discovery in
                     Button { selected = discovery } label: {
                         HStack {
@@ -39,24 +39,24 @@ private struct BLEPairingContent: View {
                         }
                     }.buttonStyle(SecondaryActionStyle()).disabled(model.busy || app.ownerBusy || label.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || records.contains(where: { $0.peripheralID == discovery.id }))
                 }
-            } header: { Text("Новая привязка") }
+            } header: { Text(ProductText.string("ios_ble_pairing_new")) }
             if model.busy { Section { ProgressView("Bluetooth…") } }
-            if let message = model.message { Section { Text(message).foregroundStyle(Brand.secondaryInk) } }
+            if let message = model.message { Section { Text(ProductText.systemMessage(message)).foregroundStyle(Brand.secondaryInk) } }
             ForEach(records) { record in
                 Section {
                     Text(record.label).font(.headline)
                     Text(status(record)).foregroundStyle(Brand.secondaryInk)
                     if record.phase == .confirmed {
-                        NavigationLink("Bluetooth-доступ гостей") { BLEPermissionsScreen(server: server, deviceID: record.deviceID) }
+                        NavigationLink(ProductText.string("ios_ble_guest_access")) { BLEPermissionsScreen(server: server, deviceID: record.deviceID) }
                     }
                     if record.phase == .prepared {
-                        Button("Отправить сохранённую привязку") { Task { await model.sendPrepared(pairingID: record.id, server: server) } }.buttonStyle(PrimaryActionStyle()).disabled(model.busy || app.ownerBusy)
+                        Button(ProductText.string("ios_ble_send_saved_pairing")) { Task { await model.sendPrepared(pairingID: record.id, server: server) } }.buttonStyle(PrimaryActionStyle()).disabled(model.busy || app.ownerBusy)
                     }
                     if record.objectID == nil, record.phase != .prepared {
-                        Button("Проверить привязку") { Task { await model.check(pairingID: record.id, server: server) } }.buttonStyle(SecondaryActionStyle()).disabled(model.busy || app.ownerBusy)
+                        Button(ProductText.string("ios_ble_check_pairing")) { Task { await model.check(pairingID: record.id, server: server) } }.buttonStyle(SecondaryActionStyle()).disabled(model.busy || app.ownerBusy)
                     }
                     if record.phase == .confirmed, record.objectID == nil {
-                        Button("Добавить на сервер") {
+                        Button(ProductText.string("ios_add_to_server")) {
                             Task {
                                 _ = await app.registerPairedBLE(server: server, pairingID: record.id)
                                 // Complete only this pairing's durable object, including an
@@ -68,24 +68,24 @@ private struct BLEPairingContent: View {
                         }.buttonStyle(PrimaryActionStyle())
                             .disabled(model.busy || app.ownerBusy)
                     }
-                } header: { Text("Сохранённая привязка") }
+                } header: { Text(ProductText.string("ios_ble_saved_pairing")) }
             }
         }
-        .navigationTitle("Bluetooth-контроллер").navigationBarTitleDisplayMode(.inline)
+        .navigationTitle(ProductText.string("ios_ble_controller")).navigationBarTitleDisplayMode(.inline)
         .toolbar(.visible,for:.navigationBar)
         .onDisappear { if model.busy { model.suspend() } }
-        .appConfirmationDialog("Привязать свой контроллер?",message:"Убедитесь, что выбран ваш контроллер в режиме привязки. Его название не является проверкой подлинности.",actionTitle:ProductText.string("ios_ble_pair"),isPresented:Binding(get:{ selected != nil },set:{ if !$0 { selected = nil } })) {
+        .appConfirmationDialog(ProductText.string("ios_ble_pairing_confirm_title"),message:ProductText.string("ios_ble_pairing_identity_hint"),actionTitle:ProductText.string("ios_ble_pair"),isPresented:Binding(get:{ selected != nil },set:{ if !$0 { selected = nil } })) {
             if let selected { let id = selected.id; self.selected = nil
                 Task { await model.pair(discoveryID:id,server:server,label:label) }
             }
         }
     }
     private func status(_ record: BLEPairingRecord) -> String {
-        if record.objectID != nil { return "Объект сохранён. Состояние добавления — в списке «Мои объекты»." }
+        if record.objectID != nil { return ProductText.string("ios_ble_object_saved_hint") }
         switch record.phase {
-        case .prepared: return "Секрет сохранён; отправка не начиналась. Можно отправить сохранённую привязку; новый ключ не создаётся."
-        case .sent: return "Исход записи неизвестен. Проверьте подпись контроллера поиском."
-        case .confirmed: return "Привязка подтверждена подписью контроллера."
+        case .prepared: return ProductText.string("ios_ble_pairing_prepared_hint")
+        case .sent: return ProductText.string("ios_ble_pairing_unknown_hint")
+        case .confirmed: return ProductText.string("ios_ble_pairing_verified_hint")
         }
     }
 }

@@ -32,7 +32,7 @@ struct ServerSettingsSection: View {
                         if host != "entrixy.com" { icon("trash",title:"server_forget",destructive:true) { model.serverPrompt = ServerSettingsPrompt(action:.forget(host)) } }
                         else { Color.clear.frame(width:44,height:48).accessibilityHidden(true) }
                     }
-                    if let message = model.ownerMessages[host] { Text(message).font(.footnote).foregroundStyle(Brand.secondaryInk) }
+                    if let message = model.ownerMessages[host] { Text(ProductText.systemMessage(message)).font(.footnote).foregroundStyle(Brand.secondaryInk) }
                     if model.canSaveOwnerAccess(host) {
                         Button(ProductText.string("ios_server_save_access")) { Task { await model.retrySavingOwnerAccess(host) } }.buttonStyle(SecondaryActionStyle())
                     }
@@ -101,7 +101,7 @@ struct ServerSettingsDialog: View {
                     AppField(ProductText.string("account_password")) { SecureField(ProductText.string("account_password"),text:$password).textContentType(.password).serverField() }
                 }
                 if owner?.serverSettings?.pendingAccount?.sent == true { Text(ProductText.string("ios_server_account_uncertain")).font(.footnote).foregroundStyle(Brand.secondaryInk) }
-                if let feedback { Text(feedback).font(.footnote).foregroundStyle(AppPalette.destructive) }
+                if let feedback { Text(ProductText.systemMessage(feedback)).font(.footnote).foregroundStyle(AppPalette.destructive) }
 
             }.disabled(working || model.ownerBusy || model.busy || !model.canManageGuestAccess)
         } footer: {

@@ -19,6 +19,33 @@ private final class ResetStorage: StateStorage {
 }
 
 @MainActor final class LocalStateResetTests: XCTestCase {
+    func testRetiredCleanupRetryCannotEraseFilesOfAFreshModelThatAlreadyCompletedReset() async throws {
+        let store = ResetStorage(SavedState(identity:Data(repeating:7,count:32),guests:[]))
+        var oldCleanupCalls = 0, newCleanupCalls = 0
+        let old = AppModel(storage:store,resetCleanup:{ _ in
+            oldCleanupCalls += 1; throw KeychainStore.Failure(status:-1)
+        }); defer { old.suspend() }
+        XCTAssertFalse(old.eraseLocalData(confirmation:"RESET"))
+        let fresh = AppModel(storage:store,resetCleanup:{ _ in newCleanupCalls += 1 }); defer { fresh.suspend() }
+        XCTAssertTrue(fresh.storageReady); XCTAssertEqual(newCleanupCalls,1)
+        try await fresh.setActionCode("5678")
+        let identity = store.state?.identity, verifier = store.state?.actionCode?.verifier
+        XCTAssertTrue(old.finishLocalResetCleanup())
+        XCTAssertEqual(oldCleanupCalls,1); XCTAssertEqual(newCleanupCalls,1)
+        XCTAssertFalse(old.storageReady); XCTAssertFalse(old.localResetCleanupPending)
+        XCTAssertEqual(store.state?.identity,identity); XCTAssertEqual(store.state?.actionCode?.verifier,verifier)
+        let verified = try await fresh.verifySettingsCode("5678"); XCTAssertTrue(verified)
+    }
+    func testRetiredCleanupDoesNotTouchFilesAfterIdentityHasChangedAgain() {
+        let store = ResetStorage(SavedState(identity:Data(repeating:7,count:32),guests:[]))
+        var calls = 0
+        let old = AppModel(storage:store,resetCleanup:{ _ in calls += 1; throw KeychainStore.Failure(status:-1) })
+        defer { old.suspend() }
+        XCTAssertFalse(old.eraseLocalData(confirmation:"RESET")); XCTAssertEqual(calls,1)
+        store.state = SavedState(identity:Data(repeating:8,count:32),guests:[])
+        XCTAssertFalse(old.finishLocalResetCleanup()); XCTAssertEqual(calls,1)
+        XCTAssertEqual(store.state?.identity,Data(repeating:8,count:32)); XCTAssertFalse(old.storageReady)
+    }
     func testCorruptResetMarkerCannotEraseFilesWhileProtectedCredentialsStillExist() throws {
         var state = try source(); state.pendingLocalReset = true
         let store = ResetStorage(state), session = LocalStateSession(store)

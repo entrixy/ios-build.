@@ -76,7 +76,7 @@ struct AppCodeDialog: View {
                     field(ProductText.string("code_field"),text:$replacement)
                     field(ProductText.string("code_field_repeat"),text:$repeated)
                 } else { field(ProductText.string("code_current"),text:$current) }
-                if let error { Text(error).font(.footnote).foregroundStyle(AppPalette.destructive) }
+                if let error { Text(ProductText.systemMessage(error)).font(.footnote).foregroundStyle(AppPalette.destructive) }
 
             }.disabled(working || !model.canManageGuestAccess)
         } footer: {

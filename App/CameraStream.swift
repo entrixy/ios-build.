@@ -170,7 +170,7 @@ struct ObjectCameraStream: View {
             if let message = model.message {
                 VStack(spacing:8) {
                     Text(ProductText.string("stream_unavailable")).font(.subheadline.weight(.semibold))
-                    Text(message).font(.footnote).multilineTextAlignment(.center)
+                    Text(ProductText.systemMessage(message)).font(.footnote).multilineTextAlignment(.center)
                 }.padding(20).frame(maxWidth:.infinity,maxHeight:.infinity).background(Color(uiColor:.secondarySystemGroupedBackground))
             }
         }

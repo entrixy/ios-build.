@@ -30,6 +30,11 @@ jobs:
         if: env.ENTRIXY_FOCUSED_SWITCHES != '1'
         run: swift test 2>&1 | tee .local-checks/ci/core.log
       - name: Prepare healthy simulator before compiling application products
+        id: simulator_prepare
+        timeout-minutes: 25
+        # Retain independent SDK/archive results if the hosted UI service fails.
+        # The explicit acceptance gate below still fails the overall review.
+        continue-on-error: true
         if: github.ref == 'refs/heads/ci/review-batch'
         run: python3 scripts/prepare_review_simulator.py
       - name: Install project generator
@@ -38,6 +43,7 @@ jobs:
         run: xcodegen generate
       - name: Compile application and test bundles without launching scenarios
         id: debug_build
+        timeout-minutes: 30
         run: |
           xcodebuild -project Entrixy.xcodeproj -scheme EntrixyTests \
             -configuration Debug -sdk iphonesimulator \
@@ -51,14 +57,14 @@ jobs:
         if: startsWith(github.ref, 'refs/heads/ci/ui-review')
         run: python3 scripts/test_simulator.py --only-ui --use-built-tests 2>&1 | tee .local-checks/ci/ui-tests.log
       - name: Diagnose the two failing native switch scenarios without a gallery export
-        if: github.ref == 'refs/heads/ci/review-batch' && env.ENTRIXY_FOCUSED_SWITCHES != ''
+        if: github.ref == 'refs/heads/ci/review-batch' && env.ENTRIXY_FOCUSED_SWITCHES != '' && steps.simulator_prepare.outcome == 'success'
         run: |
           python3 scripts/test_simulator.py --only-ui --use-built-tests --prepared-device .local-checks/ci/prepared-device.json --keep-prepared-device --iterations 3 \
             --test EntrixyUITests/NavigationUITests/testCrashConsentAndSevenTapDeveloperLogUseNativeSettingsAndPreserveNavigation \
             --test EntrixyUITests/NavigationUITests/testHomeNetworkConsentAndRemovalUseSystemSectionAndPreserveReceivedKeys \
             2>&1 | tee .local-checks/ci/focused-switches.log
       - name: Verify backup entry, delegation bounds and camera scrolling before full review
-        if: github.ref == 'refs/heads/ci/review-batch' && env.ENTRIXY_FOCUSED_SWITCHES == 'preflight'
+        if: github.ref == 'refs/heads/ci/review-batch' && env.ENTRIXY_FOCUSED_SWITCHES == 'preflight' && steps.simulator_prepare.outcome == 'success'
         run: |
           python3 scripts/test_simulator.py --only-ui --use-built-tests --prepared-device .local-checks/ci/prepared-device.json --keep-prepared-device \
             --test EntrixyUITests/NavigationUITests/testSoundSettingsAndBackupPasswordFormUseRealControlsWithoutExporting \
@@ -73,8 +79,8 @@ jobs:
           path: .local-checks/ci/
           retention-days: 3
       - name: Verify native and UI scenarios with original screenshots in the same simulator pass
-        if: github.ref == 'refs/heads/ci/review-batch' && env.ENTRIXY_FOCUSED_SWITCHES != '1'
-        run: python3 scripts/test_simulator.py --use-built-tests --review-captures --prepared-device .local-checks/ci/prepared-device.json 2>&1 | tee .local-checks/ci/combined-review.log
+        if: github.ref == 'refs/heads/ci/review-batch' && env.ENTRIXY_FOCUSED_SWITCHES != '1' && steps.simulator_prepare.outcome == 'success'
+        run: python3 scripts/test_simulator.py --use-built-tests --review-captures --prepared-device .local-checks/ci/prepared-device.json --keep-prepared-device 2>&1 | tee .local-checks/ci/combined-review.log
       - name: Retain compilation evidence
         # Store candidates use the native renderer after the complete UI pass.
         # Keep them separate from the one-PNG-per-state review gallery.
@@ -85,8 +91,8 @@ jobs:
           path: .local-checks/ci/
           retention-days: 3
       - name: Capture original Store-format JPEG candidates without modifying images
-        if: github.ref == 'refs/heads/ci/review-batch' && env.ENTRIXY_FOCUSED_SWITCHES != '1'
-        run: python3 scripts/capture_store_assets.py 2>&1 | tee .local-checks/ci/store-assets.log
+        if: github.ref == 'refs/heads/ci/review-batch' && env.ENTRIXY_FOCUSED_SWITCHES != '1' && steps.simulator_prepare.outcome == 'success'
+        run: python3 scripts/capture_store_assets.py --prepared-device .local-checks/ci/prepared-device.json 2>&1 | tee .local-checks/ci/store-assets.log
       - name: Retain original Store-format screenshot candidates
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
@@ -99,7 +105,8 @@ jobs:
           retention-days: 3
       - name: Compile Release and verify fixture isolation
         id: release_build
-        if: ${{ !startsWith(github.ref, 'refs/heads/ci/ui-review') && env.ENTRIXY_FOCUSED_SWITCHES != '1' }}
+        timeout-minutes: 25
+        if: ${{ always() && steps.debug_build.outcome == 'success' && !startsWith(github.ref, 'refs/heads/ci/ui-review') && env.ENTRIXY_FOCUSED_SWITCHES != '1' }}
         run: |
           xcodebuild -project Entrixy.xcodeproj -scheme Entrixy \
             -configuration Release -sdk iphonesimulator \
@@ -125,3 +132,8 @@ jobs:
       - name: Clean up retained job-owned simulator
         if: always() && github.ref == 'refs/heads/ci/review-batch'
         run: python3 scripts/prepare_review_simulator.py --cleanup
+      - name: Require healthy simulator for complete review acceptance
+        if: ${{ always() && github.ref == 'refs/heads/ci/review-batch' && steps.simulator_prepare.outcome != 'success' }}
+        run: |
+          echo 'Simulator preparation failed; native/UI review acceptance was not executed.' >&2
+          exit 1

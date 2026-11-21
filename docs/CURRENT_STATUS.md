@@ -5,24 +5,43 @@
 `56155352b0e9f36ef3685aa071a6aafdb2ef6622`, с утверждённым дизайном, затем App Store.
 Порядок работы: [AUTONOMOUS_WORK.md](AUTONOMOUS_WORK.md).
 
-## Новый пакет без физического iPhone — source подготовлен
+## Новый пакет без физического iPhone — ожидает Apple SDK/runtime
 
-Добавлены явный безопасный local reset/PIN recovery с durable cleanup marker,
-защита от старых записей после reset, остановка отклонённого native-only hello
-без удаления ключей, параметризуемые App/Widget IDs и App Group, декларации
-фактических privacy flows и оригинальные JPEG Store candidates в CI.
-«Нарисовать маршрут» центрируется;33 legacy UI подписи используют существующие
-переводы,20 новых ключей есть во всех7 языках (984 Product keys).
+Первый source `cc5f616` / public `dd51a32`, run44924160939 завершился
+неуспешно21.11 в16:37UTC: Apple core прошёл, но два холодных запуска Intel
+симулятора остановились на timeout UI appearance service. Сборка приложения,
+hosted/UI, Release и новые снимки в этом run не запускались. Это инфраструктурный
+сбой, а не подтверждённая ошибка приложения. GitHub connector показывал устаревший
+статус; актуальное завершение проверено через REST без кэша.
+
+Следующий цельный source включает:
+- Явный local reset/PIN recovery: атомарный пустой state с durable cleanup marker,
+  отказ старым моделям в записи и повторной очистке новых данных,9 hosted contracts.
+- Остановка отклонённого native-only hello без удаления ключей и BLE grants;
+  причина переводится при отображении. Сам контракт аттестации ещё не решён.
+- Параметризуемые App/Widget IDs и App Group, проверка собранной конфигурации,
+  безопасный генератор release inputs, фактические privacy declarations.
+- Общий privacy link в System/Help;1423 Product keys во всех7 языках. Переведены
+  активные UI literals и известные системные результаты при отображении, сохраняя
+  исходные значения для протокола/логики и пользовательский текст без изменения.
+  Даты следуют выбранному языку. Добавлен английский UI-сценарий.
+- Центрирование «Нарисовать маршрут», два новых native reset checkpoints.
+- Четыре оригинальных Store JPEG после полного native/UI прохода на том же
+  проверенном симуляторе; независимые Debug/Release/archive при сбое UI service.
+  Ошибка подготовки всё равно делает общий review неуспешным.
+
+Локально: Swift syntax parse PASS (не SDK typecheck); Linux Foundation исполнил
+ProductText с реальными1423×7 resources; структура ключей/placeholder одинакова.
+11 pipeline /6 process /4 release-preparation checks прошли в подготовке.
+Ожидаемый Apple набор:313core/212hosted/33UI +9focused,64nativePNG +4originalJPEG.
+Это ожидаемые количества, новые runtime assertions ещё не приняты.
+До complete CI и просмотра всех новых кадров галерея сохраняет62 d4915bb.
+
 Материалы: [RELEASE_HANDOFF.md](RELEASE_HANDOFF.md),
 [PRIVACY_DATA_FLOWS.md](PRIVACY_DATA_FLOWS.md), `release/metadata/`.
-
-Локально: Swift syntax parse PASS (не Apple SDK typecheck),6 GuestEvent core
-cases PASS,11 pipeline/6 process/4 release-preparation contracts PASS,
-984×7 key/placeholder consistency PASS. Новый Apple runtime ещё НЕ выполнен.
-Ожидаются313core/207hosted/32UI,64 отдельных native PNG и4 original JPEG.
-До actual complete CI/visual review галерея сохраняет прежние62 d4915bb.
-Production APNs tables подготовлены пустыми, provider оставлен отключённым;
-публичная политика дополнена фактическими iOS processing/retention/reset.
+Публичная privacy policy дополнена фактическими iOS flows/retention/reset;
+все7 языковых destinations отвечают HTTPS200. Production APNs schema создана
+пустой, provider отключён. Реальная доставка и signing остаются внешними gates.
 
 ## Выполненный пакет замечаний — 21.11.2026
 
@@ -55,8 +74,8 @@ Production APNs tables подготовлены пустыми, provider ост�
   Прежняя точная причина intermittent input failures не доказана;
   успешный симулятор не заменяет устройство/Release input acceptance.
 - Backend native push: website `d9ec3b6`,23provider/22изолированных DB+HTTP
-  контрактов прошли. Provider config, production migration/worker и реальная
-  APNs доставка не настроены/не проверены. Существующий Android FCM сохранён.
+  контрактов прошли. Production migration выполнена21.11 с пустыми таблицами и отключённым provider;
+  credentials/worker и реальная APNs доставка не настроены/не проверены. Существующий Android FCM сохранён.
 
 Успешный baseline не означает полный перенос или готовность к App Store.
 Снимки показывают viewports тестовых профилей; hardware/реальные аккаунты ими
@@ -80,13 +99,11 @@ Production APNs tables подготовлены пустыми, provider ост�
 - Whole-key `native_only`: server требует attest/attest_ts, ни текущий Android,
   ни iOS hello их не посылают. Это общий source contract gap; не обходить
   проверку и не встраивать server secret. Нужна совместимость обеих платформ.
-- Предупреждение о забытом PIN копирует Android reinstall recovery; iOS Keychain
-  может пережить удаление. Проверить реальный recovery path без молчаливой
-  потери identity/ключей и исправить сообщение/поведение согласованно.
-- Остались legacy строки;964 Product keys в семи языках не означают перевод
-  всех пользовательских ветвей. Проверять активные пути, а не число ключей.
-- Публичная privacy policy пока Android-oriented. Учесть диагностику,
-  promotion install UUID/счётчики, APNs token/retention, location/Maps.
+- Новый reset/recovery и локализация ожидают Apple hosted/UI acceptance. Исходные
+  пользовательские имена и сообщения не переводятся; количество Product keys
+  само по себе не подтверждает полноту всех сценариев.
+- Публичная privacy policy обновлена; final Store answers, account/deletion
+  classification, export compliance и reviewer access ещё не подтверждены.
 - TeamID/BundleID вопрос ранее задан, ответа нет; provisional IDs не считать
   подтверждёнными. Не переспрашивать на каждом шаге и не придумывать доступы.
 

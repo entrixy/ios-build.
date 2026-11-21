@@ -18,36 +18,36 @@ private struct BLEPermissionsContent: View {
     var body: some View {
         List {
             Section {
-                Button("Передать настройки контроллеру") { Task { await model.deliverDecisions(server: server, deviceID: deviceID) } }.buttonStyle(PrimaryActionStyle())
+                Button(ProductText.string("ios_ble_transfer_settings")) { Task { await model.deliverDecisions(server: server, deviceID: deviceID) } }.buttonStyle(PrimaryActionStyle())
                     .disabled(model.busy || app.ownerBusy || records.isEmpty)
-                if model.busy { ProgressView("Передача по Bluetooth…") }
+                if model.busy { ProgressView(ProductText.string("ios_ble_transferring")) }
                 if let text = model.deliveryMessages[deviceID] { Text(text).foregroundStyle(Brand.secondaryInk) }
             } footer: {
-                Text("Поднесите iPhone к контроллеру и разбудите его. Пока контроллер не получил отзыв, ранее выданный офлайн-пропуск может действовать до истечения срока.")
+                Text(ProductText.string("ios_ble_delivery_proximity_hint"))
             }
-            if records.isEmpty { Text("Нет сохранённых изменений доступа").foregroundStyle(Brand.secondaryInk) }
+            if records.isEmpty { Text(ProductText.string("ios_ble_access_changes_empty")).foregroundStyle(Brand.secondaryInk) }
             ForEach(records) { record in
                 Section {
                     Text(guestLabel(record)).font(.headline)
-                    Text(record.revoked ? "Решение владельца: запретить доступ" : "Решение владельца: разрешить доступ")
+                    Text(record.revoked ? ProductText.string("ios_ble_owner_deny") : ProductText.string("ios_ble_owner_allow"))
                     Text(status(record)).foregroundStyle(Brand.secondaryInk)
                     if record.controllerResult == 0x41 {
-                        Button("Подготовить новую версию решения") { Task { await app.refreshOwnerBLEDecision(server: server, record: record) } }.buttonStyle(SecondaryActionStyle())
+                        Button(ProductText.string("ios_ble_decision_new_revision")) { Task { await app.refreshOwnerBLEDecision(server: server, record: record) } }.buttonStyle(SecondaryActionStyle())
                             .disabled(model.busy || app.ownerBusy)
                     }
                 }
             }
         }
-        .navigationTitle("Bluetooth-доступ").navigationBarTitleDisplayMode(.inline)
+        .navigationTitle(ProductText.string("ios_ble_access")).navigationBarTitleDisplayMode(.inline)
     }
     private func guestLabel(_ record: BLERevocation) -> String {
         owner?.issuedKeys?.first(where: { $0.guestID == Int(record.guestID) })?.label
             ?? owner?.delegatedKeys?.first(where: { $0.guestID == Int(record.guestID) })?.label
-            ?? "Гостевой пропуск"
+            ?? ProductText.string("ios_guest_pass")
     }
     private func status(_ record: BLERevocation) -> String {
-        if record.applied { return "Контроллер подтвердил применение" }
-        if record.controllerResult == 0x41 { return "Контроллеру известно это или более новое решение. Точное состояние не подтверждено." }
-        return "Ожидает передачи контроллеру"
+        if record.applied { return ProductText.string("ios_controller_applied_confirmed") }
+        if record.controllerResult == 0x41 { return ProductText.string("ios_ble_newer_decision_unknown") }
+        return ProductText.string("ios_controller_transfer_pending")
     }
 }

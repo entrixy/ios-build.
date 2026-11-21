@@ -250,12 +250,41 @@ final class NavigationUITests: XCTestCase {
         help.tap()
         XCTAssertTrue(app.staticTexts["Как пользоваться приложением"].waitForExistence(timeout:10))
         assertBottom(app,["control","settings","guests","journal"])
+        let privacy = app.descendants(matching:.any).matching(identifier:"privacy-policy").firstMatch
+        bringFullyIntoView(privacy,in:app)
+        XCTAssertTrue(privacy.isHittable); XCTAssertTrue(privacy.label.contains("Политика конфиденциальности"))
         app.navigationBars.buttons.element(boundBy:0).tap()
         app.buttons["header-menu"].tap(); app.buttons["header-language"].tap(); app.buttons["Deutsch"].tap()
         XCTAssertTrue(app.buttons["header-menu"].waitForExistence(timeout:10)); app.buttons["header-menu"].tap()
         XCTAssertEqual(app.buttons["header-help"].label,"Hilfe")
         app.buttons["header-language"].tap(); app.buttons["Русский"].tap()
         XCTAssertTrue(app.buttons["main-tab-settings"].waitForExistence(timeout:10))
+    }
+
+    func testEnglishKeyImportMessagesAndPrivacyUseSelectedLanguageWithoutOpeningExternalContent() {
+        let app = XCUIApplication()
+        app.launchArguments = ["--stage-two","empty","-AppleLanguages","(en)","-AppleLocale","en_US","-entrixy.language","en"]
+        app.launch(); activeApp = app
+        XCTAssertTrue(app.buttons["main-tab-settings"].waitForExistence(timeout:20))
+        app.segmentedControls.buttons["Keys"].tap()
+        XCTAssertTrue(app.staticTexts["No received keys yet"].waitForExistence(timeout:10))
+        app.buttons["Add key"].tap()
+        XCTAssertTrue(app.descendants(matching:.any).matching(identifier:"inviteInput").firstMatch.waitForExistence(timeout:10))
+        XCTAssertTrue(app.buttons["Paste link"].exists)
+        XCTAssertTrue(app.buttons["Scan QR code"].exists)
+        XCTAssertTrue(app.buttons["Choose QR code from Photos"].exists)
+        XCTAssertFalse(app.buttons["Вставить ссылку"].exists)
+        app.buttons["Cancel"].tap()
+        app.segmentedControls.buttons["System"].tap()
+        let messages = app.buttons["Messages"]
+        bringFullyIntoView(messages,in:app); messages.tap()
+        XCTAssertTrue(app.staticTexts["No messages yet"].waitForExistence(timeout:10))
+        XCTAssertTrue(app.staticTexts["Incoming"].exists)
+        app.navigationBars.buttons.element(boundBy:0).tap()
+        let privacy = app.descendants(matching:.any).matching(identifier:"privacy-policy").firstMatch
+        bringFullyIntoView(privacy,in:app)
+        XCTAssertTrue(privacy.isHittable); XCTAssertTrue(privacy.label.contains("Privacy policy"))
+        assertBottom(app,["settings","journal"])
     }
     func testGuestPhoneRequestOffersExplicitCallAndDeclineWithoutTelephoneHandoff() {
         let app = XCUIApplication()
@@ -895,6 +924,7 @@ final class NavigationUITests: XCTestCase {
         bringFullyIntoView(erase,in:app); XCTAssertTrue(erase.isEnabled); XCTAssertTrue(erase.isHittable); erase.tap()
         let restart = app.buttons["local-reset-restart"]
         XCTAssertTrue(restart.waitForExistence(timeout:15)); XCTAssertTrue(app.staticTexts["local-reset-complete"].exists)
+        XCTAssertTrue(restart.isEnabled)
         XCTAssertFalse(confirmation.exists); XCTAssertFalse(app.buttons["Отмена"].exists)
         reviewCapture("local-reset-complete",settledBy:restart)
     }

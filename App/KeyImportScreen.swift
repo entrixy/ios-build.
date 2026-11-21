@@ -19,36 +19,36 @@ struct KeyImportScreen: View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: 24) {
-                    Text("Вставьте ссылку от владельца или добавьте ключ с помощью QR-кода.")
+                    Text(ProductText.string("ios_import_intro"))
                         .font(.body).foregroundStyle(Brand.secondaryInk).fixedSize(horizontal: false, vertical: true)
                     VStack(alignment: .leading, spacing: 10) {
-                        Text("Ключ доступа").font(.subheadline.weight(.semibold)).foregroundStyle(Brand.ink)
-                        TextField("Ссылка или ключ", text: $input, axis: .vertical)
+                        Text(ProductText.string("ios_import_key_label")).font(.subheadline.weight(.semibold)).foregroundStyle(Brand.ink)
+                        TextField(ProductText.string("ios_import_placeholder"), text: $input, axis: .vertical)
                             .lineLimit(3...4).padding(16).foregroundStyle(Brand.ink)
                             .background(Color(uiColor: .secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 14))
                             .overlay(RoundedRectangle(cornerRadius: 14).stroke(Color(uiColor: .separator).opacity(0.5), lineWidth: 1))
                             .textInputAutocapitalization(.never).autocorrectionDisabled()
                             .privacySensitive().accessibilityIdentifier("inviteInput")
-                        if let invite { Text("Сервер: \(invite.server)").font(.subheadline).foregroundStyle(Brand.secondaryInk) }
+                        if let invite { Text(ProductText.string("ios_import_server_fmt",invite.server)).font(.subheadline).foregroundStyle(Brand.secondaryInk) }
                     }
                     if delegation == nil {
                     VStack(spacing: 0) {
                         Button {
                             guard let value = UIPasteboard.general.string, !value.isEmpty else {
-                                importError = "В буфере обмена нет ссылки на ключ."; return
+                                importError = ProductText.string("ios_import_clipboard_empty"); return
                             }
                             accept(value)
-                        } label: { ImportMethodRow(symbol: "doc.on.clipboard", title: "Вставить ссылку") }
+                        } label: { ImportMethodRow(symbol: "doc.on.clipboard", title: ProductText.string("ios_import_paste")) }
                         Divider().padding(.leading, 52)
-                        Button { scanning = true } label: { ImportMethodRow(symbol: "qrcode.viewfinder", title: "Сканировать QR-код") }
+                        Button { scanning = true } label: { ImportMethodRow(symbol: "qrcode.viewfinder", title: ProductText.string("ios_import_scan")) }
                         Divider().padding(.leading, 52)
                         PhotosPicker(selection: $photo, matching: .images) {
-                            ImportMethodRow(symbol: "photo", title: readingPhoto ? "Читаем QR-код…" : "Выбрать QR-код из фото")
+                            ImportMethodRow(symbol: "photo", title: readingPhoto ? ProductText.string("ios_import_reading") : ProductText.string("ios_import_photo"))
                         }.disabled(readingPhoto)
                     }
                     .buttonStyle(.plain).background(Color(uiColor: .secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 16))
                     }
-                    if let importError { Text(importError).font(.subheadline).foregroundStyle(Color(uiColor: .systemRed)) }
+                    if let importError { Text(ProductText.systemMessage(importError)).font(.subheadline).foregroundStyle(Color(uiColor: .systemRed)) }
                     if delegation != nil { DelegationImportSection(manager: delegationManager ?? model.delegationInbox, input: input) }
                     else {
                     Button {
@@ -86,7 +86,7 @@ struct KeyImportScreen: View {
                             throw QRPhotoReader.Failure.noCode
                         }
                         accept(try await QRPhotoReader.read(bytes))
-                    } catch { importError = "Не удалось найти гостевой ключ в QR-коде на фотографии." }
+                    } catch { importError = ProductText.string("ios_import_photo_failure") }
                 }
             }
         }.tint(Brand.ink)
@@ -95,7 +95,7 @@ struct KeyImportScreen: View {
 
     private func accept(_ value: String) {
         do { input = try AccessLink.incomingText(value); importError = nil }
-        catch { importError = "Вставьте полную ссылку или QR-код гостевого ключа Entrixy." }
+        catch { importError = ProductText.string("ios_import_invalid") }
     }
 }
 
@@ -104,10 +104,10 @@ private struct ImportMethodRow: View {
     let title: String
     var body: some View {
         HStack(spacing: 14) {
-            Image(systemName: symbol).font(.system(size: 20)).frame(width: 24)
+            Image(systemName: symbol).font(.system(size: 20)).frame(width: 24).accessibilityHidden(true)
             Text(title).font(.body)
             Spacer(minLength: 4)
-            Image(systemName: "chevron.right").font(.caption.weight(.medium)).foregroundStyle(Brand.secondaryInk)
+            Image(systemName: "chevron.right").font(.caption.weight(.medium)).foregroundStyle(Brand.secondaryInk).accessibilityHidden(true)
         }
         .foregroundStyle(Brand.ink).padding(.horizontal, 16).frame(minHeight: 54).contentShape(Rectangle())
     }

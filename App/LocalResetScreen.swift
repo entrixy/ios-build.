@@ -24,7 +24,7 @@ struct LocalResetScreen: View {
                             _ = model.eraseLocalData(confirmation:confirmation)
                         }.buttonStyle(PrimaryActionStyle()).disabled(confirmation != "RESET" || !model.storageReady || model.busy || model.ownerBusy)
                             .accessibilityIdentifier("local-reset-erase")
-                        if let error = model.errorMessage { Text(error).foregroundStyle(AppPalette.destructive).fixedSize(horizontal:false,vertical:true) }
+                        if let error = model.errorMessage { Text(ProductText.systemMessage(error)).foregroundStyle(AppPalette.destructive).fixedSize(horizontal:false,vertical:true) }
                     }.padding(DesignMetrics.pageInset)
                 }.scrollDismissesKeyboard(.interactively).background(Color(uiColor:.systemGroupedBackground))
                     .taskSheetTitle(ProductText.string("ios_reset_title"))

@@ -10,16 +10,15 @@ The current baseline, remaining work and evidence are maintained in
 [CURRENT_STATUS.md](docs/CURRENT_STATUS.md); use it before the historical notes
 below. The autonomous batch workflow is [AUTONOMOUS_WORK.md](docs/AUTONOMOUS_WORK.md).
 
-Native e2defc3/publicde13dad, [CI44877317284](https://github.com/entrixy/ios-build./actions/runs/44877317284),
-passed Apple312core,197hosted,29UI and6 focused switch cases, Debug/Release/privacy/
-isolation and an unsigned physical-iPhone app/widget archive. All58 original native
-screenshots were inspected and published in the [gallery](https://entrixy.com/ios-design.php),
-replacing56 older frames; public image hashes and desktop/mobile interactions passed.
-The ten authorised review corrections are implemented and recorded in
-[REVIEW_FIXES_20261120.md](docs/REVIEW_FIXES_20261120.md). Earlier intermittent XCTest
-input failures remain documented; their precise cause is not established by a passing
-instrumented simulator run. Signing, actual iPhone/interoperability acceptance and Store
-gates remain open. Backend APNs is verified in isolation, not configured for real delivery.
+The accepted baseline is nativeb18d37f/publicd4915bb,
+[CI44909437420](https://github.com/entrixy/ios-build./actions/runs/44909437420):
+Apple312core,198hosted,31UI +9focused, Debug/Release/privacy/isolation and an
+unsigned physical-iPhone app/widget archive passed. All62 original native frames
+were inspected and published in the [gallery](https://entrixy.com/ios-design.php).
+The next no-iPhone package adds safe explicit local reset, seven-language UI and
+system-result presentation, release identity/privacy preparation and original
+Store screenshot capture. Its new Apple SDK/runtime verification is pending;
+see CURRENT_STATUS.md for exact evidence and external release gates.
 
 The following dated package notes are historical, not the current status.
 

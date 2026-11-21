@@ -16,6 +16,9 @@ TEXT_TOOL = ROOT / '.local-checks/verify-capture-text'
 
 
 def run(*args, timeout=90, optional=False):
+    # Prefix only: retain the operation that started, even if its child stalls.
+    # Do not print arbitrary request bodies or full launch arguments.
+    print('Starting simulator operation:', ' '.join(args[:4]), flush=True)
     try:
         result = subprocess.run(args, text=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, timeout=timeout)
     except subprocess.TimeoutExpired:
