@@ -37,6 +37,17 @@ jobs:
         continue-on-error: true
         if: github.ref == 'refs/heads/ci/review-batch'
         run: python3 scripts/prepare_review_simulator.py 2>&1 | tee .local-checks/ci/simulator-prepare.log
+      - name: Retain simulator preparation evidence before compilation
+        if: always() && github.ref == 'refs/heads/ci/review-batch'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: simulator-readiness-evidence
+          path: |
+            .local-checks/ci/simulator-prepare.log
+            .local-checks/ci/simulator-runtimes.json
+            .local-checks/ci/prepared-device.json
+            .local-checks/ci/simulator-preflight.png
+          retention-days: 3
       - name: Install project generator
         run: brew install xcodegen
       - name: Generate project

@@ -14,6 +14,23 @@ from capture_simulator import create_booted_device, cleanup_device, run
 def source_sha():
     return os.environ.get('GITHUB_SHA') or subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip()
 
+def runtime_metadata_before_scenarios():
+    """One bounded recovery for the observed hosted cold-service metadata stall.
+
+    Only initial preparation calls this, before creating a device or installing
+    an app. Reuse/cleanup checks after scenarios must never restart the service.
+    """
+    command = ['xcrun','simctl','list','runtimes','--json']
+    try:
+        raw = subprocess.check_output(command,text=True,timeout=60)
+    except subprocess.TimeoutExpired:
+        if os.environ.get('GITHUB_ACTIONS') != 'true':
+            raise
+        print('Initial runtime list timed out; restarting disposable hosted CoreSimulator once before scenarios',flush=True)
+        run('killall','-9','com.apple.CoreSimulator.CoreSimulatorService',timeout=15,optional=True)
+        raw = subprocess.check_output(command,text=True,timeout=60)
+    return json.loads(raw)
+
 
 def capture_health_frame(device, frame):
     # Renderer readiness belongs to the same bounded cold-boot recovery as the
@@ -63,7 +80,7 @@ def main():
     args.output.parent.mkdir(parents=True,exist_ok=True)
     print('Reading installed iOS SDK/runtime metadata with a bounded deadline',flush=True)
     sdk = subprocess.check_output(['xcrun','--sdk','iphonesimulator','--show-sdk-version'],text=True,timeout=60).strip()
-    runtimes = json.loads(subprocess.check_output(['xcrun','simctl','list','runtimes','--json'],text=True,timeout=60))
+    runtimes = runtime_metadata_before_scenarios()
     (args.output.parent/'simulator-runtimes.json').write_text(json.dumps(runtimes,indent=2)+'\n')
     runtime = next(r['identifier'] for r in runtimes['runtimes'] if r.get('isAvailable') and '.iOS-' in r['identifier'] and (r['version'] == sdk or r['version'].startswith(sdk+'.')))
     if os.environ.get('GITHUB_ACTIONS') == 'true':

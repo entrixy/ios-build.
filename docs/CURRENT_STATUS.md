@@ -7,19 +7,28 @@
 
 ## Новый пакет без физического iPhone — два UI исправления ожидают проверки
 
-Следующий source00573f0/publicfa6f665, run44941648937 собрал Debug, однако
-preflight/full UI были пропущены: artifact не содержит prepared-device.json или
-simulator runtime metadata. REST показывает подготовку как success, но шаг имеет
-continue-on-error, поэтому по одному conclusion готовность не подтверждается.
-Точный вывод ожидает job log; это НЕ результат двух UI-исправлений. Независимый
-Release/archive выполняется. Вместо слепого полного повтора запускается отдельный
-simulator-health на Intel/ARM, с сохранением полного preparation log в artifact.
+Исправленный source00573f0/publicfa6f665, run44941648937:313core, Debug,
+Release/privacy/isolation и unsigned arm64 iPhone app/widget archive прошли.
+Но UI вообще не запускался: начальный `simctl list runtimes --json` превысил60с.
+Общий run неуспешен по обязательному simulator-health gate;2 UI-исправления
+этим запуском НЕ проверены. Нельзя выводить готовность из REST conclusion шага
+с continue-on-error: нужны prepared-device evidence и действительный UI result.
 
+Вместо слепого полного повтора выполнен отдельный run44942724439/source3445040:
+Intel и ARM оба прошли. Оба SHA-verified artifacts содержат source-owned iOS26.2
+prepared-device reports и1179×2556 native health frames; это НЕ снимки приложения.
+Добавлено ограниченное восстановление только обнаруженного metadata timeout:
+один restart CoreSimulator на disposable GHA host ДО создания устройства/сценариев,
+затем один повтор того же запроса. На Mac разработчика, при иных ошибках или
+повторном timeout восстановление не выполняется/ошибка не скрывается. Проверено
+тремя новыми boundary cases (всего14pipeline). Reuse/cleanup после UI службу
+не перезапускает. Полный preparation log сохраняется сразу, до компиляции.
 
 Source `de3e44d` / public `dbd5e1d`, run44931604741: Apple313core, Debug app/widget/
 test bundles,212hosted и9focused прошли. Общий UI:31из33 прошли; два новых сценария
 не прошли. Получены62из64PNG, complete=false/tests_succeeded=false; не опубликованы.
-Store capture после ошибки пропущен; независимые Release/archive ещё проверяются.
+Store capture после ошибки пропущен; Release/privacy/isolation и unsigned
+iPhone app/widget archive прошли, upload_ready=false.
 
 Причины и следующий цельный fix:
 - Reset sheet был прикреплён к Group из нескольких List Sections и не открывался.
@@ -57,8 +66,8 @@ Production APNs schema создана пустой, provider отключён.
 service до Debug. Новый fresh host эту ошибку не воспроизвёл. Это отдельный
 инфраструктурный сбой, не причина двух UI failures выше.
 
-Локально для исправлений: Swift syntax parse PASS (не SDK typecheck),11 pipeline
-contracts/YAML/diff PASS. Новый Apple runtime ещё не исполнен. Ожидаемый итог:
+Локально для исправлений: Swift syntax parse PASS (не SDK typecheck),14 pipeline
+contracts/Python AST/YAML/diff PASS. Новый Apple runtime ещё не исполнен. Ожидаемый итог:
 313core/212hosted/33UI +2focused,64nativePNG +4originalJPEG на том же симуляторе.
 До complete CI и просмотра всех новых кадров галерея сохраняет62 d4915bb.
 Материалы: [RELEASE_HANDOFF.md](RELEASE_HANDOFF.md),

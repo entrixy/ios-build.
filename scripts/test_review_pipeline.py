@@ -15,10 +15,45 @@ import zlib
 from export_ui_review import export_review
 from test_simulator import review_test_products
 from capture_simulator import create_booted_device
-from prepare_review_simulator import prepared_device
+from prepare_review_simulator import prepared_device, runtime_metadata_before_scenarios
 
 
 class ReviewPipelineTests(unittest.TestCase):
+    def testHostedInitialMetadataStallRecoversOnceBeforeAnyDeviceOrScenario(self):
+        events = []
+        def metadata(*args,**kwargs):
+            events.append('metadata')
+            if len(events) == 1:
+                raise subprocess.TimeoutExpired(args[0],60)
+            return '{"runtimes":[]}'
+        def restart(*args,**kwargs):
+            events.append('restart')
+        with patch('prepare_review_simulator.subprocess.check_output',side_effect=metadata) as query,patch('prepare_review_simulator.run',side_effect=restart) as execute,patch.dict('os.environ',{'GITHUB_ACTIONS':'true'}):
+            self.assertEqual(runtime_metadata_before_scenarios(),{'runtimes':[]})
+            self.assertEqual(events,['metadata','restart','metadata'])
+            self.assertEqual(query.call_count,2)
+            self.assertTrue(all(c.kwargs == {'text':True,'timeout':60} for c in query.call_args_list))
+            execute.assert_called_once_with('killall','-9','com.apple.CoreSimulator.CoreSimulatorService',timeout=15,optional=True)
+
+    def testMetadataStallNeverRestartsADevelopersSimulatorService(self):
+        with patch('prepare_review_simulator.subprocess.check_output',side_effect=subprocess.TimeoutExpired('runtime-list',60)) as query,patch('prepare_review_simulator.run') as execute,patch.dict('os.environ',{'GITHUB_ACTIONS':'false'}):
+            with self.assertRaises(subprocess.TimeoutExpired):
+                runtime_metadata_before_scenarios()
+            self.assertEqual(query.call_count,1)
+            execute.assert_not_called()
+
+    def testHostedMetadataRecoveryIsBoundedAndDoesNotHideOtherFailures(self):
+        failures = [
+            (subprocess.TimeoutExpired('runtime-list',60),2,1),
+            (subprocess.CalledProcessError(1,'runtime-list'),1,0),
+        ]
+        for failure,queries,restarts in failures:
+            with self.subTest(failure=type(failure).__name__),patch('prepare_review_simulator.subprocess.check_output',side_effect=failure) as query,patch('prepare_review_simulator.run') as execute,patch.dict('os.environ',{'GITHUB_ACTIONS':'true'}):
+                with self.assertRaises(type(failure)):
+                    runtime_metadata_before_scenarios()
+                self.assertEqual(query.call_count,queries)
+                self.assertEqual(execute.call_count,restarts)
+
     def preparedFixture(self, root):
         path = Path(root)/'device.json'
         report = {'source_sha':'a'*40,'runtime':'iOS-runtime','device':'11111111-1111-4111-8111-111111111111'}

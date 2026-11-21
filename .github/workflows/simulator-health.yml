@@ -12,7 +12,7 @@ jobs:
       matrix:
         runner: [macos-15, macos-15-intel]
     runs-on: ${{ matrix.runner }}
-    timeout-minutes: 15
+    timeout-minutes: 25
     env:
       DEVELOPER_DIR: /Applications/Xcode_26.3.app/Contents/Developer
     defaults:
@@ -26,6 +26,7 @@ jobs:
           xcodebuild -version | tee .local-checks/ci/toolchain.log
           uname -m | tee .local-checks/ci/architecture.log
       - name: Probe simulator without building or running application scenarios
+        timeout-minutes: 20
         run: python3 scripts/prepare_review_simulator.py 2>&1 | tee .local-checks/ci/simulator-prepare.log
       - name: Clean up job-owned simulator
         if: always()

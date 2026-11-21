@@ -69,3 +69,9 @@
 Прежние6 switch +3 backup/delegation/camera уже прошли на этом source и остаются
 в полном наборе; их отдельное повторение убрано. Старые случаи не удалены и
 assertions не ослаблены. `--test`/`--iterations` остаются для адресной диагностики.
+
+Начальный metadata timeout подтверждён run44941648937. Только до создания
+устройства/сценариев разрешён один bounded restart на disposable GHA host и
+один повтор запроса. Developer Mac и проверки повторно используемого устройства
+службу не перезапускают. Подготовку считать прошедшей по prepared-device evidence,
+не по REST conclusion шага с continue-on-error; общий fail gate обязателен.
