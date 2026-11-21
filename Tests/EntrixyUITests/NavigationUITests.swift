@@ -394,13 +394,14 @@ final class NavigationUITests: XCTestCase {
         XCTAssertGreaterThanOrEqual(cancel.frame.minY,send.frame.maxY)
         reviewCapture("backup-password",settledBy:cancel)
         let password=app.secureTextFields["Пароль копии"],repeated=app.secureTextFields["Повторите пароль"]
-        password.tap();password.typeText("native-review-only")
-        XCTAssertEqual((password.value as? String)?.count,17)
+        let enteredPassword="native-review-only"
+        password.tap();password.typeText(enteredPassword)
+        XCTAssertEqual((password.value as? String)?.count,enteredPassword.count)
         password.typeText("\n")
         XCTAssertFalse(save.isEnabled)
         XCTAssertTrue(waitForStable(repeated,in:app));repeated.tap()
-        repeated.typeText("native-review-only")
-        XCTAssertEqual((repeated.value as? String)?.count,17)
+        repeated.typeText(enteredPassword)
+        XCTAssertEqual((repeated.value as? String)?.count,enteredPassword.count)
         repeated.typeText("\n")
         XCTAssertTrue(waitForStable(cancel,in:app))
         XCTAssertTrue(save.isEnabled);XCTAssertTrue(send.isEnabled);XCTAssertTrue(cancel.isEnabled)
@@ -710,16 +711,22 @@ final class NavigationUITests: XCTestCase {
         inspectObjectConditions(app)
         app.buttons["Закрыть"].tap()
         XCTAssertTrue(app.buttons["owner-object-automation"].waitForExistence(timeout: 10))
+    }
+    func testObjectCameraSettingsStayInsideEditorWhileScrolling() {
+        let app=launch("owner-expanded")
+        app.buttons.matching(NSPredicate(format:"identifier BEGINSWITH %@","object-edit-owner:")).firstMatch.tap()
+        XCTAssertTrue(app.staticTexts["owner-object-title"].waitForExistence(timeout:10))
         let camera = app.descendants(matching:.any).matching(identifier:"object-camera-enabled").firstMatch
         bringIntoView(camera,in:app); tapSwitchControl(nativeSwitch(camera),in:app)
         let address = app.textFields["object-camera-url"]
-        XCTAssertTrue(address.waitForExistence(timeout:10)); bringIntoView(address,in:app)
-        for _ in 0..<5 {
-            if address.frame.minY <= app.frame.height*0.30 { break }
-            app.coordinate(withNormalizedOffset:CGVector(dx:0.5,dy:0.72)).press(forDuration:0.05,
-                thenDragTo:app.coordinate(withNormalizedOffset:CGVector(dx:0.5,dy:0.48)))
-        }
-        reviewCapture("object-camera-settings",settledBy:address)
+        XCTAssertTrue(address.waitForExistence(timeout:10))
+        // Scroll the actual Form viewport until its last option is visible;
+        // screen-relative swipes could start on the sheet's cancellation footer.
+        let nearby=app.buttons["camera-show-nearby"]
+        bringIntoView(nearby,in:app)
+        XCTAssertTrue(app.staticTexts["owner-object-title"].exists)
+        XCTAssertTrue(nearby.isHittable)
+        reviewCapture("object-camera-settings",settledBy:nearby)
     }
 
     func testCallGuestPreferencesAndDeviceAccessUseActualEditorsWithoutIssuingOrConnecting() {

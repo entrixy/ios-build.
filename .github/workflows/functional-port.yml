@@ -57,6 +57,14 @@ jobs:
             --test EntrixyUITests/NavigationUITests/testCrashConsentAndSevenTapDeveloperLogUseNativeSettingsAndPreserveNavigation \
             --test EntrixyUITests/NavigationUITests/testHomeNetworkConsentAndRemovalUseSystemSectionAndPreserveReceivedKeys \
             2>&1 | tee .local-checks/ci/focused-switches.log
+      - name: Verify backup entry, delegation bounds and camera scrolling before full review
+        if: github.ref == 'refs/heads/ci/review-batch' && env.ENTRIXY_FOCUSED_SWITCHES == 'preflight'
+        run: |
+          python3 scripts/test_simulator.py --only-ui --use-built-tests --prepared-device .local-checks/ci/prepared-device.json --keep-prepared-device \
+            --test EntrixyUITests/NavigationUITests/testSoundSettingsAndBackupPasswordFormUseRealControlsWithoutExporting \
+            --test EntrixyUITests/NavigationUITests/testDelegatedAccessShowsSeveralLevelsAndPoolWithoutCreatingKey \
+            --test EntrixyUITests/NavigationUITests/testObjectCameraSettingsStayInsideEditorWhileScrolling \
+            2>&1 | tee .local-checks/ci/focused-review.log
       - name: Retain focused diagnosis before the complete acceptance pass
         if: always() && github.ref == 'refs/heads/ci/review-batch' && env.ENTRIXY_FOCUSED_SWITCHES != ''
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02

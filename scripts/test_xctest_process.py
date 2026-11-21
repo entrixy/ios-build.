@@ -8,6 +8,7 @@ import sys
 import tempfile
 import time
 import unittest
+from unittest.mock import patch
 from run_xctest import run_xctest
 
 
@@ -58,6 +59,16 @@ class XCTestProcessTests(unittest.TestCase):
             with self.assertRaisesRegex(RuntimeError,'without starting'):
                 self.invoke("print('No test was launched')",report,startup_timeout=1,timeout=3)
             self.assertEqual(json.loads(report.read_text())['phase'],'no-tests')
+
+    def testProtectedProcessGroupStillStopsOwnedChildAndPreservesTimeoutEvidence(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            report=Path(temporary)/'progress.json'
+            with patch('run_xctest.os.killpg',side_effect=PermissionError('protected descendant')):
+                with self.assertRaises(subprocess.TimeoutExpired):
+                    self.invoke("import time;print(\"Test Case 'case' started\",flush=True);time.sleep(20)",report,startup_timeout=0.2,timeout=0.4)
+            value=json.loads(report.read_text())
+            self.assertEqual(value['phase'],'runtime-timeout')
+            self.assertTrue(value['tests_started']);self.assertIsNotNone(value['exit_code'])
 
 
 if __name__ == '__main__':unittest.main()

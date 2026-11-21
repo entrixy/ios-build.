@@ -120,7 +120,10 @@ def main():
             command.append('-only-testing:EntrixyUITests')
         elif args.only_native:
             command.append('-only-testing:EntrixyAppTests')
-        run_xctest(command,timeout=3600 if args.review_captures else 1800,
+        # The complete suite also includes native map gestures and bounded
+        # counters. Keep a finite 90-minute budget on slower hosted Macs;
+        # launch detection, assertions and the no-replay policy are unchanged.
+        run_xctest(command,timeout=5400 if args.review_captures else 1800,
                    report_path=Path('.local-checks/ci/xctest-progress.json'))
         tests_succeeded = True
     except (subprocess.CalledProcessError, subprocess.TimeoutExpired):

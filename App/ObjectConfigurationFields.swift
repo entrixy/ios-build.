@@ -114,6 +114,7 @@ struct ObjectCameraFields: View {
             Text(ProductText.string("snap_show_when_title")).font(.subheadline)
             ForEach(["always","call","nearby"],id:\.self) { value in
                 ObjectRadioChoice(title:ProductText.string("snap_when_"+value),selected:camera.showWhen == value) { camera.showWhen=value }
+                    .accessibilityIdentifier("camera-show-"+value)
             }
         }
     }

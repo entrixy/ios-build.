@@ -40,10 +40,12 @@ def run_xctest(command, *, startup_timeout=300, timeout=3600, report_path=None):
         if process.poll() is None:
             try: os.killpg(process.pid,signal.SIGTERM)
             except ProcessLookupError: pass
+            except PermissionError: process.terminate()
             try: process.wait(timeout=10)
             except subprocess.TimeoutExpired:
                 try: os.killpg(process.pid,signal.SIGKILL)
                 except ProcessLookupError: pass
+                except PermissionError: process.kill()
                 process.wait(timeout=10)
 
     next_heartbeat = 0
