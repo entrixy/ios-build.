@@ -95,6 +95,9 @@ jobs:
             .local-checks/ci/store-assets.log
           if-no-files-found: ignore
           retention-days: 3
+      - name: Release job-owned simulator before Release compilation
+        if: always() && github.ref == 'refs/heads/ci/review-batch'
+        run: python3 scripts/prepare_review_simulator.py --cleanup
       - name: Compile Release and verify fixture isolation
         id: release_build
         timeout-minutes: 25
@@ -121,9 +124,6 @@ jobs:
             .local-checks/ci/release-build.log
           if-no-files-found: ignore
           retention-days: 3
-      - name: Clean up retained job-owned simulator
-        if: always() && github.ref == 'refs/heads/ci/review-batch'
-        run: python3 scripts/prepare_review_simulator.py --cleanup
       - name: Require healthy simulator for complete review acceptance
         if: ${{ always() && github.ref == 'refs/heads/ci/review-batch' && steps.simulator_prepare.outcome != 'success' }}
         run: |
