@@ -964,3 +964,19 @@
 "ios_guest_call_request_body" = "对象：%@。请打开 Entrixy 以拨打电话。";
 "ios_guest_call_expired" = "请求已过期";
 "ios_call_now" = "拨打";
+
+/* Shared action states, map controls and delegation review — 21 Nov 2026. */
+"ios_action_working" = "正在处理…";
+"ios_map_expand" = "展开地图";
+"ios_map_collapse" = "收起地图";
+"ios_map_draw_corridor" = "绘制通行走廊";
+"ios_guest_open_request" = "访客“%@”请求打开“%@”。";
+"ios_call_question" = "拨打电话？";
+"ios_manual_call_question" = "拨打电话以打开“%@”？";
+"ios_request_open_question" = "请求打开“%@”？";
+"ios_manual_open_question" = "打开“%@”？";
+"ios_backup_save_file" = "保存文件";
+"ios_backup_share_file" = "分享备份";
+"ios_delegation_depth" = "可转授层数";
+"ios_delegation_key_count" = "可转授钥匙数量";
+"ios_map_draw_hint" = "点按“绘制通行走廊”，然后用手指画出从入口到大门的接近路线。";

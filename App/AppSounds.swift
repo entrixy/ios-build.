@@ -208,14 +208,14 @@ struct SoundSettingsRows: View {
                         Text(ProductText.string("settings_sound_master_volume")).font(.subheadline.weight(.semibold))
                         Spacer(minLength:4); Text("\(Int(volume*100))% ").font(.subheadline).foregroundStyle(Brand.secondaryInk)
                     }
-                    Slider(value:$volume,in:0...1,onEditingChanged:{ editing in if !editing { sounds.setVolume(volume) } }).tint(Brand.ink)
+                    Slider(value:$volume,in:0...1,onEditingChanged:{ editing in if !editing { sounds.setVolume(volume) } }).tint(AppPalette.selected)
                 }.padding(.vertical,4)
             }
             ForEach(AppSoundEvent.allCases) { event in
                 Section {
                     HStack(spacing:8) {
-                        Button { sounds.play(event) } label: { Image(systemName:"play.fill").font(.system(size:30)).frame(width:44,height:48) }
-                            .buttonStyle(.plain).foregroundStyle(Brand.ink).disabled(sounds.muted.contains(event))
+                        Button { sounds.play(event) } label: { Image(systemName:"play.fill").resizable().scaledToFit().frame(width:24,height:24) }
+                            .buttonStyle(SquareIconActionStyle()).disabled(sounds.muted.contains(event))
                             .accessibilityLabel(event.title)
                         VStack(alignment:.leading,spacing:5) {
                             Text(event.title).font(.subheadline.weight(.semibold)).foregroundStyle(sounds.muted.contains(event) ? Brand.secondaryInk : Brand.ink)
@@ -223,11 +223,11 @@ struct SoundSettingsRows: View {
                                 .font(.caption).foregroundStyle(Brand.secondaryInk)
                         }.frame(maxWidth:.infinity,alignment:.leading)
                         if !sounds.muted.contains(event) {
-                            Button { importing = event; choosingFile = true } label: { Image("android-upload-file").resizable().scaledToFit().frame(width:24,height:24).frame(width:44,height:44) }
-                                .buttonStyle(.plain).accessibilityLabel(ProductText.string("settings_sound_upload"))
+                            Button { importing = event; choosingFile = true } label: { Image("android-upload-file").resizable().scaledToFit().frame(width:24,height:24) }
+                                .buttonStyle(SquareIconActionStyle()).accessibilityLabel(ProductText.string("settings_sound_upload"))
                             if sounds.custom.contains(event) {
-                                Button { sounds.reset(event) } label: { Image(systemName:"arrow.counterclockwise").font(.system(size:21)).frame(width:44,height:44) }
-                                    .buttonStyle(.plain).accessibilityLabel(ProductText.string("settings_sound_reset"))
+                                Button { sounds.reset(event) } label: { Image(systemName:"arrow.counterclockwise").resizable().scaledToFit().frame(width:24,height:24) }
+                                    .buttonStyle(SquareIconActionStyle()).accessibilityLabel(ProductText.string("settings_sound_reset"))
                             }
                         }
                         Toggle(event.title,isOn:Binding(get:{ !sounds.muted.contains(event) },set:{ sounds.setEnabled(event,$0) })).labelsHidden().fixedSize()

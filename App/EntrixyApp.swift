@@ -26,6 +26,7 @@ struct EntrixyApp: App {
             LiveAppRoot()
             #endif
             }
+            .toggleStyle(SwitchToggleStyle(tint:AppPalette.selected))
             .preferredColorScheme(appearance == "light" ? .light : appearance == "dark" ? .dark : nil)
         }
     }

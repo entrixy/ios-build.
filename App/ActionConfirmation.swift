@@ -54,7 +54,15 @@ struct ActionConfirmation: View {
                             .buttonStyle(SecondaryActionStyle()).accessibilityIdentifier("action-confirmation-biometric")
                     }
                 } else {
-                    Text(ProductText.string("automation_confirm_hint_guest")).font(.body)
+                    HStack(alignment:.top,spacing:16) {
+                        if let entry = model.catalogObject(request.target) {
+                            CatalogAvatar(entry:entry,size:64)
+                                .accessibilityElement(children:.ignore).accessibilityAddTraits(.isImage)
+                                .accessibilityLabel(objectLabel).accessibilityIdentifier("action-object-image")
+                        }
+                        Text(ProductText.string(guestIntent != nil ? "ios_request_open_question" : model.catalogObject(request.target)?.kind == "call" ? "ios_manual_call_question" : "ios_manual_open_question",objectLabel))
+                            .font(.body).frame(maxWidth:.infinity,alignment:.leading)
+                    }
                 }
                 if let message { Text(message).font(.footnote).foregroundStyle(AppPalette.destructive) }
 

@@ -46,7 +46,7 @@ struct CatalogStatusAvatar: View {
         }
     }
     private func color(_ status: CatalogAvailability) -> Color {
-        switch status { case .ready: return .green; case .connecting: return .orange; case .neutral: return Brand.primary; case .offline, .unknown: return .red }
+        switch status { case .ready: return AppPalette.statusReady; case .connecting, .neutral: return AppPalette.statusBlue; case .offline, .unknown: return AppPalette.statusOffline }
     }
     private func description(_ status: CatalogAvailability) -> String {
         switch status {
@@ -298,7 +298,7 @@ private struct ReceivedObjectNameScreen: View {
                     Button(ProductText.string("btn_save")) { let name = label; editing = false; if model.renameReceivedObject(target,label:name) { dismiss() } }
                         .buttonStyle(PrimaryActionStyle()).actionListRow().disabled(model.busy || model.catalogObject(target) == nil)
                 }
-            }.navigationTitle("Название объекта").navigationBarTitleDisplayMode(.inline)
+            }.taskSheetTitle("Название объекта",form:true)
                 .sheetDismissFooter(disabled: model.busy) { dismiss() }
                 .task {
                     guard !initialized else { return }; initialized = true

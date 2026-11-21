@@ -36,9 +36,10 @@ struct GuestObjectAccessEditor: View {
             ScrollView {
                 VStack(alignment: .leading, spacing: 20) {
                     GuestAccessFields(value:$value,showNative:showNative,maxDepth:maxDepth,maxPool:maxPool)
+                        .padding(16).background(Color(uiColor:.secondarySystemGroupedBackground),in:RoundedRectangle(cornerRadius:16))
                     Button(ProductText.string("btn_ok")) { dismiss() }.buttonStyle(PrimaryActionStyle())
                 }.padding(DesignMetrics.pageInset)
-            }.background(Color(uiColor: .systemGroupedBackground)).navigationTitle(title).navigationBarTitleDisplayMode(.inline)
+            }.background(Color(uiColor: .systemGroupedBackground)).taskSheetTitle(title)
         }
     }
 }
@@ -55,12 +56,12 @@ struct GuestBLELifetimeEditor: View {
                 let index = BLETokenLifetime.levels.firstIndex(of: seconds) ?? 5
                 Text(ProductText.string(keys[index])).font(.title2).frame(maxWidth: .infinity).accessibilityIdentifier("guest-ble-lifetime-value")
                 Slider(value: Binding(get: { Double(index) }, set: { seconds = BLETokenLifetime.levels[Int($0)] }),
-                    in: 0...Double(BLETokenLifetime.levels.count-1), step: 1).accessibilityIdentifier("guest-ble-lifetime")
+                    in: 0...Double(BLETokenLifetime.levels.count-1), step: 1).accessibilityIdentifier("guest-ble-lifetime").tint(AppPalette.selected)
                 HStack { Text(ProductText.string(keys[0])); Spacer(); Text(ProductText.string(keys.last!)) }.font(.footnote)
                 Text(ProductText.string("guest_key_ttl_note")).font(.footnote).foregroundStyle(Brand.secondaryInk)
                 Spacer(minLength: 0)
             }.padding(DesignMetrics.pageInset).background(Color(uiColor: .systemGroupedBackground))
-                .navigationTitle(ProductText.string("guest_key_ttl_title")).navigationBarTitleDisplayMode(.inline)
+                .taskSheetTitle(ProductText.string("guest_key_ttl_title"))
                 .sheetDismissFooter(ProductText.string("btn_close")) { dismiss() }
         }
     }
@@ -113,7 +114,7 @@ struct GuestInvocationEditor: View {
                     }
                 }.padding(DesignMetrics.pageInset)
             }.background(Color(uiColor: .systemGroupedBackground))
-                .navigationTitle(object?.kind == "call" ? ProductText.string("guest_call_title", label) : label).navigationBarTitleDisplayMode(.inline)
+                .taskSheetTitle(object?.kind == "call" ? ProductText.string("guest_call_title", label) : label)
                 .task { if preference.reaction != "off" { rememberedReaction = preference.reaction } }
         }
         .sheetDismissFooter(ProductText.string("btn_close"),disabled:working) { dismiss() }
@@ -158,15 +159,31 @@ struct GuestAccessFields: View {
                         Text(ProductText.string("guests_allow_delegate"))
                         Text(ProductText.string("guests_allow_delegate_hint")).font(.footnote).foregroundStyle(Brand.secondaryInk)
                     }
-                }
+                }.accessibilityIdentifier("delegation-enabled")
                 if value.depth > 0 {
-                    Stepper(value:Binding(get:{ value.depth },set:{ change(depth:$0) }),in:1...maxDepth) { Text(String(value.depth)) }
+                    Stepper(value:Binding(get:{ value.depth },set:{ change(depth:$0) }),in:1...maxDepth) {
+                        HStack {
+                            Text(ProductText.string("ios_delegation_depth"))
+                            Spacer()
+                            Text(String(value.depth)).bold().foregroundStyle(AppPalette.selected)
+                                .accessibilityIdentifier("delegation-depth-value")
+                        }
+                    }.tint(AppPalette.selected).accessibilityLabel(ProductText.string("ios_delegation_depth"))
+                        .accessibilityValue(String(value.depth)).accessibilityIdentifier("delegation-depth")
                     if maxPool > 1 {
                         VStack(alignment:.leading,spacing:5) {
                             Text(ProductText.string("guests_pass_pool"))
                             Text(ProductText.string("guests_pass_pool_hint")).font(.footnote).foregroundStyle(Brand.secondaryInk)
                         }
-                        Stepper(value:Binding(get:{ value.pool },set:{ change(pool:$0) }),in:1...maxPool) { Text(String(value.pool)) }
+                        Stepper(value:Binding(get:{ value.pool },set:{ change(pool:$0) }),in:1...maxPool) {
+                            HStack {
+                                Text(ProductText.string("ios_delegation_key_count"))
+                                Spacer()
+                                Text(String(value.pool)).bold().foregroundStyle(AppPalette.selected)
+                                    .accessibilityIdentifier("delegation-pool-value")
+                            }
+                        }.tint(AppPalette.selected).accessibilityLabel(ProductText.string("ios_delegation_key_count"))
+                            .accessibilityValue(String(value.pool)).accessibilityIdentifier("delegation-pool")
                     }
                 }
             }

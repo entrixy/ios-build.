@@ -964,3 +964,19 @@
 "ios_guest_call_request_body" = "Objekt: %@. Öffnen Sie Entrixy, um anzurufen.";
 "ios_guest_call_expired" = "Die Anfrage ist abgelaufen";
 "ios_call_now" = "Anrufen";
+
+/* Shared action states, map controls and delegation review — 21 Nov 2026. */
+"ios_action_working" = "Wird ausgeführt…";
+"ios_map_expand" = "Karte vergrößern";
+"ios_map_collapse" = "Karte verkleinern";
+"ios_map_draw_corridor" = "Korridor zeichnen";
+"ios_guest_open_request" = "Gast „%@“ möchte „%@“ öffnen.";
+"ios_call_question" = "Anrufen?";
+"ios_manual_call_question" = "Zum Öffnen von „%@“ anrufen?";
+"ios_request_open_question" = "Öffnung von „%@“ anfragen?";
+"ios_manual_open_question" = "„%@“ öffnen?";
+"ios_backup_save_file" = "Datei speichern";
+"ios_backup_share_file" = "Sicherung teilen";
+"ios_delegation_depth" = "Weitergabe-Ebenen";
+"ios_delegation_key_count" = "Weitergebbare Schlüssel";
+"ios_map_draw_hint" = "Tippe auf „Korridor zeichnen“ und zeichne den Weg von der Einfahrt zum Tor.";

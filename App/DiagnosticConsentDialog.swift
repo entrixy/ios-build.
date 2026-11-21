@@ -88,7 +88,7 @@ struct DiagnosticConsentPresenter: UIViewControllerRepresentable {
 }
 
 private final class ConsentActionButton: UIButton {
-    var pressedOpacity: CGFloat = 0.86
+    var pressedOpacity: CGFloat = 0.85
     override var isHighlighted: Bool { didSet { alpha = isHighlighted ? pressedOpacity : 1 } }
 }
 
@@ -148,10 +148,11 @@ private final class ConsentActionButton: UIButton {
                 bottom:DesignMetrics.actionVerticalPadding,right:DesignMetrics.actionHorizontalPadding)
             button.layer.cornerRadius = DesignMetrics.actionRadius; button.clipsToBounds = true
             button.heightAnchor.constraint(greaterThanOrEqualToConstant:DesignMetrics.primaryHeight).isActive = true
-            button.setTitleColor(UIColor(Brand.secondaryInk),for:.disabled)
+            button.setTitleColor(UIColor(AppPalette.disabledText),for:.disabled)
+            button.layer.borderWidth = 1
             footer.addArrangedSubview(button)
         }
-        later.pressedOpacity = 0.8
+        later.pressedOpacity = 0.85
         later.accessibilityIdentifier = "diagnostic-consent-later"
         allow.accessibilityIdentifier = "diagnostic-consent-allow"
         later.addAction(UIAction { [weak self] _ in self?.consent?(false) },for:.touchUpInside)
@@ -190,8 +191,10 @@ private final class ConsentActionButton: UIButton {
         later.setTitle(next.later,for:.normal)
         allow.setTitle(next.allow,for:.normal)
         later.isEnabled = ready; allow.isEnabled = ready
-        later.backgroundColor = ready ? UIColor(AppPalette.secondary) : .systemGray5
-        allow.backgroundColor = ready ? UIColor(Brand.ink) : .tertiarySystemFill
+        later.backgroundColor = ready ? UIColor(AppPalette.secondary) : UIColor(AppPalette.disabledSurface)
+        allow.backgroundColor = ready ? UIColor(Brand.ink) : UIColor(AppPalette.disabledSurface)
+        later.layer.borderColor = UIColor(ready ? Brand.ink : AppPalette.disabledBorder).cgColor
+        allow.layer.borderColor = UIColor(ready ? Brand.ink : AppPalette.disabledBorder).cgColor
         later.setTitleColor(UIColor(Brand.ink),for:.normal); allow.setTitleColor(.systemBackground,for:.normal)
         panel.accessibilityElements = error == nil ? [titleLabel,bodyLabel,later,allow] : [titleLabel,bodyLabel,errorLabel,later,allow]
         view.setNeedsLayout()

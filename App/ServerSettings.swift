@@ -45,8 +45,8 @@ struct ServerSettingsSection: View {
         }.disabled(model.ownerBusy || model.busy || !model.canManageGuestAccess)
     }
     private func icon(_ image: String,title: String,destructive: Bool = false,action: @escaping () -> Void) -> some View {
-        Button(action:action) { Image(systemName:image).frame(width:44,height:48).contentShape(Rectangle()) }
-            .buttonStyle(.plain).foregroundStyle(destructive ? AppPalette.destructive : Brand.ink).accessibilityLabel(ProductText.string(title))
+        Button(action:action) { Image(systemName:image).resizable().scaledToFit().frame(width:24,height:24) }
+            .buttonStyle(SquareIconActionStyle(destructive:destructive)).accessibilityLabel(ProductText.string(title))
     }
 }
 
@@ -94,7 +94,7 @@ struct ServerSettingsDialog: View {
                 Text(ProductText.string("account_hint")).font(.footnote).foregroundStyle(Brand.secondaryInk)
                 if let linked = owner?.serverSettings?.accountEmail {
                     Text(ProductText.string("account_linked",linked))
-                    Button(ProductText.string("account_unlink")) { unlink() }.buttonStyle(SecondaryActionStyle())
+                    Button(ProductText.string("account_unlink"),role:.destructive) { unlink() }.buttonStyle(SecondaryActionStyle())
                 } else {
                     AppField(ProductText.string("account_email")) { TextField(ProductText.string("account_email"),text:$email).keyboardType(.emailAddress).textContentType(.username).textInputAutocapitalization(.never).autocorrectionDisabled().serverField() }
                     AppField(ProductText.string("account_password")) { SecureField(ProductText.string("account_password"),text:$password).textContentType(.password).serverField() }

@@ -129,6 +129,7 @@ struct BackupShareFile: Identifiable {
 struct BackupFlowHost: View {
     @ObservedObject var flow: BackupPresentation
     @ObservedObject private var manager: BackupManager
+    @FocusState private var focusedPassword:String?
     init(flow: BackupPresentation) { self.flow = flow; manager = flow.manager }
     var body: some View {
         ZStack {
@@ -158,8 +159,12 @@ struct BackupFlowHost: View {
         case .export:
             VStack(spacing:12) {
                 EqualActionRow {
-                    Button(ProductText.string("btn_save")) { Task { await flow.prepareExport(send:false) } }.buttonStyle(SecondaryActionStyle())
-                    Button(ProductText.string("backup_send")) { Task { await flow.prepareExport(send:true) } }.buttonStyle(PrimaryActionStyle())
+                    Button { Task { await flow.prepareExport(send:false) } } label: {
+                        Label(ProductText.string("ios_backup_save_file"),systemImage:"tray.and.arrow.down")
+                    }.buttonStyle(PrimaryActionStyle()).accessibilityIdentifier("backup-save-file")
+                    Button { Task { await flow.prepareExport(send:true) } } label: {
+                        Label(ProductText.string("ios_backup_share_file"),systemImage:"square.and.arrow.up")
+                    }.buttonStyle(SecondaryActionStyle()).accessibilityIdentifier("backup-share-file")
                 }.disabled(flow.password.count < 8 || flow.password != flow.repeated)
                 Button(ProductText.string("btn_cancel")) { flow.cancel() }.buttonStyle(SecondaryActionStyle())
             }
@@ -183,6 +188,7 @@ struct BackupFlowHost: View {
     private func password(_ title: String,value: Binding<String>) -> some View {
         AppField(ProductText.string(title)) {
             SecureField(ProductText.string(title),text:value).padding(14).background(Color(uiColor:.tertiarySystemFill),in:RoundedRectangle(cornerRadius:12))
+                .focused($focusedPassword,equals:title).submitLabel(.done).onSubmit { focusedPassword=nil }
         }
     }
     private var exportFields: some View {

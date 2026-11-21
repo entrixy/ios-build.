@@ -88,6 +88,30 @@ final class NavigationUITests: XCTestCase {
         XCTAssertTrue(waitForStable(control,in:app,requireHit:control.elementType != .switch),"Control did not settle before interaction")
         XCTAssertTrue(control.isEnabled)
     }
+    private func delegationCounter(_ id:String,in app:XCUIApplication) -> XCUIElement {
+        let counter=app.descendants(matching:.any).matching(identifier:id).firstMatch
+        XCTAssertTrue(counter.waitForExistence(timeout:10))
+        bringFullyIntoView(counter,in:app)
+        XCTAssertTrue(waitForStable(counter,in:app,requireHit:false))
+        return counter
+    }
+    private func counterButton(_ counter:XCUIElement,increase:Bool) -> XCUIElement {
+        let buttons=counter.buttons.allElementsBoundByIndex.sorted { $0.frame.midX < $1.frame.midX }
+        XCTAssertEqual(buttons.count,2)
+        return (increase ? buttons.last : buttons.first) ?? counter.buttons.firstMatch
+    }
+    private func setDelegationCount(_ id:String,to wanted:Int,in app:XCUIApplication) {
+        let counter=delegationCounter(id,in:app)
+        guard let initial=Int(counter.value as? String ?? "") else { XCTFail("Missing real counter value");return }
+        for number in 0..<abs(wanted-initial) {
+            let increasing=wanted>initial,button=counterButton(counter,increase:increasing)
+            XCTAssertTrue(button.isEnabled);button.tap()
+            let expected=initial+(increasing ? number+1 : -number-1)
+            let changed=XCTNSPredicateExpectation(predicate:NSPredicate { _,_ in counter.value as? String == String(expected) },object:nil)
+            XCTAssertEqual(XCTWaiter.wait(for:[changed],timeout:10),.completed)
+        }
+        XCTAssertEqual(counter.value as? String,String(wanted))
+    }
     private func tapSwitchControl(_ control:XCUIElement,in app:XCUIApplication) {
         XCTAssertEqual(control.elementType,.switch)
         XCTAssertTrue(control.isEnabled)
@@ -154,6 +178,13 @@ final class NavigationUITests: XCTestCase {
         let map = mapHost.maps.firstMatch, draw = app.buttons["route-map-draw"]
         XCTAssertTrue(map.waitForExistence(timeout:15)); XCTAssertTrue(draw.isEnabled); draw.tap()
         XCTAssertFalse(app.buttons["route-map-save"].isEnabled)
+        reviewCapture("automation-route-drawing",settledBy:draw)
+        draw.tap()
+        XCTAssertTrue(app.buttons["route-map-save"].isEnabled)
+        XCTAssertTrue(app.staticTexts["route-map-count"].label.contains("0"))
+        XCTAssertTrue(waitForStable(draw,in:app))
+        draw.tap()
+        XCTAssertTrue(waitForStable(draw,in:app))
         map.coordinate(withNormalizedOffset:CGVector(dx:0.35,dy:0.40)).press(forDuration:0.1,
             thenDragTo:map.coordinate(withNormalizedOffset:CGVector(dx:0.65,dy:0.60)))
         let count = app.staticTexts["route-map-count"]
@@ -161,6 +192,18 @@ final class NavigationUITests: XCTestCase {
         XCTAssertEqual(XCTWaiter.wait(for:[drawn],timeout:10),.completed)
         XCTAssertTrue(app.buttons["route-map-save"].isEnabled)
         reviewCapture("automation-route-map",settledBy:app.buttons["route-map-save"])
+        let compactMapHeight=map.frame.height
+        app.buttons["route-map-expand"].tap()
+        let collapse=app.buttons["route-map-collapse"]
+        XCTAssertTrue(collapse.waitForExistence(timeout:10))
+        XCTAssertTrue(waitForStable(collapse,in:app))
+        XCTAssertGreaterThan(map.frame.height,compactMapHeight+100)
+        XCTAssertTrue(app.staticTexts["route-map-count"].label.contains("1"))
+        reviewCapture("automation-route-map-expanded",settledBy:collapse)
+        collapse.tap()
+        XCTAssertTrue(app.buttons["route-map-save"].waitForExistence(timeout:10))
+        XCTAssertTrue(app.staticTexts["route-map-count"].label.contains("1"))
+        XCTAssertTrue(waitForStable(app.buttons["route-map-save"],in:app))
         app.buttons["route-map-save"].tap()
         XCTAssertTrue(route.waitForExistence(timeout:10)); XCTAssertTrue(route.label.contains("1"))
         setAutomationRule("location",to:false,in:app)
@@ -212,6 +255,10 @@ final class NavigationUITests: XCTestCase {
         let call = app.buttons["owner-phone-approve"], decline = app.buttons["owner-phone-decline"]
         XCTAssertTrue(call.waitForExistence(timeout:15)); XCTAssertEqual(call.label,"Позвонить")
         XCTAssertTrue(decline.isHittable)
+        let description=app.staticTexts["owner-phone-request-description"]
+        XCTAssertTrue(description.label.contains("Анна"));XCTAssertTrue(description.label.contains("Ворота во двор"))
+        XCTAssertTrue(app.images["owner-phone-object-image"].exists)
+        XCTAssertTrue(app.staticTexts["Позвонить?"].exists)
         reviewCapture("guest-call-request",settledBy:call)
         decline.tap()
         XCTAssertTrue(app.buttons["main-tab-journal"].waitForExistence(timeout:10)); app.buttons["main-tab-journal"].tap()
@@ -282,6 +329,9 @@ final class NavigationUITests: XCTestCase {
         let row = app.buttons.matching(NSPredicate(format:"identifier BEGINSWITH %@","guest-card-")).firstMatch
         XCTAssertTrue(row.waitForExistence(timeout:10)); XCTAssertTrue(row.label.contains("Анна")); row.tap()
         XCTAssertTrue(app.buttons["Изменить"].isEnabled)
+        let actions=["gearshape","plus","qrcode","share","envelope","pause.fill","trash"].map { app.buttons["guest-action-"+$0] }
+        for button in actions { XCTAssertEqual(button.frame.width,48,accuracy:1);XCTAssertEqual(button.frame.height,48,accuracy:1) }
+        XCTAssertEqual((actions[5].frame.midX+actions[6].frame.midX)/2,row.frame.midX,accuracy:1)
         reviewCapture("guest-issued-actions",settledBy:app.buttons["issue-guest"])
         app.buttons["Изменить"].tap()
         XCTAssertTrue(app.textFields.matching(NSPredicate(format:"value == %@","Анна")).firstMatch.waitForExistence(timeout:10))
@@ -289,7 +339,8 @@ final class NavigationUITests: XCTestCase {
         reviewCapture("guest-issued-edit")
         app.buttons["Отмена"].tap(); XCTAssertTrue(row.waitForExistence(timeout:10))
         app.buttons["QR"].tap()
-        XCTAssertTrue(app.navigationBars["QR"].waitForExistence(timeout:10))
+        XCTAssertTrue(app.staticTexts["task-sheet-title"].waitForExistence(timeout:10))
+        XCTAssertEqual(app.staticTexts["task-sheet-title"].label,"QR")
         XCTAssertTrue(app.buttons["Копировать"].exists)
         let image = app.images["QR-код гостевого ключа"]
         XCTAssertTrue(image.exists); XCTAssertGreaterThan(image.frame.width,200)
@@ -326,12 +377,21 @@ final class NavigationUITests: XCTestCase {
         bringIntoView(create,in:app); XCTAssertTrue(create.isHittable); create.tap()
         XCTAssertTrue(app.secureTextFields["Пароль копии"].waitForExistence(timeout:10))
         XCTAssertTrue(app.secureTextFields["Повторите пароль"].exists)
-        XCTAssertFalse(app.buttons["Сохранить"].isEnabled)
-        let save = app.buttons["Сохранить"], send = app.buttons["Отправить"], cancel = app.buttons["Отмена"]
+        let save = app.buttons["backup-save-file"], send = app.buttons["backup-share-file"], cancel = app.buttons["Отмена"]
+        XCTAssertFalse(save.isEnabled);XCTAssertFalse(send.isEnabled);XCTAssertTrue(cancel.isEnabled)
         XCTAssertEqual(save.frame.height,send.frame.height,accuracy:1)
-        XCTAssertEqual(save.frame.minY,send.frame.minY,accuracy:1)
-        XCTAssertGreaterThanOrEqual(cancel.frame.minY,save.frame.maxY)
+        XCTAssertEqual(save.frame.width,send.frame.width,accuracy:1)
+        XCTAssertGreaterThanOrEqual(send.frame.minY,save.frame.maxY)
+        XCTAssertGreaterThanOrEqual(cancel.frame.minY,send.frame.maxY)
         reviewCapture("backup-password",settledBy:cancel)
+        let password=app.secureTextFields["Пароль копии"],repeated=app.secureTextFields["Повторите пароль"]
+        password.tap();password.typeText("native-review-only");password.typeText("\n")
+        XCTAssertFalse(save.isEnabled)
+        XCTAssertTrue(waitForStable(repeated,in:app));repeated.tap()
+        repeated.typeText("native-review-only");repeated.typeText("\n")
+        XCTAssertTrue(waitForStable(cancel,in:app))
+        XCTAssertTrue(save.isEnabled);XCTAssertTrue(send.isEnabled);XCTAssertTrue(cancel.isEnabled)
+        reviewCapture("backup-password-ready",settledBy:cancel)
         app.buttons["Отмена"].tap()
         assertBottom(app,["settings","journal"])
     }
@@ -709,6 +769,10 @@ final class NavigationUITests: XCTestCase {
         XCTAssertTrue(app.buttons["Настройки реакции на звонок"].exists)
         XCTAssertTrue(app.buttons["Автоматизация для гостя"].exists)
         XCTAssertTrue(app.buttons["Доступ к объекту"].exists)
+        for prefix in ["guest-object-invocation-","guest-object-automation-","guest-object-access-"] {
+            let action=app.buttons.matching(NSPredicate(format:"identifier BEGINSWITH %@",prefix)).firstMatch
+            XCTAssertEqual(action.frame.width,48,accuracy:1);XCTAssertEqual(action.frame.height,48,accuracy:1)
+        }
         XCTAssertFalse(app.switches["Подтверждать нажатие перед открытием"].exists)
         reviewCapture("guest-issue-object")
         app.buttons["Автоматизация для гостя"].tap()
@@ -718,8 +782,16 @@ final class NavigationUITests: XCTestCase {
         app.buttons["Доступ к объекту"].tap()
         XCTAssertTrue(app.switches.matching(NSPredicate(format: "label CONTAINS %@", "Только для приложения")).firstMatch.waitForExistence(timeout: 10))
         XCTAssertTrue(app.switches.matching(NSPredicate(format: "label CONTAINS %@", "Разрешить передавать дальше")).firstMatch.exists)
+        let delegation=app.descendants(matching:.any).matching(identifier:"delegation-enabled").firstMatch
+        bringIntoView(delegation,in:app);tapSwitchControl(nativeSwitch(delegation),in:app)
+        setDelegationCount("delegation-depth",to:3,in:app)
+        setDelegationCount("delegation-pool",to:7,in:app)
         reviewCapture("guest-access-limits")
-        app.buttons["ОК"].firstMatch.tap()
+        let ok=app.buttons["ОК"].firstMatch;bringIntoView(ok,in:app);ok.tap()
+        app.buttons["Доступ к объекту"].tap()
+        XCTAssertEqual(delegationCounter("delegation-depth",in:app).value as? String,"3")
+        XCTAssertEqual(delegationCounter("delegation-pool",in:app).value as? String,"7")
+        bringIntoView(ok,in:app);ok.tap()
         app.buttons["Отмена"].tap()
         XCTAssertTrue(app.buttons["issue-guest"].waitForExistence(timeout: 10))
         XCTAssertFalse(app.buttons.matching(NSPredicate(format:"identifier BEGINSWITH %@","guest-card-")).firstMatch.exists)
@@ -738,6 +810,31 @@ final class NavigationUITests: XCTestCase {
         XCTAssertFalse(app.switches.matching(NSPredicate(format:"label CONTAINS %@","Только для приложения")).firstMatch.exists)
         reviewCapture("passed-access-limits")
         app.buttons["ОК"].tap(); app.buttons["Отмена"].tap()
+        assertBottom(app,["control","settings","guests","journal"])
+    }
+
+    func testDelegatedAccessShowsSeveralLevelsAndPoolWithoutCreatingKey() {
+        let app=launch("delegating-guests-deep")
+        app.buttons["pass-received-access"].tap()
+        let object=app.buttons.matching(NSPredicate(format:"identifier BEGINSWITH %@","pass-object-")).firstMatch
+        XCTAssertTrue(object.waitForExistence(timeout:10));object.tap()
+        app.buttons["Настройки доступа"].tap()
+        XCTAssertFalse(app.switches.matching(NSPredicate(format:"label CONTAINS %@","Только для приложения")).firstMatch.exists)
+        let enabled=app.descendants(matching:.any).matching(identifier:"delegation-enabled").firstMatch
+        XCTAssertTrue(enabled.waitForExistence(timeout:10));bringIntoView(enabled,in:app)
+        tapSwitchControl(nativeSwitch(enabled),in:app)
+        // Incoming depth4/pool12 permits at most3 further levels and11 child keys.
+        setDelegationCount("delegation-depth",to:3,in:app)
+        XCTAssertFalse(counterButton(delegationCounter("delegation-depth",in:app),increase:true).isEnabled)
+        setDelegationCount("delegation-pool",to:11,in:app)
+        XCTAssertFalse(counterButton(delegationCounter("delegation-pool",in:app),increase:true).isEnabled)
+        setDelegationCount("delegation-pool",to:7,in:app)
+        reviewCapture("passed-access-delegation-limits")
+        let ok=app.buttons["ОК"].firstMatch;bringIntoView(ok,in:app);ok.tap()
+        app.buttons["Настройки доступа"].tap()
+        XCTAssertEqual(delegationCounter("delegation-depth",in:app).value as? String,"3")
+        XCTAssertEqual(delegationCounter("delegation-pool",in:app).value as? String,"7")
+        bringIntoView(ok,in:app);ok.tap();app.buttons["Отмена"].tap()
         assertBottom(app,["control","settings","guests","journal"])
     }
 

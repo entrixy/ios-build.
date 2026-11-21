@@ -105,8 +105,7 @@ struct IssueOwnerKeyScreen: View {
                         ActionButtonLabel(title: editingKeyID == nil ? ProductText.string(forCompany ? "guests_add_org" : "guests_add") : ProductText.string("btn_save"), busy: model.ownerBusy)
                     }.buttonStyle(PrimaryActionStyle()).actionListRow().disabled(model.ownerBusy || draft.selected.isEmpty || (forCompany && editingKeyID == nil && company == nil) || (editingKeyID != nil && label.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty))
                 }
-            }.navigationTitle(editingKeyID == nil ? ProductText.string(forCompany ? "guests_add_org" : "guests_add") : ProductText.string("guests_access_title"))
-                .navigationBarTitleDisplayMode(.inline)
+            }.taskSheetTitle(editingKeyID == nil ? ProductText.string(forCompany ? "guests_add_org" : "guests_add") : ProductText.string("guests_access_title"),form:true)
                 .sheetDismissFooter(disabled: model.ownerBusy) { dismiss() }
                 .task {
                     guard !loaded else { return }; loaded = true
@@ -139,6 +138,7 @@ struct IssueOwnerKeyScreen: View {
                     Button { toggle(account, object) } label: {
                         HStack(spacing: 10) {
                             Image(systemName: selected ? "checkmark.square.fill" : "square")
+                                .foregroundStyle(selected ? AppPalette.selected : Brand.secondaryInk)
                             Text(model.objectLabel(entry)).lineLimit(1).frame(maxWidth: .infinity, alignment: .leading)
                         }.foregroundStyle(Brand.ink).frame(minHeight: 48).contentShape(Rectangle())
                     }.buttonStyle(.plain).disabled(locked || !eligible(object) || account.isMoving(object.id) || model.ownerBusy)
@@ -151,7 +151,9 @@ struct IssueOwnerKeyScreen: View {
                         }
                         if !forCompany {
                             objectButton("arrow.triangle.2.circlepath", label: ProductText.string("guests_automation_desc")) { task = .automation(entry.target) }
+                                .accessibilityIdentifier("guest-object-automation-" + entry.target.id)
                             objectButton("person.badge.key", label: ProductText.string("obj_access_desc")) { task = .access(entry.target) }
+                                .accessibilityIdentifier("guest-object-access-" + entry.target.id)
                         }
                     }
                 }
@@ -164,9 +166,9 @@ struct IssueOwnerKeyScreen: View {
     }
     private func objectButton(_ symbol: String, label: String, action: @escaping () -> Void) -> some View {
         Button(action: action) {
-            Group { if symbol == "arrow.triangle.2.circlepath" { AutomationIcon() } else { Image(systemName:symbol).frame(width:24,height:24) } }.frame(maxWidth:.infinity)
+            Group { if symbol == "arrow.triangle.2.circlepath" { AutomationIcon() } else { Image(systemName:symbol).resizable().scaledToFit().frame(width:24,height:24) } }
         }
-            .buttonStyle(SecondaryActionStyle()).frame(width: 48).accessibilityLabel(label)
+            .buttonStyle(SquareIconActionStyle()).accessibilityLabel(label)
     }
     @ViewBuilder private func nested(_ task: GuestObjectTask) -> some View {
         if case let .owned(host, id) = task.target, let account = model.owners.first(where: { $0.server == host }),

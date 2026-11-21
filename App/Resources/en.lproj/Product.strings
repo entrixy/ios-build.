@@ -964,3 +964,19 @@
 "ios_guest_call_request_body" = "Object: %@. Open Entrixy to make the call.";
 "ios_guest_call_expired" = "The request has expired";
 "ios_call_now" = "Call";
+
+/* Shared action states, map controls and delegation review — 21 Nov 2026. */
+"ios_action_working" = "In progress…";
+"ios_map_expand" = "Expand map";
+"ios_map_collapse" = "Collapse map";
+"ios_map_draw_corridor" = "Draw corridor";
+"ios_guest_open_request" = "Guest “%@” requests opening “%@”.";
+"ios_call_question" = "Call?";
+"ios_manual_call_question" = "Call to open “%@”?";
+"ios_request_open_question" = "Request opening “%@”?";
+"ios_manual_open_question" = "Open “%@”?";
+"ios_backup_save_file" = "Save file";
+"ios_backup_share_file" = "Share backup";
+"ios_delegation_depth" = "Delegation levels";
+"ios_delegation_key_count" = "Keys to delegate";
+"ios_map_draw_hint" = "Tap “Draw corridor”, then trace the approach from the entrance to the gate.";

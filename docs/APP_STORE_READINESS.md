@@ -5,15 +5,17 @@
 каталог с независимыми server/guest/object scope, порядком, раскрытием действий,
 локальным именем/скрытием и добавлением Bluetooth через выбор типа.
 
-## Текущий статус — 19.11.2026
+## Текущий статус — 21.11.2026
 
 Полный перенос остаётся активным заданием. Точная проверенная версия, оставшиеся
 пакеты и ограничения собраны в [CURRENT_STATUS.md](CURRENT_STATUS.md), порядок
 автономной работы — в [AUTONOMOUS_WORK.md](AUTONOMOUS_WORK.md).
 
-CI44521810979/nativeec2c81f/public487b2f6 прошёл312core/191hosted/27UI,
-Debug/Release/privacy/isolation и unsigned physical-iPhone app/widget archive.
-56 оригинальных кадров просмотрены и опубликованы в галерее вместо19 старых.
+CI44877317284/nativee2defc3/publicde13dad прошёл312core/197hosted/29UI,
+6 focused, Debug/Release/privacy/isolation и unsigned physical-iPhone app/widget archive.
+58 оригинальных кадров просмотрены и опубликованы в галерее вместо56 прежних.
+Пакет10 замечаний закрыт; точная причина старых intermittent XCTest input failures
+не доказана, поэтому реальная приёмка ввода/Release на iPhone остаётся обязательной.
 Это не signing/TestFlight/App Store или аппаратная приёмка. TeamID/BundleID
 ранее запрошены, ещё не подтверждены; provisional IDs не использовать как ответ.
 Реальные APNs, BLE/камера/сотовая сеть/фон, account/Android interoperability,

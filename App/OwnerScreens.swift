@@ -111,11 +111,13 @@ struct AddOwnerObjectScreen: View {
     private var fields: some View {
         Form {
             Section {
+                Text(ProductText.string("add_object_type_title")).font(.subheadline.weight(.semibold))
+                    .foregroundStyle(Brand.secondaryInk).accessibilityIdentifier("owner-object-kind")
                 ForEach(["call", "webhook", "device", "ble"], id: \.self) { value in
                     Button { kind = value } label: {
                         HStack(spacing: 12) {
                             Image(systemName: kind == value ? "largecircle.fill.circle" : "circle")
-                                .foregroundStyle(Brand.ink)
+                                .foregroundStyle(kind == value ? AppPalette.selected : Brand.secondaryInk)
                             VStack(alignment: .leading, spacing: 4) {
                                 Text(ProductText.string("add_object_type_" + value)).foregroundStyle(Brand.ink)
                                 Text(ProductText.string("add_object_type_" + value + "_desc"))
@@ -125,7 +127,7 @@ struct AddOwnerObjectScreen: View {
                     }.buttonStyle(.plain).accessibilityIdentifier("owner-object-type-" + value)
                         .accessibilityAddTraits(kind == value ? .isSelected : [])
                 }
-            } header: { Text(ProductText.string("add_object_type_title")).accessibilityIdentifier("owner-object-kind") }
+            }
             Section {
                 AppField(ProductText.string("add_object_name")) {
                     TextField(ProductText.string("add_object_name_placeholder"), text: $label)
@@ -146,7 +148,7 @@ struct AddOwnerObjectScreen: View {
                     Picker(ProductText.string("add_object_type_device"), selection: $claimMode) {
                         Text(ProductText.string("add_object_device_new")).tag(false)
                         Text(ProductText.string("add_object_device_claim")).tag(true)
-                    }.pickerStyle(.inline)
+                    }.pickerStyle(.inline).tint(AppPalette.selected)
                     if claimMode {
                         AppField(ProductText.string("add_object_device_claim_code")) {
                             TextField("A1B2C3D4", text: $claimCode).textInputAutocapitalization(.characters).autocorrectionDisabled()
@@ -182,7 +184,7 @@ struct AddOwnerObjectScreen: View {
             }
         }
         .disabled(model.ownerBusy)
-        .navigationTitle(ProductText.string("add_object_title")).navigationBarTitleDisplayMode(.inline)
+        .taskSheetTitle(ProductText.string("add_object_title"),form:true)
         .task {
             #if DEBUG && targetEnvironment(simulator)
             if StageTwoCapture.current == .addObject { kind = "ble"; label = "Новый BLE-объект" }
@@ -349,19 +351,12 @@ private struct OwnerObjectEditorForm: View {
                 }
             }
         }
-        .toolbar(.hidden,for:.navigationBar)
-        .safeAreaInset(edge:.top,spacing:0) {
-            HStack(spacing:12) {
-                Text(ProductText.string(object?.kind == "ble" ? "ble_object_default" : "edit_object_title"))
-                    .font(.title3.weight(.semibold)).frame(maxWidth:.infinity,alignment:.leading)
-                    .accessibilityAddTraits(.isHeader).accessibilityIdentifier("owner-object-title")
-                if object?.kind != "ble" {
-                    Button { automation = true } label: { AutomationIcon() }
-                        .buttonStyle(SquareIconActionStyle())
-                        .accessibilityLabel(ProductText.string("owner_automation_desc")).accessibilityIdentifier("owner-object-automation")
-                }
-            }.padding(.horizontal,DesignMetrics.pageInset).padding(.vertical,12)
-                .background(Color(uiColor:.systemGroupedBackground))
+        .taskSheetTitle(ProductText.string(object?.kind == "ble" ? "ble_object_default" : "edit_object_title"),form:true,identifier:"owner-object-title") {
+            if object?.kind != "ble" {
+                Button { automation = true } label: { AutomationIcon() }
+                    .buttonStyle(SquareIconActionStyle())
+                    .accessibilityLabel(ProductText.string("owner_automation_desc")).accessibilityIdentifier("owner-object-automation")
+            }
         }
         .sheet(isPresented: $automation) { AutomationEditor(destination: .object(.owned(server: server, objectID: objectID))) }
         .sheet(item: $credentialsPrompt) { prompt in

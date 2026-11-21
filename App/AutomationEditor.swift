@@ -23,7 +23,7 @@ struct AutomationEditor: View {
                             rule(c, title: "BLE", symbol: "wave.3.right", enabled: \.bleEnabled, level: \.bleLevel) {
                                 Text(ProductText.string("guest_auto_radius_fmt", max(1,c.template.bleRadiusM)))
                                 let maximum = max(1, c.template.ownerBleRadiusMaxM ?? 30)
-                                Slider(value: number(c, \.bleRadiusM, minimum: 1, maximum: maximum), in: 1...Double(max(2,maximum)), step: 1)
+                                Slider(value: number(c, \.bleRadiusM, minimum: 1, maximum: maximum), in: 1...Double(max(2,maximum)), step: 1).tint(AppPalette.selected)
                                     .disabled(maximum == 1)
                             }
                         }
@@ -49,7 +49,7 @@ struct AutomationEditor: View {
                     }.padding(DesignMetrics.pageInset).disabled(!c.canEdit)
                 } else { Text(text("object_unavailable")).padding(DesignMetrics.pageInset) }
             }.background(Color(uiColor: .systemGroupedBackground))
-                .navigationTitle(title).navigationBarTitleDisplayMode(.inline)
+                .taskSheetTitle(title)
                 .sheetDismissFooter(text("btn_close")) { dismiss() }
                 .task {
                     if let c = context, c.template.authEnabled, (!c.issued || c.isBLE), !model.hasActionCode { codeSetup = true }
@@ -79,6 +79,7 @@ struct AutomationEditor: View {
                 Button { change { $0.combineMode = value } } label: {
                     HStack(alignment: .top, spacing: 12) {
                         Image(systemName: c.template.combineMode == value ? "largecircle.fill.circle" : "circle").padding(.top, 2)
+                            .foregroundStyle(c.template.combineMode == value ? AppPalette.selected : Brand.secondaryInk)
                         Text(text(value == "any" ? "automation_combine_any" : "automation_combine_all"))
                             .foregroundStyle(Brand.ink).frame(maxWidth: .infinity, alignment: .leading)
                     }.padding(.vertical, 6)
@@ -95,8 +96,8 @@ struct AutomationEditor: View {
         VStack(alignment: .leading, spacing: 14) {
             HStack(spacing: 14) {
                 Image(systemName: symbol).frame(width: 38, height: 38)
-                    .background((c.issued ? color(decision) : Brand.primary).opacity(value ? 0.16 : 0.07), in: Circle())
-                    .foregroundStyle(value ? (c.issued ? color(decision) : Brand.ink) : Brand.secondaryInk)
+                    .background(value ? (c.issued ? color(decision).opacity(0.16) : AppPalette.selectedSurface) : Color(uiColor:.systemGray6), in: Circle())
+                    .foregroundStyle(value ? (c.issued ? color(decision) : AppPalette.selected) : Brand.secondaryInk)
                 VStack(alignment: .leading, spacing: 3) {
                     Text(title).font(.headline)
                     if c.issued { levelMenu(decision) { selected in change { $0[keyPath: level] = selected } } }
@@ -121,7 +122,7 @@ struct AutomationEditor: View {
             }
         } label: { Label(text("guest_tpl_lvl_" + value.rawValue), systemImage: "chevron.down").font(.subheadline) }
     }
-    private func color(_ level: AutomationRuleLevel) -> Color { switch level { case .own: return .green; case .suggest: return .orange; case .force: return .red } }
+    private func color(_ level: AutomationRuleLevel) -> Color { switch level { case .own: return AppPalette.selected; case .suggest: return .orange; case .force: return .red } }
     private func number(_ c: AutomationSettingsContext, _ key: WritableKeyPath<AutomationTemplate, Int>, minimum: Int, maximum: Int) -> Binding<Double> {
         Binding(get: { Double(min(maximum,max(minimum,c.template[keyPath: key]))) }, set: { value in change { $0[keyPath: key] = Int(value) } })
     }
@@ -163,10 +164,10 @@ private struct AutomationGeoFields: View {
                 Spacer()
                 if let lat = geometry.geoLat, let lon = geometry.geoLon {
                     Button { UIPasteboard.general.string = String(format: "%.6f, %.6f", lat, lon) } label: { Image(systemName: "doc.on.doc") }
-                        .accessibilityLabel(ProductText.string("btn_copy"))
+                        .buttonStyle(SquareIconActionStyle()).accessibilityLabel(ProductText.string("btn_copy"))
                     if !readOnly {
                         Button(role: .destructive) { change { $0.geoLat = nil; $0.geoLon = nil } } label: { Image(systemName: "trash") }
-                            .accessibilityLabel(ProductText.string("btn_delete"))
+                            .buttonStyle(SquareIconActionStyle(destructive:true)).accessibilityLabel(ProductText.string("btn_delete"))
                     }
                 }
             }
@@ -187,7 +188,7 @@ private struct AutomationGeoFields: View {
                 let maximum = context.incoming && t.geoLevel == .force ? min(200,max(10,t.ownerRadiusMaxM ?? t.radiusM ?? 200)) : 200
                 Text(ProductText.string("owner_radius_status", geometry.radiusM ?? 30))
                 if !fromObject {
-                    Slider(value: Binding(get: { Double(min(maximum,max(10,t.radiusM ?? 30))) }, set: { v in change { $0.radiusM = Int(v) } }), in: 10...Double(max(11,maximum)), step: 5)
+                    Slider(value: Binding(get: { Double(min(maximum,max(10,t.radiusM ?? 30))) }, set: { v in change { $0.radiusM = Int(v) } }), in: 10...Double(max(11,maximum)), step: 5).tint(AppPalette.selected)
                         .disabled(maximum == 10)
                 }
             }
@@ -216,17 +217,16 @@ private struct AutomationWiFiFields: View {
     private var networkNames: [String] { networkGroups.keys.sorted() }
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Picker(ProductText.string("guest_tpl_wifi_mode"), selection: Binding(get: { t.wifiMode }, set: { value in change { $0.wifiMode = value } })) {
-                Text(ProductText.string("automation_wifi_mode_connect")).tag("connect")
-                Text(ProductText.string("automation_wifi_mode_fp")).tag("fingerprint")
-            }.pickerStyle(.segmented).disabled(readOnly).accessibilityIdentifier("automation-wifi-mode")
+            SelectedModePicker(options:[("connect",ProductText.string("automation_wifi_mode_connect")),("fingerprint",ProductText.string("automation_wifi_mode_fp"))],selection:Binding(get:{ t.wifiMode },set:{ value in change { $0.wifiMode=value } }))
+                .frame(maxWidth:.infinity).disabled(readOnly).accessibilityLabel(ProductText.string("guest_tpl_wifi_mode"))
+                .accessibilityIdentifier("automation-wifi-mode")
             if t.wifiMode == "connect" {
                 if !t.wifiConnectSsid.isEmpty {
                     HStack {
                         Text(t.wifiConnectSsid); Spacer()
                         if !readOnly {
                             Button { change { $0.wifiConnectSsid = ""; $0.wifiConnectBssid = "" } } label: { Image(systemName: "xmark.circle") }
-                                .accessibilityLabel(ProductText.string("btn_delete"))
+                                .buttonStyle(SquareIconActionStyle(destructive:true)).accessibilityLabel(ProductText.string("btn_delete"))
                         }
                     }
                 } else {
@@ -250,7 +250,7 @@ private struct AutomationWiFiFields: View {
                                     $0.wifiBssids = t.wifiBssids.enumerated().filter { !removed.contains($0.offset) }.map(\.element)
                                     $0.wifiSsids = t.wifiSsids.enumerated().filter { !removed.contains($0.offset) }.map(\.element)
                                 }
-                            } label: { Image(systemName: "xmark.circle") }.accessibilityLabel(ProductText.string("btn_delete"))
+                            } label: { Image(systemName: "xmark.circle") }.buttonStyle(SquareIconActionStyle(destructive:true)).accessibilityLabel(ProductText.string("btn_delete"))
                         }
                     }
                 }
@@ -259,7 +259,7 @@ private struct AutomationWiFiFields: View {
                     let minimum = readOnly ? max(1,t.ownerMinMatch ?? t.wifiMinMatch) : 1
                     let maximum = max(minimum,t.wifiBssids.count)
                     Text(ProductText.string("guest_tpl_wifi_threshold_status_exact",min(maximum,max(minimum,t.wifiMinMatch)),t.wifiBssids.count))
-                    Slider(value: Binding(get: { Double(min(maximum,max(minimum,t.wifiMinMatch))) }, set: { v in change { $0.wifiMinMatch = Int(v) } }), in: Double(minimum)...Double(max(minimum+1,maximum)),step: 1)
+                    Slider(value: Binding(get: { Double(min(maximum,max(minimum,t.wifiMinMatch))) }, set: { v in change { $0.wifiMinMatch = Int(v) } }), in: Double(minimum)...Double(max(minimum+1,maximum)),step: 1).tint(AppPalette.selected)
                         .disabled(minimum == maximum)
                 }
             }
@@ -284,7 +284,7 @@ private struct AutomationTimeFields: View {
                         Spacer(minLength: 0)
                         if !readOnly {
                             Button(role: .destructive) { var rows = template.timeEntries; rows.remove(at: index); save(rows) } label: { Image(systemName: "xmark") }
-                                .accessibilityLabel(ProductText.string("btn_delete")).accessibilityIdentifier("automation-time-delete-" + String(index))
+                                .buttonStyle(SquareIconActionStyle(destructive:true)).accessibilityLabel(ProductText.string("btn_delete")).accessibilityIdentifier("automation-time-delete-" + String(index))
                         }
                     }
                     HStack(spacing: 4) {
@@ -295,7 +295,9 @@ private struct AutomationTimeFields: View {
                                 save(rows)
                             } label: {
                                 Text(dayName(day)).font(.caption.weight(.semibold)).frame(maxWidth: .infinity,minHeight: 36)
-                                    .background(template.timeEntries[index].weekdays.contains(day) ? AppPalette.secondary : Color.clear, in: RoundedRectangle(cornerRadius: 8))
+                                    .foregroundStyle(template.timeEntries[index].weekdays.contains(day) ? AppPalette.selected : Brand.ink)
+                                    .background(template.timeEntries[index].weekdays.contains(day) ? AppPalette.selectedSurface : Color.clear, in: RoundedRectangle(cornerRadius: 8))
+                                    .overlay(RoundedRectangle(cornerRadius:8).strokeBorder(template.timeEntries[index].weekdays.contains(day) ? AppPalette.selected : Color.clear,lineWidth:1))
                             }.buttonStyle(.plain)
                         }
                     }

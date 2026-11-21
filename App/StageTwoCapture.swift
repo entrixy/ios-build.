@@ -5,6 +5,7 @@ import EntrixyCore
 enum StageTwoCapture: String, CaseIterable {
     case empty, guestControl = "guest-control", guestKeys = "guest-keys", keyDetail = "key-detail"
     case ownerObjects = "owner-objects", ownerGuests = "owner-guests", delegatingGuests = "delegating-guests"
+    case delegatingGuestsDeep = "delegating-guests-deep"
     case system, codeSettings = "code-settings", sounds, addKey = "add-key", addServer = "add-server", journal
     case ownerExpanded = "owner-expanded", guestExpanded = "guest-expanded", addObject = "add-object"
     case objectDelete = "object-delete"
@@ -37,7 +38,7 @@ enum StageTwoCapture: String, CaseIterable {
         }
     }
     var mainTab: AppTab {
-        switch self { case .guestControl, .ownerControl, .ownerConfirmation, .ownerCodeConfirmation, .keyAccepted, .incomingMessage, .promotion, .ownerPhoneRequest: return .control; case .ownerGuests, .delegatingGuests, .ownerIssued, .ownerCallGuests: return .guests; case .journal: return .journal; default: return .settings }
+        switch self { case .guestControl, .ownerControl, .ownerConfirmation, .ownerCodeConfirmation, .keyAccepted, .incomingMessage, .promotion, .ownerPhoneRequest: return .control; case .ownerGuests, .delegatingGuests, .delegatingGuestsDeep, .ownerIssued, .ownerCallGuests: return .guests; case .journal: return .journal; default: return .settings }
     }
     var isOwner: Bool { [.ownerObjects, .ownerGuests, .addServer, .ownerExpanded, .addObject, .objectDelete, .ownerControl, .mixedObjects, .ownerConfirmation, .ownerCodeConfirmation, .ownerBLEObjects, .ownerIssued, .promotion, .ownerCallGuests, .ownerDeviceObjects, .ownerPhoneRequest].contains(self) }
     var isEmpty: Bool { [.empty, .addKey, .deviceClaim].contains(self) }
@@ -66,7 +67,7 @@ struct StageTwoRoot: View {
             if route == .mixedObjects {
                 guest.objects = try! JSONDecoder().decode([GuestObject].self, from: Data(#"[{"id":"n:7","numberID":7,"kind":"device","label":"Гостевой въезд","avatarType":"preset:0"},{"id":"b:8","numberID":8,"kind":"ble","label":"Дверь Bluetooth","avatarType":"preset:2"}]"#.utf8))
             }
-            guest.incomingDepth = route == .delegatingGuests ? 1 : 0
+            guest.incomingDepth = route == .delegatingGuests ? 1 : route == .delegatingGuestsDeep ? 4 : 0
             if route == .keyAccepted { guest.welcome = "Добро пожаловать! Въезд со стороны двора."; guest.checkedAt = Date() }
             state.guests = [guest]
             if route == .incomingMessage {
@@ -125,7 +126,7 @@ struct StageTwoRoot: View {
             // No resume/live factory or actual telephone handoff in these UI routes.
             app.ownerControl = OwnerControlModel(app:app,dialer:{ _ in false })
         }
-        if route == .delegatingGuests { app.passManager = PassManager(app:app,api:StageTwoDelegationAPI()) }
+        if route == .delegatingGuests || route == .delegatingGuestsDeep { app.passManager = PassManager(app:app,api:StageTwoDelegationAPI(depth:route == .delegatingGuestsDeep ? 4 : 1,pool:route == .delegatingGuestsDeep ? 12 : 3)) }
         return app
     }
     var body: some View {
@@ -183,9 +184,11 @@ private struct StageDiagnosticAPI: DiagnosticTransport {
     func send(_ report: DiagnosticReport) async throws { try report.validate() }
 }
 private struct StageTwoDelegationAPI: DelegationTransport {
+    var depth = 1
+    var pool = 3
     func delegate(invite: GuestInvite,fingerprint: String,operation: DelegationOperation,body: Data) async throws -> Data {
         guard operation == .list else { throw GuestCrypto.Failure.invalidEnvelope }
-        return Data(#"{"objects":[{"id":7,"depth":1,"pool_left":3,"native_only":0}],"children":[],"invites":[]}"#.utf8)
+        return try JSONSerialization.data(withJSONObject:["objects":[["id":7,"depth":depth,"pool_left":pool,"native_only":0]],"children":[],"invites":[]])
     }
     func delegationInfo(server: String,group: String) async throws -> Data { throw GuestCrypto.Failure.invalidEnvelope }
     func redeemDelegation(_ pending: DelegationRedemption,fingerprint: String) async throws -> Data { throw GuestCrypto.Failure.invalidEnvelope }

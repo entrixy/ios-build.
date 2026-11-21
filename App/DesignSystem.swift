@@ -18,6 +18,9 @@ enum DesignMetrics {
     static let dialogActionGap: CGFloat = 12
     static let dialogCorner: CGFloat = 20
     static let dialogDimOpacity = 0.35
+    static let iconActionSize: CGFloat = 48
+    static let sheetHeaderPadding: CGFloat = 8
+    static let sheetTitlePadding: CGFloat = 12
 }
 
 struct AppField<Content: View>: View {
@@ -50,31 +53,41 @@ struct PrimaryActionStyle: ButtonStyle {
         configuration.label.font(.headline)
             .multilineTextAlignment(.center)
             .padding(.horizontal, DesignMetrics.actionHorizontalPadding).padding(.vertical, DesignMetrics.actionVerticalPadding)
-            .foregroundStyle(isEnabled ? (configuration.role == .destructive ? Color.white : Color(uiColor: .systemBackground)) : Brand.secondaryInk)
+            .foregroundStyle(isEnabled ? (configuration.role == .destructive ? Color.white : Color(uiColor: .systemBackground)) : AppPalette.disabledText)
             .frame(maxWidth:.infinity,minHeight:DesignMetrics.primaryHeight,maxHeight:equalRow ? .infinity : nil)
-            .background(isEnabled ? (configuration.role == .destructive ? AppPalette.destructive : Brand.ink) : Color(uiColor: .tertiarySystemFill),
+            .background(isEnabled ? (configuration.role == .destructive ? AppPalette.destructive : Brand.ink) : AppPalette.disabledSurface,
                         in: RoundedRectangle(cornerRadius: DesignMetrics.actionRadius))
+            .overlay(RoundedRectangle(cornerRadius:DesignMetrics.actionRadius).strokeBorder(isEnabled ? Color.clear : AppPalette.disabledBorder,lineWidth:1))
             .contentShape(RoundedRectangle(cornerRadius:DesignMetrics.actionRadius))
-            .opacity(configuration.isPressed ? 0.86 : 1)
+            .opacity(configuration.isPressed && isEnabled ? 0.85 : 1)
     }
 }
 
 enum AppPalette {
     static let destructive = Color(uiColor: UIColor { $0.userInterfaceStyle == .dark ? UIColor(red: 1, green: 0.40, blue: 0.36, alpha: 1) : UIColor(red: 186/255, green: 26/255, blue: 26/255, alpha: 1) })
     static let secondary = Color(uiColor: UIColor { $0.userInterfaceStyle == .dark ? UIColor(white: 0.23, alpha: 1) : UIColor(red: 226/255, green: 227/255, blue: 237/255, alpha: 1) })
+    static let disabledSurface = Color(uiColor: UIColor { $0.userInterfaceStyle == .dark ? UIColor(white:0.16,alpha:1) : UIColor(red:0.94,green:0.94,blue:0.95,alpha:1) })
+    static let disabledText = Color(uiColor: UIColor { $0.userInterfaceStyle == .dark ? UIColor(white:0.60,alpha:1) : UIColor(red:0.43,green:0.45,blue:0.49,alpha:1) })
+    static let disabledBorder = Color(uiColor: .systemGray4)
+    static let selected = Color(uiColor: UIColor { $0.userInterfaceStyle == .dark ? UIColor(red:0.43,green:0.74,blue:0.40,alpha:1) : UIColor(red:46/255,green:125/255,blue:50/255,alpha:1) })
+    static let selectedSurface = Color(uiColor: UIColor { $0.userInterfaceStyle == .dark ? UIColor(red:0.10,green:0.22,blue:0.13,alpha:1) : UIColor(red:0.89,green:0.95,blue:0.90,alpha:1) })
+    static let statusReady = StatusIndicatorPalette.ready
+    static let statusOffline = StatusIndicatorPalette.offline
+    static let statusBlue = StatusIndicatorPalette.blue
 }
 struct SecondaryActionStyle: ButtonStyle {
     @Environment(\.isEnabled) private var isEnabled
     @Environment(\.equalActionRow) private var equalRow
     func makeBody(configuration: Configuration) -> some View {
-        configuration.label.font(.body.weight(.semibold))
+        configuration.label.font(.headline)
             .multilineTextAlignment(.center)
-            .foregroundStyle(isEnabled ? (configuration.role == .destructive ? Color.white : Brand.ink) : Brand.secondaryInk)
+            .foregroundStyle(isEnabled ? (configuration.role == .destructive ? Color.white : Brand.ink) : AppPalette.disabledText)
             .padding(.horizontal, DesignMetrics.actionHorizontalPadding).padding(.vertical, DesignMetrics.actionVerticalPadding)
             .frame(maxWidth:.infinity,minHeight:DesignMetrics.secondaryHeight,maxHeight:equalRow ? .infinity : nil)
-            .background(isEnabled ? (configuration.role == .destructive ? AppPalette.destructive : AppPalette.secondary) : Color(uiColor: .systemGray5), in: RoundedRectangle(cornerRadius: DesignMetrics.actionRadius))
+            .background(isEnabled ? (configuration.role == .destructive ? AppPalette.destructive : AppPalette.secondary) : AppPalette.disabledSurface, in: RoundedRectangle(cornerRadius: DesignMetrics.actionRadius))
+            .overlay(RoundedRectangle(cornerRadius:DesignMetrics.actionRadius).strokeBorder(isEnabled ? (configuration.role == .destructive ? AppPalette.destructive : Brand.ink) : AppPalette.disabledBorder,lineWidth:1))
             .contentShape(RoundedRectangle(cornerRadius:DesignMetrics.actionRadius))
-            .opacity(configuration.isPressed ? 0.8 : 1)
+            .opacity(configuration.isPressed && isEnabled ? 0.85 : 1)
     }
 }
 
@@ -138,17 +151,20 @@ struct LeadingActionLabel: View {
 }
 
 struct AutomationIcon: View {
-    var body: some View { Image("android-auto-mode").resizable().scaledToFit().frame(width:26,height:26).accessibilityHidden(true) }
+    var body: some View { Image("android-auto-mode").resizable().scaledToFit().frame(width:24,height:24).accessibilityHidden(true) }
 }
 
 struct SquareIconActionStyle: ButtonStyle {
     @Environment(\.isEnabled) private var enabled
     var destructive = false
     func makeBody(configuration:Configuration) -> some View {
-        configuration.label.frame(width:48,height:48)
-            .foregroundStyle(enabled ? (destructive ? AppPalette.destructive : Brand.ink) : Brand.secondaryInk)
-            .background(enabled ? AppPalette.secondary : Color(uiColor:.systemGray5),in:RoundedRectangle(cornerRadius:12))
-            .opacity(configuration.isPressed ? 0.75 : 1)
+        let danger=destructive || configuration.role == .destructive
+        return configuration.label.frame(width:DesignMetrics.iconActionSize,height:DesignMetrics.iconActionSize)
+            .foregroundStyle(enabled ? (danger ? Color.white : Brand.ink) : AppPalette.disabledText)
+            .background(enabled ? (danger ? AppPalette.destructive : AppPalette.secondary) : AppPalette.disabledSurface,in:RoundedRectangle(cornerRadius:12))
+            .overlay(RoundedRectangle(cornerRadius:12).strokeBorder(enabled ? (danger ? AppPalette.destructive : Brand.ink) : AppPalette.disabledBorder,lineWidth:1))
+            .contentShape(RoundedRectangle(cornerRadius:12))
+            .opacity(configuration.isPressed && enabled ? 0.85 : 1)
     }
 }
 
@@ -158,9 +174,9 @@ struct ActionButtonLabel: View {
     @Environment(\.isEnabled) private var isEnabled
     var body: some View {
         HStack(spacing: 10) {
-            if busy { ProgressView().controlSize(.small).tint(isEnabled ? Color(uiColor: .systemBackground) : Brand.secondaryInk) }
+            if busy { ProgressView().controlSize(.small).tint(isEnabled ? Color(uiColor: .systemBackground) : AppPalette.statusBlue) }
             Text(title).multilineTextAlignment(.center)
-        }
+        }.accessibilityValue(busy ? ProductText.string("ios_action_working") : "")
     }
 }
 

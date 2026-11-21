@@ -38,6 +38,7 @@ struct QRScannerScreen: View {
                 }
             }
             .navigationTitle(ProductText.string("add_key_scan")).navigationBarTitleDisplayMode(.inline)
+            .toolbar(.visible,for:.navigationBar)
             .sheetDismissFooter("Закрыть") { dismiss() }
             .onChange(of: phase) { value in
                 if value == .active { permission = AVCaptureDevice.authorizationStatus(for: .video) }

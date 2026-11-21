@@ -17,13 +17,19 @@
 
 ## Проверки этого source
 
-Локально: frontend parse App/Widget/hosted/UI, diff check, одиннадцать capture-pipeline
-контрактов прошли. Ядро не менялось: повторный Linux core-прогон не нужен.
-Следующий общий Apple пакет ожидает312core/197hosted/29UI/58оригинальныхPNG.
-Две новые контрольные точки — меню логотипа и production-диалог запроса гостя
-после проверки подписанного offline fixture frame. Стенд не вызывает реальные
-API/телефонию. Source есть; SDK/runtime/визуальная приёмка пока ожидаются.
-Новый набор публикуется только после полного успеха и просмотра оригиналов.
+[Apple CI44877317284](https://github.com/entrixy/ios-build./actions/runs/44877317284),
+publicde13dad/nativee2defc3:312core,197hosted,29UI прошли,6 дополнительных
+focused cases (Diagnostic/Home по3) прошли. Debug/Release/privacy/isolation и
+unsigned app/widget archive для iphoneos arm64 прошли. Все58 оригинальных
+PNG из единственного полного прохода просмотрены, опубликованы вместо56 старых;
+HTTPS-хеши всех58 и desktop/mobile управление галереей проверены. Логи/хеши/
+ограничения собраны в [CURRENT_STATUS.md](CURRENT_STATUS.md).
+
+Локально прошли frontend parse,11pipeline и5 process-watchdog regressions.
+Реальные API/телефония в UI fixture не вызываются. Касания/переходы диагностики
+фиксируются только в DEBUG simulator profiles без изменения значения/повтора
+жеста. Это дополнительное наблюдение, а не доказанная причина прежних сбоев
+XCTest. Приёмка ввода на реальном iPhone остаётся отдельной задачей.
 
 Телефонные тесты подменяют dialer: они проверяют правильность допуска и статусов,
 а не сотовый вызов. Signed archive, реальный iPhone, SIM, фон/permissions, live
@@ -42,7 +48,12 @@ Design icons под Apache2.0; лицензия уже сохранена в Thi
 и App/Resources/MaterialIcons-LICENSE.txt. Архив зависимости не коммитится.
 Dependency classes.jar SHA256: 2baa76b246bef86b8c8f2f754fe3f08280222edfe16e1534fc21e0654a443c39
 
-## Исполненный первый проход и исправления
+## История предыдущих неуспешных проходов
+
+Ниже исторические причины и изменения; их pending/failure не заменяют
+успешный итог44877317284 выше.
+
+### Исполненный первый проход и исправления
 
 Public0ea9e85/native31710fe, run44772469664/job136413417911:197hosted без ошибок
 (32.880s), включая все новые phone lifecycle cases. Debug/Release и подготовка

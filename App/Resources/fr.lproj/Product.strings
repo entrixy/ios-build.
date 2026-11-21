@@ -964,3 +964,19 @@
 "ios_guest_call_request_body" = "Objet : %@. Ouvrez Entrixy pour appeler.";
 "ios_guest_call_expired" = "La demande a expiré";
 "ios_call_now" = "Appeler";
+
+/* Shared action states, map controls and delegation review — 21 Nov 2026. */
+"ios_action_working" = "En cours…";
+"ios_map_expand" = "Agrandir la carte";
+"ios_map_collapse" = "Réduire la carte";
+"ios_map_draw_corridor" = "Tracer un couloir";
+"ios_guest_open_request" = "L’invité « %@ » demande l’ouverture de « %@ ».";
+"ios_call_question" = "Appeler ?";
+"ios_manual_call_question" = "Appeler pour ouvrir « %@ » ?";
+"ios_request_open_question" = "Demander l’ouverture de « %@ » ?";
+"ios_manual_open_question" = "Ouvrir « %@ » ?";
+"ios_backup_save_file" = "Enregistrer le fichier";
+"ios_backup_share_file" = "Partager la sauvegarde";
+"ios_delegation_depth" = "Niveaux de délégation";
+"ios_delegation_key_count" = "Clés à déléguer";
+"ios_map_draw_hint" = "Touchez « Tracer un couloir », puis tracez le trajet de l’entrée au portail.";

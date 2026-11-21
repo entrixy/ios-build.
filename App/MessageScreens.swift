@@ -101,7 +101,7 @@ struct ComposeMessageScreen: View {
                         .accessibilityIdentifier("message-send")
                 } header: { Text("Сообщение получателю") } footer: { Text("Отправка на сервер ещё не подтверждает доставку или чтение получателем.") }
             }.disabled(manager.busy)
-            .navigationTitle("Написать сообщение").navigationBarTitleDisplayMode(.inline)
+            .taskSheetTitle("Написать сообщение",form:true)
             .sheetDismissFooter(sentID == nil ? "Отмена" : "Закрыть", disabled: manager.busy) { dismiss() }
 
         }

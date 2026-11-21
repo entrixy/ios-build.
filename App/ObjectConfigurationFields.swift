@@ -17,7 +17,7 @@ struct WebhookConfigurationFields: View {
             HStack {
                 TextField("", text: $secret).textInputAutocapitalization(.never).autocorrectionDisabled()
                 Button { UIPasteboard.general.string = secret } label: { Image(systemName: "doc.on.doc") }
-                    .buttonStyle(.borderless).accessibilityLabel(ProductText.string("btn_copy")).disabled(secret.isEmpty)
+                    .buttonStyle(SquareIconActionStyle()).accessibilityLabel(ProductText.string("btn_copy")).disabled(secret.isEmpty)
             }
             Text(ProductText.string("add_object_webhook_secret_hint")).font(.footnote).foregroundStyle(Brand.secondaryInk)
         }
@@ -62,6 +62,7 @@ struct ObjectRadioChoice: View {
         Button(action: select) {
             HStack(spacing: 12) {
                 Image(systemName: selected ? "largecircle.fill.circle" : "circle")
+                    .foregroundStyle(selected ? AppPalette.selected : Brand.secondaryInk)
                 Text(title).font(.subheadline).frame(maxWidth: .infinity, alignment: .leading)
             }.foregroundStyle(Brand.ink).frame(minHeight: DesignMetrics.secondaryHeight).contentShape(Rectangle())
         }.buttonStyle(.plain).accessibilityAddTraits(selected ? .isSelected : [])
@@ -92,8 +93,7 @@ struct ObjectCameraFields: View {
             LazyVGrid(columns: [GridItem(.adaptive(minimum: 120))], spacing: 8) {
                 ForEach(["none", "basic", "bearer", "header"], id: \.self) { value in
                     Button { camera.authType = value } label: { Text(ProductText.string("snap_auth_" + value)).font(.subheadline) }
-                        .buttonStyle(SecondaryActionStyle())
-                        .overlay(RoundedRectangle(cornerRadius: DesignMetrics.actionRadius).strokeBorder(camera.authType == value ? Brand.ink : .clear, lineWidth: 2))
+                        .buttonStyle(SelectedOptionStyle(selected:camera.authType == value))
                         .accessibilityAddTraits(camera.authType == value ? .isSelected : [])
                 }
             }
@@ -109,11 +109,11 @@ struct ObjectCameraFields: View {
             }
             if !video {
                 Text(ProductText.string("snap_interval",camera.intervalSec))
-                Slider(value:Binding(get:{ Double(camera.intervalSec) },set:{ camera.intervalSec=Int($0) }),in:0...30,step:1)
+                Slider(value:Binding(get:{ Double(camera.intervalSec) },set:{ camera.intervalSec=Int($0) }),in:0...30,step:1).tint(AppPalette.selected)
             }
             Picker(ProductText.string("snap_show_when_title"),selection:$camera.showWhen) {
                 ForEach(["always","call","nearby"],id:\.self) { value in Text(ProductText.string("snap_when_"+value)).tag(value) }
-            }.pickerStyle(.inline)
+            }.pickerStyle(.inline).tint(AppPalette.selected)
         }
     }
 }
@@ -139,7 +139,7 @@ struct DeviceCredentialsSheet: View {
                     }.buttonStyle(PrimaryActionStyle())
                 }.padding(DesignMetrics.pageInset)
             }.background(Color(uiColor:.systemGroupedBackground))
-                .navigationTitle(ProductText.string("device_qr_title")).navigationBarTitleDisplayMode(.inline)
+                .taskSheetTitle(ProductText.string("device_qr_title"))
                 .sheetDismissFooter(ProductText.string("btn_done")) { dismiss() }
         }
     }

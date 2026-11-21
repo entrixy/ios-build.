@@ -169,6 +169,7 @@ struct SettingsScreen: View {
                             Button { appearance = choice } label: {
                                 HStack(spacing:12) {
                                     Image(systemName:appearance == choice ? "largecircle.fill.circle" : "circle")
+                                        .foregroundStyle(appearance == choice ? AppPalette.selected : Brand.secondaryInk)
                                     Text(ProductText.string("theme_" + choice)).frame(maxWidth:.infinity,alignment:.leading)
                                 }.foregroundStyle(Brand.ink).frame(minHeight:44).contentShape(Rectangle())
                             }.buttonStyle(.plain).accessibilityIdentifier("theme-"+choice).accessibilityAddTraits(appearance == choice ? .isSelected : [])

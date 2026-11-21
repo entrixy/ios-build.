@@ -26,10 +26,9 @@ private struct ObjectWidgetView: View {
     let entry: ObjectWidgetEntry
     private var statusColor: Color {
         switch entry.object?.currentStatus(at:entry.date) {
-        case .ready: return Color(red:149/255,green:193/255,blue:31/255)
-        case .connecting: return .orange
-        case .neutral: return Color(red:26/255,green:86/255,blue:168/255)
-        default: return Color(red:226/255,green:116/255,blue:116/255)
+        case .ready: return StatusIndicatorPalette.ready
+        case .connecting, .neutral: return StatusIndicatorPalette.blue
+        default: return StatusIndicatorPalette.offline
         }
     }
     var body: some View {

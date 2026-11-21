@@ -23,6 +23,7 @@ private final class PassAPIStub: DelegationTransport {
     var onVouch: (([String: Any]) throws -> Void)?
     var beforeEdit: (([String:Any]) -> Void)?
     var scoped = false
+    var allowedDepth = 2,allowedPool = 8
     private var invitationsBySource: [String:[[String:Any]]] = [:]
     private var childrenBySource: [String:[[String:Any]]] = [:]
     func delegationInfo(server: String, group: String) async throws -> Data { throw BackupFailure.invalidPayload }
@@ -41,7 +42,7 @@ private final class PassAPIStub: DelegationTransport {
         switch operation {
         case .list:
             lists += 1
-            return try JSONSerialization.data(withJSONObject: ["objects": [["id": 7, "depth": 2, "pool_left": 8, "native_only": 0]], "invites": invitations, "children": children, "journal": journalEvents])
+            return try JSONSerialization.data(withJSONObject: ["objects": [["id": 7, "depth": allowedDepth, "pool_left": allowedPool, "native_only": 0]], "invites": invitations, "children": children, "journal": journalEvents])
         case .create:
             creates += 1; beforeCreate?()
             invitations = [["code": code, "grp": group, "status": "new", "objects": json["objects"]!]]
@@ -79,6 +80,27 @@ private final class PassAPIStub: DelegationTransport {
 
 @MainActor
 final class PassManagerTests: XCTestCase {
+    func testSeveralRemainingLevelsAndPoolPersistBeforeWireAndCannotExceedParent() async throws {
+        let source=try invite(),api=PassAPIStub(),storage=PassMemoryStorage(source)
+        api.allowedDepth=4;api.allowedPool=12
+        let app=AppModel(storage:storage),manager=PassManager(app:app,api:api)
+        defer { app.suspend() }
+        let desired=try KeyObjectAccess(depth:3,pool:7)
+        api.beforeCreate = {
+            XCTAssertEqual(storage.state?.passedAccess?.first?.parts.first?.objects["7"],desired)
+            XCTAssertEqual(storage.state?.passedAccess?.first?.parts.first?.sent,true)
+        }
+        let created=await manager.create(label:"Получатель",welcome:"",objects:[source.id:[7:desired]])
+        XCTAssertNotNil(created);XCTAssertEqual(api.creates,1)
+        XCTAssertEqual(app.passedAccess.first?.parts.first?.objects["7"],desired)
+        let objects=try XCTUnwrap(api.invitations.first?["objects"] as? [[String:Any]])
+        let sent=try XCTUnwrap(objects.first)
+        XCTAssertEqual(sent["depth"] as? Int,3);XCTAssertEqual(sent["pool"] as? Int,7)
+        let excessiveDepth=await manager.create(label:"Недопустимый",welcome:"",objects:[source.id:[7:try KeyObjectAccess(depth:4,pool:7)]])
+        let excessivePool=await manager.create(label:"Недопустимый",welcome:"",objects:[source.id:[7:try KeyObjectAccess(depth:3,pool:12)]])
+        XCTAssertNil(excessiveDepth);XCTAssertNil(excessivePool)
+        XCTAssertEqual(api.creates,1);XCTAssertEqual(app.passedAccess.count,1)
+    }
     func testAdditionalSourcePartSavesBeforeWireAndLostReplyRecoversWithoutAnotherCreate() async throws {
         let first = try invite(), second = try GuestInvite.parse("https://sender.invalid/key#ICEiIyQlJicoKSorLC0uLzAxMjM0NTY3" + String(repeating:"A",count:43))
         let api = PassAPIStub(), storage = PassMemoryStorage(first)

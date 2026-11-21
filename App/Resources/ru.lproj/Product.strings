@@ -964,3 +964,19 @@
 "ios_guest_call_request_body" = "Объект: %@. Откройте Entrixy, чтобы позвонить.";
 "ios_guest_call_expired" = "Срок запроса истёк";
 "ios_call_now" = "Позвонить";
+
+/* Shared action states, map controls and delegation review — 21 Nov 2026. */
+"ios_action_working" = "Выполняется…";
+"ios_map_expand" = "Развернуть карту";
+"ios_map_collapse" = "Свернуть карту";
+"ios_map_draw_corridor" = "Рисовать коридор";
+"ios_guest_open_request" = "Гость «%@» запрашивает открытие объекта «%@».";
+"ios_call_question" = "Позвонить?";
+"ios_manual_call_question" = "Позвонить для открытия объекта «%@»?";
+"ios_request_open_question" = "Запросить открытие объекта «%@»?";
+"ios_manual_open_question" = "Открыть объект «%@»?";
+"ios_backup_save_file" = "Сохранить файл";
+"ios_backup_share_file" = "Поделиться копией";
+"ios_delegation_depth" = "Уровней передачи";
+"ios_delegation_key_count" = "Ключей для передачи";
+"ios_map_draw_hint" = "Нажмите «Рисовать коридор» и проведите пальцем линию от въезда к воротам.";

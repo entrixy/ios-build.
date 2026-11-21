@@ -82,7 +82,7 @@ struct PassAccessForm: View {
                 Section {
                     AppField(ProductText.string("guests_name_label")) {
                         TextField(ProductText.string("guests_default_name"),text:$label).textInputAutocapitalization(.words)
-                            .onChange(of:label) { label = String($0.replacingOccurrences(of:"\n",with:"").replacingOccurrences(of:"\r",with:"").prefix(128)) }
+                            .onChange(of:label) { value in let normalized=String(value.replacingOccurrences(of:"\n",with:"").replacingOccurrences(of:"\r",with:"").prefix(128));if normalized != value { label=normalized } }
                     }
                     if accessID == nil { AppField(ProductText.string("guests_welcome_label")) { TextField(ProductText.string("guests_welcome_hint"),text:$welcome,axis:.vertical).lineLimit(2...5) } }
                 }
@@ -102,7 +102,7 @@ struct PassAccessForm: View {
                         .disabled(selected.isEmpty || record?.parts.contains(where:{ $0.pendingEdit != nil || $0.state == .draft }) == true)
                 }
             }.disabled(saving || manager.busy || app.busy || app.ownerBusy || !app.canManageGuestAccess)
-                .navigationTitle(ProductText.string(accessID == nil ? "delegate_create" : "guests_access_title")).navigationBarTitleDisplayMode(.inline)
+                .taskSheetTitle(ProductText.string(accessID == nil ? "delegate_create" : "guests_access_title"),form:true)
                 .sheetDismissFooter(disabled:saving || manager.busy) { dismiss() }
                 .sheet(item:$editingAccess) { option in
                     GuestObjectAccessEditor(title:option.object.label,value:Binding(get:{ value(option) },set:{ selected[option.source.id,default:[:]][option.object.numberID] = $0 }),showNative:false,maxDepth:option.maximumDepth,maxPool:option.maximumPool)
@@ -118,13 +118,13 @@ struct PassAccessForm: View {
         let other = lockedHost != nil && lockedHost != option.source.invite.server
         return HStack(spacing:8) {
             Button { toggle(option) } label: {
-                HStack(spacing:12) { Image(systemName:checked ? "checkmark.square.fill" : "square"); Text(option.object.label).frame(maxWidth:.infinity,alignment:.leading) }
+                HStack(spacing:12) { Image(systemName:checked ? "checkmark.square.fill" : "square").foregroundStyle(checked ? AppPalette.selected : Brand.secondaryInk); Text(option.object.label).frame(maxWidth:.infinity,alignment:.leading) }
                     .foregroundStyle(other ? Brand.secondaryInk : Brand.ink).frame(minHeight:52).contentShape(Rectangle())
             }.buttonStyle(.plain).disabled(other || option.source.paused)
                 .accessibilityIdentifier("pass-object-" + option.id)
             if checked {
-                Button { editingAccess = option } label: { Image(systemName:"person.badge.key").font(.system(size:22)).frame(width:48,height:48) }
-                    .buttonStyle(SecondaryActionStyle()).accessibilityLabel(ProductText.string("guests_access_title"))
+                Button { editingAccess = option } label: { Image(systemName:"person.badge.key").resizable().scaledToFit().frame(width:24,height:24) }
+                    .buttonStyle(SquareIconActionStyle()).accessibilityLabel(ProductText.string("guests_access_title"))
             }
         }
     }
@@ -244,7 +244,7 @@ struct EditPassedObjects: View {
                     Button("Сохранить объекты") { Task { if await manager.editObjects(accessID, sourceID: sourceID, numberIDs: selected) { dismiss() } } }.buttonStyle(PrimaryActionStyle()).disabled(guest == nil)
                 } footer: { Text("Удаление объекта заберёт его и у тех, кому получатель передал ключ дальше. Пустой набор отзывает эту часть доступа. Добавленные объекты потребуют подтверждения владельца.") }
             }.disabled(manager.busy || app.busy || app.ownerBusy || part?.pendingEdit != nil)
-            .navigationTitle("Объекты получателя").navigationBarTitleDisplayMode(.inline)
+            .taskSheetTitle("Объекты получателя",form:true)
             .sheetDismissFooter(disabled: manager.busy || app.busy || app.ownerBusy) { dismiss() }
 
             .task { if !loaded { loaded = true; selected = Set(part?.objects.keys.compactMap(Int.init) ?? []) }; await manager.reload(sourceID: sourceID) }

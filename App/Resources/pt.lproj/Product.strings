@@ -964,3 +964,19 @@
 "ios_guest_call_request_body" = "Objeto: %@. Abra o Entrixy para ligar.";
 "ios_guest_call_expired" = "O pedido expirou";
 "ios_call_now" = "Ligar";
+
+/* Shared action states, map controls and delegation review — 21 Nov 2026. */
+"ios_action_working" = "Em andamento…";
+"ios_map_expand" = "Ampliar mapa";
+"ios_map_collapse" = "Reduzir mapa";
+"ios_map_draw_corridor" = "Desenhar corredor";
+"ios_guest_open_request" = "O convidado «%@» solicita a abertura de «%@».";
+"ios_call_question" = "Ligar?";
+"ios_manual_call_question" = "Ligar para abrir «%@»?";
+"ios_request_open_question" = "Solicitar a abertura de «%@»?";
+"ios_manual_open_question" = "Abrir «%@»?";
+"ios_backup_save_file" = "Guardar ficheiro";
+"ios_backup_share_file" = "Partilhar cópia";
+"ios_delegation_depth" = "Níveis de delegação";
+"ios_delegation_key_count" = "Chaves para delegar";
+"ios_map_draw_hint" = "Toque em «Desenhar corredor» e trace o percurso da entrada até ao portão.";

@@ -4,18 +4,22 @@ Native iOS port of the full Android client, not an expansion of Entrixy Open.
 The existing full client defines expected behavior and the server wire formats.
 This repository is private working source; no new distribution license is assigned.
 
-## Current implementation and verification — 19 November 2026
+## Current implementation and verification — 21 November 2026
 
 The current baseline, remaining work and evidence are maintained in
 [CURRENT_STATUS.md](docs/CURRENT_STATUS.md); use it before the historical notes
 below. The autonomous batch workflow is [AUTONOMOUS_WORK.md](docs/AUTONOMOUS_WORK.md).
 
-Native ec2c81f/public487b2f6, [CI44521810979](https://github.com/entrixy/ios-build./actions/runs/44521810979),
-passed Apple312core,191hosted,27UI, Debug/Release/privacy/isolation and unsigned
-physical-iPhone app/widget archive. All56 original screenshots were reviewed and
-published in the [gallery](https://entrixy.com/ios-design.php), replacing19older
-frames. Signing, real device/interoperability acceptance and Store gates remain
-open. Backend APNs source is verified in isolation but unconfigured for real delivery.
+Native e2defc3/publicde13dad, [CI44877317284](https://github.com/entrixy/ios-build./actions/runs/44877317284),
+passed Apple312core,197hosted,29UI and6 focused switch cases, Debug/Release/privacy/
+isolation and an unsigned physical-iPhone app/widget archive. All58 original native
+screenshots were inspected and published in the [gallery](https://entrixy.com/ios-design.php),
+replacing56 older frames; public image hashes and desktop/mobile interactions passed.
+The ten authorised review corrections are implemented and recorded in
+[REVIEW_FIXES_20261120.md](docs/REVIEW_FIXES_20261120.md). Earlier intermittent XCTest
+input failures remain documented; their precise cause is not established by a passing
+instrumented simulator run. Signing, actual iPhone/interoperability acceptance and Store
+gates remain open. Backend APNs is verified in isolation, not configured for real delivery.
 
 The following dated package notes are historical, not the current status.
 

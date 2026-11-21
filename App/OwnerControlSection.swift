@@ -11,13 +11,20 @@ struct OwnerPhoneRequestDialog: View {
            let owner = app.owners.first(where: { $0.server == request.server }),
            let object = owner.objects?.first(where: { $0.id == request.objectID }),
            let key = try? owner.authorizedGuest(localID: request.keyID, numberID: object.numberID ?? 0) {
+            let objectLabel = app.objectLabel(.owned(owner,object))
             AppDialogSurface {
                 VStack(alignment: .leading, spacing: 18) {
                     Text(ProductText.string("confirm_title")).font(.title3.bold()).accessibilityAddTraits(.isHeader)
-                    Text(ProductText.string("confirm_text_intro", key.label))
-                    Text((try? object.metadata(masterKey: owner.masterKey)["label"] as? String) ?? "Объект").font(.headline)
+                    HStack(alignment:.top,spacing:16) {
+                        CatalogAvatar(entry:.owned(owner,object),size:64)
+                            .accessibilityElement(children:.ignore).accessibilityAddTraits(.isImage)
+                            .accessibilityLabel(objectLabel).accessibilityIdentifier("owner-phone-object-image")
+                        Text(ProductText.string("ios_guest_open_request",key.label,objectLabel))
+                            .frame(maxWidth:.infinity,alignment:.leading)
+                            .accessibilityIdentifier("owner-phone-request-description")
+                    }
                     if object.kind == "call" {
-                        Text(ProductText.string("ios_guest_call_explicit")).font(.footnote).foregroundStyle(Brand.secondaryInk)
+                        Text(ProductText.string("ios_call_question")).font(.headline)
                     }
 
                 }
