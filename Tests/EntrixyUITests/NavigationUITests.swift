@@ -105,7 +105,9 @@ final class NavigationUITests: XCTestCase {
         let start = origin.withOffset(CGVector(dx:frame.minX+frame.width*(wasOn ? 0.75 : 0.25)-window.minX,dy:frame.midY-window.minY))
         let end = origin.withOffset(CGVector(dx:frame.minX+frame.width*(wasOn ? 0.25 : 0.75)-window.minX,dy:frame.midY-window.minY))
         print("SWITCH_GESTURE id=\(control.identifier) frame=\(frame) window=\(window) fromOn=\(wasOn)")
-        start.press(forDuration:0.1,thenDragTo:end)
+        // A List may defer the touch-down while deciding whether to scroll.
+        // Hold the real thumb before moving, then release it at the target.
+        start.press(forDuration:0.4,thenDragTo:end,withVelocity:.slow,thenHoldForDuration:0.2)
     }
     @discardableResult private func setAutomationRule(_ symbol:String,to enabled:Bool,in app:XCUIApplication) -> XCUIElement {
         let row = app.descendants(matching:.any).matching(identifier:"automation-rule-"+symbol).firstMatch
@@ -342,6 +344,7 @@ final class NavigationUITests: XCTestCase {
         XCTAssertTrue(toggle.exists); XCTAssertTrue(toggle.isEnabled); XCTAssertEqual(toggle.value as? String,"0")
         reviewCapture("home-network",settledBy:toggle)
         tapSwitchControl(toggle,in:app)
+        XCTAssertTrue(waitForStable(toggle,in:app,requireHit:false))
         let enabled = XCTNSPredicateExpectation(predicate:NSPredicate { _,_ in toggle.value as? String == "1" },object:nil)
         XCTAssertEqual(XCTWaiter.wait(for:[enabled],timeout:5),.completed)
         let remove = app.buttons.matching(NSPredicate(format:"identifier BEGINSWITH %@","privacy-remove-")).firstMatch
@@ -382,7 +385,8 @@ final class NavigationUITests: XCTestCase {
         let control = nativeSwitch(row)
         bringIntoView(row,in:app)
         XCTAssertEqual(control.value as? String,"0"); tapSwitchControl(control,in:app)
-        let enabled = XCTNSPredicateExpectation(predicate:NSPredicate { _,_ in control.value as? String == "1" },object:control)
+        XCTAssertTrue(waitForStable(control,in:app,requireHit:false))
+        let enabled = XCTNSPredicateExpectation(predicate:NSPredicate { _,_ in control.value as? String == "1" },object:nil)
         XCTAssertEqual(XCTWaiter.wait(for:[enabled],timeout:5),.completed)
         XCTAssertFalse(app.buttons["diagnostics-send"].exists)
         reviewCapture("diagnostic-settings")

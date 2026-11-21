@@ -11,12 +11,12 @@ concurrency:
 jobs:
   compile:
     runs-on: ${{ (github.ref == 'refs/heads/ci/ui-review-arm' || github.ref == 'refs/heads/ci/native-review-arm') && 'macos-15' || 'macos-15-intel' }}
-    timeout-minutes: 120
+    timeout-minutes: 180
     env:
       DEVELOPER_DIR: /Applications/Xcode_26.3.app/Contents/Developer
-      # Temporary narrow diagnosis after repeated switch interaction failures.
-      # Must be empty for the complete review/publication run.
-      ENTRIXY_FOCUSED_SWITCHES: ''
+      # Narrow stress cases must pass before the full batch, using this build.
+      # '1' is diagnosis only; 'preflight' continues into complete acceptance.
+      ENTRIXY_FOCUSED_SWITCHES: 'preflight'
     defaults:
       run:
         shell: bash
@@ -50,16 +50,23 @@ jobs:
       - name: Verify native UI routes without taking a product screenshot batch
         if: startsWith(github.ref, 'refs/heads/ci/ui-review')
         run: python3 scripts/test_simulator.py --only-ui --use-built-tests 2>&1 | tee .local-checks/ci/ui-tests.log
+      - name: Diagnose the two failing native switch scenarios without a gallery export
+        if: github.ref == 'refs/heads/ci/review-batch' && env.ENTRIXY_FOCUSED_SWITCHES != ''
+        run: |
+          python3 scripts/test_simulator.py --only-ui --use-built-tests --prepared-device .local-checks/ci/prepared-device.json --keep-prepared-device --iterations 3 \
+            --test EntrixyUITests/NavigationUITests/testCrashConsentAndSevenTapDeveloperLogUseNativeSettingsAndPreserveNavigation \
+            --test EntrixyUITests/NavigationUITests/testHomeNetworkConsentAndRemovalUseSystemSectionAndPreserveReceivedKeys \
+            2>&1 | tee .local-checks/ci/focused-switches.log
+      - name: Retain focused diagnosis before the complete acceptance pass
+        if: always() && github.ref == 'refs/heads/ci/review-batch' && env.ENTRIXY_FOCUSED_SWITCHES != ''
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: focused-switch-evidence
+          path: .local-checks/ci/
+          retention-days: 3
       - name: Verify native and UI scenarios with original screenshots in the same simulator pass
         if: github.ref == 'refs/heads/ci/review-batch' && env.ENTRIXY_FOCUSED_SWITCHES != '1'
         run: python3 scripts/test_simulator.py --use-built-tests --review-captures --prepared-device .local-checks/ci/prepared-device.json 2>&1 | tee .local-checks/ci/combined-review.log
-      - name: Diagnose the two failing native switch scenarios without a gallery export
-        if: github.ref == 'refs/heads/ci/review-batch' && env.ENTRIXY_FOCUSED_SWITCHES == '1'
-        run: |
-          python3 scripts/test_simulator.py --only-ui --use-built-tests --prepared-device .local-checks/ci/prepared-device.json \
-            --test EntrixyUITests/NavigationUITests/testActualWebhookEditorContainsAndroidFieldsAndAutomationRoute \
-            --test EntrixyUITests/NavigationUITests/testHomeNetworkConsentAndRemovalUseSystemSectionAndPreserveReceivedKeys \
-            2>&1 | tee .local-checks/ci/focused-switches.log
       - name: Retain compilation evidence
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02

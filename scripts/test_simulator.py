@@ -65,9 +65,15 @@ def main():
     parser.add_argument('--review-captures', action='store_true', help='Capture named UI checkpoints during the same native/UI test pass')
     parser.add_argument('--prepared-device',type=Path,help='Use the verified source/runtime-matched device prepared before compilation')
     parser.add_argument('--test',action='append',default=[],help='Exact EntrixyUITests method for focused diagnosis; never exports a gallery')
+    parser.add_argument('--iterations',type=int,default=1,help='Repeat every selected diagnostic test; not a retry-on-failure')
+    parser.add_argument('--keep-prepared-device',action='store_true',help='Leave the owned prepared device for the next pass; workflow finally must clean up')
     args = parser.parse_args()
     if args.test and (args.review_captures or not args.only_ui or any(not name.startswith('EntrixyUITests/NavigationUITests/test') or not name.replace('/','').replace('_','').isalnum() for name in args.test)):
         parser.error('--test requires --only-ui and exact UI methods, without --review-captures')
+    if not 1 <= args.iterations <= 3 or (args.iterations != 1 and not args.test):
+        parser.error('--iterations 2 or 3 requires explicit diagnostic --test selection')
+    if args.keep_prepared_device and (not args.prepared_device or not args.test):
+        parser.error('--keep-prepared-device requires a prepared device and explicit diagnostic tests')
     if args.review_captures and (not args.use_built_tests or args.only_native):
         parser.error('--review-captures requires --use-built-tests and UI tests')
     if args.use_built_tests:
@@ -93,6 +99,8 @@ def main():
                         '-derivedDataPath','.local-checks/DerivedData','CODE_SIGNING_ALLOWED=YES','CODE_SIGN_IDENTITY=-']
         if args.test:
             command.extend('-only-testing:'+name for name in args.test)
+            if args.iterations > 1:
+                command.extend(['-test-iterations',str(args.iterations)])
         elif args.only_ui:
             command.append('-only-testing:EntrixyUITests')
         elif args.only_native:
@@ -129,7 +137,8 @@ def main():
                     try: export_review(result,Path('.local-checks/ci/screenshots'),tests_succeeded=False)
                     except Exception as error: print('Could not export partial UI review:',error,flush=True)
         finally:
-            cleanup_device(device)
+            if not args.keep_prepared_device:
+                cleanup_device(device)
 
 
 if __name__ == '__main__':
