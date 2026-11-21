@@ -64,7 +64,10 @@ def main():
     parser.add_argument("--use-built-tests", action="store_true", help="Run the existing build-for-testing products without rebuilding")
     parser.add_argument('--review-captures', action='store_true', help='Capture named UI checkpoints during the same native/UI test pass')
     parser.add_argument('--prepared-device',type=Path,help='Use the verified source/runtime-matched device prepared before compilation')
+    parser.add_argument('--test',action='append',default=[],help='Exact EntrixyUITests method for focused diagnosis; never exports a gallery')
     args = parser.parse_args()
+    if args.test and (args.review_captures or not args.only_ui or any(not name.startswith('EntrixyUITests/NavigationUITests/test') or not name.replace('/','').replace('_','').isalnum() for name in args.test)):
+        parser.error('--test requires --only-ui and exact UI methods, without --review-captures')
     if args.review_captures and (not args.use_built_tests or args.only_native):
         parser.error('--review-captures requires --use-built-tests and UI tests')
     if args.use_built_tests:
@@ -88,7 +91,9 @@ def main():
         else:
             command += ['-project','Entrixy.xcodeproj','-scheme','EntrixyTests','-configuration','Debug',
                         '-derivedDataPath','.local-checks/DerivedData','CODE_SIGNING_ALLOWED=YES','CODE_SIGN_IDENTITY=-']
-        if args.only_ui:
+        if args.test:
+            command.extend('-only-testing:'+name for name in args.test)
+        elif args.only_ui:
             command.append('-only-testing:EntrixyUITests')
         elif args.only_native:
             command.append('-only-testing:EntrixyAppTests')
