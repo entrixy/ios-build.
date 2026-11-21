@@ -65,6 +65,9 @@ final class NavigationUITests: XCTestCase {
         }
     }
     private func nativeSwitch(_ row: XCUIElement) -> XCUIElement {
+        // SwiftUI exposes the labelled Toggle as the actionable switch. Its
+        // UIKit implementation child can exist while being non-hittable.
+        if row.elementType == .switch { return row }
         let thumb = row.switches.firstMatch
         return thumb.exists ? thumb : row
     }

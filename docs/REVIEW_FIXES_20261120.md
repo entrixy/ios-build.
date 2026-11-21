@@ -155,3 +155,18 @@ exit сохраняется; exit0 без теста не объявляется
 локальных subprocess regressions (включая остановку дочернего процесса перед
 записью маркера) и11pipeline contracts прошли. App/UI assertions не менялись.
 Следующий настоящий Apple runtime/58/Release/archive всё ещё нужен.
+
+## Runtimed6f180a: три вложенных switch, product paths прошли
+
+Run44836415970/native0e28ff8:312core/197hosted/DebugPASS;29UI26passed/3failed,
+49из58PNG. Actualsort/deviceClaim/deviceCredentials/serverAccountPASS; пустая
+панель и нижняя отмена больше не воспроизводились. Streaming runner подтвердил
+реальный запуск/lastTest и сохранил failure65 без повторения; startup не завис.
+
+Три отказа ДО действия — GEO,entry-lock,cellular consent: helper выбрал
+безымянный63x28 UIKit child внутри именованного SwiftUI Toggle. Этот child
+существует в AX snapshot, но не hittable. Helper теперь сохраняет сам row,
+если это уже .switch, и лишь для внешнего контейнера ищет вложенный switch.
+Остались прежние fully-visible/two-stable/hittability/single tap/value guards;
+проверки не пропущены. Product source не менялся; только selector helper.
+UITest frontend parse/diffPASS; новый полный Apple runtime нужен.
