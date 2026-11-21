@@ -3,6 +3,12 @@ import XCTest
 @testable import EntrixyCore
 
 final class GuestEventTests: XCTestCase {
+    func testNativeProofFailureIsNotRevocationAndRetainsItsExactCode() {
+        XCTAssertFalse(GuestEvent.terminalReasons.contains("native_only"))
+        XCTAssertThrowsError(try GuestEvent.decode(Data(#"{"type":"error","reason":"native_only"}"#.utf8))) {
+            XCTAssertEqual(($0 as? GuestAPI.Failure)?.code,"native_only")
+        }
+    }
     private func bytes(_ value: [String: Any]) throws -> Data { try JSONSerialization.data(withJSONObject: value) }
 
     func testMalformedUpdateCannotClearSavedObjects() throws {

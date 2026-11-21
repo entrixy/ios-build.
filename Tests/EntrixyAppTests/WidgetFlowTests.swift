@@ -10,6 +10,14 @@ private final class WidgetAccessMemory: StateStorage {
 }
 
 @MainActor final class WidgetFlowTests: XCTestCase {
+    func testRegisteredGroupComesFromBundleAndInvalidSettingsHaveNoFallback() {
+        XCTAssertEqual(WidgetCatalog.group,Bundle.main.object(forInfoDictionaryKey:"EntrixyAppGroup") as? String)
+        XCTAssertEqual(WidgetCatalog.validatedGroup("group.test.entrixy.fixture"),"group.test.entrixy.fixture")
+        let invalid: [Any?] = [nil,"",42,"$(ENTRIXY_APP_GROUP)","group.","group.test..invalid","group.test/path"]
+        for raw in invalid {
+            XCTAssertNil(WidgetCatalog.validatedGroup(raw))
+        }
+    }
     private func fixture(policy: String = #"{"confirm_on":true}"#) throws -> (AppModel,WidgetAccessMemory,String) {
         var owner = try OwnerAccount(importing:"owner.invalid",masterKey:Data(repeating:12,count:32),
             credentials:OwnerCredentials(deviceID:String(repeating:"a",count:32),deviceSecret:String(repeating:"b",count:64)))

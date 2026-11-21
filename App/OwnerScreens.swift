@@ -201,7 +201,7 @@ struct AddOwnerObjectScreen: View {
             }, cancelled: { contacts = false })
         }
         .sheetDismissFooter(disabled: model.ownerBusy) { dismiss() }
-        .appMessageDialog("Entrixy",message:model.errorMessage ?? "",actionTitle:"Понятно",isPresented:Binding(get: { model.errorMessage != nil }, set: { if !$0 { model.errorMessage = nil } }))
+        .appMessageDialog("Entrixy",message:model.errorMessage ?? "",actionTitle:ProductText.string("btn_understood"),isPresented:Binding(get: { model.errorMessage != nil }, set: { if !$0 { model.errorMessage = nil } }))
         .accessibilityHidden(serverModeWarning)
         .overlay {
             if serverModeWarning {
@@ -375,7 +375,7 @@ private struct OwnerObjectEditorForm: View {
             } else if serverModeWarning {
                 WebhookServerModeConfirmation(cancel: { serverModeWarning = false }, confirm: { draft.webhookMode = "server"; serverModeWarning = false })
             } else if deleting {
-                AppConfirmationDialog(title: "Удалить объект?", message: "Гости потеряют доступ к этому объекту.",
+                AppConfirmationDialog(title: ProductText.string("confirm_delete_object_title"), message: "Гости потеряют доступ к этому объекту.",
                     actionTitle: "Удалить объект", destructive: true, cancel: { deleting = false }, confirm: {
                         deleting = false
                         Task { await model.deleteOwnerObject(server: server, objectID: objectID); if object == nil { dismiss() } }

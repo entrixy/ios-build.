@@ -9,6 +9,7 @@ struct ActionTapRejection {
 
 @MainActor
 final class AppModel: ObservableObject {
+    @Published private(set) var guestConnectionProblems: [String:String] = [:]
     @Published private(set) var actionRejections: [String: ActionTapRejection] = [:]
 
     @Published private(set) var owners: [OwnerAccount] = []
@@ -158,7 +159,10 @@ final class AppModel: ObservableObject {
     private var activeOwnerAction: OwnerActionIntent?
     @Published private(set) var ownerActionRejections: [UUID: ActionTapRejection] = [:]
     var hasActionCode: Bool { actionCode != nil }
-    private let storage: StateStorage
+    private let storage: LocalStateSession
+    private let resetCleanup: @MainActor (String) throws -> Void
+    @Published private(set) var localDataErased = false
+    @Published private(set) var localResetCleanupPending = false
     private let biometricService: String
     private let api = GuestAPI()
     private var watchers: [String: Task<Void, Never>] = [:]
@@ -171,15 +175,27 @@ final class AppModel: ObservableObject {
     private var resumeRequested = false
     private var syncFailure: String?
 
-    init(storage: StateStorage = KeychainStore(), ownerAPI: OwnerTransport = OwnerAPI(),privacyRouter: ServerPrivacyRouter? = nil) {
-        self.storage = storage
+    init(storage: StateStorage = KeychainStore(), ownerAPI: OwnerTransport = OwnerAPI(),privacyRouter: ServerPrivacyRouter? = nil,
+         resetCleanup: (@MainActor (String) throws -> Void)? = nil) {
+        let session = LocalStateSession(storage)
+        self.storage = session
+        let cleanup: @MainActor (String) throws -> Void = resetCleanup ?? { try AppLocalDataCleanup.clear(biometricService:$0) }
+        self.resetCleanup = cleanup
         self.privacyRouter = privacyRouter
         biometricService = (storage as? KeychainStore)?.biometricService ?? "com.entrixy.ios.fixture-biometry." + UUID().uuidString
         self.ownerAPI = ownerAPI
         var startupStatus: Int32 = 0
         do {
             let state: SavedState
-            if let saved = try storage.load() { state = saved }
+            if let saved = try session.load() {
+                if saved.pendingLocalReset == true {
+                    localDataErased = true; localResetCleanupPending = true
+                    try cleanup(biometricService)
+                    try session.finishCleanup()
+                    guard let cleaned = try session.load() else { throw KeychainStore.Failure(status:-1) }
+                    state = cleaned; localDataErased = false; localResetCleanupPending = false
+                } else { state = saved }
+            }
             else {
                 #if DEBUG && targetEnvironment(simulator)
                 let bootstrap = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)[0].appendingPathComponent("preview-bootstrap.json")
@@ -190,7 +206,7 @@ final class AppModel: ObservableObject {
                 #else
                 state = SavedState(identity: GuestCrypto.randomBytes(count: 32), guests: [])
                 #endif
-                try storage.save(state)
+                try session.save(state)
                 #if DEBUG && targetEnvironment(simulator)
                 try? FileManager.default.removeItem(at: bootstrap)
                 #endif
@@ -1757,6 +1773,7 @@ final class AppModel: ObservableObject {
             } catch {
                 let code = (error as? GuestAPI.Failure)?.code ?? (error is KeychainStore.Failure ? "storage_error" : "connection_failed")
                 syncFailure = safeDiagnosticCode(code)
+                if stopForNativeAttestation(guestID:entry.id,reason:code) { continue }
                 // A temporary read-connection failure uses the inline connection state.
                 // Reconnection must be able to recover without a stale blocking alert.
                 if GuestEvent.terminalReasons.contains(code) || ["network_policy_unsupported", "paused", "storage_error"].contains(code) {
@@ -1778,6 +1795,7 @@ final class AppModel: ObservableObject {
     }
 
     func resume() async {
+        guard storageReady, !localDataErased else { return }
         if backgroundMonitoring { stopBackgroundCommand() }
         backgroundMonitoring = false; backgroundActionScope = nil
         foreground = true
@@ -1876,6 +1894,7 @@ final class AppModel: ObservableObject {
             generations.removeValue(forKey: id)
             watchers.removeValue(forKey: id)?.cancel()
             connections.removeValue(forKey: id)
+            guestConnectionProblems.removeValue(forKey:id)
         } catch { errorMessage = "Не удалось удалить ключ из защищённого хранилища." }
     }
 
@@ -2000,6 +2019,7 @@ final class AppModel: ObservableObject {
                             actionLink.bundle = currentBundle; actionLink.snapshot = data
                             actionLink.revision = UUID()
                             self.connections[entry.id] = .connected
+                            self.guestConnectionProblems.removeValue(forKey:entry.id)
                             self.syncFailure = nil
                             self.writePreviewStatus()
                             await avatarQueue.replace(self.customAvatarIDs(entry.id))
@@ -2056,6 +2076,7 @@ final class AppModel: ObservableObject {
                     guard !Task.isCancelled, self.foreground, self.generations[entry.id] == generation else { return }
                     let code = (error as? GuestAPI.Failure)?.code ?? (error is KeychainStore.Failure ? "storage_error" : "connection_failed")
                     self.syncFailure = self.safeDiagnosticCode(code)
+                    if self.stopForNativeAttestation(guestID:entry.id,reason:code) { return }
                     if code == "storage_error" {
                         self.errorMessage = self.readable(code)
                         self.connections[entry.id] = .offline
@@ -2113,8 +2134,17 @@ final class AppModel: ObservableObject {
 
     private func safeDiagnosticCode(_ code: String) -> String {
         if let event = DiagnosticEvent.Code(rawValue:code) { diagnostics.record(event) }
-        let allowed = GuestEvent.terminalReasons.union(["connection_failed", "storage_error", "paused", "network_policy_unsupported", "network_policy_blocked", "awaiting_owner", "server_error", "replay", "invalid_response", "rate_limited", "too_many_requests", "device_binding_failed", "event_overflow"])
+        let allowed = GuestEvent.terminalReasons.union(["native_only", "connection_failed", "storage_error", "paused", "network_policy_unsupported", "network_policy_blocked", "awaiting_owner", "server_error", "replay", "invalid_response", "rate_limited", "too_many_requests", "device_binding_failed", "event_overflow"])
         return allowed.contains(code) ? code : "unknown_error"
+    }
+
+    /// A platform proof failure is not revocation. Keep encrypted keys and BLE
+    /// grants intact, but do not hammer the same rejected hello in a retry loop.
+    @discardableResult func stopForNativeAttestation(guestID:String,reason:String) -> Bool {
+        guard reason == "native_only",guests.contains(where:{ $0.id == guestID }) else { return false }
+        stopActions(guestID); connections[guestID] = .offline
+        guestConnectionProblems[guestID] = ProductText.string("ios_native_attestation_required")
+        return true
     }
 
     private func readable(_ code: String) -> String {
@@ -2620,6 +2650,28 @@ extension AppModel {
     func verifySettingsCode(_ code: String) async throws -> Bool {
         guard canManageGuestAccess else { return false }
         return try await authorizeCode(code,authentication:"pin",requestID:nil)
+    }
+    /// Android's deliberate local-data removal, adapted for persistent iOS
+    /// Keychain. It does not authenticate or retain access to any old object.
+    @discardableResult func eraseLocalData(confirmation:String) -> Bool {
+        guard confirmation == "RESET",storageReady,foreground,!localDataErased,
+              !busy,!ownerBusy,!authenticationBusy,pendingRestore == nil,!backupPromptPending else { return false }
+        do { try storage.erase(confirmedIdentity:identity) }
+        catch { errorMessage = ProductText.string("ios_reset_write_failed");return false }
+        storageReady = false; localDataErased = true; localResetCleanupPending = true
+        syncNetworkPrivacyRouting()
+        suspend(); diagnostics.retireAfterLocalReset(); WidgetActionInbox.shared.cancel()
+        try? WidgetPresentationPublisher().publish(self,forceOffline:true)
+        return finishLocalResetCleanup()
+    }
+    @discardableResult func finishLocalResetCleanup() -> Bool {
+        guard localDataErased,localResetCleanupPending else { return localDataErased }
+        do {
+            try resetCleanup(biometricService)
+            try storage.finishCleanup()
+            localResetCleanupPending = false;errorMessage = nil
+            return true
+        } catch { errorMessage = ProductText.string("ios_reset_cleanup_failed");return false }
     }
 }
 

@@ -63,7 +63,7 @@ struct KeyImportScreen: View {
                             else { importError = model.errorMessage; model.errorMessage = nil }
                         }
                     } label: {
-                        ActionButtonLabel(title: "Добавить ключ", busy: model.busy)
+                        ActionButtonLabel(title: ProductText.string("add_key_title"), busy: model.busy)
                     }
                     .buttonStyle(PrimaryActionStyle())
                     .disabled(invite == nil || model.busy || readingPhoto || !model.canManageGuestAccess)

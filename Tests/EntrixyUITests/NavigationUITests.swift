@@ -880,6 +880,25 @@ final class NavigationUITests: XCTestCase {
         XCTAssertTrue(add.waitForExistence(timeout:10)); assertBottom(app,["settings","journal"])
     }
 
+    func testLocalResetRequiresTypedConfirmationAndDoesNotExposeOldAccess() {
+        let app = launch("empty")
+        app.segmentedControls.buttons["Система"].tap()
+        let open = app.buttons["local-reset-open"]
+        bringFullyIntoView(open,in:app); XCTAssertTrue(open.isHittable); open.tap()
+        let confirmation = app.textFields["local-reset-confirmation"], erase = app.buttons["local-reset-erase"]
+        XCTAssertTrue(confirmation.waitForExistence(timeout:10)); XCTAssertFalse(erase.isEnabled)
+        let cancel = app.buttons["Отмена"]
+        reviewCapture("local-reset-confirmation",settledBy:cancel)
+        cancel.tap(); XCTAssertTrue(open.waitForExistence(timeout:10)); open.tap()
+        XCTAssertTrue(confirmation.waitForExistence(timeout:10))
+        confirmation.tap(); confirmation.typeText("RESET\n")
+        bringFullyIntoView(erase,in:app); XCTAssertTrue(erase.isEnabled); XCTAssertTrue(erase.isHittable); erase.tap()
+        let restart = app.buttons["local-reset-restart"]
+        XCTAssertTrue(restart.waitForExistence(timeout:15)); XCTAssertTrue(app.staticTexts["local-reset-complete"].exists)
+        XCTAssertFalse(confirmation.exists); XCTAssertFalse(app.buttons["Отмена"].exists)
+        reviewCapture("local-reset-complete",settledBy:restart)
+    }
+
     func testEntryLockSettingsUseCompactCodeDialogsAndWrongCodeCannotDisableLock() {
         let app = launch("empty")
         app.segmentedControls.buttons["Система"].tap()

@@ -11,11 +11,12 @@
 пакеты и ограничения собраны в [CURRENT_STATUS.md](CURRENT_STATUS.md), порядок
 автономной работы — в [AUTONOMOUS_WORK.md](AUTONOMOUS_WORK.md).
 
-CI44877317284/nativee2defc3/publicde13dad прошёл312core/197hosted/29UI,
-6 focused, Debug/Release/privacy/isolation и unsigned physical-iPhone app/widget archive.
-58 оригинальных кадров просмотрены и опубликованы в галерее вместо56 прежних.
-Пакет10 замечаний закрыт; точная причина старых intermittent XCTest input failures
-не доказана, поэтому реальная приёмка ввода/Release на iPhone остаётся обязательной.
+CI44909437420/nativeb18d37f/publicd4915bb прошёл312core/198hosted/31UI,
+6+3 focused, Debug/Release/privacy/isolation и unsigned physical-iPhone app/widget archive.
+62 оригинальных кадра просмотрены и опубликованы вместо58 прежних.
+Вторая серия9 замечаний и показ передачи с глубиной3/пулом7 закрыты; точная причина
+старых intermittent XCTest input failures не доказана, поэтому реальная приёмка
+ввода/Release на iPhone остаётся обязательной.
 Это не signing/TestFlight/App Store или аппаратная приёмка. TeamID/BundleID
 ранее запрошены, ещё не подтверждены; provisional IDs не использовать как ответ.
 Реальные APNs, BLE/камера/сотовая сеть/фон, account/Android interoperability,

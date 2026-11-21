@@ -1,0 +1,7 @@
+{
+  "name": "Entrixy",
+  "subtitle": "Keys and access control",
+  "promotional_text": "Keep your objects and guest keys together. Configure access separately for each object.",
+  "keywords": "gate,barrier,door,key,access,guest,Bluetooth,controller",
+  "description": "Entrixy brings together your access-control objects and keys shared by their owners: gates, barriers, doors and compatible Bluetooth controllers.\n\nControl objects, issue guest keys and set their scope and expiry. Allow onward sharing with limits on delegation depth and key count, pause or revoke access, review action history and exchange protected messages linked to a key.\n\nConfigure location, route, Wi-Fi and time conditions. Background execution depends on iOS restrictions and your permissions. Protect entry and actions with your Entrixy code or available biometrics. Export encrypted backups to transfer your data.\n\nControl requires a compatible server, device or controller and the appropriate access. Bluetooth requires a compatible controller. Phone calls require confirmation in the iPhone system app; Entrixy cannot hang up calls automatically. Network features depend on connectivity and access rules.\n\nAn owner supplies your guest key. A website account is not required to use a received key."
+}

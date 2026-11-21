@@ -84,6 +84,7 @@ private final class DiagnosticSubscriber: NSObject, MXMetricManagerSubscriber {
         catch { message = "ios_diag_storage_failed" }
     }
     func activate() {
+        guard app.storageReady,!app.localDataErased else { return }
         active = true
         if !ready {
             do { state = try storage.load(); try state.validate(); enabled = state.consent.enabled; ready = true; message = nil }
@@ -95,7 +96,7 @@ private final class DiagnosticSubscriber: NSObject, MXMetricManagerSubscriber {
         if active && ready && !autoPaused && !state.consent.asked && app.canManageGuestAccess && !app.hasTaskDialog { app.diagnosticConsentPrompt = true }
     }
     func record(_ code: DiagnosticEvent.Code) {
-        guard ready else { return }
+        guard ready,app.storageReady,!app.localDataErased else { return }
         if let last = state.events.last,last.code == code,Date().timeIntervalSince(last.date) < 60 { return }
         var draft = state; draft.events.append(DiagnosticEvent(code:code)); draft.events = Array(draft.events.suffix(100))
         do { try storage.save(draft); state = draft } catch { message = "ios_diag_storage_failed" }
@@ -188,4 +189,8 @@ private final class DiagnosticSubscriber: NSObject, MXMetricManagerSubscriber {
     }
     private func cancelUpload() { operation = UUID(); upload?.cancel(); upload = nil; sending = false }
     func pause() { active = false; cancelUpload() }
+    func retireAfterLocalReset() {
+        active = false; autoPaused = true; cancelUpload(); removeSubscriber()
+        ready = false; enabled = false; state = DiagnosticState()
+    }
 }

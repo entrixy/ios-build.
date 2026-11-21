@@ -18,6 +18,11 @@ import EntrixyCore
         #endif
         retained = app; return app
     }
+    static func restartAfterLocalReset(_ app:AppModel) {
+        guard app.localDataErased,!app.localResetCleanupPending else { return }
+        if retained === app { retained = nil }
+        NotificationCenter.default.post(name:.entrixyLocalResetCompleted,object:nil)
+    }
 }
 
 @MainActor final class EntrixyLifecycleDelegate: NSObject, UIApplicationDelegate {

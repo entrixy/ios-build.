@@ -3,6 +3,6 @@
 <plist version="1.0">
 <dict>
     <key>com.apple.security.application-groups</key>
-    <array><string>group.com.entrixy.ios</string></array>
+    <array><string>$(ENTRIXY_APP_GROUP)</string></array>
 </dict>
 </plist>

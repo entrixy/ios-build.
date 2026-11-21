@@ -289,7 +289,7 @@
 "code_err_wrong_left" = "Código errado\nTentativas antes da pausa: %1$d";
 "code_field" = "Código Entrixy";
 "code_field_repeat" = "Repita o código";
-"code_forgot_warning" = "Um código esquecido não pode ser recuperado\nTerá de reinstalar a aplicação e restaurar as chaves a partir de uma cópia de segurança";
+"code_forgot_warning" = "Um código esquecido não pode ser recuperado. Pode permanecer no armazenamento seguro do iOS após reinstalar. Para começar novamente, é necessário apagar expressamente os dados locais e restaurar uma cópia ou obter acesso do proprietário.";
 "code_locked" = "Demasiadas tentativas erradas\nTente novamente dentro de %1$d s";
 "code_set" = "Definir um código";
 "code_settings_hint" = "O código próprio da aplicação, não o do telefone\nAbre a aplicação e confirma as ações";
@@ -980,3 +980,28 @@
 "ios_delegation_depth" = "Níveis de delegação";
 "ios_delegation_key_count" = "Chaves para delegar";
 "ios_map_draw_hint" = "Toque em «Desenhar corredor» e trace o percurso da entrada até ao portão.";
+
+"ios_code_forgot" = "Esqueceu-se do código?";
+"ios_reset_title" = "Repor dados deste iPhone";
+"ios_reset_explanation" = "A reposição remove deste iPhone o código Entrixy, as chaves, as definições, o histórico e os dados guardados da app. Este iPhone perderá o acesso aos objetos anteriores. Reinstalar a app não garante a limpeza do armazenamento seguro.";
+"ios_reset_backup_warning" = "Antes de repor, certifique-se de que tem uma cópia de segurança e a respetiva palavra-passe. Sem cópia, os proprietários terão de conceder acesso novamente. As cópias guardadas fora da app não são eliminadas.";
+"ios_reset_confirmation" = "Escreva RESET para confirmar";
+"ios_reset_action" = "Apagar dados do iPhone";
+"ios_reset_complete" = "Dados de acesso locais apagados";
+"ios_reset_remote_unchanged" = "Os objetos nos servidores e as chaves emitidas aos seus convidados não foram eliminados. Repor este iPhone não revoga o acesso deles.";
+"ios_reset_restore_hint" = "Comece novamente: restaure uma cópia de segurança ou receba acesso do proprietário.";
+"ios_reset_restart" = "Começar novamente";
+"ios_reset_write_failed" = "Não foi possível repor o armazenamento seguro. O código, as chaves e a identidade anterior foram preservados. Tente novamente após desbloquear o iPhone.";
+"ios_reset_cleanup_failed" = "Os dados de acesso já foram apagados, mas a limpeza dos restantes dados locais não terminou. Repita a limpeza antes de começar novamente.";
+
+// Native entry protection.
+"ios_entry_title" = "Introduza o código Entrixy";
+"ios_entry_code_hint" = "O código da app é diferente do código de desbloqueio do iPhone.";
+"ios_entry_sign_in" = "Entrar";
+"ios_entry_biometric" = "Entrar com Face ID ou Touch ID";
+"ios_entry_rejected" = "O código não foi aceite ou a entrada está temporariamente bloqueada. Após vários erros, aguarde antes de tentar de novo.";
+"ios_entry_failed" = "Não foi possível verificar a entrada. O código e os acessos não foram alterados.";
+
+"ios_native_attestation_required" = "O servidor exige uma prova de autenticidade da app para esta chave. Esta versão ainda não a suporta. A chave foi mantida e as tentativas repetidas de ligação foram interrompidas. Contacte o proprietário do acesso.";
+
+"ios_ble_pair" = "Emparelhar";

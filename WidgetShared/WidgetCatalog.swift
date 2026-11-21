@@ -27,11 +27,22 @@ struct WidgetObject: Codable, Equatable, Identifiable {
 /// Presentation only. No key, URL, phone number, BLE secret, template, pending
 /// physical command or installation identity is exported to the extension.
 struct WidgetCatalog: Codable, Equatable {
-    static let group = "group.com.entrixy.ios"
+    static var group: String? {
+        validatedGroup(Bundle.main.object(forInfoDictionaryKey:"EntrixyAppGroup"))
+    }
+    static func validatedGroup(_ raw:Any?) -> String? {
+        guard let value = raw as? String,
+              value.hasPrefix("group."), value.utf8.count <= 255,
+              value.split(separator:".",omittingEmptySubsequences:false).count >= 3,
+              value.split(separator:".",omittingEmptySubsequences:false).allSatisfy({ !$0.isEmpty }),
+              value.utf8.allSatisfy({ (48...57).contains($0) || (65...90).contains($0) || (97...122).contains($0) || $0 == 45 || $0 == 46 }) else { return nil }
+        return value
+    }
     static let kind = "EntrixyObject"
     var objects: [WidgetObject]
     static var directory: URL? {
-        FileManager.default.containerURL(forSecurityApplicationGroupIdentifier:group)?.appendingPathComponent("WidgetPresentation",isDirectory:true)
+        guard let group else { return nil }
+        return FileManager.default.containerURL(forSecurityApplicationGroupIdentifier:group)?.appendingPathComponent("WidgetPresentation",isDirectory:true)
     }
     static func load(directory: URL? = Self.directory) -> Self {
         guard let directory else { return Self(objects:[]) }

@@ -52,7 +52,7 @@ struct CatalogStatusAvatar: View {
         switch status {
         case .ready: return "Объект доступен"
         case .offline: return "Объект недоступен"
-        case .connecting: return "Подключение"
+        case .connecting: return ProductText.string("pair_connecting")
         case .neutral: return "HTTPS-запрос"
         case .unknown: return "Доступность ещё не проверена"
         }
@@ -146,7 +146,7 @@ struct ObjectSettingsRows: View {
                         Button { task = entry.kindTask } label: {
                             Image(systemName: entry.isOwned ? "gearshape" : "pencil").font(.title3).frame(maxWidth: .infinity)
                         }.buttonStyle(SecondaryActionStyle())
-                            .accessibilityLabel(entry.isOwned ? "Настройки" : "Название")
+                            .accessibilityLabel(entry.isOwned ? ProductText.string("net_ban_settings") : ProductText.string("add_object_name"))
                             .accessibilityIdentifier("object-edit-" + entry.target.id)
                         Button { task = .automation(entry.target) } label: {
                             AutomationIcon().frame(maxWidth: .infinity)
@@ -160,7 +160,7 @@ struct ObjectSettingsRows: View {
                         Button(role: .destructive) { model.objectRemovalTarget = entry.target } label: {
                             Image(systemName: "trash").font(.title3).frame(maxWidth: .infinity)
                         }.buttonStyle(SecondaryActionStyle())
-                            .accessibilityLabel(entry.isOwned ? "Удалить" : "Скрыть")
+                            .accessibilityLabel(entry.isOwned ? ProductText.string("btn_delete") : ProductText.string("btn_dismiss"))
                             .disabled(model.ownerBusy || model.busy || entry.deletionPending)
                     }
                     if case let .owned(_, object) = entry, let message = model.ownerObjectMessages[object.id] {
@@ -285,7 +285,7 @@ private struct ReceivedObjectNameScreen: View {
         NavigationStack {
             Form {
                 Section {
-                    AppField("Название") {
+                    AppField(ProductText.string("add_object_name")) {
                         TextField(ProductText.string("add_object_name"),text:$label).autocorrectionDisabled().focused($editing).submitLabel(.done)
                             .onSubmit { editing = false }
                             .onChange(of:label) { value in
@@ -324,7 +324,7 @@ struct ObjectRemovalConfirmation: View {
     let target: ObjectReference
     private var received: Bool { if case .received = target { return true }; return false }
     var body: some View {
-        AppConfirmationDialog(title: received ? "Скрыть объект?" : "Удалить объект?",
+        AppConfirmationDialog(title: received ? "Скрыть объект?" : ProductText.string("confirm_delete_object_title"),
             message: message, actionTitle: received ? "Скрыть объект" : "Удалить объект", destructive: true,
             cancel: { model.objectRemovalTarget = nil }, confirm: {
                 guard model.canManageGuestAccess, model.catalogObject(target) != nil else { model.objectRemovalTarget = nil; return }

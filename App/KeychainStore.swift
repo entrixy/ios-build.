@@ -59,6 +59,7 @@ struct SavedState: Codable {
     var androidPendingGuests: [AndroidGuestMigration]? = nil
     var selectedOwnerServer: String? = nil
     var networkPrivacy: NetworkPrivacyPreferences? = nil
+    var pendingLocalReset: Bool? = nil
 }
 
 /// One local, device-only Keychain item. Read/decode failures never mean “new installation”.

@@ -44,6 +44,10 @@ private struct AppSoundPreferences: Codable {
         }
     }
     func setVolume(_ value: Float) { guard value.isFinite else { return }; volume = min(1,max(0,value)); persist() }
+    func clearAfterLocalReset() {
+        players.forEach { $0.stop() }; players.removeAll()
+        volume = 0.1; muted.removeAll(); custom.removeAll(); generation = nil
+    }
     func setEnabled(_ event: AppSoundEvent, _ enabled: Bool) {
         if enabled { muted.remove(event) } else { muted.insert(event) }; persist()
     }

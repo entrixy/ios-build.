@@ -289,7 +289,7 @@
 "code_err_wrong_left" = "Wrong code\nAttempts left before a pause: %1$d";
 "code_field" = "Entrixy code";
 "code_field_repeat" = "Repeat the code";
-"code_forgot_warning" = "A forgotten code cannot be recovered\nYou will have to reinstall the app and restore your keys from a backup";
+"code_forgot_warning" = "A forgotten code cannot be recovered. Reinstalling may preserve it in iOS secure storage. Starting again requires explicitly erasing local data, then restoring a backup or obtaining access from the owner.";
 "code_locked" = "Too many wrong attempts\nTry again in %1$d s";
 "code_set" = "Set a code";
 "code_settings_hint" = "The app’s own code, not the phone code\nIt opens the app and confirms actions";
@@ -980,3 +980,28 @@
 "ios_delegation_depth" = "Delegation levels";
 "ios_delegation_key_count" = "Keys to delegate";
 "ios_map_draw_hint" = "Tap “Draw corridor”, then trace the approach from the entrance to the gate.";
+
+"ios_code_forgot" = "Forgot your code?";
+"ios_reset_title" = "Reset data on this iPhone";
+"ios_reset_explanation" = "Reset removes the Entrixy code, keys, settings, history and stored app data from this iPhone. This iPhone will lose access to previous objects. Reinstalling the app does not guarantee that secure storage is cleared.";
+"ios_reset_backup_warning" = "Before resetting, make sure you have a backup and its password. Without a backup, owners will need to grant you access again. Backup files saved outside the app are not deleted.";
+"ios_reset_confirmation" = "Type RESET to confirm";
+"ios_reset_action" = "Erase data from iPhone";
+"ios_reset_complete" = "Local access data erased";
+"ios_reset_remote_unchanged" = "Server objects and keys issued to your guests have not been deleted. Resetting this iPhone does not revoke their access.";
+"ios_reset_restore_hint" = "Start again: restore a backup or receive access from the owner.";
+"ios_reset_restart" = "Start again";
+"ios_reset_write_failed" = "Secure storage could not be reset. Your code, keys and previous identity are preserved. Try again after unlocking the iPhone.";
+"ios_reset_cleanup_failed" = "Access data has been erased, but additional local data cleanup is incomplete. Retry cleanup before starting again.";
+
+// Native entry protection.
+"ios_entry_title" = "Enter your Entrixy code";
+"ios_entry_code_hint" = "The app code is separate from your iPhone passcode.";
+"ios_entry_sign_in" = "Sign in";
+"ios_entry_biometric" = "Sign in with Face ID or Touch ID";
+"ios_entry_rejected" = "The code was not accepted or entry is temporarily locked. After several errors, wait before trying again.";
+"ios_entry_failed" = "Could not verify sign-in. Your code and access remain unchanged.";
+
+"ios_native_attestation_required" = "The server requires proof of app authenticity for this key. This version does not support it yet. Your key is kept; repeated connections have stopped. Contact the access owner.";
+
+"ios_ble_pair" = "Pair";

@@ -289,7 +289,7 @@
 "code_err_wrong_left" = "密码错误\n距离暂停还剩 %1$d 次尝试";
 "code_field" = "Entrixy 密码";
 "code_field_repeat" = "再次输入密码";
-"code_forgot_warning" = "忘记的密码无法找回\n只能重新安装应用并从备份恢复钥匙";
+"code_forgot_warning" = "忘记的代码无法找回。重新安装后，代码可能仍保留在 iOS 安全存储中。重新开始需要明确删除本地数据，然后恢复备份或重新向所有者获取访问权限。";
 "code_locked" = "错误次数过多\n请在 %1$d 秒后重试";
 "code_set" = "设置密码";
 "code_settings_hint" = "应用自己的密码，不是手机解锁码\n用于进入应用和确认操作";
@@ -980,3 +980,28 @@
 "ios_delegation_depth" = "可转授层数";
 "ios_delegation_key_count" = "可转授钥匙数量";
 "ios_map_draw_hint" = "点按“绘制通行走廊”，然后用手指画出从入口到大门的接近路线。";
+
+"ios_code_forgot" = "忘记代码？";
+"ios_reset_title" = "重置此 iPhone 的数据";
+"ios_reset_explanation" = "重置将从此 iPhone 删除 Entrixy 代码、钥匙、设置、历史记录及保存的应用数据。此 iPhone 将失去对原有对象的访问权限。重新安装应用并不保证清除安全存储。";
+"ios_reset_backup_warning" = "重置前请确保拥有备份及其密码。没有备份时，需要所有者重新授予访问权限。保存在应用外部的备份文件不会被删除。";
+"ios_reset_confirmation" = "输入 RESET 以确认";
+"ios_reset_action" = "删除 iPhone 上的数据";
+"ios_reset_complete" = "本地访问数据已删除";
+"ios_reset_remote_unchanged" = "服务器上的对象和已发给访客的钥匙没有被删除。重置此 iPhone 不会撤销他们的访问权限。";
+"ios_reset_restore_hint" = "重新开始：恢复备份或向所有者获取访问权限。";
+"ios_reset_restart" = "重新开始";
+"ios_reset_write_failed" = "无法重置安全存储。代码、钥匙及原有身份均已保留。请解锁 iPhone 后重试。";
+"ios_reset_cleanup_failed" = "访问数据已删除，但其他本地数据尚未清理完成。请重试清理后再重新开始。";
+
+// Native entry protection.
+"ios_entry_title" = "输入 Entrixy 验证码";
+"ios_entry_code_hint" = "应用验证码与 iPhone 锁屏密码不同。";
+"ios_entry_sign_in" = "登录";
+"ios_entry_biometric" = "使用面容 ID 或触控 ID 登录";
+"ios_entry_rejected" = "验证码未被接受，或输入已暂时锁定。多次输错后，请稍候再试。";
+"ios_entry_failed" = "无法验证登录。您的验证码和访问权限未更改。";
+
+"ios_native_attestation_required" = "服务器要求验证此密钥所用应用的真实性。此版本尚未接入该验证。密钥已保留，重复连接已停止。请联系访问权限所有者。";
+
+"ios_ble_pair" = "配对";

@@ -74,7 +74,7 @@ private struct BLEPairingContent: View {
         .navigationTitle("Bluetooth-контроллер").navigationBarTitleDisplayMode(.inline)
         .toolbar(.visible,for:.navigationBar)
         .onDisappear { if model.busy { model.suspend() } }
-        .appConfirmationDialog("Привязать свой контроллер?",message:"Убедитесь, что выбран ваш контроллер в режиме привязки. Его название не является проверкой подлинности.",actionTitle:"Привязать",isPresented:Binding(get:{ selected != nil },set:{ if !$0 { selected = nil } })) {
+        .appConfirmationDialog("Привязать свой контроллер?",message:"Убедитесь, что выбран ваш контроллер в режиме привязки. Его название не является проверкой подлинности.",actionTitle:ProductText.string("ios_ble_pair"),isPresented:Binding(get:{ selected != nil },set:{ if !$0 { selected = nil } })) {
             if let selected { let id = selected.id; self.selected = nil
                 Task { await model.pair(discoveryID:id,server:server,label:label) }
             }

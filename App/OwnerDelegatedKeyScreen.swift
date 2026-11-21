@@ -17,9 +17,9 @@ struct OwnerDelegatedKeyScreen: View {
                     if let message = app.ownerMessages[server] { Text(message).font(.subheadline).foregroundStyle(Brand.secondaryInk) }
                     Text(ownerDelegatedStatus(key)).foregroundStyle(Brand.secondaryInk)
                     if let message = app.ownerDelegationMessages[keyID] { Text(message).font(.subheadline).foregroundStyle(Brand.secondaryInk) }
-                    KeyValueRow(title: "Сервер", value: server)
+                    KeyValueRow(title: ProductText.string("ble_server_label"), value: server)
                 }
-                Section("Объекты") {
+                Section(ProductText.string("settings_tab_objects")) {
                     ForEach(key.numberIDs, id: \.self) { id in
                         Text(objectLabel(id))
                     }

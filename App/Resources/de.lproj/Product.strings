@@ -289,7 +289,7 @@
 "code_err_wrong_left" = "Falscher Code\nVersuche bis zur Pause: %1$d";
 "code_field" = "Entrixy-Code";
 "code_field_repeat" = "Code wiederholen";
-"code_forgot_warning" = "Ein vergessener Code lässt sich nicht wiederherstellen\nSie müssen die App neu installieren und die Schlüssel aus einer Sicherung wiederherstellen";
+"code_forgot_warning" = "Ein vergessener Code lässt sich nicht wiederherstellen. Eine Neuinstallation kann ihn im sicheren iOS-Speicher erhalten. Für einen Neustart müssen Sie lokale Daten ausdrücklich löschen und eine Sicherung wiederherstellen oder erneut Zugriff vom Eigentümer erhalten.";
 "code_locked" = "Zu viele falsche Versuche\nVersuchen Sie es in %1$d s erneut";
 "code_set" = "Code festlegen";
 "code_settings_hint" = "Ein eigener Code der App, nicht der Telefoncode\nEr öffnet die App und bestätigt Aktionen";
@@ -980,3 +980,28 @@
 "ios_delegation_depth" = "Weitergabe-Ebenen";
 "ios_delegation_key_count" = "Weitergebbare Schlüssel";
 "ios_map_draw_hint" = "Tippe auf „Korridor zeichnen“ und zeichne den Weg von der Einfahrt zum Tor.";
+
+"ios_code_forgot" = "Code vergessen?";
+"ios_reset_title" = "Daten auf diesem iPhone zurücksetzen";
+"ios_reset_explanation" = "Das Zurücksetzen entfernt Entrixy-Code, Schlüssel, Einstellungen, Verlauf und gespeicherte App-Daten von diesem iPhone. Der bisherige Objektzugriff geht auf diesem iPhone verloren. Eine Neuinstallation leert den sicheren Speicher nicht unbedingt.";
+"ios_reset_backup_warning" = "Prüfen Sie vor dem Zurücksetzen, ob eine Sicherung samt Passwort vorhanden ist. Ohne Sicherung müssen Eigentümer erneut Zugriff gewähren. Außerhalb der App gespeicherte Sicherungen werden nicht gelöscht.";
+"ios_reset_confirmation" = "Zur Bestätigung RESET eingeben";
+"ios_reset_action" = "Daten vom iPhone löschen";
+"ios_reset_complete" = "Lokale Zugriffsdaten gelöscht";
+"ios_reset_remote_unchanged" = "Serverobjekte und an Gäste ausgegebene Schlüssel wurden nicht gelöscht. Das Zurücksetzen dieses iPhones widerruft deren Zugriff nicht.";
+"ios_reset_restore_hint" = "Beginnen Sie neu: Stellen Sie eine Sicherung wieder her oder erhalten Sie Zugriff vom Eigentümer.";
+"ios_reset_restart" = "Neu beginnen";
+"ios_reset_write_failed" = "Der sichere Speicher konnte nicht zurückgesetzt werden. Code, Schlüssel und bisherige Identität bleiben erhalten. Versuchen Sie es nach dem Entsperren des iPhones erneut.";
+"ios_reset_cleanup_failed" = "Die Zugriffsdaten wurden gelöscht, aber die Bereinigung weiterer lokaler Daten ist noch nicht abgeschlossen. Wiederholen Sie die Bereinigung, bevor Sie neu beginnen.";
+
+// Native entry protection.
+"ios_entry_title" = "Entrixy-Code eingeben";
+"ios_entry_code_hint" = "Der App-Code ist nicht der Entsperrcode deines iPhones.";
+"ios_entry_sign_in" = "Anmelden";
+"ios_entry_biometric" = "Mit Face ID oder Touch ID anmelden";
+"ios_entry_rejected" = "Der Code wurde nicht akzeptiert oder die Eingabe ist vorübergehend gesperrt. Warte nach mehreren Fehlversuchen.";
+"ios_entry_failed" = "Die Anmeldung konnte nicht bestätigt werden. Code und Zugänge bleiben unverändert.";
+
+"ios_native_attestation_required" = "Der Server verlangt für diesen Schlüssel einen Echtheitsnachweis der App. Diese Version unterstützt ihn noch nicht. Dein Schlüssel bleibt erhalten; wiederholte Verbindungsversuche wurden gestoppt. Wende dich an den Zugangsinhaber.";
+
+"ios_ble_pair" = "Koppeln";

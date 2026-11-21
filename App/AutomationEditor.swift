@@ -181,7 +181,8 @@ private struct AutomationGeoFields: View {
                 Button {
                     showingMap = true
                 } label: {
-                    LeadingActionLabel(title:geometry.corridors.isEmpty ? ProductText.string("automation_geo_draw_route") : ProductText.string("automation_geo_route_count",geometry.corridors.count), systemImage:"pencil.tip")
+                    Label(geometry.corridors.isEmpty ? ProductText.string("automation_geo_draw_route") : ProductText.string("automation_geo_route_count",geometry.corridors.count),systemImage:"pencil.tip")
+                        .multilineTextAlignment(.center)
                 }.buttonStyle(SecondaryActionStyle()).accessibilityIdentifier("automation-geo-map")
             }
             if geometry.corridors.isEmpty {

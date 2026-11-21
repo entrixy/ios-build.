@@ -11,7 +11,7 @@ struct ControlScreen: View {
     var body: some View {
         Group {
             if model.controlObjects.isEmpty {
-                EmptyScreen(image: "icon-key", title: "Ваши объекты", detail: "Добавьте свой объект в настройках или ключ, полученный от владельца.")
+                EmptyScreen(image: "icon-key", title: ProductText.string("help_section_objects"), detail: "Добавьте свой объект в настройках или ключ, полученный от владельца.")
             } else {
                 ScrollView {
                     LazyVStack(alignment: .leading, spacing: 16) {
@@ -42,7 +42,7 @@ struct ControlScreen: View {
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
                 Button(action: addKey) { Image(systemName: "plus") }
-                    .accessibilityLabel("Добавить ключ").disabled(!model.storageReady || model.busy)
+                    .accessibilityLabel(ProductText.string("add_key_title")).disabled(!model.storageReady || model.busy)
             }
         }
         .overlay(alignment: .bottom) { if model.busy { ProgressView().padding() } }
@@ -232,7 +232,7 @@ struct KeyDetailScreen: View {
                 ScrollView {
                     VStack(alignment: .leading, spacing: DesignMetrics.sectionGap) {
                     VStack(alignment: .leading, spacing: 12) {
-                        KeyValueRow(title: "Сервер", value: guest.invite.server)
+                        KeyValueRow(title: ProductText.string("ble_server_label"), value: guest.invite.server)
                         Divider()
                         KeyValueRow(title: "Объектов", value: String(guest.objects.count))
                         Divider()
@@ -242,6 +242,9 @@ struct KeyDetailScreen: View {
                             KeyValueRow(title: "Обновлено", value: date.formatted(date: .abbreviated, time: .shortened))
                         }
                     }.padding(16).background(Color(uiColor: .secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 16))
+                        if let problem = model.guestConnectionProblems[guestID] {
+                            Text(problem).font(.subheadline).foregroundStyle(AppPalette.destructive).fixedSize(horizontal:false,vertical:true)
+                        }
                         Button { Task { await model.refresh() } } label: {
                             Label("Обновить данные", systemImage: "arrow.clockwise")
                         }.buttonStyle(SecondaryActionStyle()).disabled(model.busy)
@@ -252,7 +255,7 @@ struct KeyDetailScreen: View {
             } else { EmptyScreen(image: "icon-key", title: "Ключ удалён", detail: "Вы можете добавить его снова по ссылке владельца.") }
         }
         .navigationTitle("Полученный ключ").navigationBarTitleDisplayMode(.inline)
-        .appConfirmationDialog("Удалить ключ?",message:"Удалить ключ и его объекты с этого iPhone?",actionTitle:"Удалить ключ",destructive:true,isPresented:$removing) {
+        .appConfirmationDialog(ProductText.string("guest_delete_title"),message:"Удалить ключ и его объекты с этого iPhone?",actionTitle:"Удалить ключ",destructive:true,isPresented:$removing) {
             model.removeKey(guestID); if !model.guests.contains(where: { $0.id == guestID }) { dismiss() }
         }
     }
@@ -270,11 +273,11 @@ struct JournalScreen: View {
     var body: some View {
         VStack(spacing: 0) {
             EqualActionRow {
-                ShareLink(item: text) { JournalToolbarItem(symbol: "square.and.arrow.up", title: "Поделиться") }
+                ShareLink(item: text) { JournalToolbarItem(symbol: "square.and.arrow.up", title: ProductText.string("btn_share")) }
                 Button { UIPasteboard.general.string = text; copied = true } label: {
-                    JournalToolbarItem(symbol: "doc.on.doc", title: "Копировать")
+                    JournalToolbarItem(symbol: "doc.on.doc", title: ProductText.string("btn_copy"))
                 }
-                Button(role: .destructive) { model.clearJournal() } label: { JournalToolbarItem(symbol: "trash", title: "Очистить") }
+                Button(role: .destructive) { model.clearJournal() } label: { JournalToolbarItem(symbol: "trash", title: ProductText.string("journal_clear")) }
             }
             .buttonStyle(SecondaryActionStyle()).foregroundStyle(Brand.ink).disabled(model.journal.isEmpty)
             .padding(.horizontal, DesignMetrics.pageInset).padding(.top, 12).padding(.bottom, 16)

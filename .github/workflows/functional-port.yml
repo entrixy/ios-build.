@@ -76,11 +76,26 @@ jobs:
         if: github.ref == 'refs/heads/ci/review-batch' && env.ENTRIXY_FOCUSED_SWITCHES != '1'
         run: python3 scripts/test_simulator.py --use-built-tests --review-captures --prepared-device .local-checks/ci/prepared-device.json 2>&1 | tee .local-checks/ci/combined-review.log
       - name: Retain compilation evidence
+        # Store candidates use the native renderer after the complete UI pass.
+        # Keep them separate from the one-PNG-per-state review gallery.
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
           name: functional-port-build-evidence
           path: .local-checks/ci/
+          retention-days: 3
+      - name: Capture original Store-format JPEG candidates without modifying images
+        if: github.ref == 'refs/heads/ci/review-batch' && env.ENTRIXY_FOCUSED_SWITCHES != '1'
+        run: python3 scripts/capture_store_assets.py 2>&1 | tee .local-checks/ci/store-assets.log
+      - name: Retain original Store-format screenshot candidates
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: store-screenshot-candidates
+          path: |
+            .local-checks/ci/store-assets/
+            .local-checks/ci/store-assets.log
+          if-no-files-found: ignore
           retention-days: 3
       - name: Compile Release and verify fixture isolation
         id: release_build

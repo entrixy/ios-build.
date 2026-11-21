@@ -247,7 +247,7 @@ struct OwnerKeyScreen: View {
                 Section {
                     Text(key.label).font(.title3.bold())
                     Text(ownerKeyStatus(key)).foregroundStyle(Brand.secondaryInk)
-                    KeyValueRow(title: "Сервер", value: server)
+                    KeyValueRow(title: ProductText.string("ble_server_label"), value: server)
                     KeyValueRow(title: "Объектов", value: String((key.effectiveNumberIDs ?? key.numberIDs).count))
                     if let message = model.ownerKeyMessages[keyID] { Text(message).foregroundStyle(Brand.secondaryInk) }
                     if let owner, let bundle = try? key.bundle(masterKey: owner.masterKey), let rows = bundle["ble"] as? [[String: Any]], !rows.isEmpty {

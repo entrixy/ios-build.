@@ -6,6 +6,7 @@ import EntrixyCore
 struct EntrixyApp: App {
     @UIApplicationDelegateAdaptor(EntrixyLifecycleDelegate.self) private var lifecycle
     @AppStorage("entrixy.appearance") private var appearance = "system"
+    @State private var localGeneration = UUID()
     var body: some Scene {
         WindowGroup {
             Group {
@@ -26,6 +27,8 @@ struct EntrixyApp: App {
             LiveAppRoot()
             #endif
             }
+            .id(localGeneration)
+            .onReceive(NotificationCenter.default.publisher(for:.entrixyLocalResetCompleted)) { _ in localGeneration = UUID() }
             .toggleStyle(SelectedSwitchStyle())
             .preferredColorScheme(appearance == "light" ? .light : appearance == "dark" ? .dark : nil)
         }
@@ -44,7 +47,8 @@ private struct LiveAppRoot: View {
     }
     var body: some View {
         Group {
-            if model.appLocked || model.entryRequiresUnlock() { AppEntryLockScreen() }
+            if model.localDataErased { LocalResetCompleteScreen() }
+            else if model.appLocked || model.entryRequiresUnlock() { AppEntryLockScreen() }
             else { RootView(initialTab: PreviewRouting.tab, showAddKey: PreviewRouting.addKey, pendingURL: $pendingURL) }
         }
         .environmentObject(model)
@@ -201,7 +205,7 @@ struct RootView: View {
             if model.owners.contains(where:{ $0.server == company.server && $0.credentials != nil }) { AddOwnerObjectScreen(server:company.server) }
             else { AddOwnerServerScreen(initialServer:company.server) }
         }
-        .appMessageDialog("Entrixy",message:model.errorMessage ?? "",actionTitle:"Понятно",isPresented:Binding(get: { model.errorMessage != nil && !adding }, set: { if !$0 && !adding { model.errorMessage = nil } }))
+        .appMessageDialog("Entrixy",message:model.errorMessage ?? "",actionTitle:ProductText.string("btn_understood"),isPresented:Binding(get: { model.errorMessage != nil && !adding }, set: { if !$0 && !adding { model.errorMessage = nil } }))
     }
     private func receiveURL(_ url: URL) {
         if url.isFileURL, ["eib","ekb"].contains(url.pathExtension.lowercased()) {

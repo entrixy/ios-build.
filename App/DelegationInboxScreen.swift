@@ -29,7 +29,7 @@ private struct DelegationInboxContent: View {
             }
             ForEach(app.delegations) { pending in
                 Section {
-                    KeyValueRow(title: "Сервер", value: pending.link.server)
+                    KeyValueRow(title: ProductText.string("ble_server_label"), value: pending.link.server)
                     KeyValueRow(title: "Ожидают подтверждения", value: String(pending.parts.count - pending.completedCodes.count))
                     if !pending.sent {
                         Button("Отправить принятие") { Task { await manager.send(pending.id) } }.buttonStyle(PrimaryActionStyle()).disabled(manager.busy || app.busy || app.ownerBusy)
@@ -54,7 +54,7 @@ struct DelegationImportSection: View {
             if let message = manager.message { Text(message).font(.subheadline).foregroundStyle(Brand.secondaryInk) }
             if let pending = manager.preview {
                 Text("Переданный доступ").font(.headline)
-                KeyValueRow(title: "Сервер", value: pending.link.server)
+                KeyValueRow(title: ProductText.string("ble_server_label"), value: pending.link.server)
                 KeyValueRow(title: "Частей ключа", value: String(pending.parts.count))
                 Text("На этом iPhone будут созданы собственные ключи. Доступ станет доступен после подтверждения передавшим и владельцами объектов.").font(.subheadline).foregroundStyle(Brand.secondaryInk)
                 Button("Принять передачу") { Task { await manager.accept() } }.buttonStyle(PrimaryActionStyle()).disabled(manager.busy)

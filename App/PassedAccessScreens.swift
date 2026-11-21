@@ -160,7 +160,7 @@ struct PassedAccessDetail: View {
                 Section {
                     Text(record.label).font(.headline)
                     Text(passedAccessStatus(record)).foregroundStyle(Brand.secondaryInk)
-                    KeyValueRow(title: "Сервер", value: record.server)
+                    KeyValueRow(title: ProductText.string("ble_server_label"), value: record.server)
                     KeyValueRow(title: "Исходных ключей", value: String(record.parts.count))
                     if let message = manager.message { Text(message).font(.subheadline).foregroundStyle(Brand.secondaryInk) }
                 }

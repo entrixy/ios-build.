@@ -5,24 +5,27 @@ struct AppEntryLockScreen: View {
     @State private var code = ""
     @State private var working = false
     @State private var message: String?
+    @State private var reset = false
     var body: some View {
         NavigationStack {
             ScrollView {
             VStack(alignment: .leading, spacing: 20) {
                 Image(systemName: "lock.fill").font(.system(size: 36)).foregroundStyle(Brand.ink).accessibilityHidden(true)
-                Text("Введите код Entrixy").font(.title2.bold()).foregroundStyle(Brand.ink)
-                Text("Код приложения отличается от кода блокировки iPhone.").foregroundStyle(Brand.secondaryInk)
-                AppField("PIN-код Entrixy") {
-                    SecureField("PIN-код Entrixy", text: $code).keyboardType(.numberPad)
+                Text(ProductText.string("ios_entry_title")).font(.title2.bold()).foregroundStyle(Brand.ink)
+                Text(ProductText.string("ios_entry_code_hint")).foregroundStyle(Brand.secondaryInk)
+                AppField(ProductText.string("code_field")) {
+                    SecureField(ProductText.string("code_field"), text: $code).keyboardType(.numberPad)
                         .textContentType(.password).padding(14)
                         .background(Color(uiColor: .secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 12))
                 }
-                Button { unlock() } label: { ActionButtonLabel(title: "Войти", busy: working) }
+                Button { unlock() } label: { ActionButtonLabel(title:ProductText.string("ios_entry_sign_in"), busy: working) }
                     .buttonStyle(PrimaryActionStyle()).disabled(working || !model.storageReady || !(4...8).contains(code.count))
                 if model.appEntryBiometricEnabled {
-                    Button("Войти с биометрией") { unlock(biometric: true) }
+                    Button(ProductText.string("ios_entry_biometric")) { unlock(biometric: true) }
                         .buttonStyle(SecondaryActionStyle()).disabled(working || !model.storageReady)
                 }
+                Button(ProductText.string("ios_code_forgot")) { reset = true }
+                    .buttonStyle(SecondaryActionStyle()).disabled(working || !model.storageReady)
                 if let message { Text(message).foregroundStyle(.red).fixedSize(horizontal: false, vertical: true) }
                 if !model.storageReady, let error = model.errorMessage { Text(error).foregroundStyle(.red) }
             }.frame(maxWidth: .infinity, alignment: .leading).padding(DesignMetrics.pageInset)
@@ -31,6 +34,7 @@ struct AppEntryLockScreen: View {
                 .background(Color(uiColor: .systemGroupedBackground))
                 .navigationTitle(ProductText.string("code_bio_title")).navigationBarTitleDisplayMode(.inline)
         }
+        .sheet(isPresented:$reset) { LocalResetScreen() }
         .task {
             #if DEBUG && targetEnvironment(simulator)
             if ActionCaptureScenario.current == .appEntryRejected { code = "0000"; unlock() }
@@ -45,9 +49,9 @@ struct AppEntryLockScreen: View {
                 if biometric { try await model.unlockApplicationWithBiometrics() }
                 else {
                     let accepted = try await model.unlockApplication(code: code)
-                    if !accepted { message = "Код не принят или ввод временно заблокирован. После нескольких ошибок нужно подождать." }
+                    if !accepted { message = ProductText.string("ios_entry_rejected") }
                 }
-            } catch { message = "Не удалось подтвердить вход. Код и доступы не изменялись." }
+            } catch { message = ProductText.string("ios_entry_failed") }
         }
     }
 }

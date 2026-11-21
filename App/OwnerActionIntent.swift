@@ -12,6 +12,6 @@ struct OwnerActionIntent: Identifiable {
     var automatic = false
     let created = ProcessInfo.processInfo.systemUptime
     var title: String {
-        object.kind == "call" ? "Позвонить" : ActionIntent.displayTitle(action: action, kind: object.kind)
+        object.kind == "call" ? ProductText.string("ios_call_now") : ActionIntent.displayTitle(action: action, kind: object.kind)
     }
 }

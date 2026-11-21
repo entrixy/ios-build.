@@ -53,7 +53,7 @@ struct ReadMessageScreen: View {
                 Section {
                     Text("Сообщение по ключу").font(.headline)
                     Text(saved.receivedAt.formatted(date: .abbreviated, time: .shortened)).font(.subheadline).foregroundStyle(Brand.secondaryInk)
-                    if let guest = app.guests.first(where: { $0.id == saved.guestID }) { KeyValueRow(title: "Сервер", value: guest.invite.server) }
+                    if let guest = app.guests.first(where: { $0.id == saved.guestID }) { KeyValueRow(title: ProductText.string("ble_server_label"), value: guest.invite.server) }
                     if let text = try? manager.text(saved) { Text(text).textSelection(.enabled) }
                     else { Text("Не удалось расшифровать сообщение").foregroundStyle(Brand.secondaryInk) }
                 }
@@ -96,14 +96,14 @@ struct ComposeMessageScreen: View {
                             sentID = app.outgoingMessages.first(where: { !previous.contains($0.id) })?.id
                             if sent { text = "" }
                         }
-                    } label: { ActionButtonLabel(title: "Отправить сообщение", busy: manager.busy) }
+                    } label: { ActionButtonLabel(title: ProductText.string("msg_send_icon_desc"), busy: manager.busy) }
                         .buttonStyle(PrimaryActionStyle())
                         .disabled(text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || text.count > 500 || text.utf8.count > 2048)
                         .accessibilityIdentifier("message-send")
                 } footer: { Text("Отправка на сервер ещё не подтверждает доставку или чтение получателем.") }
             }.disabled(manager.busy)
             .taskSheetTitle("Написать сообщение",form:true)
-            .sheetDismissFooter(sentID == nil ? "Отмена" : "Закрыть", disabled: manager.busy) { dismiss() }
+            .sheetDismissFooter(sentID == nil ? ProductText.string("btn_cancel") : ProductText.string("btn_close"), disabled: manager.busy) { dismiss() }
 
         }
     }

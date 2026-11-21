@@ -26,6 +26,10 @@ def main():
         raise RuntimeError('Release executable contains isolated fixture/bootstrap code')
     for bundle, environment in [(args.debug_app, 'sandbox'), (args.release_app, 'production')]:
         info = plistlib.loads((bundle / 'Info.plist').read_bytes())
+        widget_info = plistlib.loads((bundle / 'PlugIns/EntrixyWidget.appex/Info.plist').read_bytes())
+        group = info.get('EntrixyAppGroup', '')
+        if not group.startswith('group.') or '$' in group or widget_info.get('EntrixyAppGroup') != group:
+            raise RuntimeError('App/widget do not have the same expanded App Group setting')
         if info.get('EntrixyPushEnvironment') != environment or 'remote-notification' not in info.get('UIBackgroundModes', []):
             raise RuntimeError('Built application has an incorrect APNs environment/background declaration')
         for language in ['en','ru','de','es','fr','pt','zh']:

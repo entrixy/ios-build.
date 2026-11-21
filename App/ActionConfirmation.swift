@@ -24,7 +24,7 @@ struct ActionConfirmation: View {
     private var title: String { guestIntent?.title ?? ownerIntent?.title ?? "Подтвердить" }
     private var objectLabel: String {
         if let intent = guestIntent, let entry = model.catalogObject(.received(guestID:intent.guestID,objectID:intent.object.id)) { return model.objectLabel(entry) }
-        return guestIntent?.object.label ?? ownerIntent?.label ?? "Объект"
+        return guestIntent?.object.label ?? ownerIntent?.label ?? ProductText.string("journal_who_limit")
     }
     @State private var code = ""
     @State private var repeatedCode = ""
@@ -142,7 +142,7 @@ struct ActionConfirmation: View {
             defer { working = false; code = "" }
             do {
                 if try await authorizeCode() { await perform(); close() }
-                else { message = "Код не принят или ввод временно заблокирован. После нескольких ошибок нужно подождать." }
+                else { message = ProductText.string("ios_entry_rejected") }
             } catch { message = "Не удалось проверить код в защищённом хранилище." }
         }
     }
