@@ -1,3 +1,19 @@
+## Verified UI and physical archive; packaging delivery correction
+
+Apple run45034724769/publiceebde4a9b3deb2a9d617e112151e3e16f3e6eae2:
+330core, allDebugSDKproducts, both affectedUI scenarios twice (4passes),
+normalStoreRelease/privacy/isolation, physicalarm64personalIPA archive all PASS.
+Final evidence guard failed; IPA was not retained. Evidence14761867849 outerSHA
+4633d449b61d3e542628f02cfa7eebf49290594a3f5b41f18480890dda3376b3
+verified and downloaded. UI log SHA1d1f088cc9f2dc87191cd2b96a2989dc9dce85a92a47e6ab766e4fa56d559388.
+New packaging-only follow-up fixes extraction directories, checks immutable build
+and UI evidence and unchanged committed application/test source BEFORE generators.
+No new full runtime run claimed: c8 complete232hosted/32otherUI plus eeb2UI×2.
+Only fresh Debug app comparison and physical arm64 Release/IPA are rebuilt, then
+actual file download/source/hash/platform/privacy validation is still required.
+No new screenshots/gallery. Personal profile lacks APNs/widget/associated domains/
+WiFi-info; no access checks bypass. Physical iPhone acceptance remains pending.
+
 ## Current: complete Apple run finished; two bounded UI corrections pending
 
 Run45022342509/publicc8b3b63/native186a467 finished:330Core PASS,

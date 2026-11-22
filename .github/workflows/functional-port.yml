@@ -1,4 +1,4 @@
-name: iPhone build and complete application checks
+name: iPhone install package with verified runtime evidence
 "on":
   push:
     branches: [ci/functional-port, ci/automation-runtime, ci/ui-review, ci/ui-review-arm, ci/native-review-arm, ci/review-batch]
@@ -29,16 +29,25 @@ jobs:
         uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
         with:
           artifact-ids: 14758179556
+          merge-multiple: true
           run-id: 45022342509
           github-token: ${{ github.token }}
           path: .local-checks/PreviousCompleteEvidence
-      - name: Test protocol core with Apple CryptoKit
-        run: swift test 2>&1 | tee .local-checks/ci/core.log
-      - name: Prepare healthy job-owned simulator before compilation
-        id: simulator_prepare
-        timeout-minutes: 25
-        continue-on-error: true
-        run: python3 scripts/prepare_review_simulator.py 2>&1 | tee .local-checks/ci/simulator-prepare.log
+      - name: Retrieve passed follow-up evidence for unchanged application source
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          artifact-ids: 14761867849
+          merge-multiple: true
+          run-id: 45034724769
+          github-token: ${{ github.token }}
+          path: .local-checks/PassedFollowupEvidence
+      - name: Verify source identity and immutable complete plus follow-up evidence
+        id: application_tests
+        run: |
+          python3 scripts/verify_runtime_followup.py \
+            --baseline-evidence .local-checks/PreviousCompleteEvidence \
+            --retained-followup-evidence .local-checks/PassedFollowupEvidence \
+            2>&1 | tee .local-checks/ci/runtime-coverage.log
       - name: Install project generator and isolated spec reader
         run: |
           brew install xcodegen
@@ -49,53 +58,21 @@ jobs:
           xcodegen generate
           .local-checks/python/bin/python scripts/prepare_personal_project.py
           xcodegen generate --spec project.personal.json
-      - name: Compile personal application and all test products once
+      - name: Compile personal Debug comparison product without repeating passed tests
         id: debug_build
         timeout-minutes: 30
         run: |
-          xcodebuild -project EntrixyPersonal.xcodeproj -scheme EntrixyTests \
+          xcodebuild -project EntrixyPersonal.xcodeproj -scheme Entrixy \
             -configuration Debug -sdk iphonesimulator \
             -destination 'generic/platform=iOS Simulator' \
             -clonedSourcePackagesDirPath .local-checks/SourcePackages \
             -derivedDataPath .local-checks/DerivedData \
-            CODE_SIGNING_ALLOWED=YES CODE_SIGN_IDENTITY=- build-for-testing 2>&1 | tee .local-checks/ci/debug-build.log
-      - name: Check both corrected UI scenarios twice with complete checkpoint assertions
-        id: corrected_scenarios
-        if: ${{ always() && steps.debug_build.outcome == 'success' && steps.simulator_prepare.outcome == 'success' }}
-        run: |
-          python3 scripts/test_simulator.py --use-built-tests --only-ui --checkpoint-assertions \
-            --prepared-device .local-checks/ci/prepared-device.json --keep-prepared-device \
-            --test EntrixyUITests/NavigationUITests/testActualWebhookEditorContainsAndroidFieldsAndAutomationRoute \
-            --test EntrixyUITests/NavigationUITests/testOwnedBLEInformationUsesSeparateActionAndDoesNotInventUnobservedReadings \
-            --iterations 2 \
-            2>&1 | tee .local-checks/ci/corrected-scenarios.log
-      - name: Compile normal Store Release and verify fixture and privacy isolation
-        id: release_build
-        timeout-minutes: 30
-        if: ${{ always() && steps.debug_build.outcome == 'success' && steps.corrected_scenarios.outcome == 'success' }}
-        run: |
-          xcodebuild -project Entrixy.xcodeproj -scheme Entrixy \
-            -configuration Release -sdk iphonesimulator \
-            -destination 'generic/platform=iOS Simulator' \
-            -clonedSourcePackagesDirPath .local-checks/SourcePackages \
-            -derivedDataPath .local-checks/ReleaseDerivedData \
-            CODE_SIGNING_ALLOWED=YES CODE_SIGN_IDENTITY=- build 2>&1 | tee .local-checks/ci/release-build.log
-          python3 scripts/verify_release_isolation.py \
-            .local-checks/DerivedData/Build/Products/Debug-iphonesimulator/Entrixy.app \
-            .local-checks/ReleaseDerivedData/Build/Products/Release-iphonesimulator/Entrixy.app
+            ARCHS=x86_64 ONLY_ACTIVE_ARCH=YES CODE_SIGNING_ALLOWED=YES CODE_SIGN_IDENTITY=- build 2>&1 | tee .local-checks/ci/debug-build.log
       - name: Archive real arm64 personal Release and package IPA for local signing
         id: personal_package
         timeout-minutes: 35
-        if: ${{ always() && steps.debug_build.outcome == 'success' && steps.release_build.outcome == 'success' }}
+        if: ${{ always() && steps.debug_build.outcome == 'success' && steps.application_tests.outcome == 'success' }}
         run: python3 scripts/package_personal_ipa.py 2>&1 | tee .local-checks/ci/personal-package.log
-      - name: Verify complete baseline and bounded follow-up coverage
-        id: application_tests
-        if: ${{ always() && steps.debug_build.outcome == 'success' && steps.corrected_scenarios.outcome == 'success' }}
-        run: |
-          python3 scripts/verify_runtime_followup.py \
-            --baseline-evidence .local-checks/PreviousCompleteEvidence \
-            --focused-log .local-checks/ci/corrected-scenarios.log \
-            2>&1 | tee .local-checks/ci/runtime-coverage.log
       - name: Retain install package only after all mandatory checks succeed
         if: ${{ success() && steps.personal_package.outcome == 'success' && steps.application_tests.outcome == 'success' }}
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
@@ -104,9 +81,6 @@ jobs:
           path: .local-checks/ci/iphone11/
           if-no-files-found: error
           retention-days: 14
-      - name: Release job-owned simulator
-        if: always()
-        run: python3 scripts/prepare_review_simulator.py --cleanup
       - name: Retain build and transaction evidence without a screenshot gallery
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
@@ -120,8 +94,3 @@ jobs:
             .local-checks/ci/ui-failure-attachments/
           if-no-files-found: warn
           retention-days: 7
-      - name: Require healthy simulator for complete acceptance
-        if: ${{ always() && steps.simulator_prepare.outcome != 'success' }}
-        run: |
-          echo 'Simulator preparation failed; complete application checks were not executed.' >&2
-          exit 1
