@@ -163,13 +163,20 @@ final class NavigationUITests: XCTestCase {
         // small nested horizontal pickers when choosing the vertical viewport.
         let scrollTypes = NSPredicate(format:"elementType == %d OR elementType == %d",
             XCUIElement.ElementType.collectionView.rawValue,XCUIElement.ElementType.scrollView.rawValue)
-        let containers = app.descendants(matching:.any).matching(scrollTypes).allElementsBoundByIndex
         let window = app.frame
-        let container = containers.last { view in
-            let frame = view.frame
-            return frame.width >= window.width*0.75 && frame.height >= window.height*0.30
-        } ?? app
+        if element.exists, !element.frame.isEmpty, element.frame.intersects(window) {
+            XCTAssertTrue(waitForStable(element,in:app,requireHit:false),"Control moved while the keyboard or sheet was changing")
+        }
         for _ in 0..<22 {
+            // A keyboard disappearing changes the query's indices. Bind to
+            // actual AX elements and resolve the current viewport after every
+            // reflow instead of keeping an index into the previous hierarchy.
+            let containers = app.descendants(matching:.any).matching(scrollTypes).allElementsBoundByAccessibilityElement
+            let container = containers.last { view in
+                guard view.exists else { return false }
+                let frame = view.frame
+                return frame.width >= window.width*0.75 && frame.height >= window.height*0.30
+            } ?? app
             let viewport = container.frame.insetBy(dx:0,dy:8)
             let frame = element.exists ? element.frame : .null
             if !frame.isNull,frame.minY >= viewport.minY,frame.maxY <= viewport.maxY { return }

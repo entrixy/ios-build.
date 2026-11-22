@@ -1,3 +1,24 @@
+## Actual row-fix run45006375794:4/5PASS; test viewport bug fixed
+
+Publicd84ba8f/native1708508: Apple330CorePASS, healthySimPASS, DebugSDK/allproducts
+PASS. ActualDASH andWebM frames/aspectBOTH PASS; avatar andphoneBOTH PASS. WebM
+passingbeforecleanupfix confirms decoderisavailable; priorfailureintermittent,
+don'tclaimlibrarymissing orsoleRangecauseproven. Robustcleanup/range/newcanceltest
+remainusefulandqueued. Full-rowcontentShapeWORKS: serverformopens, realpassword
+andDELETEtyped. UItestFAILatNavigationUITests169: scrollhelperkeepsindex2while
+keyboarddismissremovesnode. ActualAX showsvalidpassword/DELETE/enabledsubmit.
+Artifact14749774433 SHA4f4dc348ed01abd5ee62ce90fe90760d2e162aa5f2f718ed2591a66a29814320
+verified/extracted .local-checks/iphone11-d84-evidence; currentactualUIissueknown.
+
+Fix testhelper: waitstableonlyvisibleanchor, bindAXelementsbyidentity (NOTindex),
+resolveforegroundverticalviewportaftereachscroll. PreserveallrealUI gestures,
+confirmation/enabled/resultassertions; noactivation/model-shortcuts. FullUIwhole
+mustvalidatesharedhelper. Local30PythonPASS, SwiftparsePASS (NOTSDK). CIcancel-
+in-progress changedtrue soKNOWNOBSOLETEsource ea7ece5 doesn'tspendfullbuildon
+confirmedrunnerbug; newSHA supersedesit. Oldrowrunalreadycompleted, no useful
+runtimecanceled. Finaldocs-onlyevidencecommit should[skip ci] toavoidredundantCI.
+NoIPAyet. UserWindows11/iPhone11, no gallery, finishactualpackage+SHA+download.
+
 ## Actual corrected run45006050619:3/5 passed, WebM investigation/fix
 
 Nativecd05d2b/public6a950d9: Apple330CorePASS, healthySimPASS, DebugSDK/allproducts
