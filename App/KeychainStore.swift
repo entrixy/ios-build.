@@ -16,8 +16,27 @@ struct SavedGuest: Codable, Identifiable {
     var androidAutomation: [String:AndroidIncomingAutomation]? = nil
     var privacyNetworks: [PrivacyNetwork]? = nil
     var welcome: String? = nil
+    var hostLabel: String? = nil
+    var localKeyLabel: String? = nil
+    var senderLabel: String? = nil
+    // Grouping/display hints only. Cryptographic membership uses the receipt.
+    var keyGroup: String? = nil
+    var sequenceNumber: Int? = nil
+    var incomingRecipient: BundleKeySeal.Recipient? = nil
+    var importedDelegationLink: DelegationLink? = nil
     var id: String { invite.id }
     func validateObjectSettings() throws {
+        if let incomingRecipient { try BundleKeySeal.validate(incomingRecipient) }
+        if let importedDelegationLink {
+            _ = try DelegationLink(server: importedDelegationLink.server, group: importedDelegationLink.group, secret: importedDelegationLink.secret)
+            guard importedDelegationLink.id == keyGroup, importedDelegationLink.server == invite.server else { throw GuestCrypto.Failure.invalidEnvelope }
+        }
+        guard [hostLabel,localKeyLabel,senderLabel].compactMap({ $0 }).allSatisfy({ $0.utf8.count <= 512 }),
+              sequenceNumber.map({ (1...Int(Int32.max)).contains($0) }) ?? true else { throw GuestCrypto.Failure.invalidEnvelope }
+        if let keyGroup {
+            let prefix = invite.server + ":"
+            guard keyGroup.hasPrefix(prefix), DelegationLink.code(String(keyGroup.dropFirst(prefix.count))) else { throw GuestCrypto.Failure.invalidEnvelope }
+        }
         guard welcome.map({ $0.utf8.count <= 16384 }) ?? true else { throw GuestCrypto.Failure.invalidEnvelope }
         try PrivacyNetwork.validate(privacyNetworks ?? [])
         try AndroidIncomingAutomation.validate(androidAutomation ?? [:])
@@ -32,6 +51,15 @@ struct SavedGuest: Codable, Identifiable {
             guard !id.isEmpty, id.utf8.count <= 512 else { throw GuestCrypto.Failure.invalidEnvelope }
             try camera.validate()
         }
+    }
+}
+
+extension SavedGuest {
+    init(android source: AndroidGuestMigration, invite: GuestInvite) {
+        self.init(invite: invite, requiresBLEExitOnRestore: true, androidAutomation: source.incomingAutomation, privacyNetworks: source.privacyNetworks)
+        hostLabel = source.label; localKeyLabel = source.labelOverride; keyGroup = source.groupID
+        senderLabel = source.senderLabel; sequenceNumber = source.localID; incomingRecipient = source.recipient
+        importedDelegationLink = source.delegationLink
     }
 }
 
@@ -123,7 +151,8 @@ struct KeychainStore: StateStorage {
         for row in outgoing { try row.validate() }
         for record in received {
             try record.validate()
-            guard Set(record.parts.map(\.guestID)).isSubset(of: guestIDs) else { throw Failure(status: errSecDecode) }
+            guard Set(record.parts.map(\.guestID)).isSubset(of: guestIDs),
+                  Set(record.importedGuestIDs ?? []).isSubset(of: guestIDs.union(waiting.map(\.id))) else { throw Failure(status: errSecDecode) }
         }
         let passed = state.passedAccess ?? []
         guard passed.count <= 500, Set(passed.map(\.id)).count == passed.count else { throw Failure(status: errSecDecode) }

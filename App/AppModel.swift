@@ -374,6 +374,19 @@ final class AppModel: ObservableObject {
     }
 
     private func save(_ updated: [SavedGuest], preferences: ObjectCatalogPreferences? = nil) throws {
+        // A display number is not a signing identity. Preserve existing numbers
+        // and allocate metadata only as part of this same atomic state write.
+        var updated = updated
+        guard updated.compactMap(\.sequenceNumber).allSatisfy({ (1...Int(Int32.max)).contains($0) }) else { throw GuestCrypto.Failure.invalidEnvelope }
+        var occupied = Set(updated.compactMap(\.sequenceNumber)), assigned = Set<Int>()
+        var next = (occupied.max() ?? 0) + 1
+        if next > Int(Int32.max) { next = 1 }
+        for index in updated.indices {
+            if let number = updated[index].sequenceNumber, assigned.insert(number).inserted { continue }
+            while occupied.contains(next) && next <= Int(Int32.max) { next += 1 }
+            guard next <= Int(Int32.max) else { throw GuestCrypto.Failure.invalidEnvelope }
+            updated[index].sequenceNumber = next; occupied.insert(next); assigned.insert(next); next += 1
+        }
         let preferences = preferences ?? objectPreferences
         try preferences.validate()
         try storage.save(SavedState(identity: identity, guests: updated, journal: journal, actionCode: actionCode, owners: owners, usedOwnerPresses: usedOwnerPresses, pendingRestore: pendingRestore, delegations: delegations, passedAccess: passedAccess, receivedDelegations: receivedDelegations, incomingMessages: incomingMessages, outgoingMessages: outgoingMessages, delegatedJournalLedger: delegatedJournalLedger, appLockEnabled: appLockEnabled, appEntryBiometricEnabled: appEntryBiometricEnabled, objectPreferences: preferences, bleAutomationDisarmed: bleAutomationDisarmed, ownerGuestDefaults: ownerGuestDefaults, companies: companies, androidArchives: androidArchives, androidPendingGuests: androidPendingGuests, selectedOwnerServer: selectedOwnerServer, networkPrivacy: networkPrivacy))
@@ -453,34 +466,52 @@ final class AppModel: ObservableObject {
         }
         do { try save(guests) } catch { passedAccess = previous; throw error }
     }
+    var hasAndroidPassedAccess: Bool { androidArchives.contains { archive in archive.entries.keys.contains { $0.hasPrefix("passed_wk_") } } }
+    func androidPassedAccessMaterial(sourceID: String, groups: Set<String>) throws -> [AndroidPassedAccessMaterial] {
+        guard canManageGuestAccess, guests.contains(where: { $0.id == sourceID }) else { throw BackupFailure.noAccess }
+        var result: [String:AndroidPassedAccessMaterial] = [:]
+        for archive in androidArchives.sorted(by: { $0.created > $1.created }) {
+            for material in try archive.passedAccessMaterial(sourceID:sourceID,groups:groups) {
+                if let current = result[material.group] {
+                    guard current.server == material.server, current.secret == material.secret else { throw BackupFailure.conflictingAccess }
+                } else { result[material.group] = material }
+            }
+        }
+        return result.values.sorted { $0.group < $1.group }
+    }
 
     func reserveDelegation(_ pending: DelegationRedemption) throws {
-        guard storageReady, !busy, !ownerBusy, pendingRestore == nil, delegations.count < 100,
+        guard canManageGuestAccess, !busy, !ownerBusy, pendingRestore == nil, delegations.count < 100,
               !delegations.contains(where: { $0.id == pending.id }) else { throw BackupFailure.busy }
+        try pending.validate()
+        if let receipt = receivedDelegations.first(where: { $0.id == pending.id }) {
+            guard receipt.link == pending.link, receipt.recipient.publicKey == pending.recipient.publicKey,
+                  receipt.recipient.privateKey == pending.recipient.privateKey else { throw BackupFailure.conflictingAccess }
+        }
         let previous = delegations
         delegations.append(pending)
         do { try save(guests) } catch { delegations = previous; throw error }
     }
     func removePendingDelegation(_ id: String) {
-        guard storageReady, !busy, !ownerBusy, pendingRestore == nil else { return }
+        guard canManageGuestAccess, !busy, !ownerBusy, pendingRestore == nil else { return }
         let previous = delegations
         delegations.removeAll { $0.id == id }
         do { try save(guests) }
         catch { delegations = previous; errorMessage = "Не удалось сохранить удаление. Данные получателя сохранены." }
     }
     func markDelegationSent(_ id: String) throws {
-        guard storageReady, !busy, !ownerBusy, pendingRestore == nil,
+        guard canManageGuestAccess, !busy, !ownerBusy, pendingRestore == nil,
               let i = delegations.firstIndex(where: { $0.id == id }), !delegations[i].sent else { throw BackupFailure.busy }
         delegations[i].sent = true
         do { try save(guests) } catch { delegations[i].sent = false; throw error }
     }
     func installDelegatedInvite(_ invite: GuestInvite, pendingID: String, code: String) throws {
-        guard storageReady, !busy, !ownerBusy, pendingRestore == nil,
+        guard canManageGuestAccess, !busy, !ownerBusy, pendingRestore == nil,
               let i = delegations.firstIndex(where: { $0.id == pendingID }),
               delegations[i].sent, delegations[i].link.server == invite.server,
               delegations[i].parts.contains(where: { $0.code == code && $0.userKey == invite.userKey }) else { throw BackupFailure.busy }
         if let current = guests.first(where: { $0.id == invite.id }), current.invite != invite { throw BackupFailure.conflictingAccess }
-        let previous = delegations, previousReceived = receivedDelegations
+        let previous = delegations, previousReceived = receivedDelegations, previousMessages = incomingMessages
         if !delegations[i].completedCodes.contains(code) { delegations[i].completedCodes.append(code) }
         do {
             let receipt = try ReceivedDelegation(pending: delegations[i])
@@ -490,7 +521,31 @@ final class AppModel: ObservableObject {
         if delegations[i].completedCodes.count == delegations[i].parts.count { delegations.remove(at: i) }
         var updated = guests
         if !updated.contains(where: { $0.id == invite.id }) { updated.append(SavedGuest(invite: invite)) }
-        do { try save(updated) } catch { delegations = previous; receivedDelegations = previousReceived; throw error }
+        do {
+            if let receiptIndex = receivedDelegations.firstIndex(where: { $0.id == pendingID }),
+               let cipher = receivedDelegations[receiptIndex].welcomeCipher {
+                let receipt = receivedDelegations[receiptIndex]
+                let welcome = try DelegationWelcome.open(cipher, secret: receipt.link.secret)
+                let ids = receipt.guestIDs
+                for index in updated.indices where ids.contains(updated[index].id) {
+                    updated[index].keyGroup = receipt.id
+                    if !welcome.from.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty { updated[index].senderLabel = welcome.from }
+                }
+                if receipt.welcomeQueued != true, !welcome.text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty, let first = receipt.parts.first {
+                    var notice = SavedMessage(guestID: first.guestID, cipher: cipher, receivedAt: Date())
+                    notice.delegationWelcomeGroup = receipt.id; notice.deliveryAcknowledged = true
+                    if !incomingMessages.contains(where: { $0.id == notice.id }) {
+                        while incomingMessages.count >= 200 {
+                            guard let index = incomingMessages.lastIndex(where: { $0.readAt != nil && $0.readAcknowledged }) else { throw BackupFailure.busy }
+                            incomingMessages.remove(at: index)
+                        }
+                        incomingMessages.insert(notice, at: 0)
+                    }
+                }
+                receivedDelegations[receiptIndex].welcomeQueued = true
+            } else if let index = updated.firstIndex(where: { $0.id == invite.id }) { updated[index].keyGroup = pendingID }
+            try save(updated)
+        } catch { delegations = previous; receivedDelegations = previousReceived; incomingMessages = previousMessages; throw error }
     }
 
     func backupState() throws -> SavedState {
@@ -503,6 +558,29 @@ final class AppModel: ObservableObject {
     func validateRestoreConflicts(_ payload: IOSBackupPayload) throws {
         guard storageReady else { throw BackupFailure.invalidPayload }
         try payload.validate()
+        // Reject group/recipient conflicts before any remote device move.
+        var groupRecipients: [String:BundleKeySeal.Recipient] = [:]
+        var groupLinks: [String:DelegationLink] = [:]
+        func includeGroup(_ id: String?, recipient: BundleKeySeal.Recipient?, link: DelegationLink?) throws {
+            guard let id else { return }
+            if let recipient {
+                if let current = groupRecipients[id], current.publicKey != recipient.publicKey || current.privateKey != recipient.privateKey { throw BackupFailure.conflictingAccess }
+                groupRecipients[id] = recipient
+            }
+            if let link {
+                if let current = groupLinks[id], current != link { throw BackupFailure.conflictingAccess }
+                groupLinks[id] = link
+            }
+        }
+        for receipt in receivedDelegations + (payload.receivedDelegations ?? []) {
+            try includeGroup(receipt.id,recipient:receipt.recipient,link:receipt.link)
+        }
+        for guest in guests + payload.guests {
+            try includeGroup(guest.keyGroup,recipient:guest.incomingRecipient,link:guest.importedDelegationLink)
+        }
+        for guest in androidPendingGuests + (payload.androidGuests ?? []) {
+            try includeGroup(guest.groupID,recipient:guest.recipient,link:guest.delegationLink)
+        }
         _ = try networkPrivacy.merging(payload.networkPrivacy)
         _ = try objectPreferences.merging(payload.objectPreferences)
         var mergedArchives = androidArchives
@@ -523,14 +601,21 @@ final class AppModel: ObservableObject {
             }
         }
         for source in payload.guests {
-            if let current = guests.first(where: { $0.id == source.id }), current.invite != source.invite { throw BackupFailure.conflictingAccess }
+            if let current = guests.first(where: { $0.id == source.id }) {
+                guard current.invite == source.invite else { throw BackupFailure.conflictingAccess }
+                try validateImportedMetadata(current, group: source.keyGroup, recipient: source.incomingRecipient, link: source.importedDelegationLink)
+            }
         }
         for source in payload.androidGuests ?? [] {
-            if let current = guests.first(where:{ $0.id == source.id }), current.invite.bundleKey != source.bundleKey { throw BackupFailure.conflictingAccess }
+            if let current = guests.first(where:{ $0.id == source.id }) {
+                guard current.invite.bundleKey == source.bundleKey else { throw BackupFailure.conflictingAccess }
+                try validateImportedMetadata(current, group: source.groupID, recipient: source.recipient, link: source.delegationLink)
+            }
             if let current = androidPendingGuests.first(where:{ $0.id == source.id }) {
                 guard current.bundleKey == source.bundleKey,
                       current.recipient?.privateKey == source.recipient?.privateKey,
-                      current.recipient?.publicKey == source.recipient?.publicKey else { throw BackupFailure.conflictingAccess }
+                      current.recipient?.publicKey == source.recipient?.publicKey,
+                      current.groupID == source.groupID, current.delegationLink == source.delegationLink else { throw BackupFailure.conflictingAccess }
             }
         }
         for source in payload.receivedDelegations ?? [] {
@@ -541,6 +626,16 @@ final class AppModel: ObservableObject {
         for source in payload.passedAccess ?? [] {
             if let current = passedAccess.first(where: { $0.id == source.id || (source.group != nil && $0.server == source.server && $0.group == source.group) }),
                current.secret != source.secret || current.server != source.server { throw BackupFailure.conflictingAccess }
+        }
+    }
+    private func validateImportedMetadata(_ current: SavedGuest, group: String?, recipient: BundleKeySeal.Recipient?, link: DelegationLink?) throws {
+        if let existing = current.incomingRecipient, let recipient,
+           existing.publicKey != recipient.publicKey || existing.privateKey != recipient.privateKey { throw BackupFailure.conflictingAccess }
+        if let existing = current.keyGroup, let group, existing != group { throw BackupFailure.conflictingAccess }
+        if let existing = current.importedDelegationLink, let link, existing != link { throw BackupFailure.conflictingAccess }
+        if let group, let record = receivedDelegations.first(where: { $0.id == group }) {
+            if let link, record.link != link { throw BackupFailure.conflictingAccess }
+            if let recipient, record.recipient.publicKey != recipient.publicKey || record.recipient.privateKey != recipient.privateKey { throw BackupFailure.conflictingAccess }
         }
     }
     func saveBackupPlan(_ plan: BackupRestorePlan?) throws {
@@ -603,6 +698,31 @@ final class AppModel: ObservableObject {
         pendingRestore = plan
         do { try saveOwners(updated) } catch { pendingRestore = previous; bleAutomationDisarmed = priorLatches; throw error }
     }
+    // Android keeps one recipient pair and fragment secret per delegation group.
+    // Preserve them in the same protected write as its migrated signing identity.
+    private func retainImportedDelegation(link: DelegationLink?, recipient: BundleKeySeal.Recipient?, guestID: String) throws {
+        guard let link, let recipient else { return }
+        if let i = receivedDelegations.firstIndex(where: { $0.id == link.id }) {
+            guard receivedDelegations[i].link == link,
+                  receivedDelegations[i].recipient.publicKey == recipient.publicKey,
+                  receivedDelegations[i].recipient.privateKey == recipient.privateKey else { throw BackupFailure.conflictingAccess }
+            if !receivedDelegations[i].guestIDs.contains(guestID) {
+                receivedDelegations[i].importedGuestIDs = (receivedDelegations[i].importedGuestIDs ?? []) + [guestID]
+                try receivedDelegations[i].validate()
+            }
+        } else {
+            receivedDelegations.append(try ReceivedDelegation(importing: link, recipient: recipient, guestIDs: [guestID]))
+        }
+    }
+    func rememberImportedDelegationCodes(_ id: String, codes: [String]) throws {
+        guard canManageGuestAccess, let i = receivedDelegations.firstIndex(where: { $0.id == id }),
+              !(receivedDelegations[i].importedGuestIDs ?? []).isEmpty else { throw BackupFailure.noAccess }
+        guard receivedDelegations[i].importedBaselineCodes == nil else { return }
+        let previous = receivedDelegations
+        receivedDelegations[i].importedBaselineCodes = codes
+        do { try receivedDelegations[i].validate(); try save(guests) }
+        catch { receivedDelegations = previous; throw error }
+    }
     func activateBackupGuest(_ guest: SavedGuest, plan: BackupRestorePlan) throws {
         var updated = guests
         if let index = updated.firstIndex(where:{ $0.id == guest.id }) {
@@ -610,38 +730,56 @@ final class AppModel: ObservableObject {
             updated[index].requiresBLEExitOnRestore = true
             let current = try NetworkPrivacyPreferences(own:updated[index].privacyNetworks ?? [])
             updated[index].privacyNetworks = try current.merging(NetworkPrivacyPreferences(own:guest.privacyNetworks ?? [])).own
+            if let existing = updated[index].incomingRecipient, let incoming = guest.incomingRecipient,
+               existing.publicKey != incoming.publicKey || existing.privateKey != incoming.privateKey { throw BackupFailure.conflictingAccess }
+            if let existing = updated[index].keyGroup, let incoming = guest.keyGroup, existing != incoming { throw BackupFailure.conflictingAccess }
+            if let existing = updated[index].importedDelegationLink, let incoming = guest.importedDelegationLink, existing != incoming { throw BackupFailure.conflictingAccess }
+            updated[index].incomingRecipient = updated[index].incomingRecipient ?? guest.incomingRecipient
+            updated[index].hostLabel = updated[index].hostLabel ?? guest.hostLabel
+            updated[index].localKeyLabel = updated[index].localKeyLabel ?? guest.localKeyLabel
+            updated[index].senderLabel = updated[index].senderLabel ?? guest.senderLabel
+            updated[index].keyGroup = updated[index].keyGroup ?? guest.keyGroup
+            updated[index].sequenceNumber = updated[index].sequenceNumber ?? guest.sequenceNumber
+            updated[index].importedDelegationLink = updated[index].importedDelegationLink ?? guest.importedDelegationLink
         } else {
             var imported = guest
             imported.requiresBLEExitOnRestore = true
             imported.objects = []; imported.checkedAt = nil
             updated.append(imported)
         }
-        let previous = pendingRestore, priorLatches = bleAutomationDisarmed
+        let previous = pendingRestore, priorLatches = bleAutomationDisarmed, priorReceived = receivedDelegations
         for object in guest.objects where object.kind == "ble" { bleAutomationDisarmed.insert(ObjectReference.received(guestID:guest.id,objectID:object.id).id) }
         pendingRestore = plan
-        do { try save(updated) } catch { pendingRestore = previous; bleAutomationDisarmed = priorLatches; throw error }
+        do {
+            if let installed = updated.first(where: { $0.id == guest.id }) {
+                try retainImportedDelegation(link: installed.importedDelegationLink, recipient: installed.incomingRecipient, guestID: installed.id)
+            }
+            try save(updated)
+        } catch { pendingRestore = previous; bleAutomationDisarmed = priorLatches; receivedDelegations = priorReceived; throw error }
     }
     func activatePendingAndroidGuest(_ source: AndroidGuestMigration,plan: BackupRestorePlan) throws {
         guard !guests.contains(where:{ $0.id == source.id }) else { throw BackupFailure.conflictingAccess }
-        let previous = androidPendingGuests, previousPlan = pendingRestore
+        let previous = androidPendingGuests, previousPlan = pendingRestore, previousReceived = receivedDelegations
         if !androidPendingGuests.contains(where:{ $0.id == source.id }) { androidPendingGuests.append(source) }
         pendingRestore = plan
-        do { try save(guests) } catch { androidPendingGuests = previous; pendingRestore = previousPlan; throw error }
+        do {
+            try retainImportedDelegation(link: source.delegationLink, recipient: source.recipient, guestID: source.id)
+            try save(guests)
+        } catch { androidPendingGuests = previous; pendingRestore = previousPlan; receivedDelegations = previousReceived; throw error }
     }
     func acceptRecoveredAndroidGuest(_ invite: GuestInvite) throws {
         guard canManageGuestAccess,
               let source = androidPendingGuests.first(where:{ $0.id == invite.id }) else { throw BackupFailure.noAccess }
-        let previous = androidPendingGuests
+        let previous = androidPendingGuests, previousReceived = receivedDelegations
         androidPendingGuests.removeAll { $0.id == invite.id }
-        do { try save(guests + [SavedGuest(invite:invite,requiresBLEExitOnRestore:true,androidAutomation:source.incomingAutomation,privacyNetworks:source.privacyNetworks)]) }
-        catch { androidPendingGuests = previous; throw error }
+        do {
+            try retainImportedDelegation(link: source.delegationLink, recipient: source.recipient, guestID: source.id)
+            try save(guests + [SavedGuest(android: source, invite: invite)])
+        } catch { androidPendingGuests = previous; receivedDelegations = previousReceived; throw error }
     }
     func removeImportedGuestRecovery(_ id: String) {
-        guard canManageGuestAccess, !busy else { return }
-        let previous = androidPendingGuests
-        androidPendingGuests.removeAll { $0.id == id }
-        do { try save(guests) }
-        catch { androidPendingGuests = previous; errorMessage = "Не удалось сохранить удаление ключа." }
+        guard let record = receivedKeyRecords.first(where: { $0.imported.contains { $0.id == id } }) else { return }
+        removeReceivedKeyRecord(record.id)
     }
     func finishBackupRestore(_ plan: BackupRestorePlan) throws {
         let previousNetworkPrivacy = networkPrivacy
@@ -730,6 +868,9 @@ final class AppModel: ObservableObject {
         guard contents["welcome"] == nil || contents["welcome"] is String,
               ((contents["welcome"] as? String)?.utf8.count ?? 0) <= 16384 else { throw GuestCrypto.Failure.invalidEnvelope }
         guest.welcome = contents["welcome"] as? String
+        guard contents["host_label"] == nil || contents["host_label"] is String,
+              ((contents["host_label"] as? String)?.utf8.count ?? 0) <= 512 else { throw GuestCrypto.Failure.invalidEnvelope }
+        if let label = contents["host_label"] as? String, !label.trimmingCharacters(in:.whitespacesAndNewlines).isEmpty { guest.hostLabel = label }
         let templates = contents["templates"] as? [String: [String: Any]] ?? [:]
         let ble = contents["ble"] as? [[String: Any]] ?? []
         guard contents["templates"] == nil || contents["templates"] is [String: [String: Any]],
@@ -1811,7 +1952,7 @@ final class AppModel: ObservableObject {
         await refresh()
         await refreshOwners()
         ownerControl.resume()
-        if !passedAccess.isEmpty { await passManager.reload() }
+        if !passedAccess.isEmpty || hasAndroidPassedAccess { await passManager.reload() }
         await messages.retryAcknowledgements()
         delegationInbox.resume()
     }
@@ -1877,28 +2018,45 @@ final class AppModel: ObservableObject {
     }
 
     func removeKey(_ id: String) {
-        guard storageReady, !busy else { return }
+        guard let record = receivedKeyRecords.first(where: { $0.members.contains { $0.id == id } }) else { return }
+        removeReceivedKeyRecord(record.id)
+    }
+
+    func removeReceivedKeyRecord(_ id: String) {
+        guard canManageGuestAccess, !busy, !ownerBusy else { return }
+        guard let record = receivedKeyRecords.first(where: { $0.id == id }) else { return }
+        let ids = Set(record.members.map(\.id)), importedIDs = Set(record.imported.map(\.id))
         do {
-            let removed = guests.first(where: { $0.id == id })
+            let removed = guests.filter { ids.contains($0.id) }
             let previousReceived = receivedDelegations, previousMessages = incomingMessages
-            incomingMessages.removeAll { $0.guestID == id }
-            for i in receivedDelegations.indices { receivedDelegations[i].parts.removeAll { $0.guestID == id } }
-            receivedDelegations.removeAll { $0.parts.isEmpty }
-            var preferences = objectPreferences; preferences.removeGuest(id)
-            do { try save(guests.filter { $0.id != id }, preferences: preferences) }
-            catch { receivedDelegations = previousReceived; incomingMessages = previousMessages; throw error }
-            if let removed { remoteNotifications.removed(removed.invite) }
-            for object in removed?.objects ?? [] {
-                let key = AvatarCache.key(guestID: id, objectID: object.id)
-                avatars.removeValue(forKey: key)
-                avatarCache.remove(key)
+            let previousPending = delegations, previousImported = androidPendingGuests
+            incomingMessages.removeAll { ids.contains($0.guestID) || $0.delegationWelcomeGroup == id }
+            delegations.removeAll { $0.id == id }
+            androidPendingGuests.removeAll { importedIDs.contains($0.id) }
+            let allIDs = ids.union(importedIDs)
+            for i in receivedDelegations.indices {
+                receivedDelegations[i].parts.removeAll { allIDs.contains($0.guestID) }
+                receivedDelegations[i].importedGuestIDs?.removeAll { allIDs.contains($0) }
             }
-            bleGuestControl.cancel(guestID: id)
-            stopActions(id)
-            generations.removeValue(forKey: id)
-            watchers.removeValue(forKey: id)?.cancel()
-            connections.removeValue(forKey: id)
-            guestConnectionProblems.removeValue(forKey:id)
+            receivedDelegations.removeAll { $0.id == id || $0.guestIDs.isEmpty }
+            var preferences = objectPreferences
+            for key in ids { preferences.removeGuest(key) }
+            do { try save(guests.filter { !ids.contains($0.id) }, preferences: preferences) }
+            catch {
+                receivedDelegations = previousReceived; incomingMessages = previousMessages
+                delegations = previousPending; androidPendingGuests = previousImported; throw error
+            }
+            delegationInbox.discardGroups([id])
+            for guest in removed {
+                remoteNotifications.removed(guest.invite)
+                for object in guest.objects {
+                    let key = AvatarCache.key(guestID: guest.id, objectID: object.id)
+                    avatars.removeValue(forKey: key); avatarCache.remove(key)
+                }
+                bleGuestControl.cancel(guestID: guest.id); stopActions(guest.id)
+                generations.removeValue(forKey: guest.id); watchers.removeValue(forKey: guest.id)?.cancel()
+                connections.removeValue(forKey: guest.id); guestConnectionProblems.removeValue(forKey:guest.id)
+            }
         } catch { errorMessage = "Не удалось удалить ключ из защищённого хранилища." }
     }
 
@@ -2068,7 +2226,7 @@ final class AppModel: ObservableObject {
                         case .message(let cipher):
                             await self.messages.receive(cipher, guestID: entry.id)
                         case .passVouch:
-                            if self.passedAccess.contains(where: { $0.parts.contains(where: { $0.sourceID == entry.id }) }) {
+                            if self.hasAndroidPassedAccess || self.passedAccess.contains(where: { $0.parts.contains(where: { $0.sourceID == entry.id }) }) {
                                 Task { await self.passManager.reload(sourceID: entry.id) }
                             }
                         case .action(let data):

@@ -11,3 +11,5 @@ __pycache__/
 
 .local-checks/
 *.xcodeproj/
+project.personal.json
+*.ipa

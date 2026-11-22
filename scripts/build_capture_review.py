@@ -10,7 +10,7 @@ from pathlib import Path
 TITLES = {
     'app-code-setup': 'Создание кода приложения', 'app-code-settings': 'Настройки входа',
     'app-entry-lock': 'Вход в приложение по коду', 'app-entry-rejected': 'Неверный код входа',
-    'control': 'Управление', 'settings': 'Настройки', 'key-detail': 'Полученный ключ',
+    'control': 'Управление', 'settings': 'Настройки', 'key-detail': 'Полученные ключи',
     'add-key': 'Добавить ключ', 'guests': 'Гости',
     'confirm-open': 'Подтверждение открытия', 'confirm-close': 'Подтверждение закрытия',
     'code-setup': 'Создание кода', 'code-entry': 'Ввод кода', 'code-rejected': 'Неверный код',

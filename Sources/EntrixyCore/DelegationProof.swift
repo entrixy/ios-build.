@@ -25,7 +25,7 @@ public struct DelegationLink: Codable, Equatable, Identifiable {
         guard parts.count == 3, parts[0].isEmpty, parts[1] == "i" else { throw GuestCrypto.Failure.invalidEnvelope }
         return try Self(server: host + (url.port.map { ":\($0)" } ?? ""), group: String(parts[2]), secret: GuestCrypto.decodeBase64URL(fragment))
     }
-    static func code(_ value: String) -> Bool {
+    public static func code(_ value: String) -> Bool {
         value.utf8.count == 22 && value.utf8.allSatisfy { (65...90).contains($0) || (97...122).contains($0) || (48...57).contains($0) || $0 == 45 || $0 == 95 }
     }
 }

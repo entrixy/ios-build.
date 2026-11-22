@@ -4,7 +4,9 @@ final class NavigationUITests: XCTestCase {
     private var activeApp: XCUIApplication?
     private static var capturedStates = Set<String>()
     private func reviewCapture(_ state: String, settledBy reference: XCUIElement? = nil) {
-        guard ProcessInfo.processInfo.environment["ENTRIXY_REVIEW_CAPTURE"] == "1",
+        let capture = ProcessInfo.processInfo.environment["ENTRIXY_REVIEW_CAPTURE"] == "1"
+        guard capture || ProcessInfo.processInfo.environment["ENTRIXY_CHECKPOINT_ASSERTIONS"] == "1" else { return }
+        guard
               Self.capturedStates.insert(state).inserted else { return }
         // Existence/enabled queries can succeed while a sheet or expanding row
         // is still moving. Keep the original screen capture, after bounded
@@ -17,6 +19,7 @@ final class NavigationUITests: XCTestCase {
         guard waitForStable(reference ?? app,in:app,requireHit:requireHit) else {
             XCTFail("Native checkpoint did not reach a stable visible layout: " + state); return
         }
+        guard capture else { return }
         let frame = XCTAttachment(screenshot:XCUIScreen.main.screenshot())
         frame.name = "review-" + state; frame.lifetime = .keepAlways; add(frame)
     }
@@ -602,23 +605,23 @@ final class NavigationUITests: XCTestCase {
     func testGuestNestedBackAndRootSwitch() {
         let app = launch("guest-keys")
         assertBottom(app, ["control", "settings", "journal"])
-        let key = app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH %@", "received-key-")).firstMatch
-        XCTAssertTrue(key.waitForExistence(timeout: 5)); key.tap()
-        XCTAssertTrue(app.buttons["Обновить данные"].waitForExistence(timeout: 5))
-        reviewCapture("received-key-detail")
-        app.buttons["Удалить ключ с iPhone"].tap()
+        let key = app.descendants(matching:.any).matching(NSPredicate(format: "identifier BEGINSWITH %@", "received-key-")).firstMatch
+        let trash = app.buttons.matching(NSPredicate(format:"identifier BEGINSWITH %@","received-key-delete-")).firstMatch
+        XCTAssertTrue(key.waitForExistence(timeout: 5)); XCTAssertTrue(trash.isHittable)
+        XCTAssertFalse(app.buttons["Обновить данные"].exists)
+        reviewCapture("received-key-list",settledBy:trash)
+        trash.tap()
         XCTAssertTrue(app.staticTexts["Удалить ключ?"].waitForExistence(timeout:5))
-        let cancel = app.buttons["Отмена"], remove = app.buttons["Удалить ключ"]
+        let cancel = app.buttons["dialog-cancel"], remove = app.buttons["dialog-confirm"]
         XCTAssertTrue(cancel.isHittable); XCTAssertTrue(remove.isHittable)
         XCTAssertEqual(cancel.frame.height,remove.frame.height,accuracy:1)
         reviewCapture("received-key-delete-confirmation")
         cancel.tap()
-        XCTAssertTrue(app.buttons["Обновить данные"].waitForExistence(timeout:5))
+        XCTAssertTrue(trash.waitForExistence(timeout:5))
         assertBottom(app, ["control", "settings", "journal"])
-        app.navigationBars.buttons.firstMatch.tap()
-        XCTAssertTrue(key.waitForExistence(timeout: 5))
-        key.tap()
-        XCTAssertTrue(app.buttons["Обновить данные"].waitForExistence(timeout: 5))
+        trash.tap(); remove.tap()
+        XCTAssertTrue(app.staticTexts["received-keys-empty"].waitForExistence(timeout:10))
+        XCTAssertFalse(trash.exists)
         app.buttons["main-tab-journal"].tap()
         app.buttons["main-tab-settings"].tap()
         XCTAssertTrue(app.segmentedControls.buttons["Объекты"].waitForExistence(timeout: 5))
@@ -683,7 +686,7 @@ final class NavigationUITests: XCTestCase {
         XCTAssertTrue(app.staticTexts["Пока нет объектов"].waitForExistence(timeout: 10))
         assertBottom(app, ["settings", "journal"])
         app.segmentedControls.buttons["Ключи"].tap()
-        XCTAssertTrue(app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH %@", "received-key-")).firstMatch.waitForExistence(timeout: 10))
+        XCTAssertTrue(app.descendants(matching:.any).matching(NSPredicate(format: "identifier BEGINSWITH %@", "received-key-")).firstMatch.waitForExistence(timeout: 10))
     }
     func testBLECreationStartsFromAddObjectAndKeepsItsName() {
         let app = launch("owner-objects")
@@ -954,6 +957,7 @@ final class NavigationUITests: XCTestCase {
         XCTAssertTrue(server.waitForExistence(timeout:10)); server.tap()
         let field = app.textFields["data-deletion-confirmation"], submit = app.buttons["data-deletion-submit"]
         XCTAssertTrue(field.waitForExistence(timeout:10)); XCTAssertFalse(submit.isEnabled)
+        bringFullyIntoView(submit,in:app)
         reviewCapture("server-deletion-confirmation",settledBy:app.buttons["Отмена"])
         let password = app.secureTextFields["data-deletion-password"]
         bringFullyIntoView(password,in:app); password.tap(); password.typeText("review-only-password")

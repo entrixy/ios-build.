@@ -63,7 +63,7 @@ struct IOSBackupPayload: Codable {
         let hash = document.archiveID
         let provenance = Data(stride(from:0,to:64,by:2).map { UInt8(hash.dropFirst($0).prefix(2),radix:16)! })
         let privacy = document.entries["blocked_wifi"] == nil ? nil : try document.networkPrivacyPreferences()
-        let state = SavedState(identity:provenance,guests:[],owners:owners,ownerGuestDefaults:try document.guestDefaults(),companies:try document.companies(),androidArchives:[document],selectedOwnerServer:try document.primaryServer(),networkPrivacy:privacy)
+        let state = SavedState(identity:provenance,guests:[],owners:owners,objectPreferences:try document.catalogPreferences(owners:owners),ownerGuestDefaults:try document.guestDefaults(),companies:try document.companies(),androidArchives:[document],selectedOwnerServer:try document.primaryServer(),networkPrivacy:privacy)
         self.init(state:state,created:document.created,androidGuests:migrations,eventSounds:try document.eventSoundBackup())
     }
     func validate() throws {
@@ -96,7 +96,8 @@ struct IOSBackupPayload: Codable {
         for row in outgoing { try row.validate() }
         for receipt in receipts {
             try receipt.validate()
-            guard Set(receipt.parts.map(\.guestID)).isSubset(of: guestIDs) else { throw BackupFailure.invalidPayload }
+            guard Set(receipt.parts.map(\.guestID)).isSubset(of: guestIDs),
+                  Set(receipt.importedGuestIDs ?? []).isSubset(of: guestIDs.union(android.map(\.id))) else { throw BackupFailure.invalidPayload }
         }
         let passed = passedAccess ?? []
         guard passed.count <= 500, Set(passed.map(\.id)).count == passed.count else { throw BackupFailure.invalidPayload }
@@ -248,7 +249,7 @@ final class BackupManager: ObservableObject {
                 let invite = try await guestMover.recover(identity:source.identity,bundleKey:source.bundleKey,recipient:source.recipient,fingerprint:newFingerprint)
                 guard invite == nil || invite?.id == source.id else { throw BackupFailure.invalidPayload }
                 plan.restoredAndroidGuests = (plan.restoredAndroidGuests ?? []) + [source.id]
-                if let invite { try app.activateBackupGuest(SavedGuest(invite:invite,requiresBLEExitOnRestore:true,androidAutomation:source.incomingAutomation,privacyNetworks:source.privacyNetworks),plan:plan) }
+                if let invite { try app.activateBackupGuest(SavedGuest(android: source, invite: invite),plan:plan) }
                 else { try app.activatePendingAndroidGuest(source,plan:plan) }
                 updateProgress()
             }

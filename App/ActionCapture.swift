@@ -866,8 +866,7 @@ struct ActionCaptureRoot: View {
         case .ownerForm: AddOwnerServerScreen(initialServer: "controller.invalid")
         case .ownerReady, .ownerUncertain, .ownerOffline: NavigationStack { OwnerServersScreen() }
         case .keyDetail:
-            if let guest = capture.model.guests.first { NavigationStack { KeyDetailScreen(guestID: guest.id) } }
-            else { ProgressView() }
+            RootView(initialTab: .settings)
         default:
             RootView(initialTab: capture.scenario == .journal ? .journal
                      : (capture.scenario == .settings ? .settings : (capture.scenario == .guests ? .guests : .control)),

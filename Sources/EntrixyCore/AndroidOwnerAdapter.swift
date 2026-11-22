@@ -5,6 +5,14 @@ import CoreFoundation
 /// a migration plan before owner claim. Imported objects stay unavailable until
 /// an authenticated snapshot decrypts with their original object keys.
 public enum AndroidOwnerAdapter {
+    /// Shared by imported owner objects and their local catalogue preferences.
+    public static func objectID(server: String, numberID: Int) -> UUID {
+        let hash = GuestCrypto.hash(Data(("entrixy-android-object-v1|" + server + "|" + String(numberID)).utf8))
+        let value = String(hash.prefix(32)), offsets = [8,12,16,20]
+        var text = ""
+        for (i,c) in value.enumerated() { if offsets.contains(i) { text.append("-") }; text.append(c) }
+        return UUID(uuidString:text)!
+    }
     public static func owners(from document: AndroidBackupDocument) throws -> [OwnerAccount] {
         try document.validate()
         let accounts = try document.owners()
@@ -25,14 +33,6 @@ public enum AndroidOwnerAdapter {
             try settings.validate(); owner.serverSettings = settings
             owner.androidKeys = try document.ownerKeyMaterial(server: source.server, masterKey: master)
             result[source.server] = owner
-        }
-        func stableID(server: String, numberID: Int) -> UUID {
-            let hash = GuestCrypto.hash(Data(("entrixy-android-object-v1|" + server + "|" + String(numberID)).utf8))
-            let value = String(hash.prefix(32))
-            let offsets = [8,12,16,20]
-            var text = ""
-            for (i, c) in value.enumerated() { if offsets.contains(i) { text.append("-") }; text.append(c) }
-            return UUID(uuidString: text)!
         }
         func secret(_ encoded: Any?) throws -> Data? {
             guard let encoded, !(encoded is NSNull) else { return nil }
@@ -99,7 +99,7 @@ public enum AndroidOwnerAdapter {
             let inFlight = pendingCipher != nil && sourceCipher != pendingCipher
                 && sourceCipher.map { (try? GuestCrypto.decrypt(key: objectKey, envelope: $0)) == nil } == true
             if inFlight { guard previousWrapped != nil, sourceCipher != nil, wrapped != nil, epoch > 1, kind != "ble" else { throw GuestCrypto.Failure.invalidEnvelope } }
-            var object = try OwnerObject(importing: stableID(server: ref.server, numberID: ref.numberID), numberID: ref.numberID,
+            var object = try OwnerObject(importing: objectID(server: ref.server, numberID: ref.numberID), numberID: ref.numberID,
                 kind: kind, cipher: sourceCipher ?? GuestCrypto.encrypt(key: objectKey, plaintext: JSONSerialization.data(withJSONObject: metadata, options: .sortedKeys)),
                 wrappedKey: (inFlight ? previousWrapped : wrapped) ?? GuestCrypto.encrypt(key: master, plaintext: objectKey), masterKey: master,
                 phone: phone, routing: routing, socketSecret: socket, bleSecret: bleSecret, bleDeviceID: bleDID, localPolicy: policy,

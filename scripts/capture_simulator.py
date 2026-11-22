@@ -100,7 +100,7 @@ def expected_visible_text(screen):
     if screen in ['journal', 'owner-journal', 'ble-owner-journal', 'ble-guest-journal']: return ['Журнал', 'Копировать']
     if screen == 'settings': return ['Настройки', 'Мои серверы', 'Гости', 'Журнал']
     if screen in ['guests', 'issued-list', 'delegated-untrusted']: return ['Гости', 'Настройки', 'Журнал']
-    if screen == 'key-detail': return ['Полученный ключ']
+    if screen == 'key-detail': return ['Настройки', 'Ключи', 'Добавить ключ']
     if screen in ['add-key', 'delegation-preview', 'delegation-rejected']: return ['Добавить ключ']
     if screen in ['owner-form']: return ['Добавить сервер']
     if screen in ['owner-ready', 'owner-uncertain', 'owner-offline']: return ['Мои серверы']

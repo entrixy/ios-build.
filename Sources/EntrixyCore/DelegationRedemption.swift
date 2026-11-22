@@ -19,6 +19,9 @@ public struct DelegationRedemption: Codable, Identifiable {
     public let parts: [Part]
     public var completedCodes: [String] = []
     public var sent: Bool = false
+    public var welcomeCipher: String? = nil
+    public var importedGuestIDs: [String]? = nil
+    public var importedBaselineCodes: [String]? = nil
     public var id: String { link.id }
 
     public static func availableCodes(info: Data, group: String) throws -> [String] {
@@ -33,13 +36,34 @@ public struct DelegationRedemption: Codable, Identifiable {
         }
         return codes
     }
-    public init(link: DelegationLink, info: Data, recipient: BundleKeySeal.Recipient? = nil, excludingCodes: Set<String> = []) throws {
+    /// Android's migrated record has no part-code mapping. Already redeemed
+    /// rows belong to the previous installation and must never get new keys.
+    public static func redeemedCodes(info: Data, group: String) throws -> [String] {
+        _ = try availableCodes(info: info, group: group)
+        guard let json = try JSONSerialization.jsonObject(with: info) as? [String: Any],
+              let rows = json["parts"] as? [[String: Any]] else { throw GuestCrypto.Failure.invalidEnvelope }
+        return rows.compactMap { $0["state"] as? String == "redeemed" ? $0["code"] as? String : nil }
+    }
+    public init(link: DelegationLink, info: Data, recipient: BundleKeySeal.Recipient? = nil, excludingCodes: Set<String> = [], importedGuestIDs: [String] = [], importedBaselineCodes: [String] = []) throws {
         let codes = try Self.availableCodes(info: info, group: link.group).filter { !excludingCodes.contains($0) }
         guard !codes.isEmpty else { throw GuestCrypto.Failure.invalidEnvelope }
         self.link = link; self.recipient = recipient ?? BundleKeySeal.makeRecipient()
+        self.importedGuestIDs = importedGuestIDs.isEmpty ? nil : importedGuestIDs
+        self.importedBaselineCodes = importedGuestIDs.isEmpty ? nil : importedBaselineCodes
         parts = codes.map { Part(code: $0, userKey: GuestCrypto.base64URL(GuestCrypto.randomBytes(count: 24))) }
+        if let json = try JSONSerialization.jsonObject(with: info) as? [String: Any],
+           let cipher = json["welcome_cipher"] as? String,
+           (try? DelegationWelcome.open(cipher, secret: link.secret)) != nil { welcomeCipher = cipher }
     }
     public func validate() throws {
+        let imported = importedGuestIDs ?? [], baseline = importedBaselineCodes ?? []
+        guard parts.count + imported.count <= 16, Set(imported).count == imported.count,
+              baseline.count <= 16, Set(baseline).count == baseline.count, baseline.allSatisfy(DelegationLink.code) else { throw GuestCrypto.Failure.invalidEnvelope }
+        for id in imported {
+            guard id.hasPrefix(link.server + ":"), id.utf8.count == link.server.utf8.count + 65,
+                  id.utf8.suffix(64).allSatisfy({ (48...57).contains($0) || (97...102).contains($0) }) else { throw GuestCrypto.Failure.invalidEnvelope }
+        }
+        if let welcomeCipher { _ = try DelegationWelcome.open(welcomeCipher, secret: link.secret) }
         _ = try DelegationLink(server: link.server, group: link.group, secret: link.secret)
         try BundleKeySeal.validate(recipient)
         guard (1...16).contains(parts.count), Set(parts.map(\.code)).count == parts.count,

@@ -1,10 +1,42 @@
+## Новый приоритет22.11: проверка и установочный IPA для iPhone11
+
+Пользователь явно разрешил собрать приложение сейчас, чтобы завтра установить
+на iPhone11 с Windows11 без своего Mac и оплаты Developer Program. Предыдущий
+запрет проверок отменён этой командой. Новые скриншоты/Store JPEG/галерея больше
+не нужны: полный hosted/UI suite сохраняет assertions без product capture/export.
+
+Добавлен производный personal project: те же app source/библиотеки, физическая
+сборка app-only/minimumiOS16 с пустыми personal entitlements. APNs/AppGroups/
+WiFi-info/associated domains и widget не входят; проверка условий доступа не
+ослабляется. Simulator сохраняет прежние ad-hoc Keychain entitlements. Полный
+обычный Store Release также собирается и проверяется отдельно. IPA упаковывается
+только из настоящего iphoneos arm64 Release, с лицензией камеры/privacy/isolation,
+SHA256 и инструкцией docs/IPHONE11_WINDOWS_INSTALL.md. Подпись своим AppleAccount
+и установка через Sideloadly выполняются пользователем на Windows11. Пароль/2FA
+агенту не передавать. Это не TestFlight/AppStore и не физическая приёмка.
+
+Локально ядро330/0fail, Swift parse (НЕ SDK) прошёл. Новые pipeline/spec boundaries
+проверяются общим набором. Новый Apple SDK/hosted/UI/device/package результат
+пока ожидается. Все старые no-checks/pending-counts ниже — история.
+
 # Entrixy for iOS — work in progress
 
 Native iOS port of the full Android client, not an expansion of Entrixy Open.
 The existing full client defines expected behavior and the server wire formats.
 This repository is private working source; no new distribution license is assigned.
 
-## Current implementation and verification — 22 November 2026
+## Source-only continuation — 22 November 2026
+
+The user has forbidden checks until their explicit command. Current local changes
+finish grouped received keys, whole-group deletion, Android delegation material,
+initial welcome messages, Android catalogue preferences and existing outgoing
+delegations reconstructed with their original group/secret. Regression/capture
+sources are prepared but NOT executed. No build, test, parse/lint, screenshots or
+CI push has followed this instruction. Public source/gallery remain unchanged.
+See [CURRENT_STATUS.md](docs/CURRENT_STATUS.md) for this unverified source and the
+last actual Apple result; historical PASS counts below do not cover it.
+
+## Previous implementation and verification — 22 November 2026
 
 The current baseline, remaining work and evidence are maintained in
 [CURRENT_STATUS.md](docs/CURRENT_STATUS.md); use it before the historical notes

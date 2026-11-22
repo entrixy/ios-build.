@@ -320,9 +320,9 @@ struct AppConfirmationDialog: View {
             }
         } footer: {
                 EqualActionRow {
-                    Button(ProductText.string("btn_cancel"), action: cancel).buttonStyle(SecondaryActionStyle())
+                    Button(ProductText.string("btn_cancel"), action: cancel).buttonStyle(SecondaryActionStyle()).accessibilityIdentifier("dialog-cancel")
                     Button(role: destructive ? .destructive : nil, action: confirm) { Text(actionTitle) }
-                        .buttonStyle(PrimaryActionStyle())
+                        .buttonStyle(PrimaryActionStyle()).accessibilityIdentifier("dialog-confirm")
                 }
         }
     }

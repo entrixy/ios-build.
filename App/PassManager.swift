@@ -27,7 +27,10 @@ final class PassManager: ObservableObject {
         guard app.canManageGuestAccess else { throw BackupFailure.busy }
         let fp = try app.backupFingerprint(server: guest.invite.server)
         let bytes = try await api.delegate(invite: guest.invite, fingerprint: fp, operation: .list, body: Data("{}".utf8))
+        guard !Task.isCancelled, app.canManageGuestAccess,
+              app.guests.contains(where: { $0.id == guest.id && $0.invite == guest.invite }) else { throw BackupFailure.noAccess }
         let snapshot = try PassSnapshot.decode(bytes)
+        try recoverAndroidRecords(guest,snapshot:snapshot)
         try app.importDelegatedJournal(snapshot.journal, sourceID: guest.id)
         snapshots[guest.id] = snapshot
         for var record in app.passedAccess where record.parts.contains(where: { $0.sourceID == guest.id }) {
@@ -43,6 +46,22 @@ final class PassManager: ObservableObject {
             for body in vouches {
                 guard app.canManageGuestAccess else { return }
                 _ = try await api.delegate(invite: guest.invite, fingerprint: fp, operation: .vouch, body: body)
+            }
+        }
+    }
+    private func recoverAndroidRecords(_ guest: SavedGuest, snapshot: PassSnapshot) throws {
+        guard app.hasAndroidPassedAccess else { return }
+        let groups = Set(snapshot.invitations.filter { $0.status == "new" }.map(\.group) + snapshot.children.map(\.group))
+        for material in try app.androidPassedAccessMaterial(sourceID:guest.id,groups:groups) {
+            if var current = app.passedAccess.first(where: { $0.server == material.server && $0.group == material.group }) {
+                guard current.secret == material.secret else { throw BackupFailure.conflictingAccess }
+                if !current.parts.contains(where: { $0.sourceID == guest.id }) {
+                    try current.recoverPart(source:guest.invite,snapshot:snapshot)
+                    try saveReply(current)
+                }
+            } else {
+                let record = try PassedAccess(importing:material,source:guest.invite,snapshot:snapshot,defaultLabel:ProductText.string("guests_default_name"))
+                try saveReply(record)
             }
         }
     }

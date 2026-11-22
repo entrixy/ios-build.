@@ -14,8 +14,27 @@ final class MessageManager: ObservableObject {
     }
     func text(_ saved: SavedMessage) throws -> String {
         guard let guest = app.guests.first(where: { $0.id == saved.guestID }) else { throw BackupFailure.noAccess }
-        let pair = app.receivedDelegations.first { $0.parts.contains(where: { $0.guestID == guest.id }) }?.recipient
+        if let group = saved.delegationWelcomeGroup {
+            guard let receipt = app.receivedDelegations.first(where: { $0.id == group && $0.guestIDs.contains(guest.id) }) else { throw BackupFailure.noAccess }
+            return try DelegationWelcome.open(saved.cipher, secret: receipt.link.secret).text
+        }
+        let pair = app.receivedDelegations.first { $0.guestIDs.contains(guest.id) }?.recipient ?? guest.incomingRecipient
         return try GuestMessageCrypto.open(saved.cipher, bundleKey: guest.invite.bundleKey, recipient: pair)
+    }
+    func sender(_ saved: SavedMessage) -> String? {
+        guard let guest = app.guests.first(where: { $0.id == saved.guestID }), (try? text(saved)) != nil else { return nil }
+        if let group = saved.delegationWelcomeGroup {
+            guard let receipt = app.receivedDelegations.first(where: { $0.id == group }),
+                  let value = try? DelegationWelcome.open(saved.cipher, secret: receipt.link.secret),
+                  !value.from.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return nil }
+            return value.from
+        }
+        let receipt = app.receivedDelegations.first { $0.guestIDs.contains(guest.id) }
+        let from: String?
+        if let receipt, let cipher = receipt.welcomeCipher { from = try? DelegationWelcome.open(cipher, secret: receipt.link.secret).from }
+        else { from = nil }
+        let value = saved.cipher.contains("|") ? (from ?? guest.senderLabel) : guest.hostLabel
+        return value?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty == false ? value : nil
     }
     func receive(_ cipher: String, guestID: String) async {
         guard app.canManageGuestAccess, app.guests.contains(where: { $0.id == guestID }) else { return }
@@ -47,6 +66,7 @@ final class MessageManager: ObservableObject {
             _ = try text(app.incomingMessages[i])
             if app.incomingMessages[i].readAt == nil {
                 var updated = app.incomingMessages; updated[i].readAt = Date()
+                if updated[i].delegationWelcomeGroup != nil { updated[i].readAcknowledged = true }
                 try app.saveMessages(incoming:updated)
             }
             message = nil; return true
@@ -69,6 +89,14 @@ final class MessageManager: ObservableObject {
         guard app.canManageGuestAccess, let saved = app.incomingMessages.first(where: { $0.id == id }),
               let guest = app.guests.first(where: { $0.id == saved.guestID }) else { return }
         _ = try text(saved)
+        // Android ShareIn's initial message has no server read/delivery ACK.
+        if saved.delegationWelcomeGroup != nil {
+            guard !saved.deliveryAcknowledged || (saved.readAt != nil && !saved.readAcknowledged),
+                  let index = app.incomingMessages.firstIndex(where: { $0.id == id }) else { return }
+            var updated = app.incomingMessages; updated[index].deliveryAcknowledged = true
+            if updated[index].readAt != nil { updated[index].readAcknowledged = true }
+            try app.saveMessages(incoming: updated); return
+        }
         let kind: MessageAcknowledgement = saved.readAt == nil ? .delivered : .read
         if (kind == .delivered && saved.deliveryAcknowledged) || (kind == .read && saved.readAcknowledged) { return }
         try await acknowledgements.acknowledgeMessage(invite: guest.invite, fingerprint: app.backupFingerprint(server: guest.invite.server), kind: kind,

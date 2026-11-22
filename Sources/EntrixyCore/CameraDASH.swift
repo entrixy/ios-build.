@@ -12,6 +12,17 @@ public enum CameraDASHManifest {
         let builder = Builder()
         let parser = XMLParser(data: data); parser.delegate = builder; parser.shouldResolveExternalEntities = false
         guard parser.parse(), !builder.invalid, let root = builder.root, root.local == "MPD" else { throw GuestCrypto.Failure.invalidEnvelope }
+        var rewrittenBytes = 0, references = 0
+        func mapped(_ value: String, _ parent: URL) throws -> String {
+            references += 1
+            guard references <= 32768 else { throw GuestCrypto.Failure.invalidEnvelope }
+            let result = try resource(value, parent), count = result.utf8.count
+            // Bound expansion while walking, before constructing the XML tree's
+            // serialized string. A short segment plus a long signed base must
+            // not multiply into hundreds of megabytes of local capabilities.
+            guard count <= 32768, rewrittenBytes + count <= 2_097_152 else { throw GuestCrypto.Failure.invalidEnvelope }
+            rewrittenBytes += count; return result
+        }
         func walk(_ node: Node, _ inherited: URL) throws {
             guard !["ContentSteering", "ContentProtection"].contains(node.local) else { throw GuestCrypto.Failure.invalidEnvelope }
             var origin = inherited
@@ -22,21 +33,21 @@ public enum CameraDASHManifest {
                 guard child.children.isEmpty, !value.isEmpty, let next = URL(string: value, relativeTo: inherited)?.absoluteURL else { throw GuestCrypto.Failure.invalidEnvelope }
                 // Validate the original BaseURL even when every segment uses an
                 // absolute URI. Do not leave a remote fallback in the manifest.
-                child.text = try resource(value, inherited); origin = next
+                child.text = try mapped(value, inherited); origin = next
             }
             for name in node.attributes.keys.sorted() {
                 let local = name.split(separator: ":").last.map(String.init) ?? name
                 if local == "href" { throw GuestCrypto.Failure.invalidEnvelope }
                 let reference = ["media", "initialization", "index", "sourceURL"].contains(local)
                     || (node.local == "SegmentTemplate" && local == "bitstreamSwitching")
-                if reference, let value = node.attributes[name], !value.isEmpty { node.attributes[name] = try resource(value, origin) }
+                if reference, let value = node.attributes[name], !value.isEmpty { node.attributes[name] = try mapped(value, origin) }
             }
             if ["Location", "PatchLocation"].contains(node.local) {
-                node.text = try resource(node.text.trimmingCharacters(in: .whitespacesAndNewlines), origin)
+                node.text = try mapped(node.text.trimmingCharacters(in: .whitespacesAndNewlines), origin)
             }
             if node.local == "UTCTiming", let scheme = node.attributes["schemeIdUri"], scheme.contains(":http-"), let value = node.attributes["value"] {
                 guard !value.contains(" ") else { throw GuestCrypto.Failure.invalidEnvelope }
-                node.attributes["value"] = try resource(value, origin)
+                node.attributes["value"] = try mapped(value, origin)
             } else if node.local == "UTCTiming" {
                 guard node.attributes["schemeIdUri"]?.contains(":direct:") == true else { throw GuestCrypto.Failure.invalidEnvelope }
             }

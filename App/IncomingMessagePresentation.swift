@@ -101,7 +101,9 @@ private struct IncomingMessageDialog: View {
             VStack(alignment:.leading,spacing:18) {
                 Text(ProductText.string("msg_incoming_title")).font(.title3.bold()).accessibilityAddTraits(.isHeader)
                     .accessibilityIdentifier("incoming-message-title")
-                if let guest = app.guests.first(where:{ $0.id == message.guestID }) {
+                if let sender = manager.sender(message) {
+                    Text(sender).font(.subheadline.weight(.semibold))
+                } else if let guest = app.guests.first(where:{ $0.id == message.guestID }) {
                     Text(guest.invite.server).font(.subheadline).foregroundStyle(Brand.secondaryInk)
                 }
                 if let text = try? manager.text(message) {

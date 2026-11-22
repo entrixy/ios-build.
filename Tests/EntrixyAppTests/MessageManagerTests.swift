@@ -75,6 +75,27 @@ final class MessageManagerTests: XCTestCase {
         XCTAssertEqual(Set(ack.acks.map { $0.1 }).count, 1)
         XCTAssertTrue(relaunched.journal.isEmpty)
     }
+    func testDelegationWelcomeReadsLocallyWithoutSendingServerAcknowledgement() async throws {
+        let invite = try invite(), ack = MessageAckStub(), storage = MessageStorage(invite)
+        let link = try DelegationLink(server:invite.server,group:String(repeating:"G",count:22),secret:Data(repeating:5,count:32))
+        let recipient = BundleKeySeal.makeRecipient()
+        var receipt = try ReceivedDelegation(importing:link,recipient:recipient,guestIDs:[invite.id])
+        let cipher = try GuestCrypto.encrypt(key:link.secret,plaintext:JSONSerialization.data(withJSONObject:["from":"Анна","text":"Со двора"]))
+        receipt.welcomeCipher = cipher
+        var message = SavedMessage(guestID:invite.id,cipher:cipher,receivedAt:Date())
+        message.delegationWelcomeGroup = link.id; message.deliveryAcknowledged = true
+        storage.state = SavedState(identity:Data(repeating:37,count:32),guests:[SavedGuest(invite:invite)],receivedDelegations:[receipt],incomingMessages:[message])
+        let model = AppModel(storage:storage), manager = MessageManager(app:model,acknowledgements:ack)
+        defer { model.suspend() }
+        storage.fail = true
+        await manager.read(message.id)
+        XCTAssertNil(model.incomingMessages.first?.readAt); XCTAssertTrue(ack.acks.isEmpty)
+        storage.fail = false
+        await manager.read(message.id); await manager.retryAcknowledgements()
+        XCTAssertNotNil(storage.state?.incomingMessages?.first?.readAt)
+        XCTAssertEqual(storage.state?.incomingMessages?.first?.readAcknowledged,true)
+        XCTAssertTrue(ack.acks.isEmpty); XCTAssertEqual(manager.sender(message),"Анна")
+    }
 }
 
 private final class MessageDelegationStub: DelegationTransport {

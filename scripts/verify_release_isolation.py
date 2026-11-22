@@ -26,12 +26,16 @@ def main():
         raise RuntimeError('Release executable contains isolated fixture/bootstrap code')
     for bundle, environment in [(args.debug_app, 'sandbox'), (args.release_app, 'production')]:
         info = plistlib.loads((bundle / 'Info.plist').read_bytes())
-        widget_info = plistlib.loads((bundle / 'PlugIns/EntrixyWidget.appex/Info.plist').read_bytes())
-        group = info.get('EntrixyAppGroup', '')
-        if not group.startswith('group.') or '$' in group or widget_info.get('EntrixyAppGroup') != group:
-            raise RuntimeError('App/widget do not have the same expanded App Group setting')
-        if info.get('EntrixyPushEnvironment') != environment or 'remote-notification' not in info.get('UIBackgroundModes', []):
-            raise RuntimeError('Built application has an incorrect APNs environment/background declaration')
+        if info.get('EntrixyBuildVariant') == 'personal':
+            if (bundle / 'PlugIns').exists() or info.get('EntrixyAppGroup') or info.get('EntrixyPushEnvironment') or 'remote-notification' in info.get('UIBackgroundModes', []):
+                raise RuntimeError('Personal application unexpectedly includes paid-profile integration')
+        else:
+            widget_info = plistlib.loads((bundle / 'PlugIns/EntrixyWidget.appex/Info.plist').read_bytes())
+            group = info.get('EntrixyAppGroup', '')
+            if not group.startswith('group.') or '$' in group or widget_info.get('EntrixyAppGroup') != group:
+                raise RuntimeError('App/widget do not have the same expanded App Group setting')
+            if info.get('EntrixyPushEnvironment') != environment or 'remote-notification' not in info.get('UIBackgroundModes', []):
+                raise RuntimeError('Built application has an incorrect APNs environment/background declaration')
         for language in ['en','ru','de','es','fr','pt','zh']:
             if not (bundle / (language + '.lproj') / 'Localizable.strings').is_file():
                 raise RuntimeError('Built application is missing a localized OS message alert: ' + language)
@@ -46,11 +50,13 @@ def main():
         'NSPrivacyAccessedAPICategoryUserDefaults':['CA92.1'],
         'NSPrivacyAccessedAPICategorySystemBootTime':['35F9.1'],
         'NSPrivacyAccessedAPICategoryFileTimestamp':['C617.1','3B52.1']})
-    required_reasons(args.release_app / 'PlugIns/EntrixyWidget.appex', {
-        'NSPrivacyAccessedAPICategoryFileTimestamp':['C617.1']})
+    personal = plistlib.loads((args.release_app / 'Info.plist').read_bytes()).get('EntrixyBuildVariant') == 'personal'
+    if not personal:
+        required_reasons(args.release_app / 'PlugIns/EntrixyWidget.appex', {
+            'NSPrivacyAccessedAPICategoryFileTimestamp':['C617.1']})
     app_manifest = plistlib.loads((args.release_app / 'PrivacyInfo.xcprivacy').read_bytes())
-    widget_manifest = plistlib.loads((args.release_app / 'PlugIns/EntrixyWidget.appex/PrivacyInfo.xcprivacy').read_bytes())
-    if app_manifest.get('NSPrivacyTracking') is not False or widget_manifest.get('NSPrivacyTracking') is not False:
+    widget_manifest = {} if personal else plistlib.loads((args.release_app / 'PlugIns/EntrixyWidget.appex/PrivacyInfo.xcprivacy').read_bytes())
+    if app_manifest.get('NSPrivacyTracking') is not False or (not personal and widget_manifest.get('NSPrivacyTracking') is not False):
         raise RuntimeError('Built privacy manifests do not match the audited no-tracking behavior')
     expected_types = {'EmailAddress','UserID','DeviceID','ProductInteraction','AdvertisingData',
                       'OtherUserContent','EmailsOrTextMessages','CrashData','OtherDiagnosticData'}
@@ -67,7 +73,7 @@ def main():
                 or not row.get('NSPrivacyCollectedDataTypePurposes')
                 or not set(row['NSPrivacyCollectedDataTypePurposes']).issubset(allowed_purposes)):
             raise RuntimeError('Built app has an incomplete audited data-flow declaration')
-    if widget_manifest.get('NSPrivacyCollectedDataTypes') != []:
+    if not personal and widget_manifest.get('NSPrivacyCollectedDataTypes') != []:
         raise RuntimeError('Widget must not declare a nonexistent server data collection path')
     print('Audited app data-flow declarations and on-device-only widget manifest are packaged')
     print('Required API manifests verified in the actual Release app and widget bundles')

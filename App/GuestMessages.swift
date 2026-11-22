@@ -12,9 +12,11 @@ struct SavedMessage: Codable, Identifiable {
     var readAt: Date?
     var deliveryAcknowledged = false
     var readAcknowledged = false
+    var delegationWelcomeGroup: String? = nil
     var id: String { guestID + ":" + GuestCrypto.hash(Data(cipher.utf8)) }
     func validate() throws {
-        guard !guestID.isEmpty, !cipher.isEmpty, cipher.utf8.count <= 4096,
+        guard !guestID.isEmpty, !cipher.isEmpty, cipher.utf8.count <= (delegationWelcomeGroup == nil ? 4096 : 16384),
+              delegationWelcomeGroup.map({ !$0.isEmpty && $0.utf8.count <= 512 }) ?? true,
               receivedAt.timeIntervalSinceReferenceDate.isFinite,
               readAt?.timeIntervalSinceReferenceDate.isFinite != false,
               !readAcknowledged || readAt != nil else { throw GuestCrypto.Failure.invalidEnvelope }

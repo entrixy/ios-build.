@@ -3,6 +3,17 @@
 Основание: [62 узла Android](ANDROID_STRUCTURE.md), Android 5615535. Это карта
 реального подключения и пробелов, а не объявление полного переноса.
 
+## Новый локальный source —22.11.2026
+
+Пользователь запретил любые проверки до команды; обновления НЕ запускались.
+ReceivedKeyRecords заменяет отдельную KeyDetailScreen: один ключ/группа частей,
+имя передавшего/владельца, объекты, статус и общее удаление, как Settings Android.
+AndroidCatalogPreferences переносит scoped порядок, локальные имена/скрытие и
+встроенные иконки. AndroidGuestMigration/ReceivedDelegation сохраняют прежние
+RSA recipient/group secret для новых частей и сообщений. Первое сообщение
+отображается один раз с настоящим from, без server ACK. Подробности/пределы в
+CURRENT_STATUS.md. Исторические counts/acceptance ниже к этому source не относятся.
+
 ## Актуальная сверка — 19.11.2026
 
 Текущее доказательство и оставшиеся пакеты: [CURRENT_STATUS.md](CURRENT_STATUS.md).

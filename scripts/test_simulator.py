@@ -4,6 +4,7 @@ import argparse
 import hashlib
 import json
 import plistlib
+import os
 from pathlib import Path
 import subprocess
 import struct
@@ -38,8 +39,8 @@ def device_screen_probe(device):
     print('Full native renderer probe:',width,height,'; product/content acceptance remains pending',flush=True)
 
 
-def review_test_products(products):
-    candidates = [path for path in products.glob('*.xctestrun') if not path.name.endswith('-review.xctestrun')]
+def review_test_products(products, *, capture=True):
+    candidates = [path for path in products.glob('*.xctestrun') if not path.name.endswith(('-review.xctestrun','-complete.xctestrun'))]
     if len(candidates) != 1:
         raise RuntimeError('Expected one exact build-for-testing configuration')
     source = candidates[0]
@@ -50,9 +51,12 @@ def review_test_products(products):
     ui_targets = [target for target in targets if 'EntrixyUITests' in str(target.get('TestBundlePath', ''))]
     if len(ui_targets) != 1:
         raise RuntimeError('Expected the compiled EntrixyUITests target')
-    ui_targets[0].setdefault('EnvironmentVariables', {})['ENTRIXY_REVIEW_CAPTURE'] = '1'
+    environment = ui_targets[0].setdefault('EnvironmentVariables', {})
+    environment['ENTRIXY_REVIEW_CAPTURE'] = '1' if capture else '0'
+    if not capture:
+        environment['ENTRIXY_CHECKPOINT_ASSERTIONS'] = '1'
     # Keep __TESTROOT__ relative paths valid: the copy stays beside the original.
-    destination = source.with_name(source.stem + '-review.xctestrun')
+    destination = source.with_name(source.stem + ('-review' if capture else '-complete') + '.xctestrun')
     destination.write_bytes(plistlib.dumps(data))
     return destination
 
@@ -78,16 +82,19 @@ def main():
     selection.add_argument("--only-ui", action="store_true", help="Run unchanged UI assertions on a fresh runner without hosted unit tests")
     parser.add_argument("--use-built-tests", action="store_true", help="Run the existing build-for-testing products without rebuilding")
     parser.add_argument('--review-captures', action='store_true', help='Capture named UI checkpoints during the same native/UI test pass')
+    parser.add_argument('--complete-suite', action='store_true', help='Run all hosted/UI assertions without screenshot collection')
     parser.add_argument('--prepared-device',type=Path,help='Use the verified source/runtime-matched device prepared before compilation')
     parser.add_argument('--test',action='append',default=[],help='Exact EntrixyUITests method for focused diagnosis; never exports a gallery')
     parser.add_argument('--iterations',type=int,default=1,help='Repeat every selected diagnostic test; not a retry-on-failure')
     parser.add_argument('--keep-prepared-device',action='store_true',help='Leave the owned prepared device for the next pass; workflow finally must clean up')
     args = parser.parse_args()
-    if args.test and (args.review_captures or not args.only_ui or any(not name.startswith('EntrixyUITests/NavigationUITests/test') or not name.replace('/','').replace('_','').isalnum() for name in args.test)):
-        parser.error('--test requires --only-ui and exact UI methods, without --review-captures')
+    if args.complete_suite and (args.review_captures or args.only_native or args.only_ui or args.test):
+        parser.error('--complete-suite cannot be combined with partial selections or screenshot collection')
+    if args.test and (args.review_captures or args.complete_suite or any(not name.startswith(('EntrixyUITests/NavigationUITests/test','EntrixyAppTests/')) or not name.replace('/','').replace('_','').isalnum() for name in args.test)):
+        parser.error('--test requires exact native/UI targets without complete-suite or captures')
     if not 1 <= args.iterations <= 3 or (args.iterations != 1 and not args.test):
         parser.error('--iterations 2 or 3 requires explicit diagnostic --test selection')
-    if args.keep_prepared_device and (not args.prepared_device or not (args.test or args.review_captures)):
+    if args.keep_prepared_device and (not args.prepared_device or not (args.test or args.review_captures or args.complete_suite)):
         parser.error('--keep-prepared-device requires a prepared device and an explicit diagnostic or complete review pass')
     if args.review_captures and (not args.use_built_tests or args.only_native):
         parser.error('--review-captures requires --use-built-tests and UI tests')
@@ -104,13 +111,13 @@ def main():
     try:
         command = ['xcodebuild', '-destination', 'id=' + device,
             '-parallel-testing-enabled', 'NO', 'test-without-building' if args.use_built_tests else 'test']
-        if args.review_captures:
+        if args.review_captures or args.complete_suite:
             result.parent.mkdir(parents=True,exist_ok=True)
             if result.exists():
                 raise RuntimeError('Review result already exists; do not mix test runs')
-            command += ['-xctestrun',str(review_test_products(Path('.local-checks/DerivedData/Build/Products'))),'-resultBundlePath',str(result)]
+            command += ['-xctestrun',str(review_test_products(Path('.local-checks/DerivedData/Build/Products'),capture=args.review_captures)),'-resultBundlePath',str(result)]
         else:
-            command += ['-project','Entrixy.xcodeproj','-scheme','EntrixyTests','-configuration','Debug',
+            command += ['-project',os.environ.get('ENTRIXY_TEST_PROJECT','Entrixy.xcodeproj'),'-scheme','EntrixyTests','-configuration','Debug',
                         '-derivedDataPath','.local-checks/DerivedData','CODE_SIGNING_ALLOWED=YES','CODE_SIGN_IDENTITY=-']
         if args.test:
             command.extend('-only-testing:'+name for name in args.test)
@@ -123,13 +130,13 @@ def main():
         # The complete suite also includes native map gestures and bounded
         # counters. Keep a finite 90-minute budget on slower hosted Macs;
         # launch detection, assertions and the no-replay policy are unchanged.
-        run_xctest(command,timeout=5400 if args.review_captures else 1800,
+        run_xctest(command,timeout=5400 if args.review_captures or args.complete_suite else 1800,
                    report_path=Path('.local-checks/ci/xctest-progress.json'))
         tests_succeeded = True
     except (subprocess.CalledProcessError, subprocess.TimeoutExpired):
         # Retain the exact failed UI frame/hierarchy instead of guessing from a
         # different capture process. Diagnostics must not hide the test failure.
-        results = [result] if args.review_captures and result.exists() else list(Path('.local-checks/DerivedData/Logs/Test').glob('*.xcresult'))
+        results = [result] if (args.review_captures or args.complete_suite) and result.exists() else list(Path('.local-checks/DerivedData/Logs/Test').glob('*.xcresult'))
         if results:
             result = max(results, key=lambda p: p.stat().st_mtime)
             destination = Path('.local-checks/ci/ui-failure-attachments')

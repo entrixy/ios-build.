@@ -20,11 +20,16 @@ private final class DelegationAPIStub: DelegationTransport {
     var redeemedCodes: [[String]] = []
     var recipientPublicKeys: [String] = []
     var beforeRedeem: ((DelegationRedemption) -> Void)?
+    var afterInfo: (() -> Void)?
+    var welcomeCipher: String?
     func delegate(invite: GuestInvite, fingerprint: String, operation: DelegationOperation, body: Data) async throws -> Data { throw BackupFailure.invalidPayload }
     func delegationInfo(server: String, group: String) async throws -> Data {
         var parts = [["code": String(repeating: "B", count: 22), "state": extraPart ? "redeemed" : "new"]]
         if extraPart { parts.append(["code": String(repeating: "C", count: 22), "state": "new"]) }
-        return try JSONSerialization.data(withJSONObject: ["grp": group, "state": "new", "parts": parts])
+        var json: [String:Any] = ["grp": group, "state": "new", "parts": parts]
+        if let welcomeCipher { json["welcome_cipher"] = welcomeCipher }
+        afterInfo?()
+        return try JSONSerialization.data(withJSONObject:json)
     }
     func redeemDelegation(_ pending: DelegationRedemption, fingerprint: String) async throws -> Data {
         redeems += 1; beforeRedeem?(pending)
@@ -138,6 +143,61 @@ final class DelegationInboxTests: XCTestCase {
         try await Task.sleep(nanoseconds: 20_000_000)
         XCTAssertEqual(api.redeems, 2)
         XCTAssertEqual(app.guests.count, 2)
+    }
+
+    func testDeletingGroupDuringInfoResponseCannotReinstallIt() async throws {
+        let storage = DelegationStorage(), api = DelegationAPIStub()
+        let app = AppModel(storage:storage), manager = DelegationInbox(app:app,api:api,automaticUpdates:false)
+        defer { app.suspend() }
+        api.ready = true
+        await manager.inspect(try link().url); await manager.accept()
+        let groupID = try link().id
+        api.extraPart = true; api.afterInfo = { app.removeReceivedKeyRecord(groupID) }
+        await manager.refreshAdditionalParts()
+        XCTAssertTrue(app.guests.isEmpty); XCTAssertTrue(app.receivedDelegations.isEmpty)
+        XCTAssertTrue(app.delegations.isEmpty); XCTAssertEqual(api.redeems,1)
+    }
+    func testMigratedGroupPersistsBaselineBeforeRedeemAndRetainsOriginalSigningKey() async throws {
+        let storage = DelegationStorage(), api = DelegationAPIStub(), group = try link()
+        let recipient = BundleKeySeal.makeRecipient()
+        let original = try GuestInvite.parse("https://controller.invalid/key#" + GuestCrypto.base64URL(Data(repeating:13,count:24)) + GuestCrypto.base64URL(Data(repeating:7,count:32)))
+        var guest = SavedGuest(invite:original)
+        guest.keyGroup = group.id; guest.incomingRecipient = recipient; guest.importedDelegationLink = group
+        let receipt = try ReceivedDelegation(importing:group,recipient:recipient,guestIDs:[guest.id])
+        storage.state = SavedState(identity:Data(repeating:19,count:32),guests:[guest],receivedDelegations:[receipt])
+        let app = AppModel(storage:storage), manager = DelegationInbox(app:app,api:api,automaticUpdates:false)
+        defer { app.suspend() }
+        api.extraPart = true; api.ready = true; storage.fail = true
+        await manager.refreshAdditionalParts()
+        XCTAssertEqual(api.redeems,0); XCTAssertNil(app.receivedDelegations.first?.importedBaselineCodes)
+        storage.fail = false
+        api.beforeRedeem = { pending in
+            XCTAssertEqual(storage.state?.receivedDelegations?.first?.importedBaselineCodes,[String(repeating:"B",count:22)])
+            XCTAssertEqual(storage.state?.delegations?.first?.recipient.privateKey,recipient.privateKey)
+            XCTAssertEqual(pending.parts.map(\.code),[String(repeating:"C",count:22)])
+        }
+        await manager.refreshAdditionalParts(); await manager.checkAll()
+        XCTAssertEqual(api.redeems,1); XCTAssertEqual(app.guests.first?.invite,original)
+        XCTAssertEqual(app.receivedDelegations.first?.recipient.privateKey,recipient.privateKey)
+        XCTAssertEqual(app.receivedKeyRecords.count,1); XCTAssertEqual(app.guests.count,2)
+    }
+    func testInitialWelcomeIsQueuedOnceAndLaterPartRetainsGroupLabel() async throws {
+        let storage = DelegationStorage(), api = DelegationAPIStub()
+        let app = AppModel(storage:storage), manager = DelegationInbox(app:app,api:api,automaticUpdates:false)
+        defer { app.suspend() }
+        api.ready = true
+        api.welcomeCipher = try GuestCrypto.encrypt(key:link().secret,plaintext:JSONSerialization.data(withJSONObject:["from":"Анна","text":"Вход со двора"]))
+        await manager.inspect(try link().url); await manager.accept()
+        let first = try XCTUnwrap(app.incomingMessages.first)
+        XCTAssertEqual(app.receivedKeyRecords.first?.title,"Анна")
+        XCTAssertEqual(try MessageManager(app:app).text(first),"Вход со двора")
+        XCTAssertTrue(first.deliveryAcknowledged)
+        // Simulate a read message evicted from the bounded local queue.
+        try app.saveMessages(incoming:[])
+        api.extraPart = true
+        await manager.refreshAdditionalParts(); await manager.checkAll()
+        XCTAssertEqual(app.guests.count,2); XCTAssertEqual(app.receivedKeyRecords.count,1)
+        XCTAssertTrue(app.incomingMessages.isEmpty); XCTAssertEqual(app.receivedKeyRecords.first?.title,"Анна")
     }
 
 }

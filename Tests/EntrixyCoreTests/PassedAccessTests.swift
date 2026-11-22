@@ -30,7 +30,7 @@ final class PassedAccessTests: XCTestCase {
     func testSenderNameIsOnlyInsideEncryptedWelcomeAndLocalRenameKeepsLinkMaterial() throws {
         let source = try invite()
         var record = try PassedAccess(server:source.server,label:"Получатель",welcome:"Привет",objects:[source.id:[7:KeyObjectAccess(depth:0,pool:1)]],snapshots:[source.id:snapshot()],from:"Хозяин")
-        let plain = try JSONSerialization.jsonObject(with:GuestCrypto.decrypt(key:record.secret,envelope:record.welcomeCipher)) as! [String:Any]
+        let plain = try JSONSerialization.jsonObject(with:GuestCrypto.decrypt(key:record.secret,envelope:XCTUnwrap(record.welcomeCipher))) as! [String:Any]
         XCTAssertEqual(plain["from"] as? String,"Хозяин"); XCTAssertEqual(plain["text"] as? String,"Привет")
         let secret = record.secret, cipher = record.welcomeCipher
         record.label = "Другое имя"; try record.validate()

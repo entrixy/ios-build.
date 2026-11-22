@@ -43,7 +43,7 @@ SCREENS = {
     'ble-information': ('Информация Bluetooth', 'Объекты'),
     'device-claim': ('Добавление устройства по QR', 'Объекты'),
     'received-key-delete-confirmation': ('Удаление полученного ключа', 'Ключи'),
-    'received-key-detail': ('Полученный ключ', 'Ключи'),
+    'received-key-list': ('Полученные ключи', 'Ключи'),
     'add-key': ('Добавление ключа', 'Ключи'),
     'key-accepted': ('Приветствие владельца', 'Ключи'),
     'guests-owner': ('Гости', 'Гости'),

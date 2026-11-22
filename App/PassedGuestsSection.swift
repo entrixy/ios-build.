@@ -24,6 +24,7 @@ private struct PassedGuestsContent: View {
             if otherSection, !visible.isEmpty { Text(ProductText.string("delegate_create")).font(.headline).padding(.top,12) }
             ForEach(visible) { record in
                 PassedGuestCard(record:record,edit:{ editing = record },message:{ messaging = record },remove:{ app.guestRemovalTarget = .passed(record) })
+                    .disabled(manager.busy || app.ownerBusy || app.busy || !app.canManageGuestAccess)
             }
             if let message = manager.message { Text(ProductText.systemMessage(message)).font(.footnote).foregroundStyle(Brand.secondaryInk) }
             if canPass {
@@ -58,13 +59,13 @@ private struct PassedGuestCard: View {
                 }.contentShape(Rectangle())
             }.buttonStyle(.plain)
             if expanded {
-                HStack(spacing:0) {
+                CenteredIconActions {
                     GuestIconButton("gearshape",label:ProductText.string("guests_edit_desc"),action:edit)
                     GuestIconButton("doc.on.doc",label:ProductText.string("btn_copy")) { UIPasteboard.general.string = record.link?.url }.disabled(record.link == nil)
                     GuestIconButton("qrcode",label:"QR") { showingQR = true }.disabled(record.link == nil)
                     if let link = record.link {
-                        ShareLink(item:link.url) { Image(systemName:"square.and.arrow.up").font(.system(size:22)).frame(maxWidth:.infinity,minHeight:48) }
-                            .buttonStyle(.plain).accessibilityLabel(ProductText.string("guests_share_chooser"))
+                        ShareLink(item:link.url) { Image(systemName:"square.and.arrow.up").resizable().scaledToFit().frame(width:24,height:24) }
+                            .buttonStyle(SquareIconActionStyle()).accessibilityLabel(ProductText.string("guests_share_chooser"))
                     }
                     GuestIconButton("envelope",label:ProductText.string("msg_send_icon_desc"),action:message).disabled(!record.parts.contains(where:{ $0.childID != nil }))
                     GuestIconButton("trash",label:ProductText.string("btn_delete"),destructive:true,action:remove)

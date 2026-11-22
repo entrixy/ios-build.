@@ -1,6 +1,32 @@
-Следующий цельный source можно поставить в очередь того жеci/review-batch:
-workflow cancel-in-progress=false сохраняет полезный текущий SDK/archive прогон.
-Нельзя отправлять микрокоммиты, отменять текущую работу или плодить новые ветки.
+## Новый приоритет22.11: проверка и установочный IPA для iPhone11
+
+Пользователь явно разрешил собрать приложение сейчас, чтобы завтра установить
+на iPhone11 с Windows11 без своего Mac и оплаты Developer Program. Предыдущий
+запрет проверок отменён этой командой. Новые скриншоты/Store JPEG/галерея больше
+не нужны: полный hosted/UI suite сохраняет assertions без product capture/export.
+
+Добавлен производный personal project: те же app source/библиотеки, физическая
+сборка app-only/minimumiOS16 с пустыми personal entitlements. APNs/AppGroups/
+WiFi-info/associated domains и widget не входят; проверка условий доступа не
+ослабляется. Simulator сохраняет прежние ad-hoc Keychain entitlements. Полный
+обычный Store Release также собирается и проверяется отдельно. IPA упаковывается
+только из настоящего iphoneos arm64 Release, с лицензией камеры/privacy/isolation,
+SHA256 и инструкцией docs/IPHONE11_WINDOWS_INSTALL.md. Подпись своим AppleAccount
+и установка через Sideloadly выполняются пользователем на Windows11. Пароль/2FA
+агенту не передавать. Это не TestFlight/AppStore и не физическая приёмка.
+
+Локально ядро330/0fail, Swift parse (НЕ SDK) прошёл. Новые pipeline/spec boundaries
+проверяются общим набором. Новый Apple SDK/hosted/UI/device/package результат
+пока ожидается. Все старые no-checks/pending-counts ниже — история.
+
+## Действующий запрет проверок —22ноября
+
+Пользователь: «не запускай проверку до моей команды. доделывай все».
+До явной команды выполняются только чтение Android/iOS source, реализация,
+подготовка исходников тестов и локальные коммиты с отметкой «не проверено».
+Не выполнять тесты, lint/syntax/build, simulator/captures, CI и push в ветку,
+запускающую workflow. Старые указания о дешёвых проверках и очереди ниже
+приостановлены этим требованием. Разрешение не выводится из времени ожидания.
 
 ## Текущий preflight —22ноября
 
@@ -8,8 +34,8 @@ Source916:313core/212hosted/32из33UI, единственный сбой — no
 adjust оставил raw-value SwiftUI Slider на5 («1 день»). Actualfailureframe/AX
 проверены. Тест теперь двигает видимый thumb по actualframe/rawvalue, сохраняет
 проверку изменения и дополнительно требует «1 час». Продуктовый Slider не меняли.
-Перед следующим полным batch —4 адресных случая одним запуском: фактический
-sliderfailure, новый server-deletionUI и реальный decoder output WebM/DASH.
+Перед следующим полным batch —6 адресных случаев одним запуском: фактический
+sliderfailure, новый server-deletionUI, реальный decoder output WebM/DASH и2 RTSP proxy cases.
 Прежние reset/English уже дважды прошли; отдельно их не повторять. Весь набор
 223hosted/34UI/66PNG затем один раз, без отдельных replay-снимков.
 

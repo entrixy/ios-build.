@@ -19,7 +19,7 @@ private struct DelegationInboxContent: View {
                     ForEach(app.receivedDelegations) { receipt in
                         VStack(alignment: .leading, spacing: 6) {
                             Text(receipt.link.server).font(.headline)
-                            Text(ProductText.string("ios_parts_installed_fmt",receipt.parts.count)).foregroundStyle(Brand.secondaryInk)
+                            Text(ProductText.string("ios_parts_installed_fmt",receipt.guestIDs.count)).foregroundStyle(Brand.secondaryInk)
                         }
                     }
                     Button(ProductText.string("ios_check_new_parts")) {

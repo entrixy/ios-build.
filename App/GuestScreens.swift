@@ -117,7 +117,7 @@ struct SettingsScreen: View {
     @EnvironmentObject private var model: AppModel
     @AppStorage("entrixy.appearance") private var appearance = "system"
     @State private var selected: SettingsTab = .objects
-    @State private var showKey = false
+    @State private var removingReceivedKey: String?
     @State private var showCodeSettings = false
     @State private var showingLocalReset = false
     #if DEBUG && targetEnvironment(simulator)
@@ -145,18 +145,9 @@ struct SettingsScreen: View {
                             .disabled(!model.storageReady || model.ownerBusy)
                     }
                 case .keys:
-                    if model.guests.isEmpty && model.androidPendingGuests.isEmpty { Text(ProductText.string("ios_keys_empty")).foregroundStyle(Brand.secondaryInk) }
-                    ForEach(model.androidPendingGuests) { source in
-                        ImportedGuestKeyRow(source:source,manager:model.backups)
-                    }
-                    ForEach(model.guests) { guest in
-                        NavigationLink { KeyDetailScreen(guestID: guest.id) } label: {
-                            VStack(alignment: .leading, spacing: 7) {
-                                Text(guest.invite.server).font(.headline)
-                                Text(ProductText.string("ios_object_count_fmt",guest.objects.count)).font(.subheadline).foregroundStyle(Brand.secondaryInk)
-                                ConnectionLabel(guestID: guest.id, paused: guest.paused)
-                            }.padding(.vertical, 4)
-                        }.accessibilityIdentifier("received-key-" + guest.id)
+                    if model.receivedKeyRecords.isEmpty { Text(ProductText.string("ios_keys_empty")).foregroundStyle(Brand.secondaryInk).accessibilityIdentifier("received-keys-empty") }
+                    ForEach(model.receivedKeyRecords) { record in
+                        ReceivedKeySettingsRow(record: record, backups: model.backups, inbox: model.delegationInbox) { removingReceivedKey = record.id }
                     }
                     Section {
                         Button(ProductText.string("settings_add_key")) { keyInput = ""; addingKey = true }.buttonStyle(PrimaryActionStyle())
@@ -198,9 +189,10 @@ struct SettingsScreen: View {
                 .refreshable { if selected == .objects { await model.refreshOwners() }; await model.refresh() }
         }.background(Color(uiColor: .systemGroupedBackground)).navigationTitle(ProductText.string("tab_settings"))
             .navigationDestination(isPresented: $showCodeSettings) { AppEntryLockSettings() }
-            .navigationDestination(isPresented: $showKey) {
-                if let guest = model.guests.first { KeyDetailScreen(guestID: guest.id) }
-            }
+            .appConfirmationDialog(ProductText.string("guest_delete_title"),message:ProductText.string("guest_delete_warning"),actionTitle:ProductText.string("guest_delete_confirm"),destructive:true,
+                isPresented:Binding(get:{ removingReceivedKey != nil },set:{ if !$0 { removingReceivedKey = nil } })) {
+                    if let id = removingReceivedKey { model.removeReceivedKeyRecord(id) }
+                }
             .sheet(isPresented: $addingKey) { KeyImportScreen(input: $keyInput) }
             .sheet(isPresented: $showingLocalReset) { LocalResetScreen() }
             .sheet(isPresented: $addingObject, onDismiss: {
@@ -219,58 +211,18 @@ struct SettingsScreen: View {
                 if !captureConfigured {
                 captureConfigured = true
                 if let scenario = ActionCaptureScenario.current, [ActionCaptureScenario.appCodeSetup, .appCodeSettings].contains(scenario) { selected = .system; showCodeSettings = true }
+                if ActionCaptureScenario.current == .keyDetail { selected = .keys }
                 if let route = StageTwoCapture.current {
                     selected = route.settingsTab
-                    showKey = route == .keyDetail
                     showCodeSettings = route == .codeSettings
                     if route == .addServer { model.serverPrompt = ServerSettingsPrompt(action:.configure(nil,initial:"entrixy.com")) }
                     addingObject = route == .addObject
                 }
                 }
                 #endif
-                if PreviewRouting.keyDetail && !model.guests.isEmpty { selected = .keys; showKey = true }
+                if PreviewRouting.keyDetail && !model.guests.isEmpty { selected = .keys }
             }
             .onChange(of:model.settingsRequest) { requested in if let requested { selected = requested; model.settingsRequest = nil } }
-    }
-}
-
-struct KeyDetailScreen: View {
-    @EnvironmentObject private var model: AppModel
-    @Environment(\.dismiss) private var dismiss
-    @State private var removing = false
-    let guestID: String
-    var body: some View {
-        Group {
-            if let guest = model.guests.first(where: { $0.id == guestID }) {
-                ScrollView {
-                    VStack(alignment: .leading, spacing: DesignMetrics.sectionGap) {
-                    VStack(alignment: .leading, spacing: 12) {
-                        KeyValueRow(title: ProductText.string("ble_server_label"), value: guest.invite.server)
-                        Divider()
-                        KeyValueRow(title: ProductText.string("ios_object_count"), value: String(guest.objects.count))
-                        Divider()
-                        ConnectionLabel(guestID: guest.id, paused: guest.paused)
-                        if let date = guest.checkedAt {
-                            Divider()
-                            KeyValueRow(title: ProductText.string("ios_updated"), value: ProductText.date(date))
-                        }
-                    }.padding(16).background(Color(uiColor: .secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 16))
-                        if let problem = model.guestConnectionProblems[guestID] {
-                            Text(ProductText.string(problem)).font(.subheadline).foregroundStyle(AppPalette.destructive).fixedSize(horizontal:false,vertical:true)
-                        }
-                        Button { Task { await model.refresh() } } label: {
-                            Label(ProductText.string("ios_refresh_data"), systemImage: "arrow.clockwise")
-                        }.buttonStyle(SecondaryActionStyle()).disabled(model.busy)
-                        Button(ProductText.string("ios_key_remove_local"), role: .destructive) { removing = true }.buttonStyle(SecondaryActionStyle()).disabled(model.busy)
-                        Text(ProductText.string("ios_key_remove_hint")).font(.footnote).foregroundStyle(Brand.secondaryInk)
-                    }.padding(DesignMetrics.pageInset)
-                }.background(Color(uiColor: .systemGroupedBackground))
-            } else { EmptyScreen(image: "icon-key", title: ProductText.string("ios_key_removed"), detail: ProductText.string("ios_key_readd_hint")) }
-        }
-        .navigationTitle(ProductText.string("ios_key_received_title")).navigationBarTitleDisplayMode(.inline)
-        .appConfirmationDialog(ProductText.string("guest_delete_title"),message:ProductText.string("ios_key_remove_body"),actionTitle:ProductText.string("ios_key_remove_action"),destructive:true,isPresented:$removing) {
-            model.removeKey(guestID); if !model.guests.contains(where: { $0.id == guestID }) { dismiss() }
-        }
     }
 }
 

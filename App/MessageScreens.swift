@@ -21,6 +21,7 @@ private struct MessageListContent: View {
                                 Spacer()
                                 Text(ProductText.date(row.receivedAt)).font(.caption).foregroundStyle(Brand.secondaryInk)
                             }
+                            if let sender = manager.sender(row) { Text(sender).font(.subheadline.weight(.semibold)) }
                             Text((try? manager.text(row)) ?? ProductText.string("ios_message_decrypt_failed")).lineLimit(2).foregroundStyle(Brand.secondaryInk)
                         }.padding(.vertical, 5)
                     }
@@ -53,6 +54,7 @@ struct ReadMessageScreen: View {
                 Section {
                     Text(ProductText.string("ios_message_by_key")).font(.headline)
                     Text(ProductText.date(saved.receivedAt)).font(.subheadline).foregroundStyle(Brand.secondaryInk)
+                    if let sender = manager.sender(saved) { Text(sender).font(.headline) }
                     if let guest = app.guests.first(where: { $0.id == saved.guestID }) { KeyValueRow(title: ProductText.string("ble_server_label"), value: guest.invite.server) }
                     if let text = try? manager.text(saved) { Text(text).textSelection(.enabled) }
                     else { Text(ProductText.string("ios_message_decrypt_failed")).foregroundStyle(Brand.secondaryInk) }

@@ -13,6 +13,8 @@ import EntrixyCore
         var sequence: UInt32 = 0
         var digest: CameraRTSPDigest?
         var nonceCount: UInt32 = 0
+        var authorized = false
+        var authorizationTimeout: Task<Void, Never>?
         var tasks: [Task<Void, Never>] = []
         init(_ local: NWConnection, _ remote: NWConnection) { self.local = local; self.remote = remote }
     }
@@ -76,8 +78,8 @@ import EntrixyCore
         let token = capability + "/" + UUID().uuidString.lowercased()
         resources[token] = url; return origin.appendingPathComponent(token)
     }
-    private func target(_ text: String) throws -> URL {
-        if text == "*" { return camera.url }
+    private func target(_ text: String, allowWildcard: Bool) throws -> URL {
+        if text == "*" { guard allowWildcard else { throw CameraStreamFailure.format }; return camera.url }
         guard let url = URL(string: text), url.scheme == "rtsp", url.host == "127.0.0.1", url.port == origin?.port,
               url.user == nil, url.password == nil, url.query == nil, url.fragment == nil,
               let target = resources[String(url.path.dropFirst())] else { throw CameraStreamFailure.format }
@@ -89,13 +91,17 @@ import EntrixyCore
               let port = NWEndpoint.Port(rawValue: portValue) else { connection.cancel(); return }
         let remote = NWConnection(host: NWEndpoint.Host(host), port: port, using: .tcp)
         let peer = Peer(connection, remote), id = UUID(); peers[id] = peer
-        connection.start(queue: queue); remote.start(queue: queue)
-        peer.tasks = [Task { [weak self] in guard let self else { return }; await self.pumpClient(id) },
-                      Task { [weak self] in guard let self else { return }; await self.pumpCamera(id) }]
+        connection.start(queue: queue)
+        peer.tasks = [Task { [weak self] in guard let self else { return }; await self.pumpClient(id) }]
+        peer.authorizationTimeout = Task { [weak self] in
+            try? await Task.sleep(nanoseconds: 5_000_000_000)
+            guard !Task.isCancelled, let self, let peer = self.peers[id], !peer.authorized else { return }
+            self.close(id)
+        }
     }
     private func close(_ id: UUID) {
         guard let peer = peers.removeValue(forKey: id) else { return }
-        peer.local.cancel(); peer.remote.cancel(); peer.tasks.forEach { $0.cancel() }
+        peer.authorizationTimeout?.cancel(); peer.local.cancel(); peer.remote.cancel(); peer.tasks.forEach { $0.cancel() }
     }
     private func authorize(_ message: inout CameraRTSPMessage, peer: Peer) throws {
         for (name, value) in camera.headers { message.headers[name.lowercased()] = value }
@@ -116,16 +122,23 @@ import EntrixyCore
                 let data = try await CameraSocket.read(peer.local)
                 for frame in try parser.append(data) {
                     switch frame {
-                    case .packet(let bytes): try await CameraSocket.send(bytes, on: peer.remote)
+                    case .packet(let bytes):
+                        guard peer.authorized else { throw CameraStreamFailure.format }
+                        try await CameraSocket.send(bytes, on: peer.remote)
                     case .message(var message):
                         guard let request = message.request, message.body.isEmpty, let cseq = message.headers["cseq"],
                               !peer.pending.values.contains(where: { $0.localSequence == cseq }), peer.pending.count < 32 else { throw CameraStreamFailure.format }
-                        let remote = try target(request.uri)
+                        let remote = try target(request.uri, allowWildcard: peer.authorized && ["OPTIONS", "GET_PARAMETER"].contains(request.method))
                         if request.method == "SETUP" {
                             let transport = message.headers["transport"]?.lowercased() ?? ""
                             guard transport.contains("rtp/avp/tcp"), transport.contains("interleaved="), !transport.contains("destination="), !transport.contains("multicast") else { throw CameraStreamFailure.format }
                         }
                         message.start = request.method + " " + remote.absoluteString + " RTSP/1.0"
+                        if !peer.authorized {
+                            peer.authorized = true; peer.authorizationTimeout?.cancel(); peer.authorizationTimeout = nil
+                            peer.remote.start(queue: queue)
+                            peer.tasks.append(Task { [weak self] in guard let self else { return }; await self.pumpCamera(id) })
+                        }
                         // Authentication is generated here only. Reject decoder-
                         // supplied credentials and proxy/cookie side channels.
                         message.headers.removeValue(forKey: "authorization"); message.headers.removeValue(forKey: "proxy-authorization")
@@ -137,7 +150,7 @@ import EntrixyCore
                     }
                 }
             }
-        } catch { if active, !Task.isCancelled { failed?(error) } }
+        } catch { if active, peer.authorized, !Task.isCancelled { failed?(error) } }
     }
     private func pumpCamera(_ id: UUID) async {
         guard let peer = peers[id] else { return }; var parser = CameraRTSPFramer()
@@ -197,7 +210,7 @@ import EntrixyCore
                     }
                 }
             }
-        } catch { if active, !Task.isCancelled { failed?(error) } }
+        } catch { if active, peer.authorized, !Task.isCancelled { failed?(error) } }
     }
 }
 

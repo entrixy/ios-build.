@@ -95,9 +95,14 @@ import EntrixyCore
     func testRTSPRejectsDecoderRequestsForForeignOriginsBeforeSendingCameraCredentials() async throws {
         let fixture = try RTSPCameraFixture(); defer { fixture.stop() }
         let remote = try await fixture.start(), bridge = try proxy(remote); defer { bridge.stop() }
-        let local = try await bridge.start(), connection = try client(local); defer { connection.cancel() }
-        try await CameraSocket.send(Data("DESCRIBE rtsp://foreign.invalid/steal RTSP/1.0\r\nCSeq: 1\r\n\r\n".utf8), on: connection)
-        do { _ = try await readMessage(connection); XCTFail("Foreign origin was accepted") } catch { }
+        let local = try await bridge.start()
+        var failures = 0; bridge.failed = { _ in failures += 1 }
+        for address in ["rtsp://foreign.invalid/steal", "*"] {
+            let connection = try client(local); defer { connection.cancel() }
+            try await CameraSocket.send(Data("DESCRIBE \(address) RTSP/1.0\r\nCSeq: 1\r\n\r\n".utf8), on: connection)
+            do { _ = try await readMessage(connection); XCTFail("Unregistered camera capability was accepted") } catch { }
+        }
         XCTAssertTrue(fixture.requests.isEmpty)
+        XCTAssertEqual(failures,0,"Unauthorized loopback requests must not stop the legitimate camera")
     }
 }

@@ -80,6 +80,34 @@ private final class PassAPIStub: DelegationTransport {
 
 @MainActor
 final class PassManagerTests: XCTestCase {
+    func testAndroidOutgoingLinkRecoversAfterWriteFailureWithoutAnotherIssueRequest() async throws {
+        let source = try invite(), api = PassAPIStub(), storage = PassMemoryStorage(source)
+        let secret = Data(repeating:41,count:32)
+        let keys: [[String:Any]] = [["id":3,"host":source.server,"key":source.userKey]]
+        let fields = ["backup_src_seed":String(repeating:"ab",count:32),"guest_keys":String(decoding:try JSONSerialization.data(withJSONObject:keys),as:UTF8.self),"passed_wk_" + api.group:GuestCrypto.base64URL(secret),"passed_name_" + api.group:"Иван"]
+        let entries = fields.mapValues { ["t":"s","v":$0] }
+        let archive = try AndroidBackupDocument(JSONSerialization.data(withJSONObject:["app":"entrixy","ver":1,"created":1800000000,"device":"Public fixture","count":entries.count,"entries":entries]))
+        storage.state?.androidArchives = [archive]
+        api.invitations = [["grp":api.group,"code":api.code,"status":"new","objects":[try KeyObjectAccess(depth:0,pool:1).json(id:7)]]]
+        let app = AppModel(storage:storage), manager = PassManager(app:app,api:api)
+        defer { app.suspend() }
+        storage.fail = true
+        await manager.reload()
+        XCTAssertTrue(app.passedAccess.isEmpty); XCTAssertEqual(api.creates,0)
+        storage.fail = false
+        await manager.reload()
+        let record = try XCTUnwrap(app.passedAccess.first)
+        XCTAssertEqual(record.label,"Иван"); XCTAssertEqual(record.link?.secret,secret)
+        XCTAssertNil(record.welcomeCipher); XCTAssertEqual(api.creates,0)
+        await manager.continueCreating(record.id)
+        XCTAssertEqual(api.creates,0); XCTAssertEqual(app.passedAccess.count,1)
+        let relaunched = AppModel(storage:storage), resumed = PassManager(app:relaunched,api:api)
+        defer { relaunched.suspend() }
+        await resumed.reload()
+        XCTAssertEqual(relaunched.passedAccess.first?.id,record.id)
+        XCTAssertEqual(relaunched.passedAccess.first?.link?.url,record.link?.url)
+        XCTAssertEqual(relaunched.passedAccess.count,1); XCTAssertEqual(api.creates,0)
+    }
     func testSeveralRemainingLevelsAndPoolPersistBeforeWireAndCannotExceedParent() async throws {
         let source=try invite(),api=PassAPIStub(),storage=PassMemoryStorage(source)
         api.allowedDepth=4;api.allowedPool=12

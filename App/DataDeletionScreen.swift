@@ -28,8 +28,10 @@ struct DataDeletionForm: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.scenePhase) private var phase
     @State private var scope = DataDeletionScope.device
-    @State private var confirmation = "", password = ""
-    @State private var working = false, configured = false
+    @State private var confirmation = ""
+    @State private var password = ""
+    @State private var working = false
+    @State private var configured = false
     @State private var feedback: String?
     @FocusState private var confirming: Bool
     private var owner: OwnerAccount? { model.owners.first { $0.server == server } }

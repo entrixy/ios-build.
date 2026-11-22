@@ -1,4 +1,4 @@
-name: iOS functional port compilation
+name: iPhone build and complete application checks
 "on":
   push:
     branches: [ci/functional-port, ci/automation-runtime, ci/ui-review, ci/ui-review-arm, ci/native-review-arm, ci/review-batch]
@@ -7,17 +7,14 @@ permissions:
   contents: read
 concurrency:
   group: functional-port-${{ github.ref }}
-  # Preserve useful SDK/archive evidence; the next coherent source waits in queue.
   cancel-in-progress: false
 jobs:
   compile:
-    runs-on: ${{ (github.ref == 'refs/heads/ci/ui-review-arm' || github.ref == 'refs/heads/ci/native-review-arm') && 'macos-15' || 'macos-15-intel' }}
+    runs-on: macos-15-intel
     timeout-minutes: 180
     env:
       DEVELOPER_DIR: /Applications/Xcode_26.3.app/Contents/Developer
-      # Reproduce the actual raw-value slider failure and new decoder/deletion paths.
-      # '1' is diagnosis only; 'preflight' continues into complete acceptance.
-      ENTRIXY_REVIEW_PREFLIGHT: 'preflight'
+      ENTRIXY_TEST_PROJECT: EntrixyPersonal.xcodeproj
     defaults:
       run:
         shell: bash
@@ -28,118 +25,80 @@ jobs:
           mkdir -p .local-checks/ci
           xcodebuild -version | tee .local-checks/ci/toolchain.log
       - name: Test protocol core with Apple CryptoKit
-        if: env.ENTRIXY_REVIEW_PREFLIGHT != '1'
         run: swift test 2>&1 | tee .local-checks/ci/core.log
-      - name: Prepare healthy simulator before compiling application products
+      - name: Prepare healthy job-owned simulator before compilation
         id: simulator_prepare
         timeout-minutes: 25
-        # Retain independent SDK/archive results if the hosted UI service fails.
-        # The explicit acceptance gate below still fails the overall review.
         continue-on-error: true
-        if: github.ref == 'refs/heads/ci/review-batch'
         run: python3 scripts/prepare_review_simulator.py 2>&1 | tee .local-checks/ci/simulator-prepare.log
-      - name: Retain simulator preparation evidence before compilation
-        if: always() && github.ref == 'refs/heads/ci/review-batch'
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
-        with:
-          name: simulator-readiness-evidence
-          path: |
-            .local-checks/ci/simulator-prepare.log
-            .local-checks/ci/simulator-runtimes.json
-            .local-checks/ci/prepared-device.json
-            .local-checks/ci/simulator-preflight.png
-          retention-days: 3
-      - name: Install project generator
-        run: brew install xcodegen
-      - name: Generate project
-        run: xcodegen generate
-      - name: Compile application and test bundles without launching scenarios
+      - name: Install project generator and isolated spec reader
+        run: |
+          brew install xcodegen
+          python3 -m venv .local-checks/python
+          .local-checks/python/bin/pip install PyYAML==6.0.3
+      - name: Generate Store and personal application projects
+        run: |
+          xcodegen generate
+          .local-checks/python/bin/python scripts/prepare_personal_project.py
+          xcodegen generate --spec project.personal.json
+      - name: Compile personal application and all test products once
         id: debug_build
         timeout-minutes: 30
         run: |
-          xcodebuild -project Entrixy.xcodeproj -scheme EntrixyTests \
+          xcodebuild -project EntrixyPersonal.xcodeproj -scheme EntrixyTests \
             -configuration Debug -sdk iphonesimulator \
             -destination 'generic/platform=iOS Simulator' \
+            -clonedSourcePackagesDirPath .local-checks/SourcePackages \
             -derivedDataPath .local-checks/DerivedData \
             CODE_SIGNING_ALLOWED=YES CODE_SIGN_IDENTITY=- build-for-testing 2>&1 | tee .local-checks/ci/debug-build.log
-      - name: Verify native transactions without capture or UI automation
-        if: ${{ !startsWith(github.ref, 'refs/heads/ci/ui-review') && github.ref != 'refs/heads/ci/review-batch' }}
-        run: python3 scripts/test_simulator.py --only-native --use-built-tests 2>&1 | tee .local-checks/ci/native-tests.log
-      - name: Verify native UI routes without taking a product screenshot batch
-        if: startsWith(github.ref, 'refs/heads/ci/ui-review')
-        run: python3 scripts/test_simulator.py --only-ui --use-built-tests 2>&1 | tee .local-checks/ci/ui-tests.log
-      - name: Verify rendered slider input and new decoder and deletion paths before full review
-        if: github.ref == 'refs/heads/ci/review-batch' && env.ENTRIXY_REVIEW_PREFLIGHT != '' && steps.simulator_prepare.outcome == 'success'
-        run: |
-          python3 scripts/test_simulator.py --use-built-tests --prepared-device .local-checks/ci/prepared-device.json --keep-prepared-device \
-            --test EntrixyUITests/NavigationUITests/testOwnedBLEInformationUsesSeparateActionAndDoesNotInventUnobservedReadings \
-            --test EntrixyUITests/NavigationUITests/testServerDeletionRequiresConfirmationAndReportsPendingWithoutClaimingErasure \
-            --test EntrixyAppTests/CameraVideoProxyTests/testActualWebMDecoderDisplaysFramesThroughAuthenticatedHTTPBridge \
-            --test EntrixyAppTests/CameraVideoProxyTests/testActualDASHDecoderDisplaysFramesFromProtectedManifestAndSegments \
-            2>&1 | tee .local-checks/ci/review-preflight.log
-      - name: Retain focused diagnosis before the complete acceptance pass
-        if: always() && github.ref == 'refs/heads/ci/review-batch' && env.ENTRIXY_REVIEW_PREFLIGHT != ''
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
-        with:
-          name: review-preflight-evidence
-          path: .local-checks/ci/
-          retention-days: 3
-      - name: Verify native and UI scenarios with original screenshots in the same simulator pass
-        if: github.ref == 'refs/heads/ci/review-batch' && env.ENTRIXY_REVIEW_PREFLIGHT != '1' && steps.simulator_prepare.outcome == 'success'
-        run: python3 scripts/test_simulator.py --use-built-tests --review-captures --prepared-device .local-checks/ci/prepared-device.json --keep-prepared-device 2>&1 | tee .local-checks/ci/combined-review.log
-      - name: Retain compilation evidence
-        # Store candidates use the native renderer after the complete UI pass.
-        # Keep them separate from the one-PNG-per-state review gallery.
-        if: always()
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
-        with:
-          name: functional-port-build-evidence
-          path: .local-checks/ci/
-          retention-days: 3
-      - name: Capture original Store-format JPEG candidates without modifying images
-        if: github.ref == 'refs/heads/ci/review-batch' && env.ENTRIXY_REVIEW_PREFLIGHT != '1' && steps.simulator_prepare.outcome == 'success'
-        run: python3 scripts/capture_store_assets.py --prepared-device .local-checks/ci/prepared-device.json 2>&1 | tee .local-checks/ci/store-assets.log
-      - name: Retain original Store-format screenshot candidates
-        if: always()
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
-        with:
-          name: store-screenshot-candidates
-          path: |
-            .local-checks/ci/store-assets/
-            .local-checks/ci/store-assets.log
-          if-no-files-found: ignore
-          retention-days: 3
-      - name: Release job-owned simulator before Release compilation
-        if: always() && github.ref == 'refs/heads/ci/review-batch'
-        run: python3 scripts/prepare_review_simulator.py --cleanup
-      - name: Compile Release and verify fixture isolation
+      - name: Compile normal Store Release and verify fixture and privacy isolation
         id: release_build
-        timeout-minutes: 25
-        if: ${{ always() && steps.debug_build.outcome == 'success' && !startsWith(github.ref, 'refs/heads/ci/ui-review') && env.ENTRIXY_REVIEW_PREFLIGHT != '1' }}
+        timeout-minutes: 30
+        if: ${{ always() && steps.debug_build.outcome == 'success' }}
         run: |
           xcodebuild -project Entrixy.xcodeproj -scheme Entrixy \
             -configuration Release -sdk iphonesimulator \
             -destination 'generic/platform=iOS Simulator' \
+            -clonedSourcePackagesDirPath .local-checks/SourcePackages \
             -derivedDataPath .local-checks/ReleaseDerivedData \
             CODE_SIGNING_ALLOWED=YES CODE_SIGN_IDENTITY=- build 2>&1 | tee .local-checks/ci/release-build.log
           python3 scripts/verify_release_isolation.py \
             .local-checks/DerivedData/Build/Products/Debug-iphonesimulator/Entrixy.app \
             .local-checks/ReleaseDerivedData/Build/Products/Release-iphonesimulator/Entrixy.app
-      - name: Archive unsigned Release for physical iPhone and verify app/widget packaging
-        if: ${{ always() && github.ref == 'refs/heads/ci/review-batch' && steps.debug_build.outcome == 'success' && steps.release_build.outcome == 'success' }}
-        run: python3 scripts/archive_device_release.py 2>&1 | tee .local-checks/ci/device-release.log
-      - name: Retain physical iPhone archive evidence
-        if: always() && github.ref == 'refs/heads/ci/review-batch'
+      - name: Archive real arm64 personal Release and package IPA for local signing
+        id: personal_package
+        timeout-minutes: 35
+        if: ${{ always() && steps.debug_build.outcome == 'success' && steps.release_build.outcome == 'success' }}
+        run: python3 scripts/package_personal_ipa.py 2>&1 | tee .local-checks/ci/personal-package.log
+      - name: Run complete hosted and UI suite without product screenshots
+        id: application_tests
+        if: ${{ always() && steps.debug_build.outcome == 'success' && steps.simulator_prepare.outcome == 'success' }}
+        run: python3 scripts/test_simulator.py --use-built-tests --complete-suite --prepared-device .local-checks/ci/prepared-device.json --keep-prepared-device 2>&1 | tee .local-checks/ci/application-tests.log
+      - name: Retain install package only after all mandatory checks succeed
+        if: ${{ success() && steps.personal_package.outcome == 'success' && steps.application_tests.outcome == 'success' }}
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
-          name: iphone-release-evidence
+          name: Entrixy-iPhone11-personal-IPA
+          path: .local-checks/ci/iphone11/
+          if-no-files-found: error
+          retention-days: 14
+      - name: Release job-owned simulator
+        if: always()
+        run: python3 scripts/prepare_review_simulator.py --cleanup
+      - name: Retain build and transaction evidence without a screenshot gallery
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: iphone11-build-evidence
           path: |
-            .local-checks/ci/device-release.*
-            .local-checks/ci/release-build.log
-          if-no-files-found: ignore
-          retention-days: 3
-      - name: Require healthy simulator for complete review acceptance
-        if: ${{ always() && github.ref == 'refs/heads/ci/review-batch' && steps.simulator_prepare.outcome != 'success' }}
+            .local-checks/ci/*.log
+            .local-checks/ci/*.json
+            .local-checks/ci/iphone11/package.json
+            .local-checks/ci/ui-failure-attachments/
+          if-no-files-found: warn
+          retention-days: 7
+      - name: Require healthy simulator for complete acceptance
+        if: ${{ always() && steps.simulator_prepare.outcome != 'success' }}
         run: |
-          echo 'Simulator preparation failed; native/UI review acceptance was not executed.' >&2
+          echo 'Simulator preparation failed; complete application checks were not executed.' >&2
           exit 1

@@ -18,7 +18,9 @@ public struct PassedAccess: Codable, Identifiable, Equatable {
     public let server: String
     public var label: String
     public let secret: Data
-    public let welcomeCipher: String
+    // Android keeps the group secret/name, but not a second copy of this cipher.
+    // An imported, already-created group must never fabricate its first message.
+    public let welcomeCipher: String?
     public var group: String?
     public var parts: [Part]
     public let created: Date
@@ -42,11 +44,39 @@ public struct PassedAccess: Codable, Identifiable, Equatable {
                 baselineGroups: Array(Set(snapshot.invitations.map(\.group) + snapshot.children.map(\.group))).sorted())
         }
     }
+    public init(importing material: AndroidPassedAccessMaterial, source: GuestInvite, snapshot: PassSnapshot, defaultLabel: String) throws {
+        guard material.server == source.server else { throw GuestCrypto.Failure.invalidEnvelope }
+        _ = try DelegationLink(server:material.server,group:material.group,secret:material.secret)
+        server = material.server; group = material.group; secret = material.secret
+        label = material.label ?? defaultLabel; created = material.created; welcomeCipher = nil
+        let value = String(GuestCrypto.hash(Data(("entrixy-android-pass-v1|" + server + "|" + material.group).utf8)).prefix(32))
+        var text = ""
+        for (i,c) in value.enumerated() { if [8,12,16,20].contains(i) { text.append("-") }; text.append(c) }
+        id = UUID(uuidString:text)!
+        parts = []
+        try recoverPart(source:source,snapshot:snapshot)
+        try validate()
+    }
+    public mutating func recoverPart(source: GuestInvite, snapshot: PassSnapshot) throws {
+        guard source.server == server, let group, parts.count < 16,
+              !parts.contains(where: { $0.sourceID == source.id }) else { throw GuestCrypto.Failure.invalidEnvelope }
+        let invitations = snapshot.invitations.filter { $0.group == group }, children = snapshot.children.filter { $0.group == group }
+        guard invitations.count <= 1, children.count <= 1,
+              children.first != nil || invitations.first?.status == "new",
+              let objects = children.first?.objects ?? invitations.first?.objects, !objects.isEmpty else { throw GuestCrypto.Failure.invalidEnvelope }
+        var next = self
+        var part = Part(sourceID:source.id,objects:objects,baselineGroups:[])
+        part.code = invitations.first?.code; part.sent = true; part.state = .unavailable
+        next.parts.append(part)
+        try next.reconcile(snapshot,sourceID:source.id)
+        try next.validate(); self = next
+    }
     public func validate() throws {
         guard server == (try GuestInvite.normalizeServer(server)), secret.count == 32, (1...16).contains(parts.count),
               Set(parts.map(\.sourceID)).count == parts.count, !label.isEmpty, label.utf8.count <= 512,
               group == nil || DelegationLink.code(group!), created.timeIntervalSinceReferenceDate.isFinite else { throw GuestCrypto.Failure.invalidEnvelope }
-        _ = try GuestCrypto.decrypt(key: secret, envelope: welcomeCipher)
+        if let welcomeCipher { _ = try GuestCrypto.decrypt(key: secret, envelope: welcomeCipher) }
+        else { guard group != nil else { throw GuestCrypto.Failure.invalidEnvelope } }
         for part in parts {
             guard !part.sourceID.isEmpty, !part.objects.isEmpty, part.objects.count <= 1000,
                   part.code == nil || DelegationLink.code(part.code!), part.baselineGroups.count <= 5050,
@@ -65,7 +95,11 @@ public struct PassedAccess: Codable, Identifiable, Equatable {
         guard parts.indices.contains(index), parts[index].sent, parts[index].state == .draft,
               group != nil || index == 0 else { throw GuestCrypto.Failure.invalidEnvelope }
         var body: [String: Any] = ["objects": parts[index].objects.keys.sorted().map { parts[index].objects[$0]!.json(id: Int($0)!) }]
-        if let group { body["grp"] = group } else { body["welcome_cipher"] = welcomeCipher }
+        if let group { body["grp"] = group }
+        else {
+            guard let welcomeCipher else { throw GuestCrypto.Failure.invalidEnvelope }
+            body["welcome_cipher"] = welcomeCipher
+        }
         return try JSONSerialization.data(withJSONObject: body, options: .sortedKeys)
     }
     public mutating func addPart(sourceID: String,objects: [Int:KeyObjectAccess],snapshot: PassSnapshot) throws {
