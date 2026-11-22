@@ -9,7 +9,7 @@ private struct ControlContentHeight: PreferenceKey {
 @MainActor final class HomeWidgetPresence: ObservableObject {
     @Published private(set) var installed: Bool?
     func refresh() {
-        guard #available(iOS 17.0, *) else { installed = nil; return }
+        guard WidgetCatalog.group != nil, #available(iOS 17.0, *) else { installed = nil; return }
         WidgetCenter.shared.getCurrentConfigurations { [weak self] result in
             Task { @MainActor in
                 if case .success(let widgets) = result { self?.installed = widgets.contains { $0.kind == WidgetCatalog.kind } }
