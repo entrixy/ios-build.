@@ -968,7 +968,9 @@ final class NavigationUITests: XCTestCase {
         bringFullyIntoView(submit,in:app)
         reviewCapture("server-deletion-confirmation",settledBy:app.buttons["Отмена"])
         let password = app.secureTextFields["data-deletion-password"]
-        bringFullyIntoView(password,in:app); password.tap(); password.typeText("review-only-password")
+        let enteredPassword = "review-only-password"
+        bringFullyIntoView(password,in:app); password.tap(); password.typeText(enteredPassword)
+        XCTAssertEqual((password.value as? String)?.count,enteredPassword.count,"The secure field must retain every typed password character")
         bringFullyIntoView(field,in:app); field.tap(); field.typeText("DELETE\n")
         bringFullyIntoView(submit,in:app); XCTAssertTrue(submit.isEnabled); submit.tap()
         let status = app.staticTexts["data-deletion-status"]

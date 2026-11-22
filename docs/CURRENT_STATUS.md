@@ -1,3 +1,26 @@
+## PROVEN deletion failure:20typedchars became2bytes; keyboard fixed —12:24UTC
+
+Run45020052264/public0e8a6c5COMPLETEDFAIL solelydeletionUI975. Core330PASS,
+Debug/alltestproductsSDKPASS; UIactuallystarted sohealthySimconfirmed. Artifact
+14754361948 SHAb4f00b9c3283c57c3ec340fd2b7090d06842ff90d470aa66ad7b7fcce292a31a
+verified/extracted .local-checks/iphone11-0e8-evidence. ACTUALfocused-native-input.jsonl:
+passwordinputbytes2; formsubmitpasswordBytes2 scopeaccount; modelprepared;
+fixtureloginserverMatchesTRUE,emailMatchesTRUE,passwordMatchesFALSE,passwordBytes2;
+modelerrorGuestCrypto.invalidEnvelope. NOinactivephase/clearwhiletypingevents.
+Thisisactualinput/fixtureauthfailure, NOTserver/resultvalidation/credentialrotation.
+Do NOTchangeauth/receiptlogic, phaseclearing oracceptshorterpassword.
+
+ComparedexistingPASSbackupUI: ituses.keyboardType(.asciiCapable) andassertsfull
+secureAXlength aftertypingLatinpassword. Account/deletionSecureFields lackedthat
+keyboardtrait. AddedASCIICapablepresentationtobothaccountpasswordfields, retains
+String/Unicode/nomodification/noautocap/noautocorrect; removedownredundantduplicate
+traitsfrombackuphelper(existingASCIInoAutoalreadybelow). DeletionUI nowasserts
+ALL20typedchars retained BEFOREPOST, thenstrictexactauth/pendingassertunchanged.
+Parse/diffPASS (NOTSDK); core/pipelineunchanged30lastPASS, don'trerunlocally.
+NeednextsourcepreflightdeletionONLY→normalRelease/privacy/isolation→physicalIPA→
+WHOLE232hosted/34UI→actualartifact+SHA/download/Windowsguide. NoIPAyet. Persistuntil
+actualfile, no gallery/site/subagents. Finaldocsonly[skip ci].
+
 ## Actual45015094443/public460a826:5/6PASS; credentials cause stillunknown
 
 Apple330Core/healthySim/DebugPASS; DASH/WebM/readabort+503/avatar/phoneallPASS.
