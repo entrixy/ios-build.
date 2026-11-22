@@ -107,11 +107,44 @@ private final class CameraVideoProtocol: URLProtocol {
         let video = try Data(contentsOf:url)
         CameraVideoProtocol.configure { request in
             XCTAssertEqual(request.value(forHTTPHeaderField:"X-Camera-Key"),"public-video-test-key")
-            return (200,["Content-Type":"video/webm"],video)
+            let fields = ["Content-Type":"video/webm", "Accept-Ranges":"bytes"]
+            guard let range = request.value(forHTTPHeaderField:"Range") else { return (200,fields,video) }
+            XCTAssertTrue(range.hasPrefix("bytes="))
+            let bounds = range.dropFirst(6).split(separator:"-",omittingEmptySubsequences:false)
+            guard bounds.count == 2 else { throw URLError(.badServerResponse) }
+            let start = bounds[0].isEmpty ? max(0,video.count-(Int(bounds[1]) ?? 0)) : (Int(bounds[0]) ?? -1)
+            let end = bounds[0].isEmpty || bounds[1].isEmpty ? video.count-1 : min(Int(bounds[1]) ?? -1,video.count-1)
+            guard start >= 0, start <= end else { throw URLError(.badServerResponse) }
+            var partial = fields; partial["Content-Range"] = "bytes \(start)-\(end)/\(video.count)"
+            return (206,partial,video.subdata(in:start..<(end+1)))
         }
         var camera = ObjectCameraConfiguration(); camera.enabled = true; camera.url = "https://camera.invalid/video.webm"
         camera.authType = "header"; camera.authHeader = "X-Camera-Key"; camera.authValue = "public-video-test-key"
         try await assertDecoded(camera)
+    }
+    func testDecoderMayAbandonAReadForASeekWithoutFailingCameraButRemoteErrorsStillFail() async throws {
+        CameraVideoProtocol.configure { _ in
+            Thread.sleep(forTimeInterval:0.25)
+            return (200,["Content-Type":"video/mp4"],Data(repeating:7,count:524288))
+        }
+        let proxy = try bridge(path:"video.mp4"); defer { proxy.stop() }
+        var failures = 0; proxy.failed = { _ in failures += 1 }
+        let local = try await proxy.start()
+        let session = URLSession(configuration:.ephemeral); defer { session.invalidateAndCancel() }
+        let read = session.dataTask(with:local); read.resume()
+        for _ in 0..<100 where CameraVideoProtocol.recorded().isEmpty { try await Task.sleep(nanoseconds:20_000_000) }
+        XCTAssertFalse(CameraVideoProtocol.recorded().isEmpty)
+        read.cancel()
+        try await Task.sleep(nanoseconds:500_000_000)
+        XCTAssertEqual(failures,0,"A decoder abandoning one local read must not stop its camera")
+        CameraVideoProtocol.configure { _ in (200,["Content-Type":"video/mp4"],Data([1,2,3,4])) }
+        let (bytes,response) = try await get(local)
+        XCTAssertEqual(response.statusCode,200); XCTAssertEqual(bytes,Data([1,2,3,4])); XCTAssertEqual(failures,0)
+        CameraVideoProtocol.configure { _ in (503,["Content-Type":"text/plain"],Data()) }
+        let (_,denied) = try await get(local)
+        XCTAssertEqual(denied.statusCode,502)
+        for _ in 0..<100 where failures == 0 { try await Task.sleep(nanoseconds:10_000_000) }
+        XCTAssertEqual(failures,1,"An upstream camera failure must still fail the stream")
     }
     func testActualDASHDecoderDisplaysFramesFromProtectedManifestAndSegments() async throws {
         let bundle = Bundle(for: Self.self)

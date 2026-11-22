@@ -1,3 +1,28 @@
+## Actual corrected run45006050619:3/5 passed, WebM investigation/fix
+
+Nativecd05d2b/public6a950d9: Apple330CorePASS, healthySimPASS, DebugSDK/allproducts
+PASS. FocusDASH actualframes/aspectPASS, avatarCancel/uploadgeometry/dismissPASS,
+phoneDecline/nohandoffPASS: actual hosted boundary fixed bothmodal failures.
+ServerformstillFAIL fieldabsent, actualdiagnosticshowsserverlistunchanged;
+thatrunpredates full-row contentShape alreadyin nat1708508/publicd84ba8f.
+WebMFAIL actualframes/aspect withnetworkmessage andcannot-seek/VP80 logs.
+Evidence14748534664 SHAea872a38ee8a8a36b74d05932a411d7d54d92c769b3a9877a4fdc489b077f1b8
+verified/extracted .local-checks/iphone11-6a9-evidence; actualPNG inspected.
+
+Checked pinned OFFICIAL VLCKit artifact910171154bytes SHA
+1fec7232f88e706f44d9a015133e08d742166eb2666cb44915c9f570bf339463:
+bothactualiPhone/simulator containVP8 decoder/vpx; simulatorlibvpx buildconfig
+explicitlyenable-vp8-decoder. Do NOTswaplibraries/inventabsence. Upstreamsource
+f7caf7922 modules/codec/vpx.c andbuild.conf confirm expecteddecoder. Actualmock
+WebMserverignoredRange; loopbackproxy treatedlocalreaderresetaswholecamerafailure.
+Fix pendingbatch: WebMfixtureimplementsreal206/ranges +Accept-Ranges; proxyignores
+ONLYlocalNWError.posixEPIPE/ECONNRESET/ECANCELED/ENOTCONN whileupstreamfailures
+remainfatal. NewtestabortsrealHTTPreadbeforeupstreambody, verifiesnextrequestworks
+and503stillfailscamera. Existingactualframe/aspectassertionsunchanged.
+LocalSwiftparsePASS (NOTSDK),30PythonpipelinePASS. Queueaftercurrentd84runwhich
+canprovefull-rowfix. PluginhasREAD/rerunbutnocanceltool; don'tseeksecretsforCLI.
+NoIPAyet. UserWindows11/iPhone11, no gallery, finishactualIPA notstatus.
+
 ## iPhone11: completed run44998500441 and concrete fixes —22.11.2026
 
 Public66f2068/nativebf2c19c: Apple330CorePASS; PersonalDebug/alltestproducts SDK

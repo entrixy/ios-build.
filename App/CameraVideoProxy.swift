@@ -186,7 +186,15 @@ import EntrixyCore
             try await Self.finish(connection)
         } catch {
             if !sentHeaders { try? await Self.failure(502,on:connection) }
-            if active, legitimate, !(error is CancellationError), !Task.isCancelled {
+            // Players close an HTTP read when seeking or probing a container.
+            // That loopback connection ending does not invalidate the camera
+            // or the next authenticated request. Remote URLSession errors still
+            // fail the stream, as do invalid manifests and authorization errors.
+            let readerClosed: Bool
+            if let networkError = error as? NWError, case let .posix(code) = networkError {
+                readerClosed = [.EPIPE, .ECONNRESET, .ECANCELED, .ENOTCONN].contains(code)
+            } else { readerClosed = false }
+            if active, legitimate, !readerClosed, !(error is CancellationError), !Task.isCancelled {
                 let reason: Error = error is GuestCrypto.Failure ? CameraStreamFailure.format : error
                 failed?(reason)
             }

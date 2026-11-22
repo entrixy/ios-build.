@@ -59,6 +59,7 @@ jobs:
             --prepared-device .local-checks/ci/prepared-device.json --keep-prepared-device \
             --test EntrixyAppTests/CameraVideoProxyTests/testActualDASHDecoderDisplaysFramesFromProtectedManifestAndSegments \
             --test EntrixyAppTests/CameraVideoProxyTests/testActualWebMDecoderDisplaysFramesThroughAuthenticatedHTTPBridge \
+            --test EntrixyAppTests/CameraVideoProxyTests/testDecoderMayAbandonAReadForASeekWithoutFailingCameraButRemoteErrorsStillFail \
             --test EntrixyUITests/NavigationUITests/testAvatarPickerOpensFromAvatarAndKeepsObjectRow \
             --test EntrixyUITests/NavigationUITests/testGuestPhoneRequestOffersExplicitCallAndDeclineWithoutTelephoneHandoff \
             --test EntrixyUITests/NavigationUITests/testServerDeletionRequiresConfirmationAndReportsPendingWithoutClaimingErasure \
