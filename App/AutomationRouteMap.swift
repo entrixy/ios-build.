@@ -197,8 +197,17 @@ private struct RouteMapCanvas: UIViewRepresentable {
         }
         @objc func stroke(_ gesture: UIPanGestureRecognizer) {
             guard parent.drawing, !parent.readOnly, let map = gesture.view as? MKMapView else { return }
-            if gesture.state == .began { points = []; lastPixel = nil }
             let pixel = gesture.location(in: map)
+            if gesture.state == .began {
+                // UIPan begins only after movement crosses its threshold. Keep
+                // the touch origin too, as Android's onDragStart does, so a
+                // quick stroke with coalesced move events still has endpoints.
+                let translation = gesture.translation(in:map)
+                let start = CGPoint(x:pixel.x-translation.x,y:pixel.y-translation.y)
+                let coordinate = map.convert(start,toCoordinateFrom:map)
+                points = [.init(lat:coordinate.latitude,lon:coordinate.longitude)]
+                lastPixel = start
+            }
             if lastPixel.map({ hypot(pixel.x-$0.x, pixel.y-$0.y) >= 3 }) ?? true {
                 let coordinate = map.convert(pixel, toCoordinateFrom: map)
                 points.append(.init(lat: coordinate.latitude, lon: coordinate.longitude)); lastPixel = pixel

@@ -83,11 +83,14 @@ def main():
     parser.add_argument("--use-built-tests", action="store_true", help="Run the existing build-for-testing products without rebuilding")
     parser.add_argument('--review-captures', action='store_true', help='Capture named UI checkpoints during the same native/UI test pass')
     parser.add_argument('--complete-suite', action='store_true', help='Run all hosted/UI assertions without screenshot collection')
+    parser.add_argument('--checkpoint-assertions',action='store_true',help='Use the complete suite checkpoint assertions during an explicitly selected UI follow-up, without screenshots')
     parser.add_argument('--prepared-device',type=Path,help='Use the verified source/runtime-matched device prepared before compilation')
     parser.add_argument('--test',action='append',default=[],help='Exact EntrixyUITests method for focused diagnosis; never exports a gallery')
     parser.add_argument('--iterations',type=int,default=1,help='Repeat every selected diagnostic test; not a retry-on-failure')
     parser.add_argument('--keep-prepared-device',action='store_true',help='Leave the owned prepared device for the next pass; workflow finally must clean up')
     args = parser.parse_args()
+    if args.checkpoint_assertions and (not args.test or not args.use_built_tests or args.review_captures or args.complete_suite):
+        parser.error('--checkpoint-assertions requires selected built tests without captures or complete-suite')
     if args.complete_suite and (args.review_captures or args.only_native or args.only_ui or args.test):
         parser.error('--complete-suite cannot be combined with partial selections or screenshot collection')
     if args.test and (args.review_captures or args.complete_suite or any(not name.startswith(('EntrixyUITests/NavigationUITests/test','EntrixyAppTests/')) or not name.replace('/','').replace('_','').isalnum() for name in args.test)):
@@ -111,7 +114,7 @@ def main():
     try:
         command = ['xcodebuild', '-destination', 'id=' + device,
             '-parallel-testing-enabled', 'NO', 'test-without-building' if args.use_built_tests else 'test']
-        if args.review_captures or args.complete_suite:
+        if args.review_captures or args.complete_suite or args.checkpoint_assertions:
             result.parent.mkdir(parents=True,exist_ok=True)
             if result.exists():
                 raise RuntimeError('Review result already exists; do not mix test runs')
@@ -136,7 +139,7 @@ def main():
     except (subprocess.CalledProcessError, subprocess.TimeoutExpired):
         # Retain the exact failed UI frame/hierarchy instead of guessing from a
         # different capture process. Diagnostics must not hide the test failure.
-        results = [result] if (args.review_captures or args.complete_suite) and result.exists() else list(Path('.local-checks/DerivedData/Logs/Test').glob('*.xcresult'))
+        results = [result] if (args.review_captures or args.complete_suite or args.checkpoint_assertions) and result.exists() else list(Path('.local-checks/DerivedData/Logs/Test').glob('*.xcresult'))
         if results:
             result = max(results, key=lambda p: p.stat().st_mtime)
             destination = Path('.local-checks/ci/ui-failure-attachments')

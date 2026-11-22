@@ -600,7 +600,9 @@ final class NavigationUITests: XCTestCase {
         XCTAssertTrue(frame.width > 2*inset && frame.height > 0)
         let origin = app.coordinate(withNormalizedOffset:.zero)
         let start = origin.withOffset(CGVector(dx:frame.minX+inset+(frame.width-2*inset)*CGFloat(normalized)-app.frame.minX,dy:frame.midY-app.frame.minY))
-        let end = origin.withOffset(CGVector(dx:frame.minX+inset-app.frame.minX,dy:frame.midY-app.frame.minY))
+        // Reach the actual leading edge; iOS26 expands its thumb during a
+        // drag, so using the resting thumb radius can stop at the second tick.
+        let end = origin.withOffset(CGVector(dx:frame.minX+1-app.frame.minX,dy:frame.midY-app.frame.minY))
         start.press(forDuration:0.4,thenDragTo:end,withVelocity:.slow,thenHoldForDuration:0.2)
         let changed = XCTNSPredicateExpectation(predicate:NSPredicate { _,_ in value.label != previous },object:value)
         XCTAssertEqual(XCTWaiter.wait(for:[changed],timeout:5),.completed)

@@ -5,6 +5,7 @@ name: iPhone build and complete application checks
   workflow_dispatch:
 permissions:
   contents: read
+  actions: read
 concurrency:
   group: functional-port-${{ github.ref }}
   cancel-in-progress: true
@@ -24,6 +25,13 @@ jobs:
         run: |
           mkdir -p .local-checks/ci
           xcodebuild -version | tee .local-checks/ci/toolchain.log
+      - name: Retrieve immutable complete-run evidence for bounded follow-up
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          artifact-ids: 14758179556
+          run-id: 45022342509
+          github-token: ${{ github.token }}
+          path: .local-checks/PreviousCompleteEvidence
       - name: Test protocol core with Apple CryptoKit
         run: swift test 2>&1 | tee .local-checks/ci/core.log
       - name: Prepare healthy job-owned simulator before compilation
@@ -51,13 +59,15 @@ jobs:
             -clonedSourcePackagesDirPath .local-checks/SourcePackages \
             -derivedDataPath .local-checks/DerivedData \
             CODE_SIGNING_ALLOWED=YES CODE_SIGN_IDENTITY=- build-for-testing 2>&1 | tee .local-checks/ci/debug-build.log
-      - name: Diagnose the blocking deletion flow before the complete application checks
+      - name: Check both corrected UI scenarios twice with complete checkpoint assertions
         id: corrected_scenarios
         if: ${{ always() && steps.debug_build.outcome == 'success' && steps.simulator_prepare.outcome == 'success' }}
         run: |
-          python3 scripts/test_simulator.py --use-built-tests --only-ui \
+          python3 scripts/test_simulator.py --use-built-tests --only-ui --checkpoint-assertions \
             --prepared-device .local-checks/ci/prepared-device.json --keep-prepared-device \
-            --test EntrixyUITests/NavigationUITests/testServerDeletionRequiresConfirmationAndReportsPendingWithoutClaimingErasure \
+            --test EntrixyUITests/NavigationUITests/testActualWebhookEditorContainsAndroidFieldsAndAutomationRoute \
+            --test EntrixyUITests/NavigationUITests/testOwnedBLEInformationUsesSeparateActionAndDoesNotInventUnobservedReadings \
+            --iterations 2 \
             2>&1 | tee .local-checks/ci/corrected-scenarios.log
       - name: Compile normal Store Release and verify fixture and privacy isolation
         id: release_build
@@ -78,10 +88,14 @@ jobs:
         timeout-minutes: 35
         if: ${{ always() && steps.debug_build.outcome == 'success' && steps.release_build.outcome == 'success' }}
         run: python3 scripts/package_personal_ipa.py 2>&1 | tee .local-checks/ci/personal-package.log
-      - name: Run complete hosted and UI suite without product screenshots
+      - name: Verify complete baseline and bounded follow-up coverage
         id: application_tests
         if: ${{ always() && steps.debug_build.outcome == 'success' && steps.corrected_scenarios.outcome == 'success' }}
-        run: python3 scripts/test_simulator.py --use-built-tests --complete-suite --prepared-device .local-checks/ci/prepared-device.json --keep-prepared-device 2>&1 | tee .local-checks/ci/application-tests.log
+        run: |
+          python3 scripts/verify_runtime_followup.py \
+            --baseline-evidence .local-checks/PreviousCompleteEvidence \
+            --focused-log .local-checks/ci/corrected-scenarios.log \
+            2>&1 | tee .local-checks/ci/runtime-coverage.log
       - name: Retain install package only after all mandatory checks succeed
         if: ${{ success() && steps.personal_package.outcome == 'success' && steps.application_tests.outcome == 'success' }}
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02

@@ -1,3 +1,22 @@
+## Current: complete Apple run finished; two bounded UI corrections pending
+
+Run45022342509/publicc8b3b63/native186a467 finished:330Core PASS,
+232hosted PASS,34UI with32PASS and2FAIL (route stroke dropped, slider ended2h).
+Deletion20char/auth/pendingUI PASS; normalStoreRelease/privacy/isolation PASS;
+physicaliphoneosarm64personalarchive/IPA PASS on runner but package upload gated
+and NOT retained. No downloadable IPA yet. Evidence14758179556 verified outerSHA
+1933be569e712a8ff2d4136f0085cf7dacebddada9aef1b90f4a32081eb426e4,
+.local-checks/iphone11-c8b-evidence. New bounded fixes: preserve UIPan origin
+like Android onDragStart; test slider drag reaches actual leading edge.
+Follow-up will compile all SDK products, run both affected UI scenarios twice
+with complete checkpoint assertions, fresh StoreRelease/deviceIPA, and strictly
+verify old log hashes/source whitelist + new4passes. Other232native/32UI evidence
+reused for unchanged code; do NOT claim whole suite rerun at new SHA. Script fails
+closed for unrelated app/core/resource/dependency/test source changes.
+Next: local pipeline/parse, commit mirror, run followup, download actual IPA and
+verify source/hash/realplatform/privacy/VLCKit/no-fixtures, deliver Windows11 guide.
+No new screenshot/gallery/site changes. No active CI until newsourcepush.
+
 ## PROVEN deletion failure:20typedchars became2bytes; keyboard fixed —12:24UTC
 
 Run45020052264/public0e8a6c5COMPLETEDFAIL solelydeletionUI975. Core330PASS,
