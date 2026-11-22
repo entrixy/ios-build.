@@ -126,6 +126,6 @@ struct ServerSettingsDialog: View {
     }
 }
 
-private extension View {
+extension View {
     func serverField() -> some View { padding(14).background(Color(uiColor:.tertiarySystemFill),in:RoundedRectangle(cornerRadius:DesignMetrics.actionRadius)) }
 }
