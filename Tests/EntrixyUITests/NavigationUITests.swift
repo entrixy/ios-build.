@@ -954,7 +954,8 @@ final class NavigationUITests: XCTestCase {
         let open = app.buttons["data-deletion-settings"]
         bringFullyIntoView(open,in:app); XCTAssertTrue(open.isHittable); open.tap()
         let server = app.buttons["data-deletion-server-controller.invalid"]
-        XCTAssertTrue(server.waitForExistence(timeout:10)); server.tap()
+        XCTAssertTrue(server.waitForExistence(timeout:10))
+        XCTAssertTrue(waitForStable(server,in:app)); server.tap()
         let field = app.textFields["data-deletion-confirmation"], submit = app.buttons["data-deletion-submit"]
         XCTAssertTrue(field.waitForExistence(timeout:10)); XCTAssertFalse(submit.isEnabled)
         bringFullyIntoView(submit,in:app)

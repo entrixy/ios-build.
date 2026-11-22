@@ -10,9 +10,30 @@ from prepare_personal_project import personal_spec
 from package_personal_ipa import inspect_personal
 from archive_device_release import verify_device_image
 from test_simulator import review_test_products
+from verify_release_isolation import verify_personal_integrations
 
 
 class PersonalPackageTests(unittest.TestCase):
+    def testHostedXCTestIsAllowedOnlyInDebugAndCannotLeakIntoDistribution(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            app = Path(temporary)
+            (app/'Info.plist').write_bytes(plistlib.dumps({'EntrixyBuildVariant':'personal'}))
+            tests = app/'PlugIns/EntrixyAppTests.xctest'
+            tests.mkdir(parents=True)
+            verify_personal_integrations(app, debug=True)
+            with self.assertRaises(RuntimeError): verify_personal_integrations(app)
+            (app/'PlugIns/EntrixyWidget.appex').mkdir()
+            with self.assertRaises(RuntimeError): verify_personal_integrations(app, debug=True)
+
+    def testDebugXCTestExceptionCannotPermitAPNsOrAppGroups(self):
+        for setting in [{'EntrixyAppGroup':'group.test'}, {'EntrixyPushEnvironment':'sandbox'},
+                        {'UIBackgroundModes':['remote-notification']}]:
+            with self.subTest(setting=setting), tempfile.TemporaryDirectory() as temporary:
+                app = Path(temporary)
+                (app/'Info.plist').write_bytes(plistlib.dumps(setting))
+                (app/'PlugIns/EntrixyAppTests.xctest').mkdir(parents=True)
+                with self.assertRaises(RuntimeError): verify_personal_integrations(app, debug=True)
+
     def testPersonalVariantUsesSameSourceAndDependenciesWithoutMutatingStoreCapabilities(self):
         source = yaml.safe_load(Path('project.yml').read_text())
         original = copy.deepcopy(source)

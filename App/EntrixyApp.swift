@@ -137,7 +137,7 @@ struct RootView: View {
                     }
                 }
         }
-        .accessibilityHidden(model.hasInlineRootDialog)
+        .accessibilityHidden(model.hasInlineRootDialog && model.objectAvatarTarget == nil && !model.ownerGuestRequestPending)
         .allowsHitTesting(!model.hasRootDialog)
         .overlay { BackupFlowHost(flow:model.backupPresentation) }
         // Keep the modal a sibling of the hidden navigation tree. An overlay
@@ -150,7 +150,6 @@ struct RootView: View {
             else if let network = model.networkPrivacyPrompt { NetworkPrivacyDialog(network:network) }
             else if let prompt = model.codePrompt { AppCodeDialog(request:prompt).id(prompt.id) }
             else if let target = model.objectRemovalTarget { ObjectRemovalConfirmation(target: target) }
-            else if let target = model.objectAvatarTarget { ObjectAvatarPicker(target: target) }
             else if let target = model.bleInformationTarget { BLEInformationDialog(target:target) }
             else if let target = model.guestRemovalTarget { GuestRemovalDialog(target:target) }
             else if let id = model.companyRequestID, let company = model.companies.first(where:{ $0.id == id }) {
@@ -161,10 +160,16 @@ struct RootView: View {
                         userPickedTab = true; selectedTab = .guests
                     } else { companyObjectFlow = company }
                 }
-            } else { OwnerPhoneRequestDialog(control: model.ownerControl) }
+            }
         }
         }
         .background(Color(uiColor: .systemGroupedBackground).ignoresSafeArea())
+        .background(NativeTaskOverlay(isPresented:model.objectAvatarTarget != nil || model.ownerGuestRequestPending) {
+            Group {
+                if let target = model.objectAvatarTarget { ObjectAvatarPicker(target:target) }
+                else { OwnerPhoneRequestDialog(control:model.ownerControl) }
+            }.environmentObject(model).environment(\.locale,Locale(identifier:ProductText.language)).tint(Brand.primary)
+        }.frame(width:0,height:0))
         .background(DiagnosticConsentPresenter(service:model.diagnostics).frame(width:0,height:0))
         .background(IncomingMessagePresenter(manager:model.messages).frame(width:0,height:0))
         .onChange(of: model.navigationState) { value in

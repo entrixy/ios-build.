@@ -8,6 +8,19 @@ MARKERS = [b'--capture-actions', b'preview-bootstrap.json', b'action-capture-sta
            b'com.entrixy.ios.capture.', b'controller.invalid', b'--native-design', b'native-design-status.json', b'--stage-two', b'stage-two-status.json', b'--ui-offline-promotions']
 
 
+def verify_personal_integrations(bundle, *, debug=False):
+    info = plistlib.loads((bundle / 'Info.plist').read_bytes())
+    plugins = bundle / 'PlugIns'
+    # build-for-testing embeds the hosted XCTest bundle in the Debug app.
+    # Distribution must contain neither test bundles nor app extensions.
+    invalid_plugins = plugins.exists() and (not debug or any(
+        item.name != 'EntrixyAppTests.xctest' or not item.is_dir()
+        for item in plugins.iterdir()))
+    if (invalid_plugins or info.get('EntrixyAppGroup') or info.get('EntrixyPushEnvironment')
+            or 'remote-notification' in info.get('UIBackgroundModes', [])):
+        raise RuntimeError('Personal application unexpectedly includes paid-profile integration')
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('debug_app', type=Path)
@@ -27,8 +40,7 @@ def main():
     for bundle, environment in [(args.debug_app, 'sandbox'), (args.release_app, 'production')]:
         info = plistlib.loads((bundle / 'Info.plist').read_bytes())
         if info.get('EntrixyBuildVariant') == 'personal':
-            if (bundle / 'PlugIns').exists() or info.get('EntrixyAppGroup') or info.get('EntrixyPushEnvironment') or 'remote-notification' in info.get('UIBackgroundModes', []):
-                raise RuntimeError('Personal application unexpectedly includes paid-profile integration')
+            verify_personal_integrations(bundle, debug=bundle == args.debug_app)
         else:
             widget_info = plistlib.loads((bundle / 'PlugIns/EntrixyWidget.appex/Info.plist').read_bytes())
             group = info.get('EntrixyAppGroup', '')

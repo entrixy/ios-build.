@@ -18,10 +18,11 @@ struct NativeTaskOverlay<Dialog:View>: UIViewControllerRepresentable {
 @MainActor final class NativeTaskOverlayController: UIViewController {
     var shown = false
     var content: AnyView?
-    private var host: UIViewController?
+    private var host: UIHostingController<AnyView>?
     private var scheduled = false
     private var dismissing = false
     private var stopped = false
+    private let boundary = NativeModalAccessibilityBoundary()
     override func loadView() { view = UIView(); view.backgroundColor = .clear; view.isUserInteractionEnabled = false }
     override func viewDidAppear(_ animated:Bool) { super.viewDidAppear(animated); schedule() }
     func schedule() {
@@ -34,8 +35,10 @@ struct NativeTaskOverlay<Dialog:View>: UIViewControllerRepresentable {
     }
     private func refresh() {
         if let host {
-            guard !shown, !dismissing else { return }; dismissing = true
+            if shown { if let content { host.rootView = content }; return }
+            guard !dismissing else { return }; dismissing = true
             host.dismiss(animated:true) { [weak self] in
+                self?.boundary.restore()
                 self?.host = nil; self?.dismissing = false; self?.schedule()
             }
             return
@@ -50,7 +53,11 @@ struct NativeTaskOverlay<Dialog:View>: UIViewControllerRepresentable {
         next.view.backgroundColor = .clear; next.view.accessibilityViewIsModal = true
         next.overrideUserInterfaceStyle = presenter.traitCollection.userInterfaceStyle
         next.modalPresentationStyle = .overFullScreen; next.modalTransitionStyle = .crossDissolve
-        host = next; presenter.present(next,animated:true)
+        host = next
+        presenter.present(next,animated:true) { [weak self,weak next,weak presenter] in
+            guard let self,let next,let presenter,self.host === next else { return }
+            self.boundary.conceal(presenter,for:next)
+        }
     }
-    func stop() { stopped = true; host?.dismiss(animated:false); host = nil }
+    func stop() { stopped = true; host?.dismiss(animated:false); host = nil; boundary.restore() }
 }

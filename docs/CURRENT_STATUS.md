@@ -1,3 +1,27 @@
+## iPhone11: completed run44998500441 and concrete fixes —22.11.2026
+
+Public66f2068/nativebf2c19c: Apple330CorePASS; PersonalDebug/alltestproducts SDK
+PASS; normalStoreRelease actual BUILD SUCCEEDED. Isolation verifier rejected the
+Debug hosted PlugIns/EntrixyAppTests.xctest, NOT a Release compiler error. IPA step
+SKIPPED, no install file yet. Full runtime: 31/34UI PASS; avatarCancel/phoneDecline
+not hittable despite visible actual frames; server row tap did not present form.
+Two actual VLC decoder tests CRASH with unsupported --no-lua; other hosted tests
+continue after XCTest restart, do not claim whole native PASS. Evidence artifact
+14747381594 SHA2562b859983c84d82b56735ff54b0049ea5531c95be05c231d5e1b200394de5da51
+verified and extracted native .local-checks/iphone11-66f-evidence; PNG/AX inspected.
+
+Fix batch: remove unsupported VLC flag; permit ONLY exact hosted XCTest bundle
+in Debug personal, reject all distribution PlugIns and paid integrations; regression
+2new packaging boundaries. Avatar/phone use actual overFullScreen hosting plus
+existing NativeModalAccessibilityBoundary, update hosted root on state changes.
+Other dialogs unchanged. Server UI scenario waits for stable hittable row before
+actual tap; do not weaken confirmation/result assertions. Source parse PASS;
+30Python pipeline tests PASS; core unchanged, not rerun locally.
+Next CI first checks 2actual decoders +3failedUI against same compiled products,
+then StoreRelease/deviceIPA/WHOLE hosted+UI. Never cancel useful runs or claimIPA
+until actual verified artifact. Windows11 user/free Sideloadly local signing;
+no screenshots/gallery requested; no subagents. Source batch Apple pending.
+
 ## Новый приоритет22.11: проверка и установочный IPA для iPhone11
 
 Пользователь явно разрешил собрать приложение сейчас, чтобы завтра установить

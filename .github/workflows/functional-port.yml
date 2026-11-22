@@ -51,10 +51,22 @@ jobs:
             -clonedSourcePackagesDirPath .local-checks/SourcePackages \
             -derivedDataPath .local-checks/DerivedData \
             CODE_SIGNING_ALLOWED=YES CODE_SIGN_IDENTITY=- build-for-testing 2>&1 | tee .local-checks/ci/debug-build.log
+      - name: Verify corrected decoder and modal interactions on the compiled application
+        id: corrected_scenarios
+        if: ${{ always() && steps.debug_build.outcome == 'success' && steps.simulator_prepare.outcome == 'success' }}
+        run: |
+          python3 scripts/test_simulator.py --use-built-tests \
+            --prepared-device .local-checks/ci/prepared-device.json --keep-prepared-device \
+            --test EntrixyAppTests/CameraVideoProxyTests/testActualDASHDecoderDisplaysFramesFromProtectedManifestAndSegments \
+            --test EntrixyAppTests/CameraVideoProxyTests/testActualWebMDecoderDisplaysFramesThroughAuthenticatedHTTPBridge \
+            --test EntrixyUITests/NavigationUITests/testAvatarPickerOpensFromAvatarAndKeepsObjectRow \
+            --test EntrixyUITests/NavigationUITests/testGuestPhoneRequestOffersExplicitCallAndDeclineWithoutTelephoneHandoff \
+            --test EntrixyUITests/NavigationUITests/testServerDeletionRequiresConfirmationAndReportsPendingWithoutClaimingErasure \
+            2>&1 | tee .local-checks/ci/corrected-scenarios.log
       - name: Compile normal Store Release and verify fixture and privacy isolation
         id: release_build
         timeout-minutes: 30
-        if: ${{ always() && steps.debug_build.outcome == 'success' }}
+        if: ${{ always() && steps.debug_build.outcome == 'success' && steps.corrected_scenarios.outcome == 'success' }}
         run: |
           xcodebuild -project Entrixy.xcodeproj -scheme Entrixy \
             -configuration Release -sdk iphonesimulator \
@@ -72,7 +84,7 @@ jobs:
         run: python3 scripts/package_personal_ipa.py 2>&1 | tee .local-checks/ci/personal-package.log
       - name: Run complete hosted and UI suite without product screenshots
         id: application_tests
-        if: ${{ always() && steps.debug_build.outcome == 'success' && steps.simulator_prepare.outcome == 'success' }}
+        if: ${{ always() && steps.debug_build.outcome == 'success' && steps.corrected_scenarios.outcome == 'success' }}
         run: python3 scripts/test_simulator.py --use-built-tests --complete-suite --prepared-device .local-checks/ci/prepared-device.json --keep-prepared-device 2>&1 | tee .local-checks/ci/application-tests.log
       - name: Retain install package only after all mandatory checks succeed
         if: ${{ success() && steps.personal_package.outcome == 'success' && steps.application_tests.outcome == 'success' }}

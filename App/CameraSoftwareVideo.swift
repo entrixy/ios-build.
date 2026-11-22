@@ -5,7 +5,7 @@ import VLCKit
 /// bridges own remote addresses, redirects, credentials and segment validation.
 @MainActor final class CameraSoftwareVideo: NSObject, ObservableObject, VLCMediaPlayerDelegate {
     let view = UIView()
-    private let player = VLCMediaPlayer(options: ["--no-audio", "--rtsp-tcp", "--no-video-title-show", "--no-snapshot-preview", "--no-sub-autodetect-file", "--no-lua"])
+    private let player = VLCMediaPlayer(options: ["--no-audio", "--rtsp-tcp", "--no-video-title-show", "--no-snapshot-preview", "--no-sub-autodetect-file"])
     private var active = true
     private var lastSize = CGSize.zero
     var hasDecodedVideo: Bool { player.hasVideoOut && player.videoSize.width > 0 && player.videoSize.height > 0 }
