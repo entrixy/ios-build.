@@ -209,12 +209,17 @@ private struct StageDeletionAPI: OwnerTransport {
     func sync(server:String,credentials:OwnerCredentials,fingerprint:String) async throws -> Data { throw GuestCrypto.Failure.invalidEnvelope }
     func mutate(server:String,credentials:OwnerCredentials,fingerprint:String,operation:OwnerOperation,body:Data) async throws -> Data { throw GuestCrypto.Failure.invalidEnvelope }
     func accountLogin(server:String,email:String,password:String) async throws -> String {
-        print("DELETION_FIXTURE_LOGIN serverMatches=\(server == "controller.invalid") emailMatches=\(email == "owner@example.test") passwordMatches=\(password == "review-only-password") passwordBytes=\(password.utf8.count)")
+        await MainActor.run {
+            StageTwoInputTrace.record("deletion-fixture-login",["serverMatches":server == "controller.invalid","emailMatches":email == "owner@example.test","passwordMatches":password == "review-only-password","passwordBytes":password.utf8.count])
+        }
         guard server == "controller.invalid", email == "owner@example.test", password == "review-only-password" else { throw GuestCrypto.Failure.invalidEnvelope }
         return "review-only-auth"
     }
     func dataDeletion(server:String,credentials:OwnerCredentials?,receipt:DataDeletionReceipt,accountToken:String?,submit:Bool) async throws -> DataDeletionResult {
-        print("DELETION_FIXTURE_REQUEST submit=\(submit) credentialsPresent=\(credentials != nil) tokenMatches=\(accountToken == "review-only-auth")")
+        let hasCredentials = credentials != nil
+        await MainActor.run {
+            StageTwoInputTrace.record("deletion-fixture-request",["submit":submit,"credentialsPresent":hasCredentials,"tokenMatches":accountToken == "review-only-auth"])
+        }
         guard server == "controller.invalid", !submit || (credentials != nil && accountToken == "review-only-auth") else { throw GuestCrypto.Failure.invalidEnvelope }
         let now = Int64(Date().timeIntervalSince1970)
         return DataDeletionResult(requestID:receipt.id,scope:receipt.scope,status:.pending,requestedAt:now,expectedBy:now+30*86400)

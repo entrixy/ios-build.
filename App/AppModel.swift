@@ -3201,16 +3201,30 @@ extension AppModel {
             // Preserve the id/bearer BEFORE authentication/network. Reopening or
             // losing a response cannot create a second request identity.
             try storeDataDeletionReceipt(receipt, server: server)
+            #if DEBUG && targetEnvironment(simulator)
+            StageTwoInputTrace.record("deletion-model-prepared",["scope":scope.rawValue])
+            #endif
             let token: String?
             if scope == .account, let email = owner.serverSettings?.accountEmail {
                 token = try await ownerAPI.accountLogin(server: server, email: email, password: password)
             } else { token = nil }
+            #if DEBUG && targetEnvironment(simulator)
+            StageTwoInputTrace.record("deletion-model-authenticated",["tokenPresent":token != nil])
+            #endif
             guard canManageGuestAccess, owners.first(where: { $0.server == server })?.credentials == credentials else { return false }
             let result = try await ownerAPI.dataDeletion(server: server, credentials: credentials, receipt: receipt, accountToken: token, submit: true)
+            #if DEBUG && targetEnvironment(simulator)
+            StageTwoInputTrace.record("deletion-model-response",["scopeMatches":result.scope == receipt.scope,"idMatches":result.requestID == receipt.id])
+            #endif
             guard canManageGuestAccess, owners.first(where: { $0.server == server })?.credentials == credentials,
                   owners.first(where: { $0.server == server })?.serverSettings?.deletionReceipt?.id == receipt.id else { return false }
             var saved = receipt; saved.result = result; try storeDataDeletionReceipt(saved, server: server); return true
-        } catch { errorMessage = dataDeletionError(error); return false }
+        } catch {
+            #if DEBUG && targetEnvironment(simulator)
+            StageTwoInputTrace.record("deletion-model-error",["type":String(reflecting:type(of:error)),"cryptoFailure":(error as? GuestCrypto.Failure).map { String(describing:$0) } ?? ""])
+            #endif
+            errorMessage = dataDeletionError(error); return false
+        }
     }
     func refreshDataDeletion(server: String) async -> Bool {
         guard canManageGuestAccess, !ownerBusy, !busy,

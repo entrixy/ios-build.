@@ -6,7 +6,7 @@ import UIKit
 /// Boolean transitions; never labels, credentials, user data or live profiles.
 @MainActor enum StageTwoInputTrace {
     static func record(_ event:String,_ fields:[String:Any] = [:]) {
-        guard let route = StageTwoCapture.current,route == .diagnostics || route == .networkPrivacy,
+        guard let route = StageTwoCapture.current,route == .diagnostics || route == .networkPrivacy || route == .dataDeletion,
               let cache = FileManager.default.urls(for:.cachesDirectory,in:.userDomainMask).first else { return }
         var row = fields
         row["event"] = event; row["route"] = route.rawValue

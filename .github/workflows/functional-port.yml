@@ -51,17 +51,12 @@ jobs:
             -clonedSourcePackagesDirPath .local-checks/SourcePackages \
             -derivedDataPath .local-checks/DerivedData \
             CODE_SIGNING_ALLOWED=YES CODE_SIGN_IDENTITY=- build-for-testing 2>&1 | tee .local-checks/ci/debug-build.log
-      - name: Verify corrected decoder and modal interactions on the compiled application
+      - name: Diagnose the blocking deletion flow before the complete application checks
         id: corrected_scenarios
         if: ${{ always() && steps.debug_build.outcome == 'success' && steps.simulator_prepare.outcome == 'success' }}
         run: |
-          python3 scripts/test_simulator.py --use-built-tests \
+          python3 scripts/test_simulator.py --use-built-tests --only-ui \
             --prepared-device .local-checks/ci/prepared-device.json --keep-prepared-device \
-            --test EntrixyAppTests/CameraVideoProxyTests/testActualDASHDecoderDisplaysFramesFromProtectedManifestAndSegments \
-            --test EntrixyAppTests/CameraVideoProxyTests/testActualWebMDecoderDisplaysFramesThroughAuthenticatedHTTPBridge \
-            --test EntrixyAppTests/CameraVideoProxyTests/testDecoderMayAbandonAReadForASeekWithoutFailingCameraButRemoteErrorsStillFail \
-            --test EntrixyUITests/NavigationUITests/testAvatarPickerOpensFromAvatarAndKeepsObjectRow \
-            --test EntrixyUITests/NavigationUITests/testGuestPhoneRequestOffersExplicitCallAndDeclineWithoutTelephoneHandoff \
             --test EntrixyUITests/NavigationUITests/testServerDeletionRequiresConfirmationAndReportsPendingWithoutClaimingErasure \
             2>&1 | tee .local-checks/ci/corrected-scenarios.log
       - name: Compile normal Store Release and verify fixture and privacy isolation
@@ -106,6 +101,7 @@ jobs:
           path: |
             .local-checks/ci/*.log
             .local-checks/ci/*.json
+            .local-checks/ci/*.jsonl
             .local-checks/ci/iphone11/package.json
             .local-checks/ci/ui-failure-attachments/
           if-no-files-found: warn

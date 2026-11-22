@@ -94,10 +94,17 @@ struct DataDeletionForm: View {
             .task { guard !configured else { return }; configured = true; scope = receipt?.scope ?? (owner?.serverSettings?.accountEmail == nil ? .device : .account) }
             .onDisappear { password = ""; confirmation = "" }
             .onChange(of: phase) { if $0 != .active { password = ""; confirmation = "" } }
+            #if DEBUG && targetEnvironment(simulator)
+            .onChange(of:phase) { StageTwoInputTrace.record("deletion-form-phase",["phase":String(describing:$0)]) }
+            .onChange(of:password) { StageTwoInputTrace.record("deletion-password-input",["bytes":$0.utf8.count]) }
+            #endif
     }
     private func submit() {
         guard confirmation == "DELETE", !working else { return }; working = true; feedback = nil
         let secret = password, typed = confirmation; password = ""; confirmation = ""
+        #if DEBUG && targetEnvironment(simulator)
+        StageTwoInputTrace.record("deletion-form-submit",["passwordBytes":secret.utf8.count,"scope":scope.rawValue])
+        #endif
         Task { defer { working = false }; if !(await model.submitDataDeletion(server: server, scope: scope, password: secret, confirmation: typed)) { feedback = model.errorMessage; model.errorMessage = nil } }
     }
     private func refresh() {

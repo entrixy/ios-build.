@@ -1,3 +1,24 @@
+## Actual45015094443/public460a826:5/6PASS; credentials cause stillunknown
+
+Apple330Core/healthySim/DebugPASS; DASH/WebM/readabort+503/avatar/phoneallPASS.
+Deletionstillline975pendingstatusFAIL afterrealconfirmation/submit. Passwordtraits
+fixdoesNOTresolveonitsown. StageAPIprintdiagnosticnotinjoblogs becauseUIapplication
+stdoutnotstreamedtoXCTesttee; don'tpretendpasswordmatchknown. Artifact14752232154
+SHAaa0f47c10bd403607ee8c6a24fada86618d052ae2ce802c4209c0e9652c6faa3 verified/extracted
+.local-checks/iphone11-460-evidence; onlyAX/screen/eventattachments, noappstdout.
+
+Source diagnostic fix: existing StageTwoInputTrace nowallowsONLYisolateddata-deletion
+route inadditiondiagnostics/networkprivacy. Formrecordsinputbytecounts/phase/submit;
+modelrecordsreceipt/auth/result/errorTYPE, safecryptoenumonly; fakeAPIrecordsboolean
+matches/presence, NEVERsecret/token/identityvalue. CrossactorAPIrecordsuseMainActor.run.
+Workflowretains*.jsonl (omittedbyearlierpersonalrewriteso oldtracewouldn'tupload).
+Helperalreadycopiesfocused-native-input.jsonl afterexactselectedtest. Nextpreflight
+ONLYremainingdeletionUI (prior5alreadyPASS, no unneededrepeats); normalRelease/device
+IPA+WHOLE232hosted/34UI stillMANDATORYbeforeinstallartifact. No sourceauthweakened.
+30PythonPASS,Swiftparse/diffPASS; actualApplepending. NoIPAyet. Finishpackage+SHA+
+Windowsguide/download, no gallery/site/subagents. Don'tchangeproductlogicuntilactual
+trace provesfailure. Finaldocsonly[skip ci].
+
 ## Actual45012683504/public4c9541e:5/6focusPASS; deletion submit diagnostic
 
 Apple330CorePASS, healthySimPASS, Debug/allproductsSDKPASS. ActualDASHframesPASS,
