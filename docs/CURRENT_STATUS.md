@@ -1,3 +1,43 @@
+# Готовый IPA для личной проверки на iPhone 11 —22.11.2026
+
+[Скачать IPA и инструкцию Windows 11](https://github.com/entrixy/ios-build./actions/runs/45041835321/artifacts/14762611720).
+Пакет доступен до06.12.2026; после скачивания его можно хранить на компьютере.
+[Установка через Sideloadly](IPHONE11_WINDOWS_INSTALL.md): свой Apple Account,
+USB, бесплатная подпись на7дней, собственного Mac/платного Developer не требуется.
+Минимальная версия iOS16. Физическая проверка на телефоне пользователя — следующий шаг.
+
+Apple run45041835321 завершился SUCCESS. Скачаны и проверены настоящие байты IPA:
+23,948,017bytes, com.entrixy.ios, version0.1.0/build1, arm64/iphoneos, unsigned.
+IPA SHA256 `4a97f6cbb2fcf4bd0771c97f13ab953b5b9b2675ab8fbda9e8d53a05dbf380d4`.
+Исходник IPA public`ff107bb3a4c5921a66d24cb85b24a9a19b91941f` / native`32db6b0`.
+Внешний ZIP SHA256 `40d6e99234e2744073054c7211ac358133351dfed1436aa71dde876ff32acbbf`.
+Проверены package.json/source, внутренний SHA/размер/SHA256SUMS, настоящий
+Mach-O PLATFORM_IOS (не Simulator), framework камеры/лицензия, privacy manifest,
+отсутствие provisioning/signature, платных extensions и тестовых fixtures/bootstrap.
+
+Доказательства runtime составные, НЕ новый полный прогон при ff107bb:
+
+- c8b3b63/run45022342509:330Core/232hosted прошли;32из34UI прошли.
+- eebde4a/run45034724769: обе исправленные UI-ситуации (быстрый штрих маршрута,
+  ползунок срока BLE) прошли по2итерации с полными checkpoint assertions;
+  Core330, все SDK-продукты, обычный Store Release/privacy/isolation и physical
+  personal archive также прошли. Итог run failure связан со сборочным guard.
+- ff107bb/run45041835321: неизменность кода приложения/тестов и точные хеши обоих
+  архивов результатов проверены ДО генераторов; новый Debug comparison product,
+  physical arm64 Release/IPA/isolation и upload прошли. Без новых UI/галереи.
+  `runtime-coverage.json` явно хранит current_full_suite_rerun=false/current_ui_rerun=false.
+
+Бесплатный personal-профиль не включает APNs, widget/App Groups, Associated Domains
+и Access Wi-Fi Information. Обязательные проверки доступа не обходятся.
+Это готовый установочный пакет для личной проверки, не подписанный App Store выпуск.
+Остаются реальный iPhone/контроллеры/камера/фон, Developer/signing/Store,
+APNs/AASA и операционные условия server deletion из APP_STORE_READINESS.
+Обычный полный CI восстановлен после выдачи пакета, чтобы следующие сборки
+не зависели от временных архивов этой разовой проверки. Документирующий commit
+[skip ci] не меняет код приложения и не создаёт другой IPA.
+
+Ниже — история; старые pending/no-checks статусы не действуют.
+
 ## Verified UI and physical archive; packaging delivery correction
 
 Apple run45034724769/publiceebde4a9b3deb2a9d617e112151e3e16f3e6eae2:

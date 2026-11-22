@@ -1,3 +1,16 @@
+## Готовый пакет для iPhone 11 и Windows 11 —22.11.2026
+
+[Скачать IPA и инструкцию](https://github.com/entrixy/ios-build./actions/runs/45041835321/artifacts/14762611720)
+(доступен до06.12.2026). Установка: [Windows/Sideloadly](docs/IPHONE11_WINDOWS_INSTALL.md).
+Свой Apple Account, USB, iOS16+, бесплатная подпись на7дней; Mac не нужен.
+Исходник IPA public`ff107bb`/native`32db6b0`; Apple run45041835321 SUCCESS,
+реальный скачанный arm64 IPA/хеш/source/privacy/fixture-isolation проверены.
+Физическая приёмка ещё впереди; это personal-версия без платных capabilities,
+не готовая подпись App Store. Точная составная runtime-доказательная база и
+ограничения: [CURRENT_STATUS.md](docs/CURRENT_STATUS.md).
+
+Ниже сохранена история. Прежний запрет проверок и pending статусы отменены.
+
 ## Новый приоритет22.11: проверка и установочный IPA для iPhone11
 
 Пользователь явно разрешил собрать приложение сейчас, чтобы завтра установить
