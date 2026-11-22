@@ -151,6 +151,7 @@ import EntrixyCore
             if request.value(forHTTPHeaderField:"User-Agent") == nil { request.setValue("Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15",forHTTPHeaderField:"User-Agent") }
             if !playlistURL, let range = local.range { request.setValue(range,forHTTPHeaderField:"Range") }
             let (bytes,response) = try await session.bytes(for:request)
+            defer { bytes.task.cancel() }
             guard let http = response as? HTTPURLResponse, let finalURL = http.url, camera.allowsRedirect(to:finalURL) else { throw CameraStreamFailure.format }
             guard (200..<300).contains(http.statusCode) else { throw CameraStreamFailure.http(http.statusCode) }
             let mime = http.mimeType?.lowercased() ?? "application/octet-stream"
