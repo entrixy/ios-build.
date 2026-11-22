@@ -13,7 +13,7 @@ struct DataDeletionServersScreen: View {
             ForEach(owners, id: \.server) { owner in
                 Button { selected = DeletionServer(id: owner.server) } label: {
                     HStack { Text(owner.server); Spacer(); Image(systemName: "chevron.right") }
-                        .foregroundStyle(Brand.ink).frame(minHeight: 48)
+                        .foregroundStyle(Brand.ink).frame(minHeight: 48).contentShape(Rectangle())
                 }.buttonStyle(.plain).accessibilityIdentifier("data-deletion-server-" + owner.server)
             }
         }.scrollContentBackground(.hidden).background(Color(uiColor: .systemGroupedBackground))
