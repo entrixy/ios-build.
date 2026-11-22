@@ -69,7 +69,8 @@ struct DataDeletionForm: View {
                         if scope == .account {
                             Text(owner?.serverSettings?.accountEmail ?? "").font(.subheadline)
                             AppField(ProductText.string("account_password")) {
-                                SecureField(ProductText.string("account_password"), text: $password).textContentType(.password).serverField()
+                                SecureField(ProductText.string("account_password"), text: $password).textContentType(.password)
+                                    .textInputAutocapitalization(.never).autocorrectionDisabled().serverField()
                                     .accessibilityIdentifier("data-deletion-password")
                             }
                         }

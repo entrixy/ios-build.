@@ -1,3 +1,25 @@
+## Actual45012683504/public4c9541e:5/6focusPASS; deletion submit diagnostic
+
+Apple330CorePASS, healthySimPASS, Debug/allproductsSDKPASS. ActualDASHframesPASS,
+WebMframesPASS, localreadabort/nextrequest/upstream503PASS, avatarPASS, phonePASS.
+UIviewportfixWORKS: deletionformopens,password+DELETEtyped, realenabledsubmittapped.
+Onlyline975pendingstatusmissing. ActualPNG/AXshows PREPARED receipt andgeneric
+server-confirmationfailure; notsubmittedresult. Cause NOTYETproven; likelyfixture
+passworddiffersafterkeyboardinput. Model deletion tests previouslyallPASS butreal
+UI mustpass too; don'tweaken auth orpendingstatusassertions. Evidence14750508672
+SHA95a4b2c93b7247742714cbd85e398dcc29207fbabd752522e2e8e2274efded4e verified/extracted
+.local-checks/iphone11-4c9-evidence; actualPNGseen.
+
+Fixbatch inputtraits: accountpasswords (deletion/servers) andbackuppassphrases
+explicitnoautocap/noautocorrection, preserveUnicode andexactsecret. DEBUGsim-only
+StageDeletionAPI nowlogs ONLY booleans server/email/passwordmatch andbytecount,
+plusrequestsubmit/credentialpresence/tokenmatch; NEVERpassword/token itself. This
+makesnextactualauthfailurediagnosablewithoutguessing. Strictfixturechecksretained.
+Parse/diffPASS (NOTSDK), noCore/pipelinechanges so doNOTrerununchangedlocaltests.
+Neednew6focus thenRelease/deviceIPA/WHOLE suite. NoIPAyet. No furtherchangesuntil
+actualAppleevidence. No gallery/sitechanges/subagents. Windows11/iPhone11/free
+localSideloadlysigning, finishfile+SHA+usablelink. Finaldocsonly[skip ci].
+
 ## Actual row-fix run45006375794:4/5PASS; test viewport bug fixed
 
 Publicd84ba8f/native1708508: Apple330CorePASS, healthySimPASS, DebugSDK/allproducts
