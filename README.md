@@ -1,7 +1,7 @@
 ## Готовый пакет для iPhone 11 и Windows 11 —22.11.2026
 
-[Скачать IPA и инструкцию](https://github.com/entrixy/ios-build./actions/runs/45041835321/artifacts/14762611720)
-(доступен до06.12.2026). Установка: [Windows/Sideloadly](docs/IPHONE11_WINDOWS_INSTALL.md).
+[Скачать IPA и инструкцию](https://entrixy.com/uploads/ios-builds/Entrixy-iPhone11-Windows11-ff107bb.zip)
+(прямая загрузка без входа в GitHub). Установка: [Windows/Sideloadly](docs/IPHONE11_WINDOWS_INSTALL.md).
 Свой Apple Account, USB, iOS16+, бесплатная подпись на7дней; Mac не нужен.
 Исходник IPA public`ff107bb`/native`32db6b0`; Apple run45041835321 SUCCESS,
 реальный скачанный arm64 IPA/хеш/source/privacy/fixture-isolation проверены.
